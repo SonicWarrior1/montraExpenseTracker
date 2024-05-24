@@ -1,0 +1,90 @@
+{
+  "project_info": {
+    "project_number": "426728684733",
+    "project_id": "montra-e9c39",
+    "storage_bucket": "montra-e9c39.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:426728684733:android:93c1e3b3715432b6bf4bd4",
+        "android_client_info": {
+          "package_name": "com.montra"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "426728684733-08hbgavcdljaclium152ea992drr4ev3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBm6yLO887WdwLQuhhQHgmkhVy0gT26IRY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "426728684733-08hbgavcdljaclium152ea992drr4ev3.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "426728684733-410aobpj259e4pctj4k1njle02032ads.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "org.reactjs.native.example.montraExpenseTracker"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:426728684733:android:f1da7c4ea451e26fbf4bd4",
+        "android_client_info": {
+          "package_name": "com.montraexpensetracker"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "426728684733-0b2rehl50p5d06qlebd6b97h49ls4ptc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.montraexpensetracker",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "426728684733-08hbgavcdljaclium152ea992drr4ev3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBm6yLO887WdwLQuhhQHgmkhVy0gT26IRY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "426728684733-08hbgavcdljaclium152ea992drr4ev3.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "426728684733-410aobpj259e4pctj4k1njle02032ads.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "org.reactjs.native.example.montraExpenseTracker"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
