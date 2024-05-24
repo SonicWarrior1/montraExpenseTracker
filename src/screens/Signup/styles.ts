@@ -6,28 +6,21 @@ const styles = StyleSheet.create({
     mainView: {
         flex: 1,
         justifyContent: "center",
+        alignItems: "center",
         paddingHorizontal: 20
     },
-    text1: {
-        fontSize: 32,
-        textAlign: "center",
-        fontWeight: "bold"
+    orText: {
+        fontWeight: "bold",
+        color: COLORS.DARK[25]
     },
-    text2: {
-        fontSize: 16,
-        textAlign: "center",
-        color: "grey"
-    },
-    carouselCtr: { paddingHorizontal: 20 },
-    progressDotCtr: {
-        flexDirection: 'row',
-        gap: 20,
+    btn: {
+        width: '100%',
+        height: 50,
         justifyContent: 'center',
         alignItems: 'center',
-    },
-    progressDot: {
-
         borderRadius: 10,
-    },
+        borderWidth: 1, 
+        borderColor: COLORS.DARK[25]
+    }, text: { fontWeight: 'bold', fontSize: 16 }
 })
 export default styles
