@@ -84,6 +84,23 @@ export function EmailValError({
     </>
   );
 }
+export function EmailEmptyError({
+  email,
+  formKey,
+}: Readonly<{
+  email: string;
+  formKey: boolean;
+}>) {
+  return (
+    <>
+      <Sapcer height={10} />
+
+      {email === '' && formKey && (
+        <Text style={style.error}>Email cannot be Empty</Text>
+      )}
+    </>
+  );
+}
 
 export function NameValError({
   name,
@@ -112,6 +129,6 @@ const style = StyleSheet.create({
     paddingLeft: 12,
     marginTop: -5,
     marginBottom: 10,
-    alignSelf:"flex-start"
+    alignSelf: 'flex-start',
   },
 });

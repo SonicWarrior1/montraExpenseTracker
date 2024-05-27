@@ -7,6 +7,7 @@ import store, {persistor} from './redux/store';
 import {PersistGate} from 'redux-persist/integration/react';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import Loader from './components/Loader';
+import Toast from 'react-native-toast-message';
 
 GoogleSignin.configure();
 
@@ -18,6 +19,7 @@ function App(): React.JSX.Element {
           <Loader>
             <NavigationContainer>
               <RootNavigator />
+              <Toast/>
             </NavigationContainer>
           </Loader>
         </PersistGate>

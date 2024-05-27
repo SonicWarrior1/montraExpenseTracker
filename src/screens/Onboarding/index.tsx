@@ -5,7 +5,7 @@ import Carousel from 'react-native-reanimated-carousel';
 import {ICONS} from '../../constants/icons';
 import styles from './styles';
 import CustomButton from '../../components/CustomButton';
-import {STRINGS} from '../../constants/strings';
+import {NAVIGATION, STRINGS} from '../../constants/strings';
 import {COLORS} from '../../constants/commonStyles';
 import {OnboardingScreenProps} from '../../defs/navigation';
 import Sapcer from '../../components/Spacer';
@@ -14,14 +14,14 @@ const screenHeight = Dimensions.get('screen').height;
 const data = [
   {
     icon: (
-      <ICONS.Onboard1 height={screenWidth * 0.8} width={screenWidth * 0.8} />
+      <ICONS.Onboard1 height={screenWidth * 0.75} width={screenWidth * 0.65} />
     ),
     text1: 'Gain total control of your money',
     text2: 'Become your own money manager and make every cent count',
   },
   {
     icon: (
-      <ICONS.Onboard2 height={screenWidth * 0.8} width={screenWidth * 0.8} />
+      <ICONS.Onboard2 height={screenWidth * 0.75} width={screenWidth * 0.65} />
     ),
     text1: 'Know where your money goes',
     text2:
@@ -29,15 +29,18 @@ const data = [
   },
   {
     icon: (
-      <ICONS.Onboard3 height={screenWidth * 0.8} width={screenWidth * 0.8} />
+      <ICONS.Onboard3 height={screenWidth * 0.75} width={screenWidth * 0.65} />
     ),
     text1: 'Planning ahead',
     text2: 'Setup your budget for each category so you in control',
   },
 ];
-function Onboarding({navigation}: OnboardingScreenProps) {
+function Onboarding({navigation}: Readonly<OnboardingScreenProps>) {
   function handleSignup() {
-    navigation.navigate('Signup');
+    navigation.navigate(NAVIGATION.SIGNUP);
+  }
+  function handleLogin() {
+    navigation.navigate(NAVIGATION.LOGIN);
   }
   const [index, setIndex] = useState(0);
   return (
@@ -45,7 +48,7 @@ function Onboarding({navigation}: OnboardingScreenProps) {
       <View style={styles.mainView}>
         <Carousel
           loop={false}
-          width={screenWidth}
+          width={screenWidth - 40}
           height={screenHeight * 0.6}
           data={data}
           scrollAnimationDuration={1000}
@@ -88,7 +91,7 @@ function Onboarding({navigation}: OnboardingScreenProps) {
         <Sapcer height={screenHeight * 0.025} />
         <CustomButton
           title={STRINGS.LOGIN}
-          onPress={() => {}}
+          onPress={handleLogin}
           backgroundColor={COLORS.SECONDARY.VIOLET}
           textColor={COLORS.PRIMARY.VIOLET}
         />

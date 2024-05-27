@@ -1,8 +1,10 @@
 import React from 'react';
 import {ActivityIndicator, View} from 'react-native';
+import { useAppSelector } from '../../redux/store';
 
 function Loader({children}: Readonly<{children: React.JSX.Element}>) {
-  return false ? (
+  const isLoading=useAppSelector(state=>state.user.loading);
+  return isLoading ? (
     <>
       {children}
       <View

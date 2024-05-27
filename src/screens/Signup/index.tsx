@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {
-  ActivityIndicator,
+  Pressable,
   SafeAreaView,
   ScrollView,
   Text,
@@ -23,6 +23,7 @@ import CustomButton from '../../components/CustomButton';
 import {
   emailRegex,
   nameRegex,
+  NAVIGATION,
   passRegex,
   STRINGS,
 } from '../../constants/strings';
@@ -30,16 +31,19 @@ import {COLORS} from '../../constants/commonStyles';
 import {ICONS} from '../../constants/icons';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
-import {User} from '../../defs/user.ts';
+import {UserFromJson, UserToJson} from '../../defs/user.ts';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
-function Signup() {
-
+import {SignupScreenProps} from '../../defs/navigation';
+import {setLoading, userLoggedIn} from '../../redux/reducers/userSlice.ts';
+import {useAppDispatch} from '../../redux/store/index.ts';
+import Toast from 'react-native-toast-message';
+function Signup({navigation}: SignupScreenProps) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [pass, setPass] = useState('');
   const [confirmPass, setconfirmPass] = useState('');
   const [checked, setChecked] = useState(false);
-  const [loading, setLoading] = useState(false);
+
   function onChangeName(str: string) {
     setName(str);
   }
@@ -52,6 +56,7 @@ function Signup() {
   function onChangeConfirmPass(str: string) {
     setconfirmPass(str);
   }
+  const dispatch = useAppDispatch();
 
   async function handleSignup() {
     setForm(true);
@@ -65,74 +70,67 @@ function Signup() {
       checked
     ) {
       try {
-        setLoading(true);
+        dispatch(setLoading(true));
         const creds = await auth().createUserWithEmailAndPassword(email, pass);
         if (creds) {
           await firestore()
             .collection('users')
             .doc(creds.user.uid)
-            .set(User({name: name, email: email, uid: creds.user.uid}));
+            .set(
+              UserToJson({
+                name: name,
+                email: email,
+                uid: creds.user.uid,
+                pin: '',
+              }),
+            );
+          dispatch(setLoading(false));
+          Toast.show({text1: STRINGS.SignupSuccesful});
+          navigation.replace(NAVIGATION.LOGIN);
         }
       } catch (e) {
         console.log(e);
+        dispatch(setLoading(false));
       }
-      setLoading(false);
     }
   }
-//   async function onGoogleButtonPress() {
-//     try {
-//       // Check if your device supports Google Play
-//       await GoogleSignin.hasPlayServices({showPlayServicesUpdateDialog: true});
-//       // Get the users ID token
-//       const {idToken} = await GoogleSignin.signIn();
-
-//       // Create a Google credential with the token
-//       const googleCredential = auth.GoogleAuthProvider.credential(idToken);
-
-//       // Sign-in the user with the credential
-//       const creds = await auth().signInWithCredential(googleCredential);
-//       //   if (creds) {
-//       //     const res = await firestore()
-//       //       .collection('users')
-//       //       .doc(creds.user.uid)
-//       //       .get();
-//       //     if (!res.exists) {
-//       //     //   const user: User = {
-//       //     //     firstName: creds.user.displayName?.split(' ')[0]!,
-//       //     //     lastName: creds.user.displayName?.split(' ')[1]!,
-//       //     //     email: creds.user.email!,
-//       //     //     phone: creds.user.phoneNumber ?? '1234567890',
-//       //     //     uid: creds.user.uid,
-//       //     //     image: creds.user.photoURL!,
-//       //     //     dob: Timestamp.now(),
-//       //     //   };
-//       //       await firestore().collection('users').doc(creds.user.uid).set(user);
-//       //     //   dispatch(
-//       //     //     setCurrentUser({
-//       //     //       ...user,
-//       //     //       dob: (user.dob as Timestamp)?.toDate().toLocaleDateString(),
-//       //     //     }),
-//       //     //   );
-//       //     } else {
-//       //       const data = await firestore()
-//       //         .collection('users')
-//       //         .doc(creds.user.uid)
-//       //         .get();
-//       //       const user = data.data();
-//       //     //   if (user) {
-//       //     //     dispatch(
-//       //     //       setCurrentUser({
-//       //     //         ...user,
-//       //     //         dob: user.dob?.toDate().toLocaleDateString(),
-//       //     //       }),
-//       //     //     );
-//       //     //   }
-//       //     }
-//       //   }
-//     } catch (e) {
-//       console.log(e);
-//     }
-//   }
+  async function onGoogleButtonPress() {
+    try {
+      dispatch(setLoading(true));
+      await GoogleSignin.hasPlayServices({showPlayServicesUpdateDialog: true});
+      const {idToken} = await GoogleSignin.signIn();
+      const googleCredential = auth.GoogleAuthProvider.credential(idToken);
+      const creds = await auth().signInWithCredential(googleCredential);
+      if (creds) {
+        const res = await firestore()
+          .collection('users')
+          .doc(creds.user.uid)
+          .get();
+        if (!res.exists) {
+          const user = UserToJson({
+            name: creds.user.displayName!,
+            email: creds.user.email!,
+            uid: creds.user.uid,
+            pin: '',
+          });
+          await firestore().collection('users').doc(creds.user.uid).set(user);
+          dispatch(userLoggedIn(user));
+        } else {
+          const data = await firestore()
+            .collection('users')
+            .doc(creds.user.uid)
+            .get();
+          const user = UserFromJson(data.data()!);
+          if (user) {
+            dispatch(userLoggedIn(user));
+          }
+        }
+      }
+    } catch (e) {
+      console.log(e);
+    }
+    dispatch(setLoading(false));
+  }
   const [form, setForm] = useState(false);
   return (
     <SafeAreaView style={styles.safeView}>
@@ -143,14 +141,14 @@ function Signup() {
         }}>
         <View style={styles.mainView}>
           <CustomInput
-            placeholderText="Name"
+            placeholderText={STRINGS.Name}
             onChangeText={onChangeName}
             type="name"
             value={name}
           />
           <NameValError name={name} formKey={form} />
           <CustomInput
-            placeholderText="Email"
+            placeholderText={STRINGS.Email}
             onChangeText={onChangeEmail}
             type="email"
             value={email}
@@ -158,13 +156,13 @@ function Signup() {
           <EmailValError email={email} formKey={form} />
           <CustomPassInput
             onChangeText={onChangePass}
-            placeholderText="Password"
+            placeholderText={STRINGS.Password}
             value={pass}
           />
           <PassValidationError pass={pass} formKey={form} />
           <CustomPassInput
             onChangeText={onChangeConfirmPass}
-            placeholderText="Confirm Password"
+            placeholderText={STRINGS.ConfrimPassword}
             value={confirmPass}
           />
           <ConfirmPassError
@@ -184,14 +182,13 @@ function Signup() {
             onPress={(isChecked: boolean) => {
               setChecked(isChecked);
             }}
-            //   ref={ref}
             isChecked={checked}
             textComponent={
               <View style={{flex: 1, marginLeft: 16}}>
                 <Text style={{}}>
-                  By signing up, you agree to the{' '}
+                  {STRINGS.BySigningUp}{' '}
                   <Text style={{color: COLORS.PRIMARY.VIOLET}}>
-                    Terms of Service and Privacy Policy
+                    {STRINGS.Terms}
                   </Text>
                 </Text>
               </View>
@@ -199,30 +196,31 @@ function Signup() {
             disableText={false}
           />
           <Sapcer height={20} />
-          {loading ? (
-            <ActivityIndicator size={30} />
-          ) : (
-            <CustomButton title={STRINGS.SIGNUP} onPress={handleSignup} />
-          )}
+          <CustomButton title={STRINGS.SIGNUP} onPress={handleSignup} />
           <Sapcer height={10} />
-          <Text style={styles.orText}>Or With</Text>
+          <Text style={styles.orText}>{STRINGS.OrWith}</Text>
           <Sapcer height={10} />
-          <TouchableOpacity onPress={()=>{}} style={[styles.btn]}>
-            <View style={{flexDirection: 'row', alignItems: 'center', gap: 20}}>
+          <TouchableOpacity onPress={onGoogleButtonPress} style={[styles.btn]}>
+            <View style={styles.googleBtn}>
               {ICONS.Google({height: 25, width: 25})}
-              <Text style={[styles.text]}>Sign Up with Google</Text>
+              <Text style={styles.text}>{STRINGS.SignupWithGoogle}</Text>
             </View>
           </TouchableOpacity>
           <Sapcer height={10} />
           <Text style={{color: COLORS.DARK[25]}}>
-            Already have an Account?{' '}
-            <Text
-              style={{
-                color: COLORS.PRIMARY.VIOLET,
-                textDecorationLine: 'underline',
+            {STRINGS.AlreadyHaveAccount}{' '}
+            <Pressable
+              onPress={() => {
+                navigation.navigate(NAVIGATION.LOGIN);
               }}>
-              Login
-            </Text>
+              <Text
+                style={{
+                  color: COLORS.PRIMARY.VIOLET,
+                  textDecorationLine: 'underline',
+                }}>
+                {STRINGS.LOGIN}
+              </Text>
+            </Pressable>
           </Text>
         </View>
       </ScrollView>

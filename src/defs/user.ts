@@ -1,20 +1,34 @@
-type User = {
+import { FirebaseFirestoreTypes } from "@react-native-firebase/firestore";
+
+export type UserType = {
     name: string,
     email: string,
-    uid: string
+    uid: string,
+    pin: string
 }
-export function User({
+export function UserToJson({
     uid,
     name,
     email,
+    pin
 }: {
     uid: string;
     name: string;
     email: string;
-}): User {
+    pin: string
+}): UserType {
     return {
         uid: uid,
         name: name,
         email: email,
+        pin: pin
     };
+}
+export function UserFromJson(json: FirebaseFirestoreTypes.DocumentData): UserType {
+    return {
+        uid: json.uid,
+        email: json.email,
+        name: json.name,
+        pin: json.pin ?? ''
+    }
 }
