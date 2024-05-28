@@ -10,13 +10,19 @@ import Google from '../assets/Svgs/google.svg';
 import ArrowLeft from '../assets/Svgs/arrow left.svg';
 import EmailSent from '../assets/Svgs/emailSent.svg';
 import Home from '../assets/Svgs/home.svg';
-import Transaction from '../assets/Svgs/Transaction.svg';
+import Transaction from '../assets/Svgs/transaction.svg';
 import Pie from '../assets/Svgs/pie-chart.svg';
 import Close from '../assets/Svgs/close.svg';
 import Income from '../assets/Svgs/income.svg';
 import Expense from '../assets/Svgs/expense.svg';
 import Transfer from '../assets/Svgs/currency-exchange.svg';
 import Attachment from '../assets/Svgs/attachment.svg';
+import Camera from '../assets/Svgs/camera.svg';
+import Document from '../assets/Svgs/file.svg';
+import Gallery from '../assets/Svgs/gallery.svg';
+import Filter from '../assets/Svgs/sort.svg';
+import ArrowDown from '../assets/Svgs/arrow down.svg';
+import ArrowRight from '../assets/Svgs/arrow-right.svg';
 const iconStyle = (
   { width = 0,
     height = 0,
@@ -48,4 +54,10 @@ export const ICONS = {
   Expense: (params: iconProps) => Expense({ ...iconStyle({ ...params }) }),
   Transfer: (params: iconProps) => Transfer({ ...iconStyle({ ...params }) }),
   Attachment: (params: iconProps) => Attachment({ ...iconStyle({ ...params }) }),
+  Camera: (params: iconProps) => Camera({ ...iconStyle({ ...params }) }),
+  Document: (params: iconProps) => Document({ ...iconStyle({ ...params }) }),
+  Gallery: (params: iconProps) => Gallery({ ...iconStyle({ ...params }) }),
+  Filter: (params: iconProps) => Filter({ ...iconStyle({ ...params }) }),
+  ArrowDown: (params: iconProps) => ArrowDown({ ...iconStyle({ ...params }) }),
+  ArrowRight: (params: iconProps) => ArrowRight({ ...iconStyle({ ...params }) }),
 };

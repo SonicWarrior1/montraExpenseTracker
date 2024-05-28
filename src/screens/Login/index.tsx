@@ -22,9 +22,9 @@ import firestore from '@react-native-firebase/firestore';
 import {setLoading, userLoggedIn} from '../../redux/reducers/userSlice';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import {useAppDispatch} from '../../redux/store';
-import {UserFromJson, UserToJson, UserType} from '../../defs/user';
+import {UserFromJson, UserToJson} from '../../defs/user';
 
-function Login({navigation}: LoginScreenProps) {
+function Login({navigation}: Readonly<LoginScreenProps>) {
   const [email, setEmail] = useState('');
   const [pass, setPass] = useState('');
   const [form, setForm] = useState(false);
@@ -39,6 +39,7 @@ function Login({navigation}: LoginScreenProps) {
     setForm(true);
     if (email !== '' && pass !== '') {
       try {
+        dispatch(setLoading(true));
         const creds = await auth().signInWithEmailAndPassword(email, pass);
         if (creds) {
           const data = await firestore()
@@ -48,21 +49,11 @@ function Login({navigation}: LoginScreenProps) {
           const user = UserFromJson(data.data()!);
           console.log(user);
           dispatch(userLoggedIn(user));
-        //   if (user.pin === '') {
-        //     navigation.reset({
-        //       index: 0,
-        //       routes: [{name: NAVIGATION.PIN, params: {setup: true}}],
-        //     });
-        //   } else {
-        //     navigation.reset({
-        //       index: 0,
-        //       routes: [{name: NAVIGATION.PIN, params: {setup: false}}],
-        //     });
-        //   }
         }
       } catch (e) {
         console.log(e);
       }
+      dispatch(setLoading(false));
     }
   }
   async function onGoogleButtonPress() {

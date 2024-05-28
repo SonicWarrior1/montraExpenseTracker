@@ -56,6 +56,7 @@ function CustomTab(props: Readonly<BottomTabBarProps>): React.JSX.Element {
       deg.value = withTiming('-45deg');
     }
   }
+
   return (
     <View style={styles.tabCtr}>
       <TabButton
@@ -64,18 +65,20 @@ function CustomTab(props: Readonly<BottomTabBarProps>): React.JSX.Element {
           props.navigation.navigate('Home');
         }}
         title="Home"
+        isActive={props.state.index === 0}
       />
       <TabButton
         icon={ICONS.Transaction}
         onPress={() => {
-          props.navigation.navigate('Home');
+          props.navigation.navigate('Transaction');
         }}
         title="Transaction"
+        isActive={props.state.index === 1}
       />
       <AnimatedBtn
         icon={ICONS.Expense}
         onPress={() => {
-          props.navigation.navigate(NAVIGATION.AddExpense);
+          props.navigation.navigate(NAVIGATION.AddExpense, {type: 'expense'});
         }}
         translateX={translate3X}
         translateY={translate3Y}
@@ -90,7 +93,9 @@ function CustomTab(props: Readonly<BottomTabBarProps>): React.JSX.Element {
       />
       <AnimatedBtn
         icon={ICONS.Income}
-        onPress={() => {}}
+        onPress={() => {
+          props.navigation.navigate(NAVIGATION.AddExpense, {type: 'income'});
+        }}
         translateX={translate1X}
         translateY={translate1Y}
         backgrounColor={COLORS.PRIMARY.GREEN}
@@ -110,6 +115,7 @@ function CustomTab(props: Readonly<BottomTabBarProps>): React.JSX.Element {
           props.navigation.navigate('Home');
         }}
         title="Budget"
+        isActive={props.state.index === 3}
       />
       <TabButton
         icon={ICONS.User}
@@ -117,6 +123,7 @@ function CustomTab(props: Readonly<BottomTabBarProps>): React.JSX.Element {
           props.navigation.navigate('Home');
         }}
         title="Profile"
+        isActive={props.state.index === 4}
       />
     </View>
   );
@@ -150,7 +157,7 @@ function AnimatedBtn({
       <Pressable
         style={[styles.animatedBtn, {backgroundColor: backgrounColor}]}
         onPress={onPress}>
-        {icon({height: 30, width: 30})}
+        {icon({height: 30, width: 30, color: 'green'})}
       </Pressable>
     </Animated.View>
   );

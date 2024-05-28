@@ -7,11 +7,13 @@ function CustomDropdown({
   onChange,
   value,
   placeholder,
+  onFocus
 }: Readonly<{
   data: Array<any>;
   onChange: (item: any) => void;
   value: any;
   placeholder: string;
+  onFocus?:()=>void
 }>) {
   return (
     <Dropdown
@@ -30,6 +32,7 @@ function CustomDropdown({
       value={value}
       onChange={onChange}
       valueField={'value'}
+      onFocus={onFocus}
     />
   );
 }

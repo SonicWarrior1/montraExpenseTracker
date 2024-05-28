@@ -58,7 +58,7 @@ function RootNavigator(): React.JSX.Element {
               headerShown: true,
               headerTransparent: true,
               headerTitleStyle: {color: 'white'},
-              title: 'Expense',
+              
               headerLeft: (props: HeaderBackButtonProps) => {
                 return (
                   <Pressable

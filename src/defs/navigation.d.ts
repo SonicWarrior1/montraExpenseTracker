@@ -8,11 +8,11 @@ export type RootStackParamList = {
     ForgotPassword: undefined,
     ForgotEmailSent: { email: string },
     Pin: { setup?: boolean, pin?: string }
-    AddExpense:undefined
+    AddExpense: { type: 'expense' | 'income' }
 }
 
-export type BottomParamList={
-    Home:undefined
+export type BottomParamList = {
+    Home: undefined
 }
 
 export type OnboardingScreenProps = NativeStackScreenProps<RootStackParamList, 'Onboarding'>
@@ -21,3 +21,4 @@ export type LoginScreenProps = NativeStackScreenProps<RootStackParamList, 'Login
 export type ForgotScreenProps = NativeStackScreenProps<RootStackParamList, 'ForgotPassword'>
 export type ForgotSentScreenProps = NativeStackScreenProps<RootStackParamList, 'ForgotEmailSent'>
 export type PinSentScreenProps = NativeStackScreenProps<RootStackParamList, 'Pin'>
+export type ExpenseScreenProps = NativeStackScreenProps<RootStackParamList, 'AddExpense'>

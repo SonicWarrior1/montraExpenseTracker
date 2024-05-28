@@ -42,6 +42,10 @@
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>Allow access to the Camera for taking images</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Allow access to the photo library for selecting images</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string></string>
 	<key>UILaunchStoryboardName</key>

@@ -15,6 +15,8 @@ function CustomInput({
   inputColor = COLORS.PRIMARY.DARK,
   onBlur,
   flex,
+  editable,
+  onPress,
 }: Readonly<{
   value: string;
   onChangeText: (str: string) => void;
@@ -24,6 +26,8 @@ function CustomInput({
   inputColor?: string;
   onBlur?: (e: NativeSyntheticEvent<TextInputFocusEventData>) => void;
   flex?: number;
+  editable?: boolean;
+  onPress?: () => void;
 }>) {
   return (
     <TextInput
@@ -37,6 +41,8 @@ function CustomInput({
       autoCorrect={false}
       maxLength={maxLength}
       onBlur={onBlur}
+      editable={editable}
+      onPress={onPress}
     />
   );
 }

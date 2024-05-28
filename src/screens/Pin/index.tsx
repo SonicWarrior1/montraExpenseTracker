@@ -7,7 +7,7 @@ import {COLORS} from '../../constants/commonStyles';
 import {PinSentScreenProps} from '../../defs/navigation';
 import {NAVIGATION} from '../../constants/strings';
 import {useAppDispatch, useAppSelector} from '../../redux/store';
-import {userLoggedIn} from '../../redux/reducers/userSlice';
+import {setLoading, userLoggedIn} from '../../redux/reducers/userSlice';
 import firestore from '@react-native-firebase/firestore';
 function Pin({route, navigation}: PinSentScreenProps) {
   const matrix = [

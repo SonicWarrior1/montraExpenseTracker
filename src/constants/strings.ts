@@ -10,7 +10,7 @@ export const NAVIGATION: {
     Transaction: 'Transaction',
     Budget: 'Budget',
     Profile: 'Profile',
-    AddExpense:'AddExpense'
+    AddExpense: 'AddExpense'
 } = {
     ONBOARDING: 'Onboarding',
     SIGNUP: 'Signup',
@@ -23,7 +23,7 @@ export const NAVIGATION: {
     Transaction: 'Transaction',
     Budget: 'Budget',
     Profile: 'Profile',
-    AddExpense:'AddExpense'
+    AddExpense: 'AddExpense'
 }
 
 export const STRINGS = {
@@ -51,3 +51,27 @@ export const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w]{1,}$/;
 export const nameRegex = /^[a-zA-Z ]*$/;
 export const passRegex =
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+export const monthData = [
+    { label: 'January', value: 1 },
+    { label: 'February', value: 2 },
+    { label: 'March', value: 3 },
+    { label: 'April', value: 4 },
+    { label: 'May', value: 5 },
+    { label: 'June', value: 6 },
+    { label: 'July', value: 7 },
+    { label: 'August', value: 8 },
+    { label: 'September', value: 9 },
+    { label: 'October', value: 10 },
+    { label: 'November', value: 11 },
+    { label: 'December', value: 12 },
+];
+export const weekData = [
+    { label: 'Sunday', value: 0 },
+    { label: 'Monday', value: 1 },
+    { label: 'Tuesday', value: 2 },
+    { label: 'Wednesday', value: 3 },
+    { label: 'Thursday', value: 4 },
+    { label: 'Friday', value: 5 },
+    { label: 'Saturday', value: 6 },
+]
