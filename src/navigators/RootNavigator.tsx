@@ -10,23 +10,28 @@ import {useNavigation} from '@react-navigation/native';
 import Login from '../screens/Login';
 import {HeaderBackButtonProps} from '@react-navigation/native-stack/lib/typescript/src/types';
 import {useAppSelector} from '../redux/store';
-import Home from '../screens/Home';
 import ForgotPassword from '../screens/ForgotPassword';
 import ForgotEmailSent from '../screens/ForgotEmailSent';
 import Pin from '../screens/Pin';
 import BottomTabNavigator from './BottomTabNavigator';
 import AddExpense from '../screens/AddExpense';
+import TransactionDetails from '../screens/TransactionDetails';
 export const Stack = createNativeStackNavigator<RootStackParamList>();
 
 function RootNavigator(): React.JSX.Element {
   const navigation = useNavigation(); // Use useNavigation hook to get navigation prop
-  function headerLeft({canGoBack}: HeaderBackButtonProps) {
+  function headerLeft({canGoBack}: HeaderBackButtonProps, color: string) {
     return canGoBack ? (
       <Pressable
         onPress={() => {
           navigation.goBack();
         }}>
-        {ICONS.ArrowLeft({height: 20, width: 20})}
+        {ICONS.ArrowLeft({
+          height: 20,
+          width: 20,
+          color: color,
+          borderColor: color,
+        })}
       </Pressable>
     ) : undefined;
   }
@@ -38,7 +43,7 @@ function RootNavigator(): React.JSX.Element {
         headerBackTitleVisible: false,
         headerTitleAlign: 'center',
         headerShadowVisible: false,
-        headerLeft: headerLeft,
+        headerLeft: props => headerLeft(props, 'black'),
       }}>
       {isLoggedIn ? (
         <Stack.Group>
@@ -58,17 +63,18 @@ function RootNavigator(): React.JSX.Element {
               headerShown: true,
               headerTransparent: true,
               headerTitleStyle: {color: 'white'},
-              
-              headerLeft: (props: HeaderBackButtonProps) => {
-                return (
-                  <Pressable
-                    onPress={() => {
-                      navigation.goBack();
-                    }}>
-                    <Text style={{fontSize: 30, color: 'white'}}>←</Text>
-                  </Pressable>
-                );
-              },
+              headerLeft: props => headerLeft(props, 'white'),
+            }}
+          />
+          <Stack.Screen
+            name={NAVIGATION.TransactionDetail}
+            component={TransactionDetails}
+            options={{
+              headerShown: true,
+              headerTransparent: true,
+              headerTitleStyle: {color: 'white'},
+              title: 'Detail Transaction',
+              headerLeft: props => headerLeft(props, 'white'),
             }}
           />
         </Stack.Group>

@@ -1,12 +1,13 @@
 import React from 'react';
-import {Dimensions, Pressable, View} from 'react-native';
-import {COLORS} from '../../constants/commonStyles';
+import {Pressable, View} from 'react-native';
 import {ICONS} from '../../constants/icons';
 import {Dropdown} from 'react-native-element-dropdown';
-import {BottomTabHeaderProps} from '@react-navigation/bottom-tabs';
 import styles from './styles';
+import {useAppDispatch} from '../../redux/store';
+import { openFilterSheet } from '../../redux/reducers/transactionSlice';
 
-function TransactionHeader(props: Readonly<BottomTabHeaderProps>) {
+function TransactionHeader() {
+  const dispatch = useAppDispatch();
   return (
     <View style={styles.header}>
       <Dropdown
@@ -24,7 +25,10 @@ function TransactionHeader(props: Readonly<BottomTabHeaderProps>) {
         onChange={() => {}}
       />
       <Pressable
-        style={styles.filterBtn}>
+        style={styles.filterBtn}
+        onPress={() => {
+          dispatch(openFilterSheet(true));
+        }}>
         {ICONS.Filter({height: 20, width: 20})}
       </Pressable>
     </View>

@@ -23,6 +23,7 @@ import Gallery from '../assets/Svgs/gallery.svg';
 import Filter from '../assets/Svgs/sort.svg';
 import ArrowDown from '../assets/Svgs/arrow down.svg';
 import ArrowRight from '../assets/Svgs/arrow-right.svg';
+import Trash from '../assets/Svgs/trash.svg';
 const iconStyle = (
   { width = 0,
     height = 0,
@@ -60,4 +61,5 @@ export const ICONS = {
   Filter: (params: iconProps) => Filter({ ...iconStyle({ ...params }) }),
   ArrowDown: (params: iconProps) => ArrowDown({ ...iconStyle({ ...params }) }),
   ArrowRight: (params: iconProps) => ArrowRight({ ...iconStyle({ ...params }) }),
+  Trash: (params: iconProps) => Trash({ ...iconStyle({ ...params }) }),
 };

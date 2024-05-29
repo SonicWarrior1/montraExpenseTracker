@@ -10,7 +10,8 @@ export const NAVIGATION: {
     Transaction: 'Transaction',
     Budget: 'Budget',
     Profile: 'Profile',
-    AddExpense: 'AddExpense'
+    AddExpense: 'AddExpense',
+    TransactionDetail:'TransactionDetail'
 } = {
     ONBOARDING: 'Onboarding',
     SIGNUP: 'Signup',
@@ -23,7 +24,8 @@ export const NAVIGATION: {
     Transaction: 'Transaction',
     Budget: 'Budget',
     Profile: 'Profile',
-    AddExpense: 'AddExpense'
+    AddExpense: 'AddExpense',
+    TransactionDetail:'TransactionDetail'
 }
 
 export const STRINGS = {
@@ -74,4 +76,13 @@ export const weekData = [
     { label: 'Thursday', value: 4 },
     { label: 'Friday', value: 5 },
     { label: 'Saturday', value: 6 },
+]
+export const expenseCat = [
+    { label: 'Food', value: 'food' },
+    { label: 'Bill', value: 'bill' },
+    { label: 'Shopping', value: 'shopping' },
+]
+export const incomeCat = [
+    { label: 'Salary', value: 'salary' },
+    { label: 'Passive Income', value: 'passive income' },
 ]

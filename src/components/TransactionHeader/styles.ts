@@ -4,7 +4,7 @@ const screenHeight = Dimensions.get('screen').height;
 const styles = StyleSheet.create({
     header: {
         backgroundColor: 'white',
-        height: screenHeight * 0.13,
+        height: screenHeight * 0.06,
         width: '100%',
         flexDirection: 'row',
         alignItems: 'flex-end',

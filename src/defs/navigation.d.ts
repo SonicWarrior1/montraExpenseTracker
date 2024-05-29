@@ -1,4 +1,7 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack"
+import { transactionType } from "./transaction"
+import { CompositeScreenProps } from "@react-navigation/native"
+import { BottomTabScreenProps } from "@react-navigation/bottom-tabs"
 
 export type RootStackParamList = {
     Onboarding: undefined,
@@ -8,11 +11,13 @@ export type RootStackParamList = {
     ForgotPassword: undefined,
     ForgotEmailSent: { email: string },
     Pin: { setup?: boolean, pin?: string }
-    AddExpense: { type: 'expense' | 'income' }
+    AddExpense: { type: 'expense' | 'income' | 'transfer', isEdit: boolean, transaction?: transactionType }
+    TransactionDetail: { transaction: transactionType }
 }
 
 export type BottomParamList = {
     Home: undefined
+    Transaction: undefined
 }
 
 export type OnboardingScreenProps = NativeStackScreenProps<RootStackParamList, 'Onboarding'>
@@ -22,3 +27,5 @@ export type ForgotScreenProps = NativeStackScreenProps<RootStackParamList, 'Forg
 export type ForgotSentScreenProps = NativeStackScreenProps<RootStackParamList, 'ForgotEmailSent'>
 export type PinSentScreenProps = NativeStackScreenProps<RootStackParamList, 'Pin'>
 export type ExpenseScreenProps = NativeStackScreenProps<RootStackParamList, 'AddExpense'>
+export type TransactionScreenProps = CompositeScreenProps<BottomTabScreenProps<BottomParamList, 'Transaction'>, NativeStackScreenProps<RootStackParamList>>
+export type TransactionDetailScreenProps = NativeStackScreenProps<RootStackParamList, 'TransactionDetail'>

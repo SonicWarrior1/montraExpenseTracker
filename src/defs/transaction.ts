@@ -6,7 +6,7 @@ export type transactionType = {
     category: string;
     desc: string;
     wallet: string;
-    attachement: string;
+    attachement?: string;
     repeat: boolean;
     freq: repeatDataType | null;
     timeStamp:Timestamp,
@@ -18,5 +18,5 @@ export type repeatDataType = {
     day?: number;
     weekDay: number;
     end: 'date' | 'never';
-    date?: Date;
+    date?: Date ;
 }

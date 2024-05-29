@@ -18,7 +18,12 @@ import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import FilePickerSheet from '../../components/FilePickerSheet';
 import RepeatTransactionSheet from '../../components/RepeatTranscationSheet';
 import firestore, {Timestamp} from '@react-native-firebase/firestore';
-import {monthData, weekData} from '../../constants/strings';
+import {
+  expenseCat,
+  incomeCat,
+  monthData,
+  weekData,
+} from '../../constants/strings';
 import CustomButton from '../../components/CustomButton';
 import {repeatDataType, transactionType} from '../../defs/transaction';
 import {useAppDispatch, useAppSelector} from '../../redux/store';
@@ -30,6 +35,12 @@ import storage from '@react-native-firebase/storage';
 
 function AddExpense({navigation, route}: ExpenseScreenProps) {
   const pageType = route.params.type;
+  const isEdit = route.params.isEdit;
+  let transaction: transactionType | undefined = undefined;
+  if (isEdit) {
+    transaction = route.params.transaction;
+  }
+  console.log(transaction?.freq);
   const backgroundColor =
     pageType === 'expense' ? COLORS.PRIMARY.RED : COLORS.PRIMARY.GREEN;
   navigation.setOptions({title: pageType[0].toUpperCase() + pageType.slice(1)});
@@ -38,15 +49,84 @@ function AddExpense({navigation, route}: ExpenseScreenProps) {
   const handlePresentModalPress = useCallback(() => {
     bottomSheetModalRef.current?.present();
   }, []);
-  const [image, setImage] = useState('');
+
+  const [image, setImage] = useState(
+    transaction ? transaction.attachement : '',
+  );
   const [doc, setDoc] = useState<{uri: string; name: string}>();
-  const [repeatData, setRepeatData] = useState<repeatDataType>();
-  const [desc, setDesc] = useState('');
-  const [amount, setAmount] = useState('');
-  const [category, setCategory] = useState('');
-  const [wallet, setWallet] = useState('');
+  const [repeatData, setRepeatData] = useState<repeatDataType | undefined>(
+    transaction ? transaction.freq! : undefined,
+  );
+  const [desc, setDesc] = useState(transaction ? transaction.desc : '');
+  const [amount, setAmount] = useState(
+    transaction ? transaction.amount.toString() : '',
+  );
+  const [category, setCategory] = useState(
+    transaction ? transaction.category : '',
+  );
+  const [wallet, setWallet] = useState(transaction ? transaction.wallet : '');
   const dispatch = useAppDispatch();
   const uid = useAppSelector(state => state.user.currentUser?.uid);
+  async function handlePress() {
+    if (amount) {
+      dispatch(setLoading(true));
+      let attachement = '';
+      if (image !== '') {
+        attachement = image!;
+      } else if (doc) {
+        attachement = doc.uri;
+      }
+      try {
+        const id = uuid.v4().toString();
+        let url = '';
+
+        if (attachement !== '') {
+          if (
+            !attachement?.startsWith('https://firebasestorage.googleapis.com')
+          ) {
+            await storage().ref(`users/${uid}/${id}`).putFile(attachement);
+            url = await storage().ref(`users/${uid}/${id}`).getDownloadURL();
+          } else {
+            console.log('yo');
+            url = attachement;
+          }
+        }
+        const trans: transactionType = {
+          amount: Number(amount),
+          category: category,
+          desc: desc,
+          wallet: wallet,
+          attachement: url,
+          repeat: repeatData !== undefined,
+          freq: repeatData ?? null,
+          id: isEdit ? transaction!.id : id,
+          timeStamp: isEdit ? transaction?.timeStamp! : Timestamp.now(),
+          type: pageType,
+        };
+        console.log(transaction);
+        if (isEdit) {
+          await firestore()
+            .collection('users')
+            .doc(uid)
+            .collection('transactions')
+            .doc(transaction!.id)
+            .update(trans);
+        } else {
+          await firestore()
+            .collection('users')
+            .doc(uid)
+            .collection('transactions')
+            .doc(id)
+            .set(trans);
+        }
+        Toast.show({text1: pageType + ' Added Succesfully'});
+        navigation.pop();
+      } catch (e) {
+        console.log(e);
+      }
+      dispatch(setLoading(false));
+    }
+  }
   return (
     <View style={[styles.safeView, {backgroundColor: backgroundColor}]}>
       <SafeAreaView
@@ -70,11 +150,7 @@ function AddExpense({navigation, route}: ExpenseScreenProps) {
       </SafeAreaView>
       <View style={styles.detailsCtr}>
         <CustomDropdown
-          data={[
-            {label: 'Food', value: 'food'},
-            {label: 'Bill', value: 'bill'},
-            {label: 'Shopping', value: 'Shopping'},
-          ]}
+          data={pageType === 'expense' ? expenseCat : incomeCat}
           onChange={val => {
             setCategory(val.value);
           }}
@@ -155,7 +231,10 @@ function AddExpense({navigation, route}: ExpenseScreenProps) {
             ios_backgroundColor={COLORS.VIOLET[20]}
             onValueChange={val => {
               if (val) {
-                bottomSheetModalRef2.current?.present();
+                bottomSheetModalRef2.current?.present({
+                  isEdit: isEdit,
+                  transaction: transaction,
+                });
               } else {
                 setRepeatData(undefined);
               }
@@ -184,72 +263,28 @@ function AddExpense({navigation, route}: ExpenseScreenProps) {
               <View>
                 <Text style={styles.flexRowText1}>End After</Text>
                 <Text style={styles.flexRowText2}>
-                  {repeatData.date?.toLocaleDateString()}
+                  {isEdit
+                    ? (repeatData.date! as Timestamp)
+                        .toDate()
+                        .toLocaleDateString()
+                    : repeatData.date?.toLocaleDateString()}
                 </Text>
               </View>
             )}
             <Pressable
               style={styles.editBtn}
               onPress={() => {
-                bottomSheetModalRef2.current?.present();
+                bottomSheetModalRef2.current?.present({
+                  isEdit: isEdit,
+                  transaction: transaction,
+                });
               }}>
               <Text style={styles.editBtnText}>Edit</Text>
             </Pressable>
           </View>
         )}
         <Sapcer height={20} />
-        <CustomButton
-          title="Continue"
-          onPress={async () => {
-            console.log('i');
-            if (amount) {
-              dispatch(setLoading(true));
-              let attachement = '';
-              if (image !== '') {
-                attachement = image;
-              } else if (doc) {
-                attachement = doc.uri;
-              }
-              try {
-                const id = uuid.v4().toString();
-                let url = '';
-                if (attachement !== '') {
-                  await storage()
-                    .ref(`users/${uid}/${id}`)
-                    .putFile(attachement);
-                  url = await storage()
-                    .ref(`users/${uid}/${id}`)
-                    .getDownloadURL();
-                }
-                const transaction: transactionType = {
-                  amount: Number(amount),
-                  category: category,
-                  desc: desc,
-                  wallet: wallet,
-                  attachement: url,
-                  repeat: repeatData !== undefined,
-                  freq: repeatData ?? null,
-                  id: id,
-                  timeStamp: Timestamp.now(),
-                  type: pageType,
-                };
-                console.log(transaction);
-
-                await firestore()
-                  .collection('users')
-                  .doc(uid)
-                  .collection('transactions')
-                  .doc(id)
-                  .set(transaction);
-                Toast.show({text1: 'Expense Added Succesfully'});
-                navigation.pop();
-              } catch (e) {
-                console.log(e);
-              }
-              dispatch(setLoading(false));
-            }
-          }}
-        />
+        <CustomButton title="Continue" onPress={handlePress} />
         <Sapcer height={20} />
       </View>
       <BottomSheetModalProvider>

@@ -18,7 +18,7 @@ function FilePickerSheet({
   setDoc,
 }: Readonly<{
   bottomSheetModalRef: React.RefObject<BottomSheetModalMethods>;
-  setImage: React.Dispatch<React.SetStateAction<string>>;
+  setImage: React.Dispatch<React.SetStateAction<string|undefined>>;
   setDoc: React.Dispatch<
     React.SetStateAction<
       | {

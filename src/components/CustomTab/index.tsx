@@ -20,6 +20,7 @@ function CustomTab(props: Readonly<BottomTabBarProps>): React.JSX.Element {
   const translate2Y = useSharedValue(0);
   const translate3X = useSharedValue(0);
   const translate3Y = useSharedValue(0);
+  const zIndex = useSharedValue(0);
 
   function handleAddBtnPress() {
     if (deg.value === '-45deg') {
@@ -38,7 +39,9 @@ function CustomTab(props: Readonly<BottomTabBarProps>): React.JSX.Element {
         withTiming(-80),
       );
       deg.value = withTiming('0deg');
+      zIndex.value = 1;
     } else {
+      zIndex.value = 0;
       translate3X.value = withSequence(
         withTiming(0),
         withTiming(-80),
@@ -78,11 +81,16 @@ function CustomTab(props: Readonly<BottomTabBarProps>): React.JSX.Element {
       <AnimatedBtn
         icon={ICONS.Expense}
         onPress={() => {
-          props.navigation.navigate(NAVIGATION.AddExpense, {type: 'expense'});
+          props.navigation.navigate(NAVIGATION.AddExpense, {
+            type: 'expense',
+            isEdit: false,
+          });
+          handleAddBtnPress();
         }}
         translateX={translate3X}
         translateY={translate3Y}
         backgrounColor={COLORS.PRIMARY.RED}
+        zIndex={zIndex}
       />
       <AnimatedBtn
         icon={ICONS.Transfer}
@@ -90,15 +98,21 @@ function CustomTab(props: Readonly<BottomTabBarProps>): React.JSX.Element {
         translateX={translate2X}
         translateY={translate2Y}
         backgrounColor={COLORS.PRIMARY.BLUE}
+        zIndex={zIndex}
       />
       <AnimatedBtn
         icon={ICONS.Income}
         onPress={() => {
-          props.navigation.navigate(NAVIGATION.AddExpense, {type: 'income'});
+          props.navigation.navigate(NAVIGATION.AddExpense, {
+            type: 'income',
+            isEdit: false,
+          });
+          handleAddBtnPress();
         }}
         translateX={translate1X}
         translateY={translate1Y}
         backgrounColor={COLORS.PRIMARY.GREEN}
+        zIndex={zIndex}
       />
       <Animated.View
         style={[
@@ -136,9 +150,11 @@ function AnimatedBtn({
   icon,
   onPress,
   backgrounColor,
+  zIndex,
 }: Readonly<{
   translateX: SharedValue<number>;
   translateY: SharedValue<number>;
+  zIndex: SharedValue<number>;
   icon: (params: iconProps) => React.ReactNode;
   onPress: () => void;
   backgrounColor: string;
@@ -150,7 +166,7 @@ function AnimatedBtn({
         {
           position: 'absolute',
           marginLeft: '39%',
-          zIndex: 0,
+          zIndex: zIndex,
           transform: [{translateY: -15}, {translateX}, {translateY}],
         },
       ]}>

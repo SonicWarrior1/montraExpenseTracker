@@ -7,13 +7,13 @@ function CustomDropdown({
   onChange,
   value,
   placeholder,
-  onFocus
+  onFocus,
 }: Readonly<{
   data: Array<any>;
   onChange: (item: any) => void;
   value: any;
   placeholder: string;
-  onFocus?:()=>void
+  onFocus?: () => void;
 }>) {
   return (
     <Dropdown
@@ -29,7 +29,7 @@ function CustomDropdown({
       placeholderStyle={{color: COLORS.DARK[25]}}
       data={data}
       labelField={'label'}
-      value={value}
+      value={{label: value, value: value}}
       onChange={onChange}
       valueField={'value'}
       onFocus={onFocus}
