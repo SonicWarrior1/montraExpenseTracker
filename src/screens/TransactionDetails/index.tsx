@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useRef} from 'react';
 import {
   Dimensions,
   Image,
@@ -14,18 +14,28 @@ import {ICONS} from '../../constants/icons';
 import {monthData, NAVIGATION, weekData} from '../../constants/strings';
 import Sapcer from '../../components/Spacer';
 import CustomButton from '../../components/CustomButton';
+import {BottomSheetModalMethods} from '@gorhom/bottom-sheet/lib/typescript/types';
+import DeleteTransactionSheet from '../../components/DeleteTransSheet';
 
-function TransactionDetails({route, navigation}: TransactionDetailScreenProps) {
+function TransactionDetails({
+  route,
+  navigation,
+}: Readonly<TransactionDetailScreenProps>) {
+  const bottomSheetModalRef = useRef<BottomSheetModalMethods>(null);
   const trans = route.params.transaction;
   console.log();
+  const headerRight = () => {
+    return (
+      <Pressable
+        onPress={() => {
+          bottomSheetModalRef.current?.present();
+        }}>
+        {ICONS.Trash({height: 20, width: 20})}
+      </Pressable>
+    );
+  };
   navigation.setOptions({
-    headerRight: props => {
-      return (
-        <Pressable onPress={() => {}}>
-          {ICONS.Trash({height: 20, width: 20})}
-        </Pressable>
-      );
-    },
+    headerRight: headerRight,
   });
   return (
     <View style={{flex: 1}}>
@@ -96,17 +106,32 @@ function TransactionDetails({route, navigation}: TransactionDetailScreenProps) {
             sint. Velit officia consequat duis enim velit mollit. Exercitation
             veniam consequat sunt nostrud amet.
           </Text>
-          <Text style={styles.descTitle}>Attachement</Text>
-          <Image
-            source={{uri: trans.attachement}}
-            style={{width: '100%', height: 150, borderRadius: 8}}
-          />
+          {trans.attachementType !== 'none' && (
+            <View>
+              <Text style={styles.descTitle}>Attachement</Text>
+              {trans.attachementType === 'image' ? (
+                <Image
+                  source={{uri: trans.attachement}}
+                  style={{width: '100%', height: 150, borderRadius: 8}}
+                />
+              ) : (
+                <CustomButton
+                  title="View Document"
+                  onPress={() => {
+                    navigation.navigate('DocView', {uri: trans.attachement!});
+                  }}
+                  backgroundColor={COLORS.VIOLET[20]}
+                  textColor={COLORS.VIOLET[100]}
+                />
+              )}
+            </View>
+          )}
         </View>
         <View style={{transform: [{translateY: -40}]}}>
           <CustomButton
             title="Edit"
             onPress={() => {
-              navigation.navigate(NAVIGATION.AddExpense, {
+              navigation.replace(NAVIGATION.AddExpense, {
                 type: trans.type,
                 isEdit: true,
                 transaction: trans,
@@ -115,9 +140,16 @@ function TransactionDetails({route, navigation}: TransactionDetailScreenProps) {
           />
         </View>
       </View>
+      <DeleteTransactionSheet
+        bottomSheetModalRef={bottomSheetModalRef}
+        id={trans.id}
+        navigation={navigation}
+        type={trans.type}
+        category={trans.category}
+        amt={trans.amount}
+      />
     </View>
   );
 }
-
 
 export default TransactionDetails;

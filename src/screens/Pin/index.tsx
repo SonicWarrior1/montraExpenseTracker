@@ -2,14 +2,13 @@ import React, {useState} from 'react';
 import {Dimensions, SafeAreaView, Text, View} from 'react-native';
 import styles from './styles';
 import {TouchableOpacity} from 'react-native-gesture-handler';
-import {ICONS} from '../../constants/icons';
 import {COLORS} from '../../constants/commonStyles';
 import {PinSentScreenProps} from '../../defs/navigation';
 import {NAVIGATION} from '../../constants/strings';
 import {useAppDispatch, useAppSelector} from '../../redux/store';
-import {setLoading, userLoggedIn} from '../../redux/reducers/userSlice';
+import {userLoggedIn} from '../../redux/reducers/userSlice';
 import firestore from '@react-native-firebase/firestore';
-function Pin({route, navigation}: PinSentScreenProps) {
+function Pin({route, navigation}: Readonly<PinSentScreenProps>) {
   const matrix = [
     [1, 2, 3],
     [4, 5, 6],

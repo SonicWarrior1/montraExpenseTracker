@@ -35,7 +35,7 @@ function TransactionScreen({navigation}: TransactionScreenProps) {
         .orderBy('timeStamp', 'desc')
         .get();
       const data = res.docs.map(snapshot => snapshot.data() as transactionType);
-      dispatch(setTransaction(data));
+      // dispatch(setTransaction(data));
       const filteredData = filterDataByDate(data);
       setData(filteredData);
     } catch (e) {
@@ -63,8 +63,7 @@ function TransactionScreen({navigation}: TransactionScreenProps) {
           }
         } else {
           if (acc[item.timeStamp.seconds]) {
-            acc[item.timeStamp.seconds] =
-              acc[item.timeStamp.seconds].push(item);
+            acc[item.timeStamp.seconds].push(item);
           } else {
             acc[item.timeStamp.seconds] = [item];
           }
@@ -73,11 +72,12 @@ function TransactionScreen({navigation}: TransactionScreenProps) {
       },
       {},
     );
-    console.log(res);
     const result = [
-      {title: 'today', data: res['today']},
-      {title: 'yesterday', data: res['yesterday']},
+      {title: 'today', data: res['today'] ?? []},
+      {title: 'yesterday', data: res['yesterday'] ?? []},
     ];
+    delete res['today'];
+    delete res['yesterday'];
     const arr = Object.entries(res);
     const x = arr.reduce(
       (acc: Array<{title: string; data: Array<transactionType>}>, curr) => {
@@ -87,8 +87,7 @@ function TransactionScreen({navigation}: TransactionScreenProps) {
       [],
     );
     x.reverse();
-    console.log([...result, ...x.slice(0, -2)]);
-    return [...result, ...x.slice(2)];
+    return [...result, ...x];
   }
   useEffect(() => {
     fetchData();
@@ -181,7 +180,9 @@ function TransactionScreen({navigation}: TransactionScreenProps) {
                   </Text>
                   <Text style={styles.text2}>
                     {item.timeStamp.toDate().getHours()}:
-                    {item.timeStamp.toDate().getMinutes()}
+                    {item.timeStamp.toDate().getMinutes() < 10
+                      ? '0' + item.timeStamp.toDate().getMinutes()
+                      : item.timeStamp.toDate().getMinutes()}
                   </Text>
                 </View>
               </Pressable>
@@ -194,7 +195,18 @@ function TransactionScreen({navigation}: TransactionScreenProps) {
                   {title !== 'today' && title !== 'yesterday'
                     ? Timestamp.fromMillis(Number(title) * 1000)
                         .toDate()
-                        .toLocaleDateString()
+                        .getDate()
+                        .toString() +
+                      '/' +
+                      Timestamp.fromMillis(Number(title) * 1000)
+                        .toDate()
+                        .getMonth()
+                        .toString() +
+                      '/' +
+                      Timestamp.fromMillis(Number(title) * 1000)
+                        .toDate()
+                        .getFullYear()
+                        .toString()
                     : title[0].toUpperCase() + title.slice(1)}
                 </Text>
               )

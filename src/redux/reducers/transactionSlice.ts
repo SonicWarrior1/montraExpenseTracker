@@ -1,15 +1,18 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { transactionType } from "../../defs/transaction";
+import { setLoading } from "./userSlice";
 const initialState: {
     transactions: { [key: string]: transactionType },
     isFilterOpen: boolean,
     isCatOpen: boolean,
-    filters: { filter: 'income' | 'expense' | 'transfer' | 'none', sort: 'highest' | 'lowest' | 'newest' | 'oldest' }
+    filters: { filter: 'income' | 'expense' | 'transfer' | 'none', sort: 'highest' | 'lowest' | 'newest' | 'oldest' },
+   
 } = {
     transactions: {},
     isFilterOpen: false,
     isCatOpen: false,
-    filters: { filter: 'none', sort: 'newest' }
+    filters: { filter: 'none', sort: 'newest' },
+   
 }
 const TransactionSlice = createSlice({
     name: "transaction",
@@ -53,7 +56,8 @@ const TransactionSlice = createSlice({
                 return acc;
             }, {});
             console.log(state)
-        }
+        },
+      
     }
 })
 export const { openFilterSheet, setFilters, openCatSheet, setSortFilter, setTransaction } = TransactionSlice.actions

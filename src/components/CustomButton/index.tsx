@@ -8,15 +8,26 @@ function CustomButton({
   title,
   onPress,
   textColor = COLORS.PRIMARY.LIGHT,
+  borderWidth = 0,
+  borderColor,
 }: Readonly<{
   backgroundColor?: string;
   title: string;
   onPress: () => void;
   textColor?: string;
+  borderWidth?: number;
+  borderColor?: string;
 }>) {
   return (
     <TouchableOpacity
-      style={[styles.btn, {backgroundColor: backgroundColor}]}
+      style={[
+        styles.btn,
+        {
+          backgroundColor: backgroundColor,
+          borderWidth: borderWidth,
+          borderColor: borderColor,
+        },
+      ]}
       onPress={onPress}>
       <Text style={[styles.text, {color: textColor}]}>{title}</Text>
     </TouchableOpacity>

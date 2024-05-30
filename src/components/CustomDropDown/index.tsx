@@ -1,6 +1,7 @@
 import React from 'react';
 import {Dropdown} from 'react-native-element-dropdown';
 import {COLORS} from '../../constants/commonStyles';
+import styles from './styles';
 
 function CustomDropdown({
   data,
@@ -17,14 +18,7 @@ function CustomDropdown({
 }>) {
   return (
     <Dropdown
-      style={{
-        borderWidth: 1,
-        borderRadius: 20,
-        height: 60,
-        paddingHorizontal: 20,
-        borderColor: COLORS.LIGHT[20],
-        width: '100%',
-      }}
+      style={styles.dropdown}
       placeholder={placeholder}
       placeholderStyle={{color: COLORS.DARK[25]}}
       data={data}

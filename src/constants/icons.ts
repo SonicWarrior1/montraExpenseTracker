@@ -8,6 +8,7 @@ import Show from '../assets/Svgs/show.svg';
 import Hide from '../assets/Svgs/eye-off.svg';
 import Google from '../assets/Svgs/google.svg';
 import ArrowLeft from '../assets/Svgs/arrow left.svg';
+import ArrowLeft2 from '../assets/Svgs/arrow-left-2.svg';
 import EmailSent from '../assets/Svgs/emailSent.svg';
 import Home from '../assets/Svgs/home.svg';
 import Transaction from '../assets/Svgs/transaction.svg';
@@ -24,6 +25,7 @@ import Filter from '../assets/Svgs/sort.svg';
 import ArrowDown from '../assets/Svgs/arrow down.svg';
 import ArrowRight from '../assets/Svgs/arrow-right.svg';
 import Trash from '../assets/Svgs/trash.svg';
+import Alert from '../assets/Svgs/alert.svg';
 const iconStyle = (
   { width = 0,
     height = 0,
@@ -62,4 +64,6 @@ export const ICONS = {
   ArrowDown: (params: iconProps) => ArrowDown({ ...iconStyle({ ...params }) }),
   ArrowRight: (params: iconProps) => ArrowRight({ ...iconStyle({ ...params }) }),
   Trash: (params: iconProps) => Trash({ ...iconStyle({ ...params }) }),
+  ArrowLeft2: (params: iconProps) => ArrowLeft2({ ...iconStyle({ ...params }) }),
+  Alert: (params: iconProps) => Alert({ ...iconStyle({ ...params }) }),
 };

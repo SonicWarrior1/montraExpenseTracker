@@ -1,9 +1,8 @@
 import {Pressable, View} from 'react-native';
-import {iconProps, ICONS} from '../../constants/icons';
+import {ICONS} from '../../constants/icons';
 import {COLORS} from '../../constants/commonStyles';
 import {BottomTabBarProps} from '@react-navigation/bottom-tabs';
 import Animated, {
-  SharedValue,
   useSharedValue,
   withSequence,
   withTiming,
@@ -11,6 +10,7 @@ import Animated, {
 import styles from './styles';
 import TabButton from './TabButton';
 import {NAVIGATION} from '../../constants/strings';
+import AnimatedBtn from './animatedButton';
 
 function CustomTab(props: Readonly<BottomTabBarProps>): React.JSX.Element {
   const deg = useSharedValue('-45deg');
@@ -126,10 +126,10 @@ function CustomTab(props: Readonly<BottomTabBarProps>): React.JSX.Element {
       <TabButton
         icon={ICONS.Pie}
         onPress={() => {
-          props.navigation.navigate('Home');
+          props.navigation.navigate(NAVIGATION.Budget);
         }}
         title="Budget"
-        isActive={props.state.index === 3}
+        isActive={props.state.index === 2}
       />
       <TabButton
         icon={ICONS.User}
@@ -137,44 +137,9 @@ function CustomTab(props: Readonly<BottomTabBarProps>): React.JSX.Element {
           props.navigation.navigate('Home');
         }}
         title="Profile"
-        isActive={props.state.index === 4}
+        isActive={props.state.index === 3}
       />
     </View>
   );
 }
 export default CustomTab;
-
-function AnimatedBtn({
-  translateX,
-  translateY,
-  icon,
-  onPress,
-  backgrounColor,
-  zIndex,
-}: Readonly<{
-  translateX: SharedValue<number>;
-  translateY: SharedValue<number>;
-  zIndex: SharedValue<number>;
-  icon: (params: iconProps) => React.ReactNode;
-  onPress: () => void;
-  backgrounColor: string;
-}>) {
-  return (
-    <Animated.View
-      style={[
-        styles.animatedBtnOuter,
-        {
-          position: 'absolute',
-          marginLeft: '39%',
-          zIndex: zIndex,
-          transform: [{translateY: -15}, {translateX}, {translateY}],
-        },
-      ]}>
-      <Pressable
-        style={[styles.animatedBtn, {backgroundColor: backgrounColor}]}
-        onPress={onPress}>
-        {icon({height: 30, width: 30, color: 'green'})}
-      </Pressable>
-    </Animated.View>
-  );
-}

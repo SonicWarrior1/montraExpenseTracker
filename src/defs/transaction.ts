@@ -1,7 +1,7 @@
 import { Timestamp } from "@react-native-firebase/firestore";
 
 export type transactionType = {
-    id:string,
+    id: string,
     amount: number;
     category: string;
     desc: string;
@@ -9,8 +9,9 @@ export type transactionType = {
     attachement?: string;
     repeat: boolean;
     freq: repeatDataType | null;
-    timeStamp:Timestamp,
-    type:'expense'|'income'|'transfer'
+    timeStamp: Timestamp,
+    type: 'expense' | 'income' | 'transfer',
+    attachementType: 'image' | 'doc' | 'none'
 }
 export type repeatDataType = {
     freq: 'yearly' | 'monthly' | 'weekly' | 'daily';
@@ -18,5 +19,5 @@ export type repeatDataType = {
     day?: number;
     weekDay: number;
     end: 'date' | 'never';
-    date?: Date ;
+    date?: Date;
 }

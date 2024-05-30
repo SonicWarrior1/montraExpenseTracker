@@ -4,7 +4,11 @@ export type UserType = {
     name: string,
     email: string,
     uid: string,
-    pin: string
+    pin: string,
+    expenseCategory: string[],
+    incomeCategory: string[],
+    budget: { [key: string]: { alert: boolean, limit: number, percentage: number } }
+    spend: { [key: string]: number }
 }
 export function UserToJson({
     uid,
@@ -21,7 +25,11 @@ export function UserToJson({
         uid: uid,
         name: name,
         email: email,
-        pin: pin
+        pin: pin,
+        expenseCategory: ['add', 'food', 'bill', 'shopping', 'subscription', 'transportation'],
+        incomeCategory: ['add', 'salary', 'passive income'],
+        budget: {},
+        spend: {}
     };
 }
 export function UserFromJson(json: FirebaseFirestoreTypes.DocumentData): UserType {
@@ -29,6 +37,10 @@ export function UserFromJson(json: FirebaseFirestoreTypes.DocumentData): UserTyp
         uid: json.uid,
         email: json.email,
         name: json.name,
-        pin: json.pin ?? ''
+        pin: json.pin ?? '',
+        expenseCategory: json.expenseCategory ?? ['add', 'food', 'bill', 'shopping', 'subscription', 'transportation'],
+        incomeCategory: json.incomeCategory ?? ['add', 'salary', 'passive income'],
+        budget: json.budget ?? {},
+        spend: json.spend ?? {}
     }
 }

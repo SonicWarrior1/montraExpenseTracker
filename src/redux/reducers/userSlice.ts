@@ -1,12 +1,11 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { UserType } from "../../defs/user";
-import { BottomSheetModalMethods } from "@gorhom/bottom-sheet/lib/typescript/types";
 
 const initialState: {
     currentUser: UserType | undefined, loading: boolean,
 } = {
     currentUser: undefined, loading: false,
- 
+
 }
 const UserSlice = createSlice({
     name: "user",
@@ -18,9 +17,14 @@ const UserSlice = createSlice({
         setLoading(state, action) {
             state.loading = action.payload;
         },
-       
+        addExpenseCategory(state, action: PayloadAction<string>) {
+            state.currentUser!.expenseCategory = [...state.currentUser!.expenseCategory, action.payload]
+        },
+        addIncomeCategory(state, action: PayloadAction<string>) {
+            state.currentUser!.incomeCategory = [...state.currentUser!.incomeCategory, action.payload]
+        },
     }
 })
 
-export const { userLoggedIn, setLoading,  } = UserSlice.actions
+export const { userLoggedIn, setLoading, addExpenseCategory, addIncomeCategory, } = UserSlice.actions
 export default UserSlice.reducer

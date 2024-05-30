@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {RootStackParamList} from '../defs/navigation';
 import Onboarding from '../screens/Onboarding';
@@ -16,10 +16,14 @@ import Pin from '../screens/Pin';
 import BottomTabNavigator from './BottomTabNavigator';
 import AddExpense from '../screens/AddExpense';
 import TransactionDetails from '../screens/TransactionDetails';
+import DocView from '../screens/DocView';
+import CreateBudget from '../screens/CreateBudget';
+import firestore from '@react-native-firebase/firestore';
+
 export const Stack = createNativeStackNavigator<RootStackParamList>();
 
 function RootNavigator(): React.JSX.Element {
-  const navigation = useNavigation(); // Use useNavigation hook to get navigation prop
+  const navigation = useNavigation();
   function headerLeft({canGoBack}: HeaderBackButtonProps, color: string) {
     return canGoBack ? (
       <Pressable
@@ -74,6 +78,27 @@ function RootNavigator(): React.JSX.Element {
               headerTransparent: true,
               headerTitleStyle: {color: 'white'},
               title: 'Detail Transaction',
+              headerLeft: props => headerLeft(props, 'white'),
+            }}
+          />
+          <Stack.Screen
+            name={NAVIGATION.DocView}
+            component={DocView}
+            options={{
+              headerShown: true,
+              headerTitleStyle: {color: 'black'},
+              title: 'Document',
+              headerLeft: props => headerLeft(props, 'black'),
+            }}
+          />
+          <Stack.Screen
+            name={NAVIGATION.CreateBudget}
+            component={CreateBudget}
+            options={{
+              headerShown: true,
+              headerTransparent: true,
+              headerTitleStyle: {color: 'white'},
+              title: 'Create Budget',
               headerLeft: props => headerLeft(props, 'white'),
             }}
           />

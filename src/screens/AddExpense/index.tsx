@@ -18,12 +18,7 @@ import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import FilePickerSheet from '../../components/FilePickerSheet';
 import RepeatTransactionSheet from '../../components/RepeatTranscationSheet';
 import firestore, {Timestamp} from '@react-native-firebase/firestore';
-import {
-  expenseCat,
-  incomeCat,
-  monthData,
-  weekData,
-} from '../../constants/strings';
+import {monthData, weekData} from '../../constants/strings';
 import CustomButton from '../../components/CustomButton';
 import {repeatDataType, transactionType} from '../../defs/transaction';
 import {useAppDispatch, useAppSelector} from '../../redux/store';
@@ -32,28 +27,45 @@ import uuid from 'react-native-uuid';
 import Toast from 'react-native-toast-message';
 import {ExpenseScreenProps} from '../../defs/navigation';
 import storage from '@react-native-firebase/storage';
+import AddCategorySheet from '../../components/AddCategorySheet';
+import {UserFromJson, UserType} from '../../defs/user';
 
-function AddExpense({navigation, route}: ExpenseScreenProps) {
+function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
+  const expenseCat = useAppSelector(
+    state => state.user.currentUser?.expenseCategory,
+  );
+  const incomeCat = useAppSelector(
+    state => state.user.currentUser?.incomeCategory,
+  );
+  console.log(expenseCat);
   const pageType = route.params.type;
   const isEdit = route.params.isEdit;
   let transaction: transactionType | undefined = undefined;
   if (isEdit) {
     transaction = route.params.transaction;
+    console.log(transaction?.freq);
   }
-  console.log(transaction?.freq);
+
   const backgroundColor =
     pageType === 'expense' ? COLORS.PRIMARY.RED : COLORS.PRIMARY.GREEN;
   navigation.setOptions({title: pageType[0].toUpperCase() + pageType.slice(1)});
-  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
-  const bottomSheetModalRef2 = useRef<BottomSheetModal>(null);
+  const filePickSheetRef = useRef<BottomSheetModal>(null);
+  const repeatSheetRef = useRef<BottomSheetModal>(null);
+  const addCategorySheetRef = useRef<BottomSheetModal>(null);
   const handlePresentModalPress = useCallback(() => {
-    bottomSheetModalRef.current?.present();
+    filePickSheetRef.current?.present();
   }, []);
 
   const [image, setImage] = useState(
-    transaction ? transaction.attachement : '',
+    transaction && transaction.attachementType === 'image'
+      ? transaction.attachement
+      : '',
   );
-  const [doc, setDoc] = useState<{uri: string; name: string}>();
+  const [doc, setDoc] = useState<{uri: string; name: string} | undefined>(
+    transaction && transaction.attachementType === 'doc'
+      ? {uri: transaction.attachement!, name: 'Document'}
+      : undefined,
+  );
   const [repeatData, setRepeatData] = useState<repeatDataType | undefined>(
     transaction ? transaction.freq! : undefined,
   );
@@ -71,15 +83,17 @@ function AddExpense({navigation, route}: ExpenseScreenProps) {
     if (amount) {
       dispatch(setLoading(true));
       let attachement = '';
+      let attachementType: transactionType['attachementType'] = 'none';
       if (image !== '') {
         attachement = image!;
+        attachementType = 'image';
       } else if (doc) {
         attachement = doc.uri;
+        attachementType = 'doc';
       }
       try {
         const id = uuid.v4().toString();
         let url = '';
-
         if (attachement !== '') {
           if (
             !attachement?.startsWith('https://firebasestorage.googleapis.com')
@@ -102,8 +116,10 @@ function AddExpense({navigation, route}: ExpenseScreenProps) {
           id: isEdit ? transaction!.id : id,
           timeStamp: isEdit ? transaction?.timeStamp! : Timestamp.now(),
           type: pageType,
+          attachementType: attachementType,
         };
         console.log(transaction);
+        const curr = await firestore().collection('users').doc(uid).get();
         if (isEdit) {
           await firestore()
             .collection('users')
@@ -111,6 +127,17 @@ function AddExpense({navigation, route}: ExpenseScreenProps) {
             .collection('transactions')
             .doc(transaction!.id)
             .update(trans);
+          if (pageType === 'expense') {
+            await firestore()
+              .collection('users')
+              .doc(uid)
+              .update({
+                [`spend.${category}`]:
+                  (UserFromJson(curr.data() as UserType).spend[category] ?? 0) -
+                  transaction!.amount +
+                  Number(amount),
+              });
+          }
         } else {
           await firestore()
             .collection('users')
@@ -118,6 +145,17 @@ function AddExpense({navigation, route}: ExpenseScreenProps) {
             .collection('transactions')
             .doc(id)
             .set(trans);
+
+          if (pageType === 'expense') {
+            await firestore()
+              .collection('users')
+              .doc(uid)
+              .update({
+                [`spend.${category}`]:
+                  (UserFromJson(curr.data() as UserType).spend[category] ?? 0) +
+                  Number(amount),
+              });
+          }
         }
         Toast.show({text1: pageType + ' Added Succesfully'});
         navigation.pop();
@@ -150,9 +188,24 @@ function AddExpense({navigation, route}: ExpenseScreenProps) {
       </SafeAreaView>
       <View style={styles.detailsCtr}>
         <CustomDropdown
-          data={pageType === 'expense' ? expenseCat : incomeCat}
+          data={(pageType === 'expense' ? expenseCat! : incomeCat!)?.map(
+            item => {
+              return {
+                label:
+                  item === 'add'
+                    ? 'Add new Category'
+                    : item[0].toUpperCase() + item.slice(1),
+                value: item,
+              };
+            },
+          )}
           onChange={val => {
-            setCategory(val.value);
+            if (val.value === 'add') {
+              addCategorySheetRef.current?.present();
+              console.log('yo');
+            } else {
+              setCategory(val.value);
+            }
           }}
           value={category}
           placeholder="Category"
@@ -214,7 +267,9 @@ function AddExpense({navigation, route}: ExpenseScreenProps) {
               style={[styles.closeIcon, {left: 100}]}>
               {ICONS.Close({height: 20, width: 20})}
             </Pressable>
-            <Pressable style={styles.sheetBtn} onPress={() => {}}>
+            <Pressable
+              style={[styles.sheetBtn, {paddingHorizontal: 10}]}
+              onPress={() => {}}>
               {ICONS.Document({height: 30, width: 30})}
               <Text style={styles.sheetBtnText}>{doc.name}</Text>
             </Pressable>
@@ -231,7 +286,7 @@ function AddExpense({navigation, route}: ExpenseScreenProps) {
             ios_backgroundColor={COLORS.VIOLET[20]}
             onValueChange={val => {
               if (val) {
-                bottomSheetModalRef2.current?.present({
+                repeatSheetRef.current?.present({
                   isEdit: isEdit,
                   transaction: transaction,
                 });
@@ -264,7 +319,7 @@ function AddExpense({navigation, route}: ExpenseScreenProps) {
                 <Text style={styles.flexRowText1}>End After</Text>
                 <Text style={styles.flexRowText2}>
                   {isEdit
-                    ? (repeatData.date! as Timestamp)
+                    ? (repeatData.date! as unknown as Timestamp)
                         .toDate()
                         .toLocaleDateString()
                     : repeatData.date?.toLocaleDateString()}
@@ -274,7 +329,7 @@ function AddExpense({navigation, route}: ExpenseScreenProps) {
             <Pressable
               style={styles.editBtn}
               onPress={() => {
-                bottomSheetModalRef2.current?.present({
+                repeatSheetRef.current?.present({
                   isEdit: isEdit,
                   transaction: transaction,
                 });
@@ -289,13 +344,17 @@ function AddExpense({navigation, route}: ExpenseScreenProps) {
       </View>
       <BottomSheetModalProvider>
         <FilePickerSheet
-          bottomSheetModalRef={bottomSheetModalRef}
+          bottomSheetModalRef={filePickSheetRef}
           setDoc={setDoc}
           setImage={setImage}
         />
         <RepeatTransactionSheet
-          bottomSheetModalRef={bottomSheetModalRef2}
+          bottomSheetModalRef={repeatSheetRef}
           setRepeatData={setRepeatData}
+        />
+        <AddCategorySheet
+          bottomSheetModalRef={addCategorySheetRef}
+          type={pageType}
         />
       </BottomSheetModalProvider>
     </View>

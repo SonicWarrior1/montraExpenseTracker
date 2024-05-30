@@ -12,12 +12,16 @@ export type RootStackParamList = {
     ForgotEmailSent: { email: string },
     Pin: { setup?: boolean, pin?: string }
     AddExpense: { type: 'expense' | 'income' | 'transfer', isEdit: boolean, transaction?: transactionType }
-    TransactionDetail: { transaction: transactionType }
+    TransactionDetail: { transaction: transactionType },
+    DocView: { uri: string },
+    CreateBudget:undefined
 }
 
 export type BottomParamList = {
-    Home: undefined
-    Transaction: undefined
+    Home: undefined,
+    Transaction: undefined,
+    Budget:undefined,
+    Profile:undefined
 }
 
 export type OnboardingScreenProps = NativeStackScreenProps<RootStackParamList, 'Onboarding'>
@@ -29,3 +33,6 @@ export type PinSentScreenProps = NativeStackScreenProps<RootStackParamList, 'Pin
 export type ExpenseScreenProps = NativeStackScreenProps<RootStackParamList, 'AddExpense'>
 export type TransactionScreenProps = CompositeScreenProps<BottomTabScreenProps<BottomParamList, 'Transaction'>, NativeStackScreenProps<RootStackParamList>>
 export type TransactionDetailScreenProps = NativeStackScreenProps<RootStackParamList, 'TransactionDetail'>
+export type DocScreenProps = NativeStackScreenProps<RootStackParamList, 'DocView'>
+export type BudgetScreenProps = CompositeScreenProps<BottomTabScreenProps<BottomParamList, 'Budget'>, NativeStackScreenProps<RootStackParamList>>
+export type CreateBudgetScreenProps = NativeStackScreenProps<RootStackParamList>
