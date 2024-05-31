@@ -26,6 +26,9 @@ import ArrowDown from '../assets/Svgs/arrow down.svg';
 import ArrowRight from '../assets/Svgs/arrow-right.svg';
 import Trash from '../assets/Svgs/trash.svg';
 import Alert from '../assets/Svgs/alert.svg';
+import Notification from '../assets/Svgs/notifiaction.svg';
+import ArrowRight2 from '../assets/Svgs/arrow right 2.svg';
+import More from '../assets/Svgs/more-horizontal.svg';
 const iconStyle = (
   { width = 0,
     height = 0,
@@ -66,4 +69,7 @@ export const ICONS = {
   Trash: (params: iconProps) => Trash({ ...iconStyle({ ...params }) }),
   ArrowLeft2: (params: iconProps) => ArrowLeft2({ ...iconStyle({ ...params }) }),
   Alert: (params: iconProps) => Alert({ ...iconStyle({ ...params }) }),
+  Notification: (params: iconProps) => Notification({ ...iconStyle({ ...params }) }),
+  ArrowRight2: (params: iconProps) => ArrowRight2({ ...iconStyle({ ...params }) }),
+  More: (params: iconProps) => More({ ...iconStyle({ ...params }) }),
 };

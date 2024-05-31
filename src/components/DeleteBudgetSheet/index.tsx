@@ -3,43 +3,34 @@ import {
   BottomSheetModalProvider,
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
-import {BottomSheetModalMethods} from '@gorhom/bottom-sheet/lib/typescript/types';
-import React, {useCallback, useMemo} from 'react';
+import React, {useMemo} from 'react';
 import {Text, View} from 'react-native';
-import {COLORS} from '../../constants/commonStyles';
 import CustomButton from '../CustomButton';
-import firestore from '@react-native-firebase/firestore';
 import {useAppDispatch, useAppSelector} from '../../redux/store';
-import Toast from 'react-native-toast-message';
-import {RootStackParamList} from '../../defs/navigation';
-import {setLoading} from '../../redux/reducers/userSlice';
 import styles from './styles';
-import {transactionType} from '../../defs/transaction';
-import {UserFromJson, UserType} from '../../defs/user';
-import {StackNavigationProp} from '@react-navigation/stack';
-function DeleteTransactionSheet({
+import {BottomSheetModalMethods} from '@gorhom/bottom-sheet/lib/typescript/types';
+import {COLORS} from '../../constants/commonStyles';
+import {setLoading} from '../../redux/reducers/userSlice';
+import Toast from 'react-native-toast-message';
+import firestore, {deleteField} from '@react-native-firebase/firestore';
+import {RootStackParamList} from '../../defs/navigation';
+import { StackNavigationProp } from '@react-navigation/stack';
+function DeleteBudgetSheet({
   bottomSheetModalRef,
-  id,
   navigation,
-  type,
-  amt,
   category,
 }: Readonly<{
   bottomSheetModalRef: React.RefObject<BottomSheetModalMethods>;
-  id: string;
   navigation: StackNavigationProp<
     RootStackParamList,
-    'TransactionDetail',
+    'DetailBudget',
     undefined
   >;
-  type: transactionType['type'];
-  amt: number;
   category: string;
 }>) {
   const uid = useAppSelector(state => state.user.currentUser?.uid);
   const dispatch = useAppDispatch();
-  const snapPoints = useMemo(() => ['25%'], []);
-
+  const snapPoints = useMemo(() => ['30%'], []);
   return (
     <BottomSheetModalProvider>
       <BottomSheetModal
@@ -48,9 +39,9 @@ function DeleteTransactionSheet({
         index={0}
         snapPoints={snapPoints}>
         <BottomSheetView style={styles.sheetView}>
-          <Text style={styles.text1}>Remove this Transaction?</Text>
+          <Text style={styles.text1}>Remove this budget?</Text>
           <Text style={styles.text2}>
-            Are you sure do you wanna remove this transaction?
+            Are you sure do you wanna remove this budget?
           </Text>
           <View style={styles.BtnRow}>
             <View style={{flex: 1}}>
@@ -69,32 +60,15 @@ function DeleteTransactionSheet({
                 onPress={async () => {
                   try {
                     dispatch(setLoading(true));
-                    if (type === 'expense') {
-                      const curr = await firestore()
-                        .collection('users')
-                        .doc(uid)
-                        .get();
-                      await firestore()
-                        .collection('users')
-                        .doc(uid)
-                        .update({
-                          [`spend.${category}`]:
-                            Number(
-                              UserFromJson(curr.data() as UserType).spend[
-                                category
-                              ] ?? 0,
-                            ) - amt,
-                        });
-                    }
+                    bottomSheetModalRef.current?.dismiss();
+                    navigation.pop();
                     await firestore()
                       .collection('users')
                       .doc(uid)
-                      .collection('transactions')
-                      .doc(id)
-                      .delete();
-                    Toast.show({text1: 'Transaction Deleted Succesfully'});
-                    bottomSheetModalRef.current?.dismiss();
-                    navigation.pop();
+                      .update({
+                        [`budget.${category}`]: deleteField(),
+                      });
+                    Toast.show({text1: 'Budget Deleted Succesfully'});
                     dispatch(setLoading(false));
                   } catch (e) {
                     console.log(e);
@@ -110,4 +84,4 @@ function DeleteTransactionSheet({
   );
 }
 
-export default DeleteTransactionSheet;
+export default DeleteBudgetSheet;

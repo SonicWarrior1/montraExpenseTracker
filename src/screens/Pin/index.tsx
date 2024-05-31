@@ -8,6 +8,7 @@ import {NAVIGATION} from '../../constants/strings';
 import {useAppDispatch, useAppSelector} from '../../redux/store';
 import {userLoggedIn} from '../../redux/reducers/userSlice';
 import firestore from '@react-native-firebase/firestore';
+import {ICONS} from '../../constants/icons';
 function Pin({route, navigation}: Readonly<PinSentScreenProps>) {
   const matrix = [
     [1, 2, 3],
@@ -94,15 +95,19 @@ function Pin({route, navigation}: Readonly<PinSentScreenProps>) {
                       setPin([...pin, value]);
                     }
                   }}>
-                  <Text
-                    style={{
-                      fontSize: 48,
-                      fontWeight: '500',
-                      color: 'white',
-                      //   height: 80,
-                    }}>
-                    {value === -1 ? '' : value === 99 ? '→' : value}
-                  </Text>
+                  {value === 99 ? (
+                    ICONS.ArrowRight2({height: 30, width: 30})
+                  ) : (
+                    <Text
+                      style={{
+                        fontSize: 48,
+                        fontWeight: '500',
+                        color: 'white',
+                        //   height: 80,
+                      }}>
+                      {value === -1 ? '' : value}
+                    </Text>
+                  )}
                 </TouchableOpacity>
               ))}
             </View>

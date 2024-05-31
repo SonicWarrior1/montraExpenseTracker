@@ -17,7 +17,7 @@ import {ScrollView} from 'react-native-gesture-handler';
 import TransactionHeader from '../../components/TransactionHeader';
 import {TransactionScreenProps} from '../../defs/navigation';
 import {setTransaction} from '../../redux/reducers/transactionSlice';
-function TransactionScreen({navigation}: TransactionScreenProps) {
+function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
   const user = useAppSelector(state => state.user.currentUser);
   const [data, setData] = useState<
     {
@@ -198,10 +198,11 @@ function TransactionScreen({navigation}: TransactionScreenProps) {
                         .getDate()
                         .toString() +
                       '/' +
-                      Timestamp.fromMillis(Number(title) * 1000)
-                        .toDate()
-                        .getMonth()
-                        .toString() +
+                      (
+                        Timestamp.fromMillis(Number(title) * 1000)
+                          .toDate()
+                          .getMonth() + 1
+                      ).toString() +
                       '/' +
                       Timestamp.fromMillis(Number(title) * 1000)
                         .toDate()

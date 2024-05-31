@@ -12,11 +12,25 @@ import {Slider} from '@miblanchard/react-native-slider';
 import firestore from '@react-native-firebase/firestore';
 import {setLoading} from '../../redux/reducers/userSlice';
 import {CreateBudgetScreenProps} from '../../defs/navigation';
-function CreateBudget({navigation}: CreateBudgetScreenProps) {
-  const [amount, setAmount] = useState('');
-  const [category, setCategory] = useState('');
-  const [alert, setAlert] = useState(false);
-  const [sliderVal, setSliderVal] = useState(0);
+function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
+  const month = new Date().getMonth();
+  const isEdit = route.params.isEdit;
+  let cat = undefined;
+  let oldBudget = undefined;
+  if (isEdit) {
+    cat = route.params.category;
+    oldBudget = useAppSelector(
+      state => state.user.currentUser?.budget[month][cat!],
+    );
+  }
+  const [amount, setAmount] = useState(
+    isEdit ? oldBudget?.limit.toString() : '',
+  );
+  const [category, setCategory] = useState(isEdit ? cat : '');
+  const [alert, setAlert] = useState(isEdit ? oldBudget?.alert : false);
+  const [sliderVal, setSliderVal] = useState(
+    isEdit ? oldBudget?.percentage : 0,
+  );
   const expenseCat = useAppSelector(
     state => state.user.currentUser?.expenseCategory,
   );
@@ -132,7 +146,7 @@ function CreateBudget({navigation}: CreateBudgetScreenProps) {
                   .collection('users')
                   .doc(uid)
                   .update({
-                    [`budget.${category}`]: {
+                    [`budget.${month}.${category}`]: {
                       limit: Number(amount),
                       alert: alert,
                       percentage: sliderVal,

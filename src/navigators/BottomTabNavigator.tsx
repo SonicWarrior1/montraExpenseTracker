@@ -31,7 +31,7 @@ function BottomTabNavigator() {
       .doc(uid)
       .onSnapshot(snapshot => {
         dispatch(userLoggedIn(UserFromJson(snapshot.data() as UserType)));
-        console.log('hi');
+        console.log(snapshot.data());
       });
     return () => subscribe();
   }, []);

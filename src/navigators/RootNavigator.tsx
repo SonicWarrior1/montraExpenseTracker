@@ -1,14 +1,12 @@
 import React, {useEffect} from 'react';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {RootStackParamList} from '../defs/navigation';
 import Onboarding from '../screens/Onboarding';
 import {NAVIGATION} from '../constants/strings';
 import Signup from '../screens/Signup';
 import {ICONS} from '../constants/icons';
-import {Pressable, Text} from 'react-native';
+import {Alert, Pressable, Text, TouchableOpacity, View} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import Login from '../screens/Login';
-import {HeaderBackButtonProps} from '@react-navigation/native-stack/lib/typescript/src/types';
 import {useAppSelector} from '../redux/store';
 import ForgotPassword from '../screens/ForgotPassword';
 import ForgotEmailSent from '../screens/ForgotEmailSent';
@@ -18,21 +16,24 @@ import AddExpense from '../screens/AddExpense';
 import TransactionDetails from '../screens/TransactionDetails';
 import DocView from '../screens/DocView';
 import CreateBudget from '../screens/CreateBudget';
-import firestore from '@react-native-firebase/firestore';
+import DetailBudget from '../screens/DetailBudget';
+import NotificationScreen from '../screens/Notifications';
+import {createStackNavigator} from '@react-navigation/stack';
 
-export const Stack = createNativeStackNavigator<RootStackParamList>();
+export const Stack = createStackNavigator<RootStackParamList>();
 
 function RootNavigator(): React.JSX.Element {
   const navigation = useNavigation();
-  function headerLeft({canGoBack}: HeaderBackButtonProps, color: string) {
+  function headerLeft({canGoBack}: any, color: string) {
     return canGoBack ? (
       <Pressable
         onPress={() => {
           navigation.goBack();
-        }}>
+        }}
+        style={{marginLeft:15}}>
         {ICONS.ArrowLeft({
-          height: 20,
-          width: 20,
+          height: 25,
+          width: 25,
           color: color,
           borderColor: color,
         })}
@@ -102,6 +103,24 @@ function RootNavigator(): React.JSX.Element {
               headerLeft: props => headerLeft(props, 'white'),
             }}
           />
+          <Stack.Screen
+            name={NAVIGATION.DetailBudget}
+            component={DetailBudget}
+            options={{
+              headerShown: true,
+              headerTitleStyle: {color: 'black'},
+              title: 'Detail Budget',
+              headerLeft: props => headerLeft(props, 'black'),
+            }}
+          />
+          <Stack.Screen
+            name={NAVIGATION.Notification}
+            component={NotificationScreen}
+            options={{
+              headerShown: true,
+              headerLeft: props => headerLeft(props, 'black'),
+            }}
+          />
         </Stack.Group>
       ) : (
         <Stack.Group>
@@ -138,3 +157,6 @@ function RootNavigator(): React.JSX.Element {
 }
 
 export default RootNavigator;
+function createNativeStackNavigator<T>() {
+  throw new Error('Function not implemented.');
+}

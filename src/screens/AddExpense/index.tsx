@@ -1,5 +1,6 @@
-import React, {useCallback, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {
+  Alert,
   Image,
   Pressable,
   SafeAreaView,
@@ -45,10 +46,15 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
     transaction = route.params.transaction;
     console.log(transaction?.freq);
   }
-
+  const month = new Date().getMonth();
   const backgroundColor =
     pageType === 'expense' ? COLORS.PRIMARY.RED : COLORS.PRIMARY.GREEN;
-  navigation.setOptions({title: pageType[0].toUpperCase() + pageType.slice(1)});
+
+  useEffect(() => {
+    navigation.setOptions({
+      title: pageType[0].toUpperCase() + pageType.slice(1),
+    });
+  }, []);
   const filePickSheetRef = useRef<BottomSheetModal>(null);
   const repeatSheetRef = useRef<BottomSheetModal>(null);
   const addCategorySheetRef = useRef<BottomSheetModal>(null);
@@ -69,6 +75,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
   const [repeatData, setRepeatData] = useState<repeatDataType | undefined>(
     transaction ? transaction.freq! : undefined,
   );
+  console.log(repeatData);
   const [desc, setDesc] = useState(transaction ? transaction.desc : '');
   const [amount, setAmount] = useState(
     transaction ? transaction.amount.toString() : '',
@@ -132,11 +139,40 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
               .collection('users')
               .doc(uid)
               .update({
-                [`spend.${category}`]:
-                  (UserFromJson(curr.data() as UserType).spend[category] ?? 0) -
+                [`spend.${month}.${category}`]:
+                  (UserFromJson(curr.data() as UserType).spend[month][
+                    category
+                  ] ?? 0) -
                   transaction!.amount +
                   Number(amount),
               });
+            const totalSpent =
+              ((UserFromJson(curr.data() as UserType).spend[month] ?? {})[
+                category
+              ] ?? 0) -
+              transaction!.amount +
+              Number(amount);
+            const totalBudget = (UserFromJson(curr.data() as UserType).budget[
+              month
+            ] ?? {})[category];
+            if (
+              totalBudget &&
+              totalSpent >= totalBudget.limit * (totalBudget.percentage / 100)
+            ) {
+              const notificationId = uuid.v4();
+              await firestore()
+                .collection('users')
+                .doc(uid)
+                .update({
+                  [`notification.${notificationId}`]: {
+                    type: 'budget',
+                    category: category,
+                    id: notificationId,
+                    time: Timestamp.now(),
+                    read: false,
+                  },
+                });
+            }
           }
         } else {
           await firestore()
@@ -145,16 +181,41 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
             .collection('transactions')
             .doc(id)
             .set(trans);
-
           if (pageType === 'expense') {
             await firestore()
               .collection('users')
               .doc(uid)
               .update({
-                [`spend.${category}`]:
-                  (UserFromJson(curr.data() as UserType).spend[category] ?? 0) +
-                  Number(amount),
+                [`spend.${month}.${category}`]:
+                  ((UserFromJson(curr.data() as UserType).spend[month] ?? {})[
+                    category
+                  ] ?? 0) + Number(amount),
               });
+            const totalSpent =
+              ((UserFromJson(curr.data() as UserType).spend[month] ?? {})[
+                category
+              ] ?? 0) + Number(amount);
+            const totalBudget = (UserFromJson(curr.data() as UserType).budget[
+              month
+            ] ?? {})[category];
+            if (
+              totalBudget &&
+              totalSpent >= totalBudget.limit * (totalBudget.percentage / 100)
+            ) {
+              const notificationId = uuid.v4();
+              await firestore()
+                .collection('users')
+                .doc(uid)
+                .update({
+                  [`notification.${notificationId}`]: {
+                    type: 'budget',
+                    category: category,
+                    id: notificationId,
+                    time: Timestamp.now(),
+                    read: false,
+                  },
+                });
+            }
           }
         }
         Toast.show({text1: pageType + ' Added Succesfully'});
@@ -294,7 +355,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
                 setRepeatData(undefined);
               }
             }}
-            value={repeatData !== undefined}
+            value={repeatData !== undefined && repeatData !== null}
           />
         </View>
         <Sapcer height={20} />

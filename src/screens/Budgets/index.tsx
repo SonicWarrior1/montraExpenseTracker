@@ -1,142 +1,115 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {Pressable, SafeAreaView, ScrollView, Text, View} from 'react-native';
 import styles from './styles';
 import {ICONS} from '../../constants/icons';
-import {COLORS} from '../../constants/commonStyles';
 import CustomButton from '../../components/CustomButton';
 import Sapcer from '../../components/Spacer';
 import {BudgetScreenProps} from '../../defs/navigation';
-import {NAVIGATION} from '../../constants/strings';
+import {monthData, NAVIGATION} from '../../constants/strings';
 import {useAppSelector} from '../../redux/store';
 import {Bar} from 'react-native-progress';
+import { COLORS } from '../../constants/commonStyles';
 
-function BudgetScreen({navigation}: BudgetScreenProps) {
-  const budgets = useAppSelector(state => state.user.currentUser?.budget);
-  const spend = useAppSelector(state => state.user.currentUser?.spend);
+function BudgetScreen({navigation}: Readonly<BudgetScreenProps>) {
+  const [month, setMonth] = useState(new Date().getMonth());
+  const budgets = useAppSelector(
+    state => state.user.currentUser?.budget[month],
+  );
   console.log(budgets);
+  const spend =
+    useAppSelector(state => state.user.currentUser?.spend[month]) ?? {};
   return (
     <View style={styles.safeView}>
       <SafeAreaView style={styles.safeView}>
-        <View
-          style={{
-            flexDirection: 'row',
-            paddingHorizontal: 20,
-            flex: 1,
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}>
-          {ICONS.ArrowLeft2({
-            height: 30,
-            width: 30,
-            color: 'white',
-          })}
-          <Text style={styles.month}>May</Text>
-          {ICONS.ArrowRight({
-            height: 30,
-            width: 30,
-            color: 'white',
-            borderColor: 'white',
-          })}
+        <View style={styles.monthRow}>
+          <Pressable
+            onPress={() => {
+              setMonth(month => {
+                if (month > 0) {
+                  return month - 1;
+                }
+                return month;
+              });
+            }}>
+            {ICONS.ArrowLeft2({
+              height: 30,
+              width: 30,
+              color: 'white',
+            })}
+          </Pressable>
+          <Text style={styles.month}>{monthData[month].label}</Text>
+          <Pressable
+            onPress={() => {
+              setMonth(month => {
+                if (month < new Date().getMonth()) {
+                  return month + 1;
+                }
+                return month;
+              });
+            }}>
+            {ICONS.ArrowRight({
+              height: 30,
+              width: 30,
+              color: 'white',
+              borderColor: 'white',
+            })}
+          </Pressable>
         </View>
       </SafeAreaView>
       <View style={styles.mainView}>
-        {Object.values(budgets!).length === 0 ? (
-          <View
-            style={{flex: 1, justifyContent: 'center', paddingHorizontal: 50}}>
-            <Text
-              style={{
-                fontSize: 16,
-                fontWeight: '500',
-                color: COLORS.DARK[25],
-                textAlign: 'center',
-              }}>
-              You don't have a budget.
-            </Text>
-            <Text
-              style={{
-                fontSize: 16,
-                fontWeight: '500',
-                color: COLORS.DARK[25],
-                textAlign: 'center',
-              }}>
-              Let's make one so you are in control.
-            </Text>
+        {budgets === undefined || Object.values(budgets).length === 0 ? (
+          <View style={styles.centerCtr}>
+            {month < new Date().getMonth() ? (
+              <Text style={styles.centerText}>
+                You don't have a budget for this month.
+              </Text>
+            ) : (
+              <>
+                <Text style={styles.centerText}>You don't have a budget.</Text>
+                <Text style={styles.centerText}>
+                  Let's make one so you are in control.
+                </Text>
+              </>
+            )}
           </View>
         ) : (
-          <ScrollView style={{flex: 1, marginTop: 10}}>
-            {Object.entries(budgets!).map(([key, val]) => {
+          <ScrollView style={{flex: 1, marginTop: 10, width: '100%'}}>
+            {Object.entries(budgets).map(([key, val]) => {
               return (
                 <Pressable
                   key={key}
-                  style={{
-                    backgroundColor: COLORS.LIGHT[100],
-                    marginVertical: 10,
-                    borderRadius: 16,
-                    padding: 16,
+                  style={styles.listItemCtr}
+                  onPress={() => {
+                    navigation.push(NAVIGATION.DetailBudget, {
+                      category: key,
+                    });
                   }}>
-                  <View
-                    style={{
-                      width: '100%',
-                      flexDirection: 'row',
-                      justifyContent: 'space-between',
-                    }}>
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        borderWidth: 1,
-                        borderColor: COLORS.LIGHT[20],
-                        backgroundColor: COLORS.LIGHT[80],
-                        paddingHorizontal: 10,
-                        paddingVertical: 5,
-                        borderRadius: 24,
-                        columnGap: 7,
-                      }}>
-                      <View
-                        style={{
-                          height: 14,
-                          width: 14,
-                          borderRadius: 10,
-                          backgroundColor: COLORS.BLUE[100],
-                        }}></View>
-                      <Text style={{fontSize: 14, fontWeight: '500'}}>
+                  <View style={styles.catRow}>
+                    <View style={styles.catCtr}>
+                      <View style={styles.colorBox}></View>
+                      <Text style={styles.catText}>
                         {key[0].toUpperCase() + key.slice(1)}
                       </Text>
                     </View>
-                    {(spend![key] ?? 0) >= val.limit &&
-                      ICONS.Alert({height: 20, width: 20})}
+                    {(spend[key] ?? 0) >= val.limit &&
+                      ICONS.Alert({height: 20, width: 20, color: COLORS.PRIMARY.RED})}
                   </View>
-                  <Text
-                    style={{
-                      fontSize: 24,
-                      fontWeight: '600',
-                      marginTop: 5,
-                      marginBottom: 5,
-                    }}>
-                    Remaining $0
+                  <Text style={styles.text1}>
+                    Remaining $
+                    {val.limit - spend[key] < 0 || spend[key] === undefined
+                      ? '0'
+                      : val.limit - (spend[key] ?? 0)}
                   </Text>
                   <Bar
-                    progress={(spend![key] ?? 0) / val.limit}
+                    progress={(spend[key] ?? 0) / val.limit}
                     height={8}
                     width={null}
                   />
-                  <Text
-                    style={{
-                      fontSize: 16,
-                      fontWeight: '500',
-                      marginTop: 5,
-                      color: COLORS.DARK[25],
-                    }}>
-                    ${spend![key] ?? 0} of ${val.limit}
+                  <Text style={styles.text2}>
+                    ${spend[key] ?? 0} of ${val.limit}
                   </Text>
-                  {(spend![key] ?? 0) >= val.limit && (
-                    <Text
-                      style={{
-                        fontSize: 14,
-                        fontWeight: '400',
-                        marginTop: 10,
-                        color: COLORS.PRIMARY.RED,
-                      }}>
+                  {(spend[key] ?? 0) >= val.limit && (
+                    <Text style={styles.limitText}>
                       You've exceed the limit!
                     </Text>
                   )}
@@ -145,16 +118,17 @@ function BudgetScreen({navigation}: BudgetScreenProps) {
             })}
           </ScrollView>
         )}
-        <CustomButton
-          title="Create a Budget"
-          onPress={() => {
-            navigation.push(NAVIGATION.CreateBudget);
-          }}
-        />
+        {month === new Date().getMonth() && (
+          <CustomButton
+            title="Create a Budget"
+            onPress={() => {
+              navigation.push(NAVIGATION.CreateBudget, {isEdit: false});
+            }}
+          />
+        )}
         <Sapcer height={20} />
       </View>
     </View>
   );
 }
-
 export default BudgetScreen;

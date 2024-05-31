@@ -12,8 +12,10 @@ export const NAVIGATION: {
     Profile: 'Profile',
     AddExpense: 'AddExpense',
     TransactionDetail: 'TransactionDetail',
-    DocView:"DocView",
-    CreateBudget:'CreateBudget'
+    DocView: "DocView",
+    CreateBudget: 'CreateBudget',
+    DetailBudget: 'DetailBudget'
+    Notification: 'Notification'
 } = {
     ONBOARDING: 'Onboarding',
     SIGNUP: 'Signup',
@@ -28,8 +30,10 @@ export const NAVIGATION: {
     Profile: 'Profile',
     AddExpense: 'AddExpense',
     TransactionDetail: 'TransactionDetail',
-    DocView:"DocView",
-    CreateBudget:'CreateBudget'
+    DocView: "DocView",
+    CreateBudget: 'CreateBudget',
+    DetailBudget: 'DetailBudget',
+    Notification: 'Notification'
 }
 
 export const STRINGS = {

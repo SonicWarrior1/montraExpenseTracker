@@ -1,4 +1,4 @@
-import React, {useRef} from 'react';
+import React, {useEffect, useRef} from 'react';
 import {
   Dimensions,
   Image,
@@ -23,20 +23,21 @@ function TransactionDetails({
 }: Readonly<TransactionDetailScreenProps>) {
   const bottomSheetModalRef = useRef<BottomSheetModalMethods>(null);
   const trans = route.params.transaction;
-  console.log();
   const headerRight = () => {
     return (
       <Pressable
         onPress={() => {
           bottomSheetModalRef.current?.present();
-        }}>
-        {ICONS.Trash({height: 20, width: 20})}
+        }} style={{marginRight:15}}>
+        {ICONS.Trash({height: 25, width: 25, color: 'white'})}
       </Pressable>
     );
   };
-  navigation.setOptions({
-    headerRight: headerRight,
-  });
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: headerRight,
+    });
+  }, []);
   return (
     <View style={{flex: 1}}>
       <SafeAreaView
@@ -51,7 +52,7 @@ function TransactionDetails({
         ]}>
         <Sapcer height={Dimensions.get('screen').height * 0.075} />
         <Text style={styles.amt}>${trans.amount}</Text>
-        <Text style={styles.desc}>{trans.desc}</Text>
+        <Text style={styles.desc}>{trans.desc ?? ''}</Text>
         <Text style={styles.time}>
           {weekData[trans.timeStamp.toDate().getDay()].label}{' '}
           {trans.timeStamp.toDate().getDate()}{' '}
@@ -61,45 +62,31 @@ function TransactionDetails({
           {trans.timeStamp.toDate().getMinutes()}
         </Text>
       </SafeAreaView>
-      <View
-        style={{
-          flex: 2,
-          backgroundColor: 'white',
-          width: '100%',
-          paddingHorizontal: 20,
-        }}>
-        <View
-          style={{
-            flexDirection: 'row',
-            backgroundColor: 'white',
-            columnGap: 50,
-            paddingVertical: 15,
-            paddingHorizontal: 40,
-            borderRadius: 12,
-            borderWidth: 1,
-            borderColor: COLORS.LIGHT[20],
-            transform: [{translateY: -40}],
-          }}>
-          <View style={{alignItems: 'center', rowGap: 8}}>
+      <View style={styles.bottomView}>
+        <View style={styles.ctr}>
+          <View style={styles.ctrColumn}>
             <Text style={styles.text1}>Type</Text>
             <Text style={styles.text2}>
               {trans.type[0].toLocaleUpperCase() + trans.type.slice(1)}
             </Text>
           </View>
-          <View style={{alignItems: 'center', rowGap: 8}}>
+          <View style={styles.ctrColumn}>
             <Text style={styles.text1}>Category</Text>
             <Text style={styles.text2}>
-              {trans.category[0].toLocaleUpperCase() + trans.category.slice(1)}
+              {(trans.category ?? '')[0].toLocaleUpperCase() +
+                (trans.category ?? '').slice(1)}
             </Text>
           </View>
-          <View style={{alignItems: 'center', rowGap: 8}}>
+          <View style={styles.ctrColumn}>
             <Text style={styles.text1}>Wallet</Text>
             <Text style={styles.text2}>
-              {trans.wallet[0].toLocaleUpperCase() + trans.wallet.slice(1)}
+              {trans.wallet === undefined || trans.wallet === ''
+                ? ''
+                : trans.wallet[0].toLocaleUpperCase() + trans.wallet.slice(1)}
             </Text>
           </View>
         </View>
-        <View style={{flex: 1, transform: [{translateY: -20}]}}>
+        <View style={styles.descCtr}>
           <Text style={styles.descTitle}>Description</Text>
           <Text style={styles.descText}>
             Amet minim mollit non deserunt ullamco est sit aliqua dolor do amet
@@ -127,7 +114,7 @@ function TransactionDetails({
             </View>
           )}
         </View>
-        <View style={{transform: [{translateY: -40}]}}>
+        <View style={styles.btnView}>
           <CustomButton
             title="Edit"
             onPress={() => {

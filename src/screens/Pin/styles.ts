@@ -2,7 +2,7 @@ import { StyleSheet } from "react-native";
 import { COLORS } from "../../constants/commonStyles";
 
 const styles = StyleSheet.create({
-    safeView: { flex: 1, backgroundColor: COLORS.PRIMARY.VIOLET },
+    safeView: { flex: 1, backgroundColor: COLORS.PRIMARY.VIOLET ,paddingTop:30},
     mainView: {
         flex: 1,
         justifyContent: "space-between",

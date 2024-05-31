@@ -2,6 +2,7 @@ import Animated, { SharedValue } from "react-native-reanimated";
 import { iconProps } from "../../constants/icons";
 import styles from "./styles";
 import { Pressable } from "react-native";
+import { COLORS } from "../../constants/commonStyles";
 
 function AnimatedBtn({
     translateX,
@@ -32,7 +33,7 @@ function AnimatedBtn({
         <Pressable
           style={[styles.animatedBtn, {backgroundColor: backgrounColor}]}
           onPress={onPress}>
-          {icon({height: 30, width: 30, color: 'green'})}
+          {icon({height: 30, width: 30, color: COLORS.LIGHT[100]})}
         </Pressable>
       </Animated.View>
     );

@@ -11,6 +11,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         paddingHorizontal: 16,
         paddingBottom: 10,
+        marginTop: 10
     },
     dropdown: {
         borderWidth: 1,
