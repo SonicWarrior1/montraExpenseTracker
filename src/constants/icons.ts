@@ -1,6 +1,5 @@
-import React from 'react';
 import { RFValue } from 'react-native-responsive-fontsize';
-import User from '../assets/Svgs/user.svg'
+import User from '../assets/Svgs/user.svg';
 import Onboard1 from '../assets/Svgs/Onboard1.svg';
 import Onboard2 from '../assets/Svgs/Onboard2.svg';
 import Onboard3 from '../assets/Svgs/Onboard3.svg';
@@ -11,7 +10,7 @@ import ArrowLeft from '../assets/Svgs/arrow left.svg';
 import ArrowLeft2 from '../assets/Svgs/arrow-left-2.svg';
 import EmailSent from '../assets/Svgs/emailSent.svg';
 import Home from '../assets/Svgs/home.svg';
-import Transaction from '../assets/Svgs/transaction.svg';
+import Transaction from '../assets/Svgs/Transaction.svg';
 import Pie from '../assets/Svgs/pie-chart.svg';
 import Close from '../assets/Svgs/close.svg';
 import Income from '../assets/Svgs/income.svg';
@@ -33,7 +32,7 @@ const iconStyle = (
   { width = 0,
     height = 0,
     color = 'black',
-    borderColor = 'none', }
+    borderColor = 'none' }
 ) => ({
   width: RFValue(width),
   height: RFValue(height),

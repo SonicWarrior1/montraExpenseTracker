@@ -12,10 +12,11 @@ export const NAVIGATION: {
     Profile: 'Profile',
     AddExpense: 'AddExpense',
     TransactionDetail: 'TransactionDetail',
-    DocView: "DocView",
+    DocView: 'DocView',
     CreateBudget: 'CreateBudget',
     DetailBudget: 'DetailBudget'
-    Notification: 'Notification'
+    Notification: 'Notification',
+    Story: 'Story'
 } = {
     ONBOARDING: 'Onboarding',
     SIGNUP: 'Signup',
@@ -30,11 +31,12 @@ export const NAVIGATION: {
     Profile: 'Profile',
     AddExpense: 'AddExpense',
     TransactionDetail: 'TransactionDetail',
-    DocView: "DocView",
+    DocView: 'DocView',
     CreateBudget: 'CreateBudget',
     DetailBudget: 'DetailBudget',
-    Notification: 'Notification'
-}
+    Notification: 'Notification',
+    Story: 'Story',
+};
 
 export const STRINGS = {
     LOGIN: 'Login',
@@ -45,18 +47,18 @@ export const STRINGS = {
     BackToLogin: 'Back to Login',
     DontWorry: "Don't worry.",
     EnterEmailForReset: "Enter your email and we'll send you a link to reset your password.",
-    Continue: "Continue",
-    Email: "Email",
-    Name: "Name",
-    Password: "Password",
-    ConfrimPassword: "Confirm Password",
+    Continue: 'Continue',
+    Email: 'Email',
+    Name: 'Name',
+    Password: 'Password',
+    ConfrimPassword: 'Confirm Password',
     BySigningUp: 'By signing up, you agree to the',
     Terms: 'Terms of Service and Privacy Policy',
     OrWith: 'Or With',
     SignupWithGoogle: 'Sign Up with Google',
     AlreadyHaveAccount: 'Already have an Account?',
     SignupSuccesful: 'Signup Succesful',
-}
+};
 export const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w]{1,}$/;
 export const nameRegex = /^[a-zA-Z ]*$/;
 export const passRegex =
@@ -84,7 +86,7 @@ export const weekData = [
     { label: 'Thursday', value: 4 },
     { label: 'Friday', value: 5 },
     { label: 'Saturday', value: 6 },
-]
+];
 // export const expenseCat = [
 //     { label: 'Add new category', value: 'add' },
 //     { label: 'Food', value: 'food' },

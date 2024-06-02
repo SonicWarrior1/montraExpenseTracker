@@ -16,7 +16,7 @@ import {COLORS} from '../../constants/commonStyles';
 import {ScrollView} from 'react-native-gesture-handler';
 import TransactionHeader from '../../components/TransactionHeader';
 import {TransactionScreenProps} from '../../defs/navigation';
-import {setTransaction} from '../../redux/reducers/transactionSlice';
+import {NAVIGATION} from '../../constants/strings';
 function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
   const user = useAppSelector(state => state.user.currentUser);
   const [data, setData] = useState<
@@ -25,7 +25,6 @@ function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
       data: Array<transactionType>;
     }[]
   >([]);
-  const dispatch = useAppDispatch();
   const fetchData = useCallback(async () => {
     try {
       const res = await firestore()
@@ -35,7 +34,6 @@ function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
         .orderBy('timeStamp', 'desc')
         .get();
       const data = res.docs.map(snapshot => snapshot.data() as transactionType);
-      // dispatch(setTransaction(data));
       const filteredData = filterDataByDate(data);
       setData(filteredData);
     } catch (e) {
@@ -50,16 +48,16 @@ function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
       (acc: {[key: string]: Array<transactionType>}, item) => {
         const itemTime = item.timeStamp.seconds;
         if (itemTime >= startOfToday) {
-          if (acc['today']) {
-            acc['today'].push(item);
+          if (acc.today) {
+            acc.today.push(item);
           } else {
-            acc['today'] = [item];
+            acc.today = [item];
           }
         } else if (itemTime >= startOfYesterday) {
-          if (acc['yesterday']) {
-            acc['yesterday'].push(item);
+          if (acc.yesterday) {
+            acc.yesterday.push(item);
           } else {
-            acc['yesterday'] = [item];
+            acc.yesterday = [item];
           }
         } else {
           if (acc[item.timeStamp.seconds]) {
@@ -73,11 +71,11 @@ function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
       {},
     );
     const result = [
-      {title: 'today', data: res['today'] ?? []},
-      {title: 'yesterday', data: res['yesterday'] ?? []},
+      {title: 'today', data: res.today ?? []},
+      {title: 'yesterday', data: res.yesterday ?? []},
     ];
-    delete res['today'];
-    delete res['yesterday'];
+    delete res.today;
+    delete res.yesterday;
     const arr = Object.entries(res);
     const x = arr.reduce(
       (acc: Array<{title: string; data: Array<transactionType>}>, curr) => {
@@ -140,7 +138,11 @@ function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
       <TransactionHeader />
       <ScrollView>
         <View style={styles.mainView}>
-          <TouchableOpacity style={styles.financialBtn} onPress={() => {}}>
+          <TouchableOpacity
+            style={styles.financialBtn}
+            onPress={() => {
+              navigation.navigate(NAVIGATION.Story);
+            }}>
             <Text style={styles.financialText}>See your financial report</Text>
             {ICONS.ArrowRight({height: 20, width: 20})}
           </TouchableOpacity>
@@ -189,7 +191,7 @@ function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
             )}
             renderSectionHeader={({section: {title, data}}) =>
               data.length === 0 ? (
-                <View></View>
+                <View />
               ) : (
                 <Text style={styles.sectionHeader}>
                   {title !== 'today' && title !== 'yesterday'

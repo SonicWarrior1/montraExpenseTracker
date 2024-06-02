@@ -1,23 +1,35 @@
 import React from 'react';
-import {Image, Pressable, SafeAreaView, Text, View} from 'react-native';
+import {
+  Dimensions,
+  Image,
+  Pressable,
+  SafeAreaView,
+  Text,
+  View,
+} from 'react-native';
 import CustomButton from '../../components/CustomButton';
 import auth from '@react-native-firebase/auth';
 import {useAppDispatch, useAppSelector} from '../../redux/store';
 import {userLoggedIn} from '../../redux/reducers/userSlice';
 import LinearGradient from 'react-native-linear-gradient';
 import {ICONS} from '../../constants/icons';
-import CustomDropdown from '../../components/CustomDropDown';
 import {monthData, NAVIGATION} from '../../constants/strings';
 import {Dropdown} from 'react-native-element-dropdown';
 import styles from './styles';
 import {COLORS} from '../../constants/commonStyles';
 import {HomeScreenProps} from '../../defs/navigation';
+import {LineChart} from 'react-native-gifted-charts';
 
-function Home({navigation}: HomeScreenProps) {
+function Home({navigation}: Readonly<HomeScreenProps>) {
   const dispatch = useAppDispatch();
   const notifications = useAppSelector(
     state => state.user.currentUser?.notification,
   );
+  const spends = useAppSelector(state => state.user.currentUser?.spend);
+  const x = Object.values(spends!).map(value => {
+    return {value: Object.values(value).reduce((a, b) => a + b, 0)};
+  });
+  console.log(x);
   return (
     <View style={{backgroundColor: 'white', flex: 1}}>
       <LinearGradient
@@ -26,7 +38,7 @@ function Home({navigation}: HomeScreenProps) {
           flex: 1,
           borderBottomLeftRadius: 32,
           borderBottomRightRadius: 32,
-          paddingTop:15
+          paddingTop: 15,
         }}>
         <SafeAreaView
           style={{
@@ -61,7 +73,7 @@ function Home({navigation}: HomeScreenProps) {
               style={styles.dropdown}
               renderLeftIcon={() => (
                 <View>{ICONS.ArrowDown({width: 15, height: 15})}</View>
-              )}
+              )}  
               renderRightIcon={() => <></>}
               placeholder="Month"
               placeholderStyle={{marginLeft: 10}}
@@ -93,7 +105,7 @@ function Home({navigation}: HomeScreenProps) {
                   }}>
                   <Text style={{color: COLORS.VIOLET[100]}}>
                     {
-                      Object.values(notifications).filter(item => item.read)
+                      Object.values(notifications).filter(item => !item.read)
                         .length
                     }
                   </Text>
@@ -152,9 +164,25 @@ function Home({navigation}: HomeScreenProps) {
           </View>
         </SafeAreaView>
       </LinearGradient>
-
       <View style={{flex: 1.4}}>
         <View style={{flex: 1, backgroundColor: 'white'}}>
+          <LineChart
+            data={[{value: 0}, {value: 100}, ...x]}
+            areaChart
+            adjustToWidth
+            startFillColor1={COLORS.VIOLET[40]}
+            animateOnDataChange
+            isAnimated={true}
+            width={Dimensions.get('screen').width}
+            hideDataPoints
+            thickness={10}
+            hideRules
+            hideYAxisText
+            hideAxesAndRules
+            color={COLORS.VIOLET[100]}
+            curveType={0}
+            curved={true}
+          />
           <CustomButton
             title="Signout"
             onPress={async () => {

@@ -121,6 +121,28 @@ export function NameValError({
     </>
   );
 }
+export function EmptyError({
+  value,
+  formKey,
+  errorText,
+  color = 'rgb(255,51,51)',
+  size=12
+}: Readonly<{
+  value: string;
+  formKey: boolean;
+  errorText: string;
+  color?: string;
+  size?: number;
+}>) {
+  return (
+    <>
+      <Sapcer height={10} />
+      {value === '' && formKey && (
+        <Text style={[style.error, {color: color,fontSize:size}]}>{errorText}</Text>
+      )}
+    </>
+  );
+}
 
 const style = StyleSheet.create({
   error: {

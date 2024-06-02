@@ -1,10 +1,9 @@
-import React, {useEffect} from 'react';
 import {RootStackParamList} from '../defs/navigation';
 import Onboarding from '../screens/Onboarding';
 import {NAVIGATION} from '../constants/strings';
 import Signup from '../screens/Signup';
 import {ICONS} from '../constants/icons';
-import {Alert, Pressable, Text, TouchableOpacity, View} from 'react-native';
+import {Pressable} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import Login from '../screens/Login';
 import {useAppSelector} from '../redux/store';
@@ -19,6 +18,7 @@ import CreateBudget from '../screens/CreateBudget';
 import DetailBudget from '../screens/DetailBudget';
 import NotificationScreen from '../screens/Notifications';
 import {createStackNavigator} from '@react-navigation/stack';
+import StoryScreen from '../screens/StoryScreen';
 
 export const Stack = createStackNavigator<RootStackParamList>();
 
@@ -30,7 +30,7 @@ function RootNavigator(): React.JSX.Element {
         onPress={() => {
           navigation.goBack();
         }}
-        style={{marginLeft:15}}>
+        style={{marginLeft: 15}}>
         {ICONS.ArrowLeft({
           height: 25,
           width: 25,
@@ -121,6 +121,7 @@ function RootNavigator(): React.JSX.Element {
               headerLeft: props => headerLeft(props, 'black'),
             }}
           />
+          <Stack.Screen name={NAVIGATION.Story} component={StoryScreen} />
         </Stack.Group>
       ) : (
         <Stack.Group>
@@ -157,6 +158,3 @@ function RootNavigator(): React.JSX.Element {
 }
 
 export default RootNavigator;
-function createNativeStackNavigator<T>() {
-  throw new Error('Function not implemented.');
-}

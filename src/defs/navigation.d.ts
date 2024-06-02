@@ -1,9 +1,8 @@
 
-import { transactionType } from "./transaction"
-import { CompositeScreenProps } from "@react-navigation/native"
-import { BottomTabScreenProps } from "@react-navigation/bottom-tabs"
-import { UserType } from "./user"
-import { StackScreenProps } from "@react-navigation/stack"
+import { transactionType } from './transaction';
+import { CompositeScreenProps } from '@react-navigation/native';
+import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
+import { StackScreenProps } from '@react-navigation/stack';
 
 export type RootStackParamList = {
     Onboarding: undefined,
@@ -18,7 +17,8 @@ export type RootStackParamList = {
     DocView: { uri: string },
     CreateBudget: { isEdit: boolean, category?: string },
     DetailBudget: { category: string },
-    Notification: undefined
+    Notification: undefined,
+    Story: undefined
 }
 
 export type BottomParamList = {
@@ -43,3 +43,4 @@ export type CreateBudgetScreenProps = StackScreenProps<RootStackParamList, 'Crea
 export type DetailBudgetScreenProps = StackScreenProps<RootStackParamList, 'DetailBudget'>
 export type NotificationScreenProps = StackScreenProps<RootStackParamList, 'Notification'>
 export type HomeScreenProps = CompositeScreenProps<BottomTabScreenProps<BottomParamList, 'Home'>, StackScreenProps<RootStackParamList>>
+export type StoryScreenProps = StackScreenProps<RootStackParamList, 'Story'>

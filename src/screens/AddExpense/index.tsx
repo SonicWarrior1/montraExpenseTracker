@@ -1,6 +1,5 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {
-  Alert,
   Image,
   Pressable,
   SafeAreaView,
@@ -18,7 +17,10 @@ import {ICONS} from '../../constants/icons';
 import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import FilePickerSheet from '../../components/FilePickerSheet';
 import RepeatTransactionSheet from '../../components/RepeatTranscationSheet';
-import firestore, {Timestamp} from '@react-native-firebase/firestore';
+import firestore, {
+  FirebaseFirestoreTypes,
+  Timestamp,
+} from '@react-native-firebase/firestore';
 import {monthData, weekData} from '../../constants/strings';
 import CustomButton from '../../components/CustomButton';
 import {repeatDataType, transactionType} from '../../defs/transaction';
@@ -30,18 +32,12 @@ import {ExpenseScreenProps} from '../../defs/navigation';
 import storage from '@react-native-firebase/storage';
 import AddCategorySheet from '../../components/AddCategorySheet';
 import {UserFromJson, UserType} from '../../defs/user';
+import {EmptyError} from '../../constants/errors';
 
 function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
-  const expenseCat = useAppSelector(
-    state => state.user.currentUser?.expenseCategory,
-  );
-  const incomeCat = useAppSelector(
-    state => state.user.currentUser?.incomeCategory,
-  );
-  console.log(expenseCat);
   const pageType = route.params.type;
   const isEdit = route.params.isEdit;
-  let transaction: transactionType | undefined = undefined;
+  let transaction: transactionType | undefined;
   if (isEdit) {
     transaction = route.params.transaction;
     console.log(transaction?.freq);
@@ -55,12 +51,19 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
       title: pageType[0].toUpperCase() + pageType.slice(1),
     });
   }, []);
+
+  const expenseCat = useAppSelector(
+    state => state.user.currentUser?.expenseCategory,
+  );
+  const incomeCat = useAppSelector(
+    state => state.user.currentUser?.incomeCategory,
+  );
+  const dispatch = useAppDispatch();
+  const uid = useAppSelector(state => state.user.currentUser?.uid);
+
   const filePickSheetRef = useRef<BottomSheetModal>(null);
   const repeatSheetRef = useRef<BottomSheetModal>(null);
   const addCategorySheetRef = useRef<BottomSheetModal>(null);
-  const handlePresentModalPress = useCallback(() => {
-    filePickSheetRef.current?.present();
-  }, []);
 
   const [image, setImage] = useState(
     transaction && transaction.attachementType === 'image'
@@ -75,7 +78,6 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
   const [repeatData, setRepeatData] = useState<repeatDataType | undefined>(
     transaction ? transaction.freq! : undefined,
   );
-  console.log(repeatData);
   const [desc, setDesc] = useState(transaction ? transaction.desc : '');
   const [amount, setAmount] = useState(
     transaction ? transaction.amount.toString() : '',
@@ -84,148 +86,185 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
     transaction ? transaction.category : '',
   );
   const [wallet, setWallet] = useState(transaction ? transaction.wallet : '');
-  const dispatch = useAppDispatch();
-  const uid = useAppSelector(state => state.user.currentUser?.uid);
-  async function handlePress() {
-    if (amount) {
-      dispatch(setLoading(true));
-      let attachement = '';
-      let attachementType: transactionType['attachementType'] = 'none';
-      if (image !== '') {
-        attachement = image!;
-        attachementType = 'image';
-      } else if (doc) {
-        attachement = doc.uri;
-        attachementType = 'doc';
+
+  const getAttachmentAndType = useCallback(() => {
+    let attachement = '';
+    let attachementType: transactionType['attachementType'] = 'none';
+    if (image !== '') {
+      attachement = image!;
+      attachementType = 'image';
+    } else if (doc) {
+      attachement = doc.uri;
+      attachementType = 'doc';
+    }
+    return {attachement, attachementType};
+  }, [image, doc]);
+
+  async function getAttachmentUrl({
+    attachement,
+    id,
+  }: {
+    attachement: string;
+    id: string;
+  }) {
+    let url = '';
+    if (attachement !== '') {
+      if (!attachement?.startsWith('https://firebasestorage.googleapis.com')) {
+        await storage().ref(`users/${uid}/${id}`).putFile(attachement);
+        url = await storage().ref(`users/${uid}/${id}`).getDownloadURL();
+      } else {
+        url = attachement;
       }
-      try {
-        const id = uuid.v4().toString();
-        let url = '';
-        if (attachement !== '') {
-          if (
-            !attachement?.startsWith('https://firebasestorage.googleapis.com')
-          ) {
-            await storage().ref(`users/${uid}/${id}`).putFile(attachement);
-            url = await storage().ref(`users/${uid}/${id}`).getDownloadURL();
-          } else {
-            console.log('yo');
-            url = attachement;
-          }
-        }
-        const trans: transactionType = {
-          amount: Number(amount),
-          category: category,
-          desc: desc,
-          wallet: wallet,
-          attachement: url,
-          repeat: repeatData !== undefined,
-          freq: repeatData ?? null,
-          id: isEdit ? transaction!.id : id,
-          timeStamp: isEdit ? transaction?.timeStamp! : Timestamp.now(),
-          type: pageType,
-          attachementType: attachementType,
-        };
-        console.log(transaction);
-        const curr = await firestore().collection('users').doc(uid).get();
-        if (isEdit) {
-          await firestore()
-            .collection('users')
-            .doc(uid)
-            .collection('transactions')
-            .doc(transaction!.id)
-            .update(trans);
-          if (pageType === 'expense') {
-            await firestore()
-              .collection('users')
-              .doc(uid)
-              .update({
-                [`spend.${month}.${category}`]:
-                  (UserFromJson(curr.data() as UserType).spend[month][
-                    category
-                  ] ?? 0) -
-                  transaction!.amount +
-                  Number(amount),
-              });
-            const totalSpent =
-              ((UserFromJson(curr.data() as UserType).spend[month] ?? {})[
-                category
-              ] ?? 0) -
-              transaction!.amount +
-              Number(amount);
-            const totalBudget = (UserFromJson(curr.data() as UserType).budget[
-              month
-            ] ?? {})[category];
-            if (
-              totalBudget &&
-              totalSpent >= totalBudget.limit * (totalBudget.percentage / 100)
-            ) {
-              const notificationId = uuid.v4();
-              await firestore()
-                .collection('users')
-                .doc(uid)
-                .update({
-                  [`notification.${notificationId}`]: {
-                    type: 'budget',
-                    category: category,
-                    id: notificationId,
-                    time: Timestamp.now(),
-                    read: false,
-                  },
-                });
-            }
-          }
-        } else {
-          await firestore()
-            .collection('users')
-            .doc(uid)
-            .collection('transactions')
-            .doc(id)
-            .set(trans);
-          if (pageType === 'expense') {
-            await firestore()
-              .collection('users')
-              .doc(uid)
-              .update({
-                [`spend.${month}.${category}`]:
-                  ((UserFromJson(curr.data() as UserType).spend[month] ?? {})[
-                    category
-                  ] ?? 0) + Number(amount),
-              });
-            const totalSpent =
-              ((UserFromJson(curr.data() as UserType).spend[month] ?? {})[
-                category
-              ] ?? 0) + Number(amount);
-            const totalBudget = (UserFromJson(curr.data() as UserType).budget[
-              month
-            ] ?? {})[category];
-            if (
-              totalBudget &&
-              totalSpent >= totalBudget.limit * (totalBudget.percentage / 100)
-            ) {
-              const notificationId = uuid.v4();
-              await firestore()
-                .collection('users')
-                .doc(uid)
-                .update({
-                  [`notification.${notificationId}`]: {
-                    type: 'budget',
-                    category: category,
-                    id: notificationId,
-                    time: Timestamp.now(),
-                    read: false,
-                  },
-                });
-            }
-          }
-        }
-        Toast.show({text1: pageType + ' Added Succesfully'});
-        navigation.pop();
-      } catch (e) {
-        console.log(e);
-      }
-      dispatch(setLoading(false));
+    }
+    return url;
+  }
+
+  function createTransaction({
+    id,
+    url,
+    attachementType,
+  }: {
+    id: string;
+    url: string;
+    attachementType: transactionType['attachementType'];
+  }) {
+    return {
+      amount: Number(amount),
+      category: category,
+      desc: desc,
+      wallet: wallet,
+      attachement: url,
+      repeat: repeatData !== undefined,
+      freq: repeatData ?? null,
+      id: isEdit ? transaction!.id : id,
+      timeStamp: isEdit ? transaction?.timeStamp! : Timestamp.now(),
+      type: pageType,
+      attachementType: attachementType,
+    };
+  }
+
+  async function updateTransaction({trans}: {trans: transactionType}) {
+    await firestore()
+      .collection('users')
+      .doc(uid)
+      .collection('transactions')
+      .doc(transaction!.id)
+      .update(trans);
+  }
+
+  async function addNewTransaction({
+    id,
+    trans,
+  }: {
+    id: string;
+    trans: transactionType;
+  }) {
+    await firestore()
+      .collection('users')
+      .doc(uid)
+      .collection('transactions')
+      .doc(id)
+      .set(trans);
+  }
+
+  async function handleExpenseUpdate({
+    curr,
+  }: {
+    curr: FirebaseFirestoreTypes.DocumentSnapshot<FirebaseFirestoreTypes.DocumentData>;
+  }) {
+    await firestore()
+      .collection('users')
+      .doc(uid)
+      .update({
+        [`spend.${month}.${category}`]:
+          (UserFromJson(curr.data() as UserType).spend[month][category] ?? 0) -
+          transaction!.amount +
+          Number(amount),
+      });
+  }
+
+  async function handleNewExpense({
+    curr,
+  }: {
+    curr: FirebaseFirestoreTypes.DocumentSnapshot<FirebaseFirestoreTypes.DocumentData>;
+  }) {
+    await firestore()
+      .collection('users')
+      .doc(uid)
+      .update({
+        [`spend.${month}.${category}`]:
+          (UserFromJson(curr.data() as UserType)?.spend[month]?.[category] ??
+            0) + Number(amount),
+      });
+  }
+  async function handleNotify({
+    curr,
+    totalSpent,
+  }: {
+    curr: FirebaseFirestoreTypes.DocumentSnapshot<FirebaseFirestoreTypes.DocumentData>;
+    totalSpent: number;
+  }) {
+    const totalBudget = UserFromJson(curr.data() as UserType)?.budget?.[
+      month
+    ]?.[category];
+    if (
+      totalBudget &&
+      totalSpent >= totalBudget.limit * (totalBudget.percentage / 100)
+    ) {
+      const notificationId = uuid.v4();
+      await firestore()
+        .collection('users')
+        .doc(uid)
+        .update({
+          [`notification.${notificationId}`]: {
+            type: 'budget',
+            category: category,
+            id: notificationId,
+            time: Timestamp.now(),
+            read: false,
+          },
+        });
     }
   }
+  async function handlePress() {
+    setFormKey(true);
+    if (amount === '' || category === '' || wallet === '') {
+      return;
+    }
+    dispatch(setLoading(true));
+    const {attachement, attachementType} = getAttachmentAndType();
+    try {
+      const id = uuid.v4().toString();
+      const url = await getAttachmentUrl({attachement, id});
+      const trans = createTransaction({id, url, attachementType});
+      const curr = await firestore().collection('users').doc(uid).get();
+      if (isEdit) {
+        await updateTransaction({trans});
+        if (pageType === 'expense') {
+          await handleExpenseUpdate({curr});
+          const totalSpent =
+            UserFromJson(curr.data() as UserType)?.spend?.[month]?.[category] ??
+            0 - transaction!.amount + Number(amount);
+          await handleNotify({curr, totalSpent});
+        }
+      } else {
+        await addNewTransaction({id, trans});
+        if (pageType === 'expense') {
+          await handleNewExpense({curr});
+          const totalSpent =
+            (UserFromJson(curr.data() as UserType)?.spend[month]?.[category] ??
+              0) + Number(amount);
+          await handleNotify({curr, totalSpent});
+        }
+      }
+      Toast.show({text1: pageType + ' Added Succesfully'});
+      navigation.pop();
+    } catch (e) {
+      console.log(e);
+    }
+    dispatch(setLoading(false));
+  }
+  const [formKey, setFormKey] = useState(false);
   return (
     <View style={[styles.safeView, {backgroundColor: backgroundColor}]}>
       <SafeAreaView
@@ -243,6 +282,15 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
               }}
               value={amount}
               keyboardType="numeric"
+            />
+          </View>
+          <View style={{left: 20}}>
+            <EmptyError
+              errorText="Please fill an amount"
+              value={amount}
+              formKey={formKey}
+              color={COLORS.RED[100]}
+              size={18}
             />
           </View>
         </View>
@@ -271,7 +319,11 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
           value={category}
           placeholder="Category"
         />
-        <Sapcer height={10} />
+        <EmptyError
+          errorText="Please select a category"
+          value={category}
+          formKey={formKey}
+        />
         <CustomInput
           placeholderText="Description"
           onChangeText={(str: string) => {
@@ -292,11 +344,13 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
           value={wallet}
           placeholder="Wallet"
         />
-        <Sapcer height={10} />
+        <EmptyError
+          errorText="Please select a wallet"
+          value={wallet}
+          formKey={formKey}
+        />
         {image === '' && doc === undefined ? (
-          <Pressable
-            style={styles.attachementCtr}
-            onPress={handlePresentModalPress}>
+          <Pressable style={styles.attachementCtr}>
             {ICONS.Attachment({
               height: 20,
               width: 20,
