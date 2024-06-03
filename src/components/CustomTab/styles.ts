@@ -3,7 +3,7 @@ import { COLORS } from "../../constants/commonStyles";
 
 const styles = StyleSheet.create({
     tabCtr: {
-        height: 90,
+        height: 100,
         backgroundColor: COLORS.LIGHT[80],
         flexDirection: 'row',
         justifyContent: 'space-around',

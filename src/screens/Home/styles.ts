@@ -12,11 +12,10 @@ const styles = StyleSheet.create({
     },
     moneyCtr: {
         height: 80,
-
         borderRadius: 28,
         justifyContent: 'center',
         flexDirection: 'row',
-        paddingHorizontal: 20,
+        paddingHorizontal: 15,
         columnGap: 10,
         alignItems: 'center',
     },

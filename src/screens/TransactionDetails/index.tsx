@@ -11,16 +11,23 @@ import styles from './styles';
 import {TransactionDetailScreenProps} from '../../defs/navigation';
 import {COLORS} from '../../constants/commonStyles';
 import {ICONS} from '../../constants/icons';
-import {monthData, NAVIGATION, weekData} from '../../constants/strings';
+import {
+  currencies,
+  monthData,
+  NAVIGATION,
+  weekData,
+} from '../../constants/strings';
 import Sapcer from '../../components/Spacer';
 import CustomButton from '../../components/CustomButton';
 import {BottomSheetModalMethods} from '@gorhom/bottom-sheet/lib/typescript/types';
 import DeleteTransactionSheet from '../../components/DeleteTransSheet';
+import {useAppSelector} from '../../redux/store';
 
 function TransactionDetails({
   route,
   navigation,
 }: Readonly<TransactionDetailScreenProps>) {
+  const currency = useAppSelector(state => state.user.currentUser?.currency);
   const bottomSheetModalRef = useRef<BottomSheetModalMethods>(null);
   const trans = route.params.transaction;
   const headerRight = () => {
@@ -28,7 +35,8 @@ function TransactionDetails({
       <Pressable
         onPress={() => {
           bottomSheetModalRef.current?.present();
-        }} style={{marginRight:15}}>
+        }}
+        style={{marginRight: 15}}>
         {ICONS.Trash({height: 25, width: 25, color: 'white'})}
       </Pressable>
     );
@@ -51,7 +59,9 @@ function TransactionDetails({
           },
         ]}>
         <Sapcer height={Dimensions.get('screen').height * 0.075} />
-        <Text style={styles.amt}>${trans.amount}</Text>
+        <Text style={styles.amt}>
+          {currencies[currency!].symbol ?? '$'} {trans.amount}
+        </Text>
         <Text style={styles.desc}>{trans.desc ?? ''}</Text>
         <Text style={styles.time}>
           {weekData[trans.timeStamp.toDate().getDay()].label}{' '}

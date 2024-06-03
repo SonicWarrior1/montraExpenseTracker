@@ -18,7 +18,10 @@ export type RootStackParamList = {
     CreateBudget: { isEdit: boolean, category?: string },
     DetailBudget: { category: string },
     Notification: undefined,
-    Story: undefined
+    Story: undefined,
+    FinancialReport: undefined,
+    Settings: undefined,
+    Currency: undefined
 }
 
 export type BottomParamList = {
@@ -44,3 +47,5 @@ export type DetailBudgetScreenProps = StackScreenProps<RootStackParamList, 'Deta
 export type NotificationScreenProps = StackScreenProps<RootStackParamList, 'Notification'>
 export type HomeScreenProps = CompositeScreenProps<BottomTabScreenProps<BottomParamList, 'Home'>, StackScreenProps<RootStackParamList>>
 export type StoryScreenProps = StackScreenProps<RootStackParamList, 'Story'>
+export type ProfileScreenProps = CompositeScreenProps<BottomTabScreenProps<BottomParamList, 'Profile'>, StackScreenProps<RootStackParamList>>
+export type SettingsScreenProps = StackScreenProps<RootStackParamList, 'Settings'>

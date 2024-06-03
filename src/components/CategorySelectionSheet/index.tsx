@@ -13,7 +13,7 @@ function CategorySelectionSheet() {
   const snapPoints = useMemo(() => ['35%'], []);
   const ref = useRef<BottomSheetModal>(null);
   const isOpen = useAppSelector(state => state.transaction.isCatOpen);
-  console.log(isOpen);
+  // console.log(isOpen);
   useEffect(() => {
     if (isOpen === true) {
       ref.current?.present();

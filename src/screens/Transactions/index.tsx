@@ -8,7 +8,7 @@ import {
   View,
 } from 'react-native';
 import styles from './styles';
-import {ICONS} from '../../constants/icons';
+import {catIcons, ICONS} from '../../constants/icons';
 import firestore, {Timestamp} from '@react-native-firebase/firestore';
 import {useAppDispatch, useAppSelector} from '../../redux/store';
 import {transactionType} from '../../defs/transaction';
@@ -16,9 +16,11 @@ import {COLORS} from '../../constants/commonStyles';
 import {ScrollView} from 'react-native-gesture-handler';
 import TransactionHeader from '../../components/TransactionHeader';
 import {TransactionScreenProps} from '../../defs/navigation';
-import {NAVIGATION} from '../../constants/strings';
+import {currencies, NAVIGATION} from '../../constants/strings';
 function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
   const user = useAppSelector(state => state.user.currentUser);
+  const conversion = useAppSelector(state => state.transaction.conversion);
+
   const [data, setData] = useState<
     {
       title: string;
@@ -150,45 +152,70 @@ function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
             scrollEnabled={false}
             style={{width: '100%'}}
             sections={applyFilters()}
-            renderItem={({item}) => (
-              <Pressable
-                style={styles.listItemCtr}
-                onPress={() => {
-                  navigation.push('TransactionDetail', {transaction: item});
-                }}>
-                <View style={styles.icon}>
-                  {ICONS.Camera({height: 30, width: 30})}
-                </View>
-                <View style={styles.catCtr}>
-                  <Text style={styles.text1}>
-                    {item.category[0].toLocaleUpperCase() +
-                      item.category.slice(1)}
-                  </Text>
-                  <Text style={styles.text2}>{item.desc}</Text>
-                </View>
-                <View style={{alignItems: 'flex-end', rowGap: 5}}>
-                  <Text
+            renderItem={({item}) => {
+              return (
+                <Pressable
+                  style={styles.listItemCtr}
+                  onPress={() => {
+                    navigation.push('TransactionDetail', {
+                      transaction: {
+                        ...item,
+                        amount: Number(
+                          (
+                            conversion['usd'][user!.currency.toLowerCase()!] *
+                            item.amount
+                          ).toFixed(2),
+                        ),
+                      },
+                    });
+                  }}>
+                  <View
                     style={[
-                      styles.text1,
+                      styles.icon,
                       {
-                        fontWeight: '600',
-                        color:
-                          item.type === 'expense'
-                            ? COLORS.PRIMARY.RED
-                            : COLORS.PRIMARY.GREEN,
+                        backgroundColor:
+                          catIcons[item.category]?.color ?? COLORS.LIGHT[20],
                       },
                     ]}>
-                    {item.type === 'expense' ? '-' : '+'} $ {item.amount}
-                  </Text>
-                  <Text style={styles.text2}>
-                    {item.timeStamp.toDate().getHours()}:
-                    {item.timeStamp.toDate().getMinutes() < 10
-                      ? '0' + item.timeStamp.toDate().getMinutes()
-                      : item.timeStamp.toDate().getMinutes()}
-                  </Text>
-                </View>
-              </Pressable>
-            )}
+                    {catIcons[item.category]?.icon({height: 30, width: 30}) ??
+                      ICONS.Money({height: 30, width: 30})}
+                  </View>
+                  <View style={styles.catCtr}>
+                    <Text style={styles.text1}>
+                      {item.category[0].toLocaleUpperCase() +
+                        item.category.slice(1)}
+                    </Text>
+                    <Text style={styles.text2}>{item.desc}</Text>
+                  </View>
+                  <View style={{alignItems: 'flex-end', rowGap: 5}}>
+                    <Text
+                      style={[
+                        styles.text1,
+                        {
+                          fontWeight: '600',
+                          color:
+                            item.type === 'expense'
+                              ? COLORS.PRIMARY.RED
+                              : COLORS.PRIMARY.GREEN,
+                        },
+                      ]}>
+                      {item.type === 'expense' ? '-' : '+'}{' '}
+                      {currencies[user!.currency].symbol}{' '}
+                      {(
+                        conversion['usd'][user!.currency.toLowerCase()!] *
+                        item.amount
+                      ).toFixed(2)}
+                    </Text>
+                    <Text style={styles.text2}>
+                      {item.timeStamp.toDate().getHours()}:
+                      {item.timeStamp.toDate().getMinutes() < 10
+                        ? '0' + item.timeStamp.toDate().getMinutes()
+                        : item.timeStamp.toDate().getMinutes()}
+                    </Text>
+                  </View>
+                </Pressable>
+              );
+            }}
             renderSectionHeader={({section: {title, data}}) =>
               data.length === 0 ? (
                 <View />

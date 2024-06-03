@@ -7,13 +7,10 @@ import {
   Text,
   View,
 } from 'react-native';
-import CustomButton from '../../components/CustomButton';
-import auth from '@react-native-firebase/auth';
-import {useAppDispatch, useAppSelector} from '../../redux/store';
-import {userLoggedIn} from '../../redux/reducers/userSlice';
+import {useAppSelector} from '../../redux/store';
 import LinearGradient from 'react-native-linear-gradient';
 import {ICONS} from '../../constants/icons';
-import {monthData, NAVIGATION} from '../../constants/strings';
+import {currencies, monthData, NAVIGATION} from '../../constants/strings';
 import {Dropdown} from 'react-native-element-dropdown';
 import styles from './styles';
 import {COLORS} from '../../constants/commonStyles';
@@ -21,15 +18,22 @@ import {HomeScreenProps} from '../../defs/navigation';
 import {LineChart} from 'react-native-gifted-charts';
 
 function Home({navigation}: Readonly<HomeScreenProps>) {
-  const dispatch = useAppDispatch();
   const notifications = useAppSelector(
     state => state.user.currentUser?.notification,
   );
-  const spends = useAppSelector(state => state.user.currentUser?.spend);
-  const x = Object.values(spends!).map(value => {
-    return {value: Object.values(value).reduce((a, b) => a + b, 0)};
-  });
-  console.log(x);
+  const conversion = useAppSelector(state => state.transaction.conversion);
+  const currency = useAppSelector(state => state.user.currentUser?.currency);
+  const month = new Date().getMonth();
+  const spends = useAppSelector(state => state.user.currentUser?.spend[month]);
+  const totalSpend = Object.values(spends ?? [])
+    .reduce((a, b) => a + b, 0)
+    .toFixed(2);
+  const incomes = useAppSelector(
+    state => state.user.currentUser?.income[month],
+  );
+  const totalIncome = Object.values(incomes ?? [])
+    .reduce((a, b) => a + b, 0)
+    .toFixed(2);
   return (
     <View style={{backgroundColor: 'white', flex: 1}}>
       <LinearGradient
@@ -73,7 +77,7 @@ function Home({navigation}: Readonly<HomeScreenProps>) {
               style={styles.dropdown}
               renderLeftIcon={() => (
                 <View>{ICONS.ArrowDown({width: 15, height: 15})}</View>
-              )}  
+              )}
               renderRightIcon={() => <></>}
               placeholder="Month"
               placeholderStyle={{marginLeft: 10}}
@@ -123,7 +127,10 @@ function Home({navigation}: Readonly<HomeScreenProps>) {
             Account Balance
           </Text>
           <Text style={{fontSize: 40, fontWeight: '600', marginTop: 8}}>
-            $9400
+            {currencies[currency!].symbol}
+            {(conversion['usd']?.[currency!.toLowerCase()!] * 9400)
+              .toFixed(2)
+              .toString()}
           </Text>
           <View
             style={{
@@ -131,7 +138,8 @@ function Home({navigation}: Readonly<HomeScreenProps>) {
               justifyContent: 'space-between',
               alignItems: 'center',
               width: '100%',
-              paddingHorizontal: 20,
+              paddingHorizontal: 15,
+              columnGap: 10,
               marginTop: 25,
             }}>
             <View
@@ -145,7 +153,15 @@ function Home({navigation}: Readonly<HomeScreenProps>) {
               </View>
               <View>
                 <Text style={styles.text1}>Income</Text>
-                <Text style={styles.text2}>$0000</Text>
+                <Text style={styles.text2}>
+                  {currencies[currency!].symbol}
+                  {(
+                    conversion['usd']?.[currency!.toLowerCase()!] *
+                    Number(totalIncome)
+                  )
+                    .toFixed(2)
+                    .toString()}
+                </Text>
               </View>
             </View>
             <View style={[styles.moneyCtr, {backgroundColor: COLORS.RED[100]}]}>
@@ -158,7 +174,15 @@ function Home({navigation}: Readonly<HomeScreenProps>) {
               </View>
               <View>
                 <Text style={styles.text1}>Expense</Text>
-                <Text style={styles.text2}>$0000</Text>
+                <Text style={styles.text2}>
+                  {currencies[currency!].symbol}
+                  {(
+                    conversion['usd']?.[currency!.toLowerCase()!] *
+                    Number(totalSpend)
+                  )
+                    .toFixed(2)
+                    .toString()}
+                </Text>
               </View>
             </View>
           </View>
@@ -166,8 +190,8 @@ function Home({navigation}: Readonly<HomeScreenProps>) {
       </LinearGradient>
       <View style={{flex: 1.4}}>
         <View style={{flex: 1, backgroundColor: 'white'}}>
-          <LineChart
-            data={[{value: 0}, {value: 100}, ...x]}
+          {/* <LineChart
+            data={[{value: 0}, {value: 100}, ...totalSpend]}
             areaChart
             adjustToWidth
             startFillColor1={COLORS.VIOLET[40]}
@@ -182,14 +206,7 @@ function Home({navigation}: Readonly<HomeScreenProps>) {
             color={COLORS.VIOLET[100]}
             curveType={0}
             curved={true}
-          />
-          <CustomButton
-            title="Signout"
-            onPress={async () => {
-              await auth().signOut();
-              dispatch(userLoggedIn(undefined));
-            }}
-          />
+          /> */}
         </View>
       </View>
     </View>

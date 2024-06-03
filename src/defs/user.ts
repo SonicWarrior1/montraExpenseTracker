@@ -9,7 +9,9 @@ export type UserType = {
     incomeCategory: string[],
     budget: { [month: string]: { [key: string]: { alert: boolean, limit: number, percentage: number } } }
     spend: { [month: string]: { [key: string]: number } },
-    notification: { [id: string]: { category: string, type: string, id: string, time: Timestamp, read: boolean } }
+    income: { [month: string]: { [key: string]: number } },
+    notification: { [id: string]: { category: string, type: string, id: string, time: Timestamp, read: boolean } },
+    currency: string
 }
 export function UserToJson({
     uid,
@@ -31,7 +33,9 @@ export function UserToJson({
         incomeCategory: ['add', 'salary', 'passive income'],
         budget: {},
         spend: {},
-        notification: {}
+        income: {},
+        notification: {},
+        currency: 'USD'
     };
 }
 export function UserFromJson(json: FirebaseFirestoreTypes.DocumentData): UserType {
@@ -44,6 +48,8 @@ export function UserFromJson(json: FirebaseFirestoreTypes.DocumentData): UserTyp
         incomeCategory: json.incomeCategory ?? ['add', 'salary', 'passive income'],
         budget: json.budget ?? {},
         spend: json.spend ?? {},
-        notification: json.notification ?? {}
+        income: json.income ?? {},
+        notification: json.notification ?? {},
+        currency: json.currency ?? 'USD'
     }
 }

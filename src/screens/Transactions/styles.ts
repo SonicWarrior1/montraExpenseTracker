@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
         columnGap: 5,
     }, icon: {
         padding: 10,
-        backgroundColor: COLORS.VIOLET[20],
+        backgroundColor: COLORS.DARK[25],
         borderRadius: 16,
     },
     catCtr: {

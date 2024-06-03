@@ -134,7 +134,7 @@ function CustomTab(props: Readonly<BottomTabBarProps>): React.JSX.Element {
       <TabButton
         icon={ICONS.User}
         onPress={() => {
-          props.navigation.navigate('Home');
+          props.navigation.navigate(NAVIGATION.Profile);
         }}
         title="Profile"
         isActive={props.state.index === 3}

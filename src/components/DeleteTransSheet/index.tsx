@@ -36,10 +36,12 @@ function DeleteTransactionSheet({
   amt: number;
   category: string;
 }>) {
+  const conversion = useAppSelector(state => state.transaction.conversion);
+  const currency = useAppSelector(state => state.user.currentUser?.currency);
   const uid = useAppSelector(state => state.user.currentUser?.uid);
   const dispatch = useAppDispatch();
   const snapPoints = useMemo(() => ['25%'], []);
-
+  const month = new Date().getMonth();
   return (
     <BottomSheetModalProvider>
       <BottomSheetModal
@@ -69,21 +71,35 @@ function DeleteTransactionSheet({
                 onPress={async () => {
                   try {
                     dispatch(setLoading(true));
+                    const curr = await firestore()
+                      .collection('users')
+                      .doc(uid)
+                      .get();
                     if (type === 'expense') {
-                      const curr = await firestore()
-                        .collection('users')
-                        .doc(uid)
-                        .get();
                       await firestore()
                         .collection('users')
                         .doc(uid)
                         .update({
-                          [`spend.${category}`]:
+                          [`spend.${month}.${category}`]:
                             Number(
                               UserFromJson(curr.data() as UserType).spend[
-                                category
-                              ] ?? 0,
-                            ) - amt,
+                                month
+                              ][category] ?? 0,
+                            ) -
+                            amt / conversion['usd'][currency!.toLowerCase()!],
+                        });
+                    } else if (type === 'income') {
+                      await firestore()
+                        .collection('users')
+                        .doc(uid)
+                        .update({
+                          [`income.${month}.${category}`]:
+                            Number(
+                              UserFromJson(curr.data() as UserType).income[
+                                month
+                              ][category] ?? 0,
+                            ) -
+                            amt / conversion['usd'][currency!.toLowerCase()!],
                         });
                     }
                     await firestore()

@@ -23,8 +23,11 @@ const UserSlice = createSlice({
         addIncomeCategory(state, action: PayloadAction<string>) {
             state.currentUser!.incomeCategory = [...state.currentUser!.incomeCategory, action.payload]
         },
+        setCurrencyCode(state, action) {
+            state.currentUser!.currency = action.payload;
+        }
     }
 })
 
-export const { userLoggedIn, setLoading, addExpenseCategory, addIncomeCategory, } = UserSlice.actions
+export const { userLoggedIn, setLoading, addExpenseCategory, addIncomeCategory,setCurrencyCode } = UserSlice.actions
 export default UserSlice.reducer

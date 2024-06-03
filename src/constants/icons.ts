@@ -10,7 +10,7 @@ import ArrowLeft from '../assets/Svgs/arrow left.svg';
 import ArrowLeft2 from '../assets/Svgs/arrow-left-2.svg';
 import EmailSent from '../assets/Svgs/emailSent.svg';
 import Home from '../assets/Svgs/home.svg';
-import Transaction from '../assets/Svgs/Transaction.svg';
+import Transaction from '../assets/Svgs/transaction.svg';
 import Pie from '../assets/Svgs/pie-chart.svg';
 import Close from '../assets/Svgs/close.svg';
 import Income from '../assets/Svgs/income.svg';
@@ -28,6 +28,18 @@ import Alert from '../assets/Svgs/alert.svg';
 import Notification from '../assets/Svgs/notifiaction.svg';
 import ArrowRight2 from '../assets/Svgs/arrow right 2.svg';
 import More from '../assets/Svgs/more-horizontal.svg';
+import Car from '../assets/Svgs/car.svg';
+import Bill from '../assets/Svgs/recurring bill.svg';
+import Food from '../assets/Svgs/restaurant.svg';
+import Salary from '../assets/Svgs/salary.svg';
+import Shopping from '../assets/Svgs/shopping bag.svg';
+import Money from '../assets/Svgs/money-bag.svg';
+import Edit from '../assets/Svgs/edit.svg';
+import Wallet from '../assets/Svgs/wallet.svg';
+import Logout from '../assets/Svgs/logout.svg';
+import Upload from '../assets/Svgs/upload.svg';
+import Setting from '../assets/Svgs/settings.svg';
+import { COLORS } from './commonStyles';
 const iconStyle = (
   { width = 0,
     height = 0,
@@ -71,4 +83,24 @@ export const ICONS = {
   Notification: (params: iconProps) => Notification({ ...iconStyle({ ...params }) }),
   ArrowRight2: (params: iconProps) => ArrowRight2({ ...iconStyle({ ...params }) }),
   More: (params: iconProps) => More({ ...iconStyle({ ...params }) }),
+  Car: (params: iconProps) => Car({ ...iconStyle({ ...params }) }),
+  Bill: (params: iconProps) => Bill({ ...iconStyle({ ...params }) }),
+  Food: (params: iconProps) => Food({ ...iconStyle({ ...params }) }),
+  Salary: (params: iconProps) => Salary({ ...iconStyle({ ...params }) }),
+  Shopping: (params: iconProps) => Shopping({ ...iconStyle({ ...params }) }),
+  Money: (params: iconProps) => Money({ ...iconStyle({ ...params }) }),
+  Edit: (params: iconProps) => Edit({ ...iconStyle({ ...params }) }),
+  Wallet: (params: iconProps) => Wallet({ ...iconStyle({ ...params }) }),
+  Logout: (params: iconProps) => Logout({ ...iconStyle({ ...params }) }),
+  Upload: (params: iconProps) => Upload({ ...iconStyle({ ...params }) }),
+  Setting: (params: iconProps) => Setting({ ...iconStyle({ ...params }) }),
 };
+
+export const catIcons: { [key: string]: { icon: (params: iconProps) => React.ReactNode, color: string } } = {
+  'food': { icon: ICONS.Food, color: COLORS.RED[20] },
+  'salary': { icon: ICONS.Salary, color: COLORS.GREEN[20] },
+  'transportation': { icon: ICONS.Car, color: COLORS.BLUE[20] },
+  'shopping': { icon: ICONS.Shopping, color: COLORS.YELLOW[20] },
+  'bill': { icon: ICONS.Bill, color: COLORS.VIOLET[20] },
+  'subscription': { icon: ICONS.Bill, color: COLORS.VIOLET[20] },
+}

@@ -5,17 +5,18 @@ import {ICONS} from '../../constants/icons';
 import CustomButton from '../../components/CustomButton';
 import Sapcer from '../../components/Spacer';
 import {BudgetScreenProps} from '../../defs/navigation';
-import {monthData, NAVIGATION} from '../../constants/strings';
+import {currencies, monthData, NAVIGATION} from '../../constants/strings';
 import {useAppSelector} from '../../redux/store';
 import {Bar} from 'react-native-progress';
-import { COLORS } from '../../constants/commonStyles';
+import {COLORS} from '../../constants/commonStyles';
 
 function BudgetScreen({navigation}: Readonly<BudgetScreenProps>) {
   const [month, setMonth] = useState(new Date().getMonth());
   const budgets = useAppSelector(
     state => state.user.currentUser?.budget[month],
   );
-  console.log(budgets);
+  const currency = useAppSelector(state => state.user.currentUser?.currency);
+  const conversion = useAppSelector(state => state.transaction.conversion);
   const spend =
     useAppSelector(state => state.user.currentUser?.spend[month]) ?? {};
   return (
@@ -92,13 +93,21 @@ function BudgetScreen({navigation}: Readonly<BudgetScreenProps>) {
                       </Text>
                     </View>
                     {(spend[key] ?? 0) >= val.limit &&
-                      ICONS.Alert({height: 20, width: 20, color: COLORS.PRIMARY.RED})}
+                      ICONS.Alert({
+                        height: 20,
+                        width: 20,
+                        color: COLORS.PRIMARY.RED,
+                      })}
                   </View>
                   <Text style={styles.text1}>
-                    Remaining $
+                    Remaining {currencies[currency!].symbol}
                     {val.limit - spend[key] < 0 || spend[key] === undefined
                       ? '0'
-                      : val.limit - (spend[key] ?? 0)}
+                      : (
+                          conversion['usd'][currency!.toLowerCase()!] *
+                            val.limit -
+                          (spend[key] ?? 0)
+                        ).toFixed(2)}
                   </Text>
                   <Bar
                     progress={(spend[key] ?? 0) / val.limit}
@@ -106,7 +115,15 @@ function BudgetScreen({navigation}: Readonly<BudgetScreenProps>) {
                     width={null}
                   />
                   <Text style={styles.text2}>
-                    ${spend[key] ?? 0} of ${val.limit}
+                    {currencies[currency!].symbol}
+                    {(
+                      conversion['usd'][currency!.toLowerCase()!] *
+                      (spend[key] ?? 0)
+                    ).toFixed(2)}{' '}
+                    of {currencies[currency!].symbol}
+                    {(
+                      conversion['usd'][currency!.toLowerCase()!] * val.limit
+                    ).toFixed(2)}
                   </Text>
                   {(spend[key] ?? 0) >= val.limit && (
                     <Text style={styles.limitText}>

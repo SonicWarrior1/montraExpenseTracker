@@ -2,16 +2,19 @@ import React, {useEffect, useRef} from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import styles from './styles';
 import {Pressable, Text, View} from 'react-native';
-import {ICONS} from '../../constants/icons';
+import {catIcons, ICONS} from '../../constants/icons';
 import {DetailBudgetScreenProps} from '../../defs/navigation';
 import {useAppSelector} from '../../redux/store';
 import {Bar} from 'react-native-progress';
 import CustomButton from '../../components/CustomButton';
-import {NAVIGATION} from '../../constants/strings';
+import {currencies, NAVIGATION} from '../../constants/strings';
 import DeleteBudgetSheet from '../../components/DeleteBudgetSheet';
 import {BottomSheetModalMethods} from '@gorhom/bottom-sheet/lib/typescript/types';
+import {COLORS} from '../../constants/commonStyles';
 
 function DetailBudget({navigation, route}: DetailBudgetScreenProps) {
+  const conversion = useAppSelector(state => state.transaction.conversion);
+  const currency = useAppSelector(state => state.user.currentUser?.currency);
   const month = new Date().getMonth();
   const budgets = useAppSelector(
     state => state.user.currentUser?.budget[month],
@@ -30,7 +33,8 @@ function DetailBudget({navigation, route}: DetailBudgetScreenProps) {
       <Pressable
         onPress={() => {
           bottomSheetModalRef.current?.present();
-        }} style={{marginRight:15}}>
+        }}
+        style={{marginRight: 15}}>
         {ICONS.Trash({height: 25, width: 25, color: 'black'})}
       </Pressable>
     );
@@ -45,8 +49,15 @@ function DetailBudget({navigation, route}: DetailBudgetScreenProps) {
     <SafeAreaView style={styles.safeView}>
       <View style={styles.mainView}>
         <View style={styles.catCtr}>
-          <View style={styles.colorBox}>
-            {ICONS.Camera({height: 20, width: 20})}
+          <View
+            style={[
+              styles.colorBox,
+              {
+                backgroundColor: catIcons[cat]?.color ?? COLORS.LIGHT[20],
+              },
+            ]}>
+            {catIcons[cat]?.icon({height: 20, width: 20}) ??
+              ICONS.Money({height: 20, width: 20})}
           </View>
           <Text style={styles.catText}>
             {cat[0].toUpperCase() + cat.slice(1)}
@@ -54,10 +65,14 @@ function DetailBudget({navigation, route}: DetailBudgetScreenProps) {
         </View>
         <Text style={styles.remainText}>Remaining</Text>
         <Text style={styles.amtText}>
-          $
+          {currencies[currency!].symbol}
           {budget.limit - spend < 0 || spend === undefined
             ? '0'
-            : budget.limit - spend}
+            : (
+                conversion['usd'][currency!.toLowerCase()!] *
+                  Number(budget.limit.toFixed(2)) -
+                Number(spend.toFixed(2))
+              ).toFixed(2)}
         </Text>
         <View style={{width: '100%'}}>
           <Bar progress={(spend ?? 0) / budget.limit} height={8} width={null} />

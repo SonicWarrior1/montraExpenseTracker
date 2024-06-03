@@ -12,6 +12,7 @@ import {Slider} from '@miblanchard/react-native-slider';
 import firestore from '@react-native-firebase/firestore';
 import {setLoading} from '../../redux/reducers/userSlice';
 import {CreateBudgetScreenProps} from '../../defs/navigation';
+import {currencies} from '../../constants/strings';
 function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
   const month = new Date().getMonth();
   const isEdit = route.params.isEdit;
@@ -23,8 +24,15 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
       state => state.user.currentUser?.budget[month][cat!],
     );
   }
+
+  const conversion = useAppSelector(state => state.transaction.conversion);
+  const currency = useAppSelector(state => state.user.currentUser?.currency);
   const [amount, setAmount] = useState(
-    isEdit ? oldBudget?.limit.toString() : '',
+    isEdit
+      ? (conversion['usd'][currency!.toLowerCase()!] * oldBudget?.limit!)
+          .toFixed(2)
+          .toString()
+      : '',
   );
   const [category, setCategory] = useState(isEdit ? cat : '');
   const [alert, setAlert] = useState(isEdit ? oldBudget?.alert : false);
@@ -43,7 +51,7 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
         <View style={styles.mainView}>
           <Text style={styles.text1}>How much do you want to spend?</Text>
           <View style={styles.moneyCtr}>
-            <Text style={styles.text2}>$</Text>
+            <Text style={styles.text2}>{currencies[currency!].symbol}</Text>
             <TextInput
               style={styles.input}
               maxLength={8}
@@ -147,7 +155,9 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
                   .doc(uid)
                   .update({
                     [`budget.${month}.${category}`]: {
-                      limit: Number(amount),
+                      limit:
+                        Number(amount) /
+                        conversion['usd'][currency!.toLowerCase()!],
                       alert: alert,
                       percentage: sliderVal,
                     },

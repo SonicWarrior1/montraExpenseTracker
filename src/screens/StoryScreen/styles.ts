@@ -18,8 +18,6 @@ const styles = StyleSheet.create({
     colorBox: {
         padding: 8,
         borderRadius: 10,
-        backgroundColor: COLORS.VIOLET[20],
-
     },
     catText: { fontSize: 18, fontWeight: '600' },
     safeView: {
@@ -84,7 +82,7 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         textAlign: 'center',
         marginBottom: 20,
-        paddingHorizontal: 80,
+        paddingHorizontal: 60,
     },
     amt2: {
         fontSize: 36,

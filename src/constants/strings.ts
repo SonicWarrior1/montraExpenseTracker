@@ -16,7 +16,10 @@ export const NAVIGATION: {
     CreateBudget: 'CreateBudget',
     DetailBudget: 'DetailBudget'
     Notification: 'Notification',
-    Story: 'Story'
+    Story: 'Story',
+    FinancialReport: 'FinancialReport',
+    Settings: 'Settings',
+    Currency: 'Currency'
 } = {
     ONBOARDING: 'Onboarding',
     SIGNUP: 'Signup',
@@ -36,6 +39,9 @@ export const NAVIGATION: {
     DetailBudget: 'DetailBudget',
     Notification: 'Notification',
     Story: 'Story',
+    FinancialReport: 'FinancialReport',
+    Settings: 'Settings',
+    Currency: 'Currency'
 };
 
 export const STRINGS = {
@@ -87,12 +93,25 @@ export const weekData = [
     { label: 'Friday', value: 5 },
     { label: 'Saturday', value: 6 },
 ];
-// export const expenseCat = [
-//     { label: 'Add new category', value: 'add' },
-//     { label: 'Food', value: 'food' },
-//     { label: 'Bill', value: 'bill' },
-//     { label: 'Shopping', value: 'shopping' },
-//     { label: 'Subscription', value: 'subscription' },
-//     { label: 'Transportation', value: 'transportation' },
-// ]
-// export const incomeCat = ['salary', 'passive income']
+export const currencies: { [key: string]: { name: string, symbol: string, code: string } } = {
+    'USD': { name: 'United States Dollar', symbol: '$', code: 'USD' },
+    'EUR': { name: 'Euro', symbol: '€', code: 'EUR' },
+    'GBP': { name: 'British Pound Sterling', symbol: '£', code: 'GBP' },
+    'JPY': { name: 'Japanese Yen', symbol: '¥', code: 'JPY' },
+    'CHF': { name: 'Swiss Franc', symbol: 'CHF', code: 'CHF' },
+    'CAD': { name: 'Canadian Dollar', symbol: 'C$', code: 'CAD' },
+    'AUD': { name: 'Australian Dollar', symbol: 'A$', code: 'AUD' },
+    'NZD': { name: 'New Zealand Dollar', symbol: 'NZ$', code: 'NZD' },
+    'CNY': { name: 'Chinese Yuan', symbol: '¥', code: 'CNY' },
+    'INR': { name: 'Indian Rupee', symbol: '₹', code: 'INR' },
+    'RUB': { name: 'Russian Ruble', symbol: '₽', code: 'RUB' },
+    'BRL': { name: 'Brazilian Real', symbol: 'R$', code: 'BRL' },
+    'ZAR': { name: 'South African Rand', symbol: 'R', code: 'ZAR' },
+    'MXN': { name: 'Mexican Peso', symbol: 'Mex$', code: 'MXN' },
+    'SGD': { name: 'Singapore Dollar', symbol: 'S$', code: 'SGD' },
+    'HKD': { name: 'Hong Kong Dollar', symbol: 'HK$', code: 'HKD' },
+    'SEK': { name: 'Swedish Krona', symbol: 'kr', code: 'SEK' },
+    'NOK': { name: 'Norwegian Krone', symbol: 'kr', code: 'NOK' },
+    'DKK': { name: 'Danish Krone', symbol: 'kr', code: 'DKK' },
+    'KRW': { name: 'South Korean Won', symbol: '₩', code: 'KRW' }
+};

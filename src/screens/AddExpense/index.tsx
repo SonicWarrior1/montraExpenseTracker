@@ -21,7 +21,7 @@ import firestore, {
   FirebaseFirestoreTypes,
   Timestamp,
 } from '@react-native-firebase/firestore';
-import {monthData, weekData} from '../../constants/strings';
+import {currencies, monthData, weekData} from '../../constants/strings';
 import CustomButton from '../../components/CustomButton';
 import {repeatDataType, transactionType} from '../../defs/transaction';
 import {useAppDispatch, useAppSelector} from '../../redux/store';
@@ -33,6 +33,7 @@ import storage from '@react-native-firebase/storage';
 import AddCategorySheet from '../../components/AddCategorySheet';
 import {UserFromJson, UserType} from '../../defs/user';
 import {EmptyError} from '../../constants/errors';
+import {useGetUsdConversionQuery} from '../../redux/api/conversionApi';
 
 function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
   const pageType = route.params.type;
@@ -60,6 +61,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
   );
   const dispatch = useAppDispatch();
   const uid = useAppSelector(state => state.user.currentUser?.uid);
+  const currency = useAppSelector(state => state.user.currentUser?.currency);
 
   const filePickSheetRef = useRef<BottomSheetModal>(null);
   const repeatSheetRef = useRef<BottomSheetModal>(null);
@@ -118,7 +120,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
     }
     return url;
   }
-
+  const conversion = useAppSelector(state => state.transaction.conversion);
   function createTransaction({
     id,
     url,
@@ -129,7 +131,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
     attachementType: transactionType['attachementType'];
   }) {
     return {
-      amount: Number(amount),
+      amount: Number(amount) / conversion['usd'][currency!.toLowerCase()!],
       category: category,
       desc: desc,
       wallet: wallet,
@@ -167,6 +169,40 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
       .set(trans);
   }
 
+  async function handleIncomeUpdate({
+    curr,
+  }: {
+    curr: FirebaseFirestoreTypes.DocumentSnapshot<FirebaseFirestoreTypes.DocumentData>;
+  }) {
+    await firestore()
+      .collection('users')
+      .doc(uid)
+      .update({
+        [`income.${month}.${category}`]:
+          ((UserFromJson(curr.data() as UserType).income[month][category] ??
+            0) -
+            transaction!.amount +
+            Number(amount)) /
+          conversion['usd'][currency!.toLowerCase()!],
+      });
+  }
+  async function handleNewIncome({
+    curr,
+  }: {
+    curr: FirebaseFirestoreTypes.DocumentSnapshot<FirebaseFirestoreTypes.DocumentData>;
+  }) {
+    await firestore()
+      .collection('users')
+      .doc(uid)
+      .update({
+        [`income.${month}.${category}`]:
+          ((UserFromJson(curr.data() as UserType)?.income[month]?.[category] ??
+            0) +
+            Number(amount)) /
+          conversion['usd'][currency!.toLowerCase()!],
+      });
+  }
+
   async function handleExpenseUpdate({
     curr,
   }: {
@@ -177,9 +213,10 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
       .doc(uid)
       .update({
         [`spend.${month}.${category}`]:
-          (UserFromJson(curr.data() as UserType).spend[month][category] ?? 0) -
-          transaction!.amount +
-          Number(amount),
+          ((UserFromJson(curr.data() as UserType).spend[month][category] ?? 0) -
+            transaction!.amount +
+            Number(amount)) /
+          conversion['usd'][currency!.toLowerCase()!],
       });
   }
 
@@ -193,8 +230,10 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
       .doc(uid)
       .update({
         [`spend.${month}.${category}`]:
-          (UserFromJson(curr.data() as UserType)?.spend[month]?.[category] ??
-            0) + Number(amount),
+          ((UserFromJson(curr.data() as UserType)?.spend[month]?.[category] ??
+            0) +
+            Number(amount)) /
+          conversion['usd'][currency!.toLowerCase()!],
       });
   }
   async function handleNotify({
@@ -211,19 +250,24 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
       totalBudget &&
       totalSpent >= totalBudget.limit * (totalBudget.percentage / 100)
     ) {
-      const notificationId = uuid.v4();
-      await firestore()
-        .collection('users')
-        .doc(uid)
-        .update({
-          [`notification.${notificationId}`]: {
-            type: 'budget',
-            category: category,
-            id: notificationId,
-            time: Timestamp.now(),
-            read: false,
-          },
-        });
+      console.log('notify');
+      try {
+        const notificationId = uuid.v4();
+        await firestore()
+          .collection('users')
+          .doc(uid)
+          .update({
+            [`notification.${notificationId}`]: {
+              type: 'budget',
+              category: category,
+              id: notificationId,
+              time: Timestamp.now(),
+              read: false,
+            },
+          });
+      } catch (e) {
+        console.log(e);
+      }
     }
   }
   async function handlePress() {
@@ -245,7 +289,10 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
           const totalSpent =
             UserFromJson(curr.data() as UserType)?.spend?.[month]?.[category] ??
             0 - transaction!.amount + Number(amount);
+          console.log(totalSpent);
           await handleNotify({curr, totalSpent});
+        } else if (pageType === 'income') {
+          await handleIncomeUpdate({curr});
         }
       } else {
         await addNewTransaction({id, trans});
@@ -255,6 +302,8 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
             (UserFromJson(curr.data() as UserType)?.spend[month]?.[category] ??
               0) + Number(amount);
           await handleNotify({curr, totalSpent});
+        } else if (pageType === 'income') {
+          await handleNewIncome({curr});
         }
       }
       Toast.show({text1: pageType + ' Added Succesfully'});
@@ -272,7 +321,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
         <View style={styles.mainView}>
           <Text style={styles.text1}>How much?</Text>
           <View style={styles.moneyCtr}>
-            <Text style={styles.text2}>$</Text>
+            <Text style={styles.text2}>{currencies[currency!].symbol}</Text>
             <TextInput
               style={styles.input}
               maxLength={8}

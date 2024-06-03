@@ -3,7 +3,7 @@ import Onboarding from '../screens/Onboarding';
 import {NAVIGATION} from '../constants/strings';
 import Signup from '../screens/Signup';
 import {ICONS} from '../constants/icons';
-import {Pressable} from 'react-native';
+import {Pressable, Settings} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import Login from '../screens/Login';
 import {useAppSelector} from '../redux/store';
@@ -19,6 +19,9 @@ import DetailBudget from '../screens/DetailBudget';
 import NotificationScreen from '../screens/Notifications';
 import {createStackNavigator} from '@react-navigation/stack';
 import StoryScreen from '../screens/StoryScreen';
+import FinancialReport from '../screens/FinancialReport';
+import SettingsScreen from '../screens/Settings';
+import CurrencyScreen from '../screens/Currency';
 
 export const Stack = createStackNavigator<RootStackParamList>();
 
@@ -116,8 +119,34 @@ function RootNavigator(): React.JSX.Element {
           <Stack.Screen
             name={NAVIGATION.Notification}
             component={NotificationScreen}
+          />
+          <Stack.Screen
+            name={NAVIGATION.FinancialReport}
+            component={FinancialReport}
             options={{
               headerShown: true,
+              headerTitleStyle: {color: 'black'},
+              title: 'Financial Report',
+              headerLeft: props => headerLeft(props, 'black'),
+            }}
+          />
+          <Stack.Screen
+            name={NAVIGATION.Settings}
+            component={SettingsScreen}
+            options={{
+              headerShown: true,
+              headerTitleStyle: {color: 'black'},
+              title: 'Settings',
+              headerLeft: props => headerLeft(props, 'black'),
+            }}
+          />
+          <Stack.Screen
+            name={NAVIGATION.Currency}
+            component={CurrencyScreen}
+            options={{
+              headerShown: true,
+              headerTitleStyle: {color: 'black'},
+              title: 'Currency',
               headerLeft: props => headerLeft(props, 'black'),
             }}
           />
