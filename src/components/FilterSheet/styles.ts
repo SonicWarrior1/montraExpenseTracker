@@ -24,6 +24,40 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: COLORS.PRIMARY.VIOLET,
     },
+    sheetView:{
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 15,
+      },
+      text1:{fontSize: 16, fontWeight: '600'},
+      flexRow:{
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+      },
+      wrapRow:{
+        flexDirection: 'row',
+        alignItems: 'center',
+        flexWrap: 'wrap',
+        columnGap: 10,
+        rowGap: 10,
+      },
+      catRow:{
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginBottom: 30,
+      },
+      pressable:{
+        flexDirection: 'row',
+        alignItems: 'center',
+      },
+      text2:{
+        fontSize: 14,
+        fontWeight: '500',
+        color: COLORS.DARK[25],
+      }
 })
 
 export default styles

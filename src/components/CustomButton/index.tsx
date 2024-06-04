@@ -1,5 +1,5 @@
 import React from 'react';
-import {Pressable, Text, TouchableOpacity} from 'react-native';
+import {Pressable, Text, TouchableOpacity, View} from 'react-native';
 import {COLORS} from '../../constants/commonStyles';
 import styles from './styles';
 
@@ -10,6 +10,7 @@ function CustomButton({
   textColor = COLORS.PRIMARY.LIGHT,
   borderWidth = 0,
   borderColor,
+  icon: component,
 }: Readonly<{
   backgroundColor?: string;
   title: string;
@@ -17,6 +18,7 @@ function CustomButton({
   textColor?: string;
   borderWidth?: number;
   borderColor?: string;
+  icon?: React.ReactNode;
 }>) {
   return (
     <TouchableOpacity
@@ -29,7 +31,15 @@ function CustomButton({
         },
       ]}
       onPress={onPress}>
-      <Text style={[styles.text, {color: textColor}]}>{title}</Text>
+      {component ? (
+        <View
+          style={{flexDirection: 'row', columnGap: 10, alignItems: 'center'}}>
+          {component}
+          <Text style={[styles.text, {color: textColor}]}>{title}</Text>
+        </View>
+      ) : (
+        <Text style={[styles.text, {color: textColor}]}>{title}</Text>
+      )}
     </TouchableOpacity>
   );
 }

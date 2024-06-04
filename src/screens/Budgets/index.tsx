@@ -101,10 +101,14 @@ function BudgetScreen({navigation}: Readonly<BudgetScreenProps>) {
                   </View>
                   <Text style={styles.text1}>
                     Remaining {currencies[currency!].symbol}
-                    {val.limit - spend[key] < 0 || spend[key] === undefined
+                    {val.limit - spend[key] < 0
                       ? '0'
+                      : spend[key] === undefined
+                      ? (
+                          conversion['usd'][currency!.toLowerCase()] * val.limit
+                        ).toFixed(2)
                       : (
-                          conversion['usd'][currency!.toLowerCase()!] *
+                          conversion['usd'][currency!.toLowerCase()] *
                             val.limit -
                           (spend[key] ?? 0)
                         ).toFixed(2)}

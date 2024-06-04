@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
   Dimensions,
   Image,
@@ -24,16 +24,33 @@ function Home({navigation}: Readonly<HomeScreenProps>) {
   const conversion = useAppSelector(state => state.transaction.conversion);
   const currency = useAppSelector(state => state.user.currentUser?.currency);
   const month = new Date().getMonth();
-  const spends = useAppSelector(state => state.user.currentUser?.spend[month]);
+  const spends = useAppSelector(
+    state => state.user.currentUser?.spend?.[month],
+  );
   const totalSpend = Object.values(spends ?? [])
     .reduce((a, b) => a + b, 0)
     .toFixed(2);
   const incomes = useAppSelector(
-    state => state.user.currentUser?.income[month],
+    state => state.user.currentUser?.income?.[month],
   );
   const totalIncome = Object.values(incomes ?? [])
     .reduce((a, b) => a + b, 0)
     .toFixed(2);
+  const [graphDay, setGraphDay] = useState(0);
+  const data = useAppSelector(state => state.transaction.transactions);
+  // const sorted = {
+  //   today: data['today']
+  //     .slice()
+  //     .sort((a, b) => a.timeStamp.seconds - b.timeStamp.seconds),
+  // };
+  // console.log(
+  //   sorted.today.reduce((acc: {value: number}[], curr) => {
+  //     if (curr.type === 'expense') {
+  //       acc.push({value: curr.amount});
+  //     }
+  //     return acc;
+  //   }, []),
+  // );
   return (
     <View style={{backgroundColor: 'white', flex: 1}}>
       <LinearGradient
@@ -109,8 +126,9 @@ function Home({navigation}: Readonly<HomeScreenProps>) {
                   }}>
                   <Text style={{color: COLORS.VIOLET[100]}}>
                     {
-                      Object.values(notifications).filter(item => !item.read)
-                        .length
+                      Object.values(notifications ?? []).filter(
+                        item => !item.read,
+                      ).length
                     }
                   </Text>
                 </View>
@@ -128,7 +146,7 @@ function Home({navigation}: Readonly<HomeScreenProps>) {
           </Text>
           <Text style={{fontSize: 40, fontWeight: '600', marginTop: 8}}>
             {currencies[currency!].symbol}
-            {(conversion['usd']?.[currency!.toLowerCase()!] * 9400)
+            {(conversion['usd']?.[currency!.toLowerCase()] * 9400)
               .toFixed(2)
               .toString()}
           </Text>
@@ -156,7 +174,7 @@ function Home({navigation}: Readonly<HomeScreenProps>) {
                 <Text style={styles.text2}>
                   {currencies[currency!].symbol}
                   {(
-                    conversion['usd']?.[currency!.toLowerCase()!] *
+                    conversion['usd']?.[currency!.toLowerCase()] *
                     Number(totalIncome)
                   )
                     .toFixed(2)
@@ -177,7 +195,7 @@ function Home({navigation}: Readonly<HomeScreenProps>) {
                 <Text style={styles.text2}>
                   {currencies[currency!].symbol}
                   {(
-                    conversion['usd']?.[currency!.toLowerCase()!] *
+                    conversion['usd']?.[currency!.toLowerCase()] *
                     Number(totalSpend)
                   )
                     .toFixed(2)
@@ -188,25 +206,125 @@ function Home({navigation}: Readonly<HomeScreenProps>) {
           </View>
         </SafeAreaView>
       </LinearGradient>
-      <View style={{flex: 1.4}}>
-        <View style={{flex: 1, backgroundColor: 'white'}}>
-          {/* <LineChart
-            data={[{value: 0}, {value: 100}, ...totalSpend]}
-            areaChart
-            adjustToWidth
-            startFillColor1={COLORS.VIOLET[40]}
-            animateOnDataChange
-            isAnimated={true}
-            width={Dimensions.get('screen').width}
-            hideDataPoints
-            thickness={10}
-            hideRules
-            hideYAxisText
-            hideAxesAndRules
-            color={COLORS.VIOLET[100]}
-            curveType={0}
-            curved={true}
-          /> */}
+      <View style={{flex: 1.5}}>
+        {/* <LineChart
+          height={150}
+          data={sorted.today.reduce((acc: {value: number}[], curr) => {
+            if (curr.type === 'expense') {
+              acc.push({value: curr.amount});
+            }
+            return acc;
+          }, [])}
+          areaChart
+          adjustToWidth
+          startFillColor1={COLORS.VIOLET[40]}
+          animateOnDataChange
+          isAnimated={true}
+          initialSpacing={-10}
+          width={Dimensions.get('screen').width}
+          hideDataPoints
+          thickness={10}
+          hideRules
+          hideYAxisText
+          hideAxesAndRules
+          color={COLORS.VIOLET[100]}
+          curveType={0}
+          curved={true}
+        /> */}
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            paddingHorizontal: 20,
+          }}>
+          <Pressable
+            style={[
+              styles.filterBtn,
+              {
+                backgroundColor:
+                  graphDay === 0 ? COLORS.YELLOW[20] : COLORS.LIGHT[100],
+              },
+            ]}
+            onPress={() => {
+              setGraphDay(0);
+            }}>
+            <Text
+              style={[
+                styles.filterBtnText,
+                {
+                  color: graphDay === 0 ? COLORS.YELLOW[100] : COLORS.DARK[25],
+                  fontWeight: graphDay === 0 ? '700' : '500',
+                },
+              ]}>
+              Today
+            </Text>
+          </Pressable>
+          <Pressable
+            style={[
+              styles.filterBtn,
+              {
+                backgroundColor:
+                  graphDay === 1 ? COLORS.YELLOW[20] : COLORS.LIGHT[100],
+              },
+            ]}
+            onPress={() => {
+              setGraphDay(1);
+            }}>
+            <Text
+              style={[
+                styles.filterBtnText,
+                {
+                  color: graphDay === 1 ? COLORS.YELLOW[100] : COLORS.DARK[25],
+                  fontWeight: graphDay === 1 ? '700' : '500',
+                },
+              ]}>
+              Week
+            </Text>
+          </Pressable>
+          <Pressable
+            style={[
+              styles.filterBtn,
+              {
+                backgroundColor:
+                  graphDay === 2 ? COLORS.YELLOW[20] : COLORS.LIGHT[100],
+              },
+            ]}
+            onPress={() => {
+              setGraphDay(2);
+            }}>
+            <Text
+              style={[
+                styles.filterBtnText,
+                {
+                  color: graphDay === 2 ? COLORS.YELLOW[100] : COLORS.DARK[25],
+                  fontWeight: graphDay === 2 ? '700' : '500',
+                },
+              ]}>
+              Month
+            </Text>
+          </Pressable>
+          <Pressable
+            style={[
+              styles.filterBtn,
+              {
+                backgroundColor:
+                  graphDay === 3 ? COLORS.YELLOW[20] : COLORS.LIGHT[100],
+              },
+            ]}
+            onPress={() => {
+              setGraphDay(3);
+            }}>
+            <Text
+              style={[
+                styles.filterBtnText,
+                {
+                  color: graphDay === 3 ? COLORS.YELLOW[100] : COLORS.DARK[25],
+                  fontWeight: graphDay === 3 ? '700' : '500',
+                },
+              ]}>
+              Year
+            </Text>
+          </Pressable>
         </View>
       </View>
     </View>

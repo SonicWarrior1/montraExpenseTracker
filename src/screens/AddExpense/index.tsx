@@ -399,7 +399,11 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
           formKey={formKey}
         />
         {image === '' && doc === undefined ? (
-          <Pressable style={styles.attachementCtr}>
+          <Pressable
+            style={styles.attachementCtr}
+            onPress={() => {
+              filePickSheetRef.current?.present();
+            }}>
             {ICONS.Attachment({
               height: 20,
               width: 20,
@@ -483,10 +487,12 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
                 <Text style={styles.flexRowText1}>End After</Text>
                 <Text style={styles.flexRowText2}>
                   {isEdit
-                    ? (repeatData.date! as unknown as Timestamp)
-                        .toDate()
-                        .toLocaleDateString()
-                    : repeatData.date?.toLocaleDateString()}
+                    ? (repeatData.date as Timestamp)?.seconds !== undefined
+                      ? (repeatData.date as Timestamp)
+                          .toDate()
+                          .toLocaleDateString()
+                      : (repeatData.date as Date)?.toLocaleDateString()
+                    : (repeatData.date as Date)?.toLocaleDateString()}
                 </Text>
               </View>
             )}

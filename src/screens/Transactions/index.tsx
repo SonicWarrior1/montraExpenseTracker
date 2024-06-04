@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React from 'react';
 import {
   Pressable,
   SafeAreaView,
@@ -9,8 +9,8 @@ import {
 } from 'react-native';
 import styles from './styles';
 import {catIcons, ICONS} from '../../constants/icons';
-import firestore, {Timestamp} from '@react-native-firebase/firestore';
-import {useAppDispatch, useAppSelector} from '../../redux/store';
+import {Timestamp} from '@react-native-firebase/firestore';
+import {useAppSelector} from '../../redux/store';
 import {transactionType} from '../../defs/transaction';
 import {COLORS} from '../../constants/commonStyles';
 import {ScrollView} from 'react-native-gesture-handler';
@@ -20,33 +20,11 @@ import {currencies, NAVIGATION} from '../../constants/strings';
 function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
   const user = useAppSelector(state => state.user.currentUser);
   const conversion = useAppSelector(state => state.transaction.conversion);
-
-  const [data, setData] = useState<
-    {
-      title: string;
-      data: Array<transactionType>;
-    }[]
-  >([]);
-  const fetchData = useCallback(async () => {
-    try {
-      const res = await firestore()
-        .collection('users')
-        .doc(user?.uid)
-        .collection('transactions')
-        .orderBy('timeStamp', 'desc')
-        .get();
-      const data = res.docs.map(snapshot => snapshot.data() as transactionType);
-      const filteredData = filterDataByDate(data);
-      setData(filteredData);
-    } catch (e) {
-      console.log(e);
-    }
-  }, []);
-  function filterDataByDate(data: transactionType[]) {
+  const transaction = useAppSelector(state => state.transaction.transactions);
+  function filterDataByDate(data: {[key: string]: transactionType}) {
     const startOfToday = new Date().setHours(0, 0, 0, 0) / 1000;
     const startOfYesterday = startOfToday - 24 * 60 * 60;
-
-    const res = data.reduce(
+    const res = Object.values(data).reduce(
       (acc: {[key: string]: Array<transactionType>}, item) => {
         const itemTime = item.timeStamp.seconds;
         if (itemTime >= startOfToday) {
@@ -73,15 +51,31 @@ function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
       {},
     );
     const result = [
-      {title: 'today', data: res.today ?? []},
-      {title: 'yesterday', data: res.yesterday ?? []},
+      {
+        title: 'today',
+        data:
+          [...res.today].sort(
+            (a, b) => b.timeStamp.seconds - a.timeStamp.seconds,
+          ) ?? [],
+      },
+      {
+        title: 'yesterday',
+        data:
+          [...res.yesterday].sort(
+            (a, b) => b.timeStamp.seconds - a.timeStamp.seconds,
+          ) ?? [],
+      },
     ];
     delete res.today;
     delete res.yesterday;
-    const arr = Object.entries(res);
-    const x = arr.reduce(
+    const x = Object.entries(res).reduce(
       (acc: Array<{title: string; data: Array<transactionType>}>, curr) => {
-        acc.push({title: curr[0], data: curr[1]});
+        acc.push({
+          title: curr[0],
+          data: [...curr[1]].sort(
+            (a, b) => b.timeStamp.seconds - a.timeStamp.seconds,
+          ),
+        });
         return acc;
       },
       [],
@@ -89,21 +83,8 @@ function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
     x.reverse();
     return [...result, ...x];
   }
-  useEffect(() => {
-    fetchData();
-    const subscribe = firestore()
-      .collection('users')
-      .doc(user?.uid)
-      .collection('transactions')
-      .orderBy('timeStamp', 'desc')
-      .onSnapshot(snapshot => {
-        const filteredData = filterDataByDate(
-          snapshot.docs.map(snapshot => snapshot.data() as transactionType),
-        );
-        setData(filteredData);
-      });
-    return () => subscribe();
-  }, []);
+
+  const data = filterDataByDate(transaction);
   const filters = useAppSelector(state => state.transaction.filters);
   function applyFilters() {
     const x =
@@ -162,7 +143,7 @@ function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
                         ...item,
                         amount: Number(
                           (
-                            conversion['usd'][user!.currency.toLowerCase()!] *
+                            conversion['usd'][user!.currency.toLowerCase()] *
                             item.amount
                           ).toFixed(2),
                         ),
@@ -202,15 +183,25 @@ function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
                       {item.type === 'expense' ? '-' : '+'}{' '}
                       {currencies[user!.currency].symbol}{' '}
                       {(
-                        conversion['usd'][user!.currency.toLowerCase()!] *
+                        conversion['usd'][user!.currency.toLowerCase()] *
                         item.amount
                       ).toFixed(2)}
                     </Text>
                     <Text style={styles.text2}>
-                      {item.timeStamp.toDate().getHours()}:
-                      {item.timeStamp.toDate().getMinutes() < 10
-                        ? '0' + item.timeStamp.toDate().getMinutes()
-                        : item.timeStamp.toDate().getMinutes()}
+                      {Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+                        .toDate()
+                        .getHours()}
+                      :
+                      {Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+                        .toDate()
+                        .getMinutes() < 10
+                        ? '0' +
+                          Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+                            .toDate()
+                            .getMinutes()
+                        : Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+                            .toDate()
+                            .getMinutes()}
                     </Text>
                   </View>
                 </Pressable>

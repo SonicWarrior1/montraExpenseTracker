@@ -19,5 +19,5 @@ export type repeatDataType = {
     day?: number;
     weekDay: number;
     end: 'date' | 'never';
-    date?: Date;
+    date?: Date | Timestamp;
 }

@@ -19,7 +19,8 @@ export const NAVIGATION: {
     Story: 'Story',
     FinancialReport: 'FinancialReport',
     Settings: 'Settings',
-    Currency: 'Currency'
+    Currency: 'Currency',
+    ExportData: 'ExportData'
 } = {
     ONBOARDING: 'Onboarding',
     SIGNUP: 'Signup',
@@ -41,7 +42,9 @@ export const NAVIGATION: {
     Story: 'Story',
     FinancialReport: 'FinancialReport',
     Settings: 'Settings',
-    Currency: 'Currency'
+    Currency: 'Currency',
+    ExportData: 'ExportData'
+
 };
 
 export const STRINGS = {

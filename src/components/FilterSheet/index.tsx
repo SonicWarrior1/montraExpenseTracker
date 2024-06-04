@@ -10,8 +10,12 @@ import {
 import {COLORS} from '../../constants/commonStyles';
 import styles from './styles';
 import {useAppDispatch, useAppSelector} from '../../redux/store';
-import { openCatSheet, openFilterSheet, setFilters, setSortFilter } from '../../redux/reducers/transactionSlice';
-
+import {
+  openCatSheet,
+  openFilterSheet,
+  setFilters,
+  setSortFilter,
+} from '../../redux/reducers/transactionSlice';
 
 function FilterSheet() {
   const snapPoints = useMemo(() => ['55%'], []);
@@ -39,16 +43,8 @@ function FilterSheet() {
           dispatch(openFilterSheet(false));
         }}>
         <BottomSheetView style={{paddingHorizontal: 20}}>
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginBottom: 15,
-            }}>
-            <Text style={{fontSize: 16, fontWeight: '600'}}>
-              Filter Transaction
-            </Text>
+          <View style={styles.sheetView}>
+            <Text style={styles.text1}>Filter Transaction</Text>
             <Pressable
               style={styles.editBtn}
               onPress={() => {
@@ -60,15 +56,8 @@ function FilterSheet() {
               <Text style={styles.editBtnText}>Reset</Text>
             </Pressable>
           </View>
-          <Text style={{fontSize: 16, fontWeight: '600', marginBottom: 10}}>
-            Filter By
-          </Text>
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-            }}>
+          <Text style={[styles.text1, {marginBottom: 10}]}>Filter By</Text>
+          <View style={styles.flexRow}>
             <Pressable
               style={[
                 styles.filterBtn,
@@ -128,22 +117,16 @@ function FilterSheet() {
             </Pressable>
           </View>
           <Text
-            style={{
-              fontSize: 16,
-              fontWeight: '600',
-              marginBottom: 10,
-              marginTop: 10,
-            }}>
+            style={[
+              styles.text1,
+              {
+                marginBottom: 10,
+                marginTop: 10,
+              },
+            ]}>
             Sort By
           </Text>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              flexWrap: 'wrap',
-              columnGap: 10,
-              rowGap: 10,
-            }}>
+          <View style={styles.wrapRow}>
             <Pressable
               style={[
                 styles.filterBtn,
@@ -222,45 +205,23 @@ function FilterSheet() {
             </Pressable>
           </View>
           <Text
-            style={{
-              fontSize: 16,
-              fontWeight: '600',
-              marginBottom: 15,
-              marginTop: 10,
-            }}>
+            style={[
+              styles.text1,
+              {
+                marginBottom: 15,
+                marginTop: 10,
+              },
+            ]}>
             Category
           </Text>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              marginBottom: 30,
-            }}>
-            <Text
-              style={{
-                fontSize: 16,
-                fontWeight: '500',
-              }}>
-              Choose Category
-            </Text>
-
+          <View style={styles.catRow}>
+            <Text style={styles.text1}>Choose Category</Text>
             <Pressable
               onPress={() => {
                 dispatch(openCatSheet(true));
               }}
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-              }}>
-              <Text
-                style={{
-                  fontSize: 14,
-                  fontWeight: '500',
-                  color: COLORS.DARK[25],
-                }}>
-                0 Selected
-              </Text>
+              style={styles.pressable}>
+              <Text style={styles.text2}>0 Selected</Text>
 
               {ICONS.ArrowRight({height: 20, width: 20})}
             </Pressable>

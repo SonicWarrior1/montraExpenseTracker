@@ -9,7 +9,7 @@ import {COLORS} from '../../constants/commonStyles';
 import {ICONS} from '../../constants/icons';
 import styles from './styles';
 
-function ProfileScreen({navigation}: ProfileScreenProps) {
+function ProfileScreen({navigation}: Readonly<ProfileScreenProps>) {
   const dispatch = useAppDispatch();
   const username = useAppSelector(state => state.user.currentUser?.name);
   return (
@@ -47,7 +47,11 @@ function ProfileScreen({navigation}: ProfileScreenProps) {
             </View>
             <Text style={styles.btnText}>Settings</Text>
           </Pressable>
-          <Pressable style={styles.btn}>
+          <Pressable
+            style={styles.btn}
+            onPress={() => {
+              navigation.navigate(NAVIGATION.ExportData);
+            }}>
             <View style={styles.colorBox}>
               {ICONS.Upload({height: 24, width: 24, color: 'transparent'})}
             </View>

@@ -39,6 +39,7 @@ import Wallet from '../assets/Svgs/wallet.svg';
 import Logout from '../assets/Svgs/logout.svg';
 import Upload from '../assets/Svgs/upload.svg';
 import Setting from '../assets/Svgs/settings.svg';
+import Download from '../assets/Svgs/download.svg';
 import { COLORS } from './commonStyles';
 const iconStyle = (
   { width = 0,
@@ -94,6 +95,7 @@ export const ICONS = {
   Logout: (params: iconProps) => Logout({ ...iconStyle({ ...params }) }),
   Upload: (params: iconProps) => Upload({ ...iconStyle({ ...params }) }),
   Setting: (params: iconProps) => Setting({ ...iconStyle({ ...params }) }),
+  Download: (params: iconProps) => Download({ ...iconStyle({ ...params }) }),
 };
 
 export const catIcons: { [key: string]: { icon: (params: iconProps) => React.ReactNode, color: string } } = {
