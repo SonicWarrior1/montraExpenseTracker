@@ -33,7 +33,6 @@ import storage from '@react-native-firebase/storage';
 import AddCategorySheet from '../../components/AddCategorySheet';
 import {UserFromJson, UserType} from '../../defs/user';
 import {EmptyError} from '../../constants/errors';
-import {useGetUsdConversionQuery} from '../../redux/api/conversionApi';
 
 function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
   const pageType = route.params.type;
@@ -131,7 +130,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
     attachementType: transactionType['attachementType'];
   }) {
     return {
-      amount: Number(amount) / conversion['usd'][currency!.toLowerCase()!],
+      amount: Number(amount) / conversion['usd'][currency!.toLowerCase()],
       category: category,
       desc: desc,
       wallet: wallet,
@@ -183,7 +182,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
             0) -
             transaction!.amount +
             Number(amount)) /
-          conversion['usd'][currency!.toLowerCase()!],
+          conversion['usd'][currency!.toLowerCase()],
       });
   }
   async function handleNewIncome({
@@ -199,7 +198,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
           ((UserFromJson(curr.data() as UserType)?.income[month]?.[category] ??
             0) +
             Number(amount)) /
-          conversion['usd'][currency!.toLowerCase()!],
+          conversion['usd'][currency!.toLowerCase()],
       });
   }
 
@@ -216,7 +215,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
           ((UserFromJson(curr.data() as UserType).spend[month][category] ?? 0) -
             transaction!.amount +
             Number(amount)) /
-          conversion['usd'][currency!.toLowerCase()!],
+          conversion['usd'][currency!.toLowerCase()],
       });
   }
 
@@ -233,7 +232,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
           ((UserFromJson(curr.data() as UserType)?.spend[month]?.[category] ??
             0) +
             Number(amount)) /
-          conversion['usd'][currency!.toLowerCase()!],
+          conversion['usd'][currency!.toLowerCase()],
       });
   }
   async function handleNotify({
@@ -399,7 +398,11 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
           formKey={formKey}
         />
         {image === '' && doc === undefined ? (
-          <Pressable style={styles.attachementCtr}>
+          <Pressable
+            style={styles.attachementCtr}
+            onPress={() => {
+              filePickSheetRef.current?.present();
+            }}>
             {ICONS.Attachment({
               height: 20,
               width: 20,
@@ -483,10 +486,12 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
                 <Text style={styles.flexRowText1}>End After</Text>
                 <Text style={styles.flexRowText2}>
                   {isEdit
-                    ? (repeatData.date! as unknown as Timestamp)
-                        .toDate()
-                        .toLocaleDateString()
-                    : repeatData.date?.toLocaleDateString()}
+                    ? (repeatData.date as Timestamp)?.seconds !== undefined
+                      ? (repeatData.date as Timestamp)
+                          .toDate()
+                          .toLocaleDateString()
+                      : (repeatData.date as Date)?.toLocaleDateString()
+                    : (repeatData.date as Date)?.toLocaleDateString()}
                 </Text>
               </View>
             )}

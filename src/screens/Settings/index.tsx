@@ -6,7 +6,7 @@ import {COLORS} from '../../constants/commonStyles';
 import {ICONS} from '../../constants/icons';
 import {useAppSelector} from '../../redux/store';
 
-function SettingsScreen({navigation}: SettingsScreenProps) {
+function SettingsScreen({navigation}: Readonly<SettingsScreenProps>) {
   const currency = useAppSelector(state => state.user.currentUser?.currency);
   return (
     <SafeAreaView style={{backgroundColor: COLORS.LIGHT[100], flex: 1}}>

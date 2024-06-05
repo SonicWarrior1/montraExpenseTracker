@@ -22,6 +22,7 @@ export type RootStackParamList = {
     FinancialReport: undefined,
     Settings: undefined,
     Currency: undefined
+    ExportData:undefined
 }
 
 export type BottomParamList = {

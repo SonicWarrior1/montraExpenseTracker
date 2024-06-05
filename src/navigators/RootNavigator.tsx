@@ -22,6 +22,7 @@ import StoryScreen from '../screens/StoryScreen';
 import FinancialReport from '../screens/FinancialReport';
 import SettingsScreen from '../screens/Settings';
 import CurrencyScreen from '../screens/Currency';
+import ExportData from '../screens/ExportData';
 
 export const Stack = createStackNavigator<RootStackParamList>();
 
@@ -147,6 +148,16 @@ function RootNavigator(): React.JSX.Element {
               headerShown: true,
               headerTitleStyle: {color: 'black'},
               title: 'Currency',
+              headerLeft: props => headerLeft(props, 'black'),
+            }}
+          />
+          <Stack.Screen
+            name={NAVIGATION.ExportData}
+            component={ExportData}
+            options={{
+              headerShown: true,
+              headerTitleStyle: {color: 'black'},
+              title: 'Export Data',
               headerLeft: props => headerLeft(props, 'black'),
             }}
           />

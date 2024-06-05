@@ -34,7 +34,16 @@ const styles = StyleSheet.create({
         fontSize: 22,
         fontWeight: '600',
         color: COLORS.LIGHT[100],
-    }
+    },
+    filterBtn: {
+        paddingVertical: 10,
+        paddingHorizontal: 22,
+        borderRadius: 40,
+    },
+    filterBtnText: {
+        fontSize: 14,
+        color: COLORS.YELLOW[100]
+    },
 })
 
 export default styles

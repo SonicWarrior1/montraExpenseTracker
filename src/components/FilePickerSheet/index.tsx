@@ -1,7 +1,7 @@
 import {BottomSheetModal, BottomSheetView} from '@gorhom/bottom-sheet';
 import React, {useCallback, useMemo} from 'react';
 import {iconProps, ICONS} from '../../constants/icons';
-import {Pressable, Text} from 'react-native';
+import {Pressable, Text, View} from 'react-native';
 import {pickSingle} from 'react-native-document-picker';
 import {
   ImageLibraryOptions,
@@ -18,7 +18,7 @@ function FilePickerSheet({
   setDoc,
 }: Readonly<{
   bottomSheetModalRef: React.RefObject<BottomSheetModalMethods>;
-  setImage: React.Dispatch<React.SetStateAction<string|undefined>>;
+  setImage: React.Dispatch<React.SetStateAction<string | undefined>>;
   setDoc: React.Dispatch<
     React.SetStateAction<
       | {
@@ -42,7 +42,7 @@ function FilePickerSheet({
       console.log('User cancelled image picker');
     } else {
       let imageUri = response.assets![0].uri;
-      setImage(imageUri!);
+      setImage(imageUri);
       bottomSheetModalRef.current?.close();
     }
   }, []);
@@ -56,7 +56,7 @@ function FilePickerSheet({
       console.log('User cancelled image picker');
     } else {
       let imageUri = response.assets![0].uri;
-      setImage(imageUri!);
+      setImage(imageUri);
       bottomSheetModalRef.current?.close();
     }
   }, []);

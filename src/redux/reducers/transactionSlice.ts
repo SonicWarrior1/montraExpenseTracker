@@ -49,13 +49,8 @@ const TransactionSlice = createSlice({
             }
             state.isFilterOpen = false;
         },
-        setTransaction(state, action: PayloadAction<transactionType[]>) {
-
-            state.transactions = action.payload.reduce((acc: { [key: string]: transactionType }, curr) => {
-                acc[curr.id] = curr;
-                return acc;
-            }, {});
-            console.log(state)
+        setTransaction(state, action) {
+            state.transactions = action.payload
         },
         setConversionData(state, action) {
             state.conversion = action.payload

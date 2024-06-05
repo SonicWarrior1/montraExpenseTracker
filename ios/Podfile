@@ -23,7 +23,7 @@ target 'montraExpenseTracker' do
     # An absolute path to your application root.
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
-
+  pod 'react-native-blob-util', :path => '../node_modules/react-native-blob-util'
   target 'montraExpenseTrackerTests' do
     inherit! :complete
     # Pods for testing
