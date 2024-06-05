@@ -33,6 +33,7 @@ import storage from '@react-native-firebase/storage';
 import AddCategorySheet from '../../components/AddCategorySheet';
 import {UserFromJson, UserType} from '../../defs/user';
 import {EmptyError} from '../../constants/errors';
+import notifee from '@notifee/react-native';
 
 function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
   const pageType = route.params.type;
@@ -264,6 +265,29 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
               read: false,
             },
           });
+        await notifee.requestPermission();
+
+        // Create a channel (required for Android)
+        const channelId = await notifee.createChannel({
+          id: 'default',
+          name: 'Default Channel',
+        });
+
+        // Display a notification
+        await notifee.displayNotification({
+          title:
+            category[0].toUpperCase() +
+            category.slice(1) +
+            ' budget has exceeded the limit',
+          body:
+            'Your ' +
+            category[0].toUpperCase() +
+            category.slice(1) +
+            ' budget has exceeded the limit',
+          android: {
+            channelId,
+          },
+        });
       } catch (e) {
         console.log(e);
       }
@@ -359,7 +383,6 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
           onChange={val => {
             if (val.value === 'add') {
               addCategorySheetRef.current?.present();
-              console.log('yo');
             } else {
               setCategory(val.value);
             }

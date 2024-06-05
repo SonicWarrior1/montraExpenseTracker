@@ -6,7 +6,7 @@ import {ICONS} from '../constants/icons';
 import {Pressable, Settings} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import Login from '../screens/Login';
-import {useAppSelector} from '../redux/store';
+import {useAppDispatch, useAppSelector} from '../redux/store';
 import ForgotPassword from '../screens/ForgotPassword';
 import ForgotEmailSent from '../screens/ForgotEmailSent';
 import Pin from '../screens/Pin';
@@ -23,10 +23,85 @@ import FinancialReport from '../screens/FinancialReport';
 import SettingsScreen from '../screens/Settings';
 import CurrencyScreen from '../screens/Currency';
 import ExportData from '../screens/ExportData';
-
+import {
+  setConversionData,
+  setTransaction,
+} from '../redux/reducers/transactionSlice';
+import {useGetUsdConversionQuery} from '../redux/api/conversionApi';
+import {UserFromJson, UserType} from '../defs/user';
+import {transactionType} from '../defs/transaction';
+import {useCallback, useEffect} from 'react';
+import firestore from '@react-native-firebase/firestore';
+import {userLoggedIn} from '../redux/reducers/userSlice';
 export const Stack = createStackNavigator<RootStackParamList>();
 
 function RootNavigator(): React.JSX.Element {
+  const dispatch = useAppDispatch();
+  const user = useAppSelector(state => state.user.currentUser);
+  const fetchData = useCallback(async () => {
+    try {
+      const res = await firestore()
+        .collection('users')
+        .doc(user!.uid)
+        .collection('transactions')
+        .orderBy('timeStamp', 'desc')
+        .get();
+      const data = res.docs.map(snapshot => snapshot.data() as transactionType);
+      const formatData = data.reduce(
+        (acc: {[key: string]: transactionType}, item) => {
+          acc[item.timeStamp.seconds] = item;
+          return acc;
+        },
+        {},
+      );
+      dispatch(setTransaction(formatData));
+    } catch (e) {
+      console.log(e);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (user) {
+      fetchData();
+      const unsubscribe = firestore()
+        .collection('users')
+        .doc(user.uid)
+        .collection('transactions')
+        .orderBy('timeStamp', 'desc')
+        .onSnapshot(snapshot => {
+          const data: transactionType[] = snapshot.docs.map(
+            doc => doc.data() as transactionType,
+          );
+          const formatData = data.reduce(
+            (acc: {[key: string]: transactionType}, item) => {
+              acc[item.timeStamp.seconds] = item;
+              return acc;
+            },
+            {},
+          );
+          dispatch(setTransaction(formatData));
+        });
+      return () => unsubscribe();
+    }
+  }, [user]);
+  const {data: conversion, isSuccess} = useGetUsdConversionQuery({});
+  useEffect(() => {
+    if (isSuccess) {
+      dispatch(setConversionData(conversion));
+    }
+  }, []);
+
+  useEffect(() => {
+    if (user) {
+      const unsubscribe = firestore()
+        .collection('users')
+        .doc(user.uid)
+        .onSnapshot(snapshot => {
+          dispatch(userLoggedIn(UserFromJson(snapshot.data() as UserType)));
+        });
+      return () => unsubscribe();
+    }
+  }, [user]);
   const navigation = useNavigation();
   function headerLeft({canGoBack}: any, color: string) {
     return canGoBack ? (

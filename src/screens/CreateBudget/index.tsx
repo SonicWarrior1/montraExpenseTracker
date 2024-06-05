@@ -80,7 +80,6 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
           onChange={val => {
             if (val.value === 'add') {
               addCategorySheetRef.current?.present();
-              console.log('yo');
             } else {
               setCategory(val.value);
             }

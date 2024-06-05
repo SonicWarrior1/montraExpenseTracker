@@ -121,12 +121,12 @@ function BudgetScreen({navigation}: Readonly<BudgetScreenProps>) {
                   <Text style={styles.text2}>
                     {currencies[currency!].symbol}
                     {(
-                      conversion['usd'][currency!.toLowerCase()!] *
+                      conversion['usd'][currency!.toLowerCase()] *
                       (spend[key] ?? 0)
                     ).toFixed(2)}{' '}
                     of {currencies[currency!].symbol}
                     {(
-                      conversion['usd'][currency!.toLowerCase()!] * val.limit
+                      conversion['usd'][currency!.toLowerCase()] * val.limit
                     ).toFixed(2)}
                   </Text>
                   {(spend[key] ?? 0) >= val.limit && (

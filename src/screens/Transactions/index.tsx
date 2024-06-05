@@ -1,5 +1,6 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
+  Dimensions,
   Pressable,
   SafeAreaView,
   SectionList,
@@ -18,14 +19,16 @@ import TransactionHeader from '../../components/TransactionHeader';
 import {TransactionScreenProps} from '../../defs/navigation';
 import {currencies, NAVIGATION} from '../../constants/strings';
 function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
+  const [month, setMonth] = useState(new Date().getMonth());
   const user = useAppSelector(state => state.user.currentUser);
   const conversion = useAppSelector(state => state.transaction.conversion);
   const transaction = useAppSelector(state => state.transaction.transactions);
   function filterDataByDate(data: {[key: string]: transactionType}) {
     const startOfToday = new Date().setHours(0, 0, 0, 0) / 1000;
     const startOfYesterday = startOfToday - 24 * 60 * 60;
-    const res = Object.values(data).reduce(
-      (acc: {[key: string]: Array<transactionType>}, item) => {
+    const res = Object.values(data)
+      .filter(item => item.timeStamp.toDate().getMonth() === month)
+      .reduce((acc: {[key: string]: Array<transactionType>}, item) => {
         const itemTime = item.timeStamp.seconds;
         if (itemTime >= startOfToday) {
           if (acc.today) {
@@ -39,17 +42,13 @@ function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
           } else {
             acc.yesterday = [item];
           }
+        } else if (acc[item.timeStamp.seconds]) {
+          acc[item.timeStamp.seconds].push(item);
         } else {
-          if (acc[item.timeStamp.seconds]) {
-            acc[item.timeStamp.seconds].push(item);
-          } else {
-            acc[item.timeStamp.seconds] = [item];
-          }
+          acc[item.timeStamp.seconds] = [item];
         }
         return acc;
-      },
-      {},
-    );
+      }, {});
     const result = [
       {
         title: 'today',
@@ -121,9 +120,8 @@ function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
     }
   }
   return (
-    
     <SafeAreaView style={styles.safeView}>
-      <TransactionHeader />
+      <TransactionHeader month={month} setMonth={setMonth} />
       <ScrollView>
         <View style={styles.mainView}>
           <TouchableOpacity

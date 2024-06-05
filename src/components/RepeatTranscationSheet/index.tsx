@@ -9,6 +9,7 @@ import CustomInput from '../CustomInput';
 import {monthData, weekData} from '../../constants/strings';
 import {repeatDataType} from '../../defs/transaction';
 import styles from './styles';
+import SheetBackdrop from '../SheetBackDrop';
 
 function RepeatTransactionSheet({
   bottomSheetModalRef,
@@ -28,9 +29,6 @@ function RepeatTransactionSheet({
   const [isDateOpen, setIsDateOpen] = useState(false);
 
   const snapPoints = useMemo(() => ['40%'], []);
-  const handleSheetChanges = useCallback((index: number) => {
-    console.log('handleSheetChanges', index);
-  }, []);
 
   const year = new Date().getFullYear();
   const generateDaysInYear = useMemo(() => {
@@ -65,7 +63,8 @@ function RepeatTransactionSheet({
       ref={bottomSheetModalRef}
       index={0}
       snapPoints={snapPoints}
-      onChange={handleSheetChanges}>
+      backdropComponent={SheetBackdrop}
+      backgroundStyle={{borderTopLeftRadius: 32, borderTopRightRadius: 32}}>
       <BottomSheetView style={styles.sheetView}>
         <View style={styles.flexRow}>
           <View style={{flex: 1}}>

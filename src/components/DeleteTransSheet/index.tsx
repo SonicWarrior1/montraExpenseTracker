@@ -17,6 +17,7 @@ import styles from './styles';
 import {transactionType} from '../../defs/transaction';
 import {UserFromJson, UserType} from '../../defs/user';
 import {StackNavigationProp} from '@react-navigation/stack';
+import SheetBackdrop from '../SheetBackDrop';
 function DeleteTransactionSheet({
   bottomSheetModalRef,
   id,
@@ -48,7 +49,9 @@ function DeleteTransactionSheet({
         enablePanDownToClose
         ref={bottomSheetModalRef}
         index={0}
-        snapPoints={snapPoints}>
+        snapPoints={snapPoints}
+        backdropComponent={SheetBackdrop}
+        backgroundStyle={{borderTopLeftRadius: 32, borderTopRightRadius: 32}}>
         <BottomSheetView style={styles.sheetView}>
           <Text style={styles.text1}>Remove this Transaction?</Text>
           <Text style={styles.text2}>

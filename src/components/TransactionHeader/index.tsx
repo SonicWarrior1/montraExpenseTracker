@@ -4,9 +4,16 @@ import {ICONS} from '../../constants/icons';
 import {Dropdown} from 'react-native-element-dropdown';
 import styles from './styles';
 import {useAppDispatch} from '../../redux/store';
-import { openFilterSheet } from '../../redux/reducers/transactionSlice';
+import {openFilterSheet} from '../../redux/reducers/transactionSlice';
+import {monthData} from '../../constants/strings';
 
-function TransactionHeader() {
+function TransactionHeader({
+  month,
+  setMonth,
+}: Readonly<{
+  month: number;
+  setMonth: React.Dispatch<React.SetStateAction<number>>;
+}>) {
   const dispatch = useAppDispatch();
   return (
     <View style={styles.header}>
@@ -18,11 +25,13 @@ function TransactionHeader() {
         renderRightIcon={() => <></>}
         placeholder="Month"
         placeholderStyle={{marginLeft: 10}}
-        value={'Month'}
-        data={[]}
+        value={monthData[month]}
+        data={monthData}
         labelField={'label'}
         valueField={'value'}
-        onChange={() => {}}
+        onChange={({value}) => {
+          setMonth(value - 1);
+        }}
       />
       <Pressable
         style={styles.filterBtn}

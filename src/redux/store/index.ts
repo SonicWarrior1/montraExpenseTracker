@@ -15,7 +15,7 @@ const RootReducer = combineReducers({ user: UserReducer, transaction: Transactio
 const persistedReducer = persistReducer(persistConfig, RootReducer,)
 const store = configureStore({
     reducer: persistedReducer,
-    middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(convertApi.middleware)
+    middleware: (getDefaultMiddleware) => getDefaultMiddleware({ serializableCheck: false, }).concat(convertApi.middleware)
 })
 export const persistor = persistStore(store)
 type RootState = ReturnType<typeof store.getState>

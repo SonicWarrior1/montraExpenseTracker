@@ -13,6 +13,7 @@ import {
 } from '../../redux/reducers/userSlice';
 import {transactionType} from '../../defs/transaction';
 import styles from './styles';
+import SheetBackdrop from '../SheetBackDrop';
 
 function AddCategorySheet({
   bottomSheetModalRef,
@@ -37,7 +38,9 @@ function AddCategorySheet({
       enablePanDownToClose
       ref={bottomSheetModalRef}
       index={0}
-      snapPoints={snapPoints}>
+      snapPoints={snapPoints}
+      backdropComponent={SheetBackdrop}
+      backgroundStyle={{borderTopLeftRadius: 32, borderTopRightRadius: 32}}>
       <BottomSheetView style={styles.sheetView}>
         <CustomInput
           placeholderText="Category Name"
