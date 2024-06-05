@@ -1,10 +1,9 @@
-import React, {useState} from 'react';
+import React, {useCallback, useState} from 'react';
 import {Platform, SafeAreaView, Text, View} from 'react-native';
 import {useAppSelector} from '../../redux/store';
 import {jsonToCSV} from 'react-native-csv';
 import {Timestamp} from '@react-native-firebase/firestore';
 import {monthData, weekData} from '../../constants/strings';
-import {COLORS} from '../../constants/commonStyles';
 import CustomDropdown from '../../components/CustomDropDown';
 import CustomButton from '../../components/CustomButton';
 import ReactNativeBlobUtil from 'react-native-blob-util';
@@ -18,7 +17,7 @@ function ExportData() {
   const [dataRange, setDataRange] = useState<7 | 15 | 30>(7);
   const [dataFormat, setDataFormat] = useState<'csv' | 'pdf'>('csv');
 
-  const handleExport = async () => {
+  const handleExport = useCallback(async () => {
     const daysAgo = new Date();
     daysAgo.setDate(daysAgo.getDate() - dataRange);
     const x = jsonToCSV(
@@ -64,7 +63,7 @@ function ExportData() {
     } catch (e) {
       console.log(e);
     }
-  };
+  }, [data]);
   return (
     <SafeAreaView style={styles.safeView}>
       <View style={styles.mainView}>
@@ -99,7 +98,10 @@ function ExportData() {
           />
           <Text style={styles.text}>What format do you want to export?</Text>
           <CustomDropdown
-            data={['csv', 'pdf'].map(item => {
+            data={[
+              'csv',
+              //  'pdf'
+            ].map(item => {
               return {
                 label: item.toUpperCase(),
                 value: item,

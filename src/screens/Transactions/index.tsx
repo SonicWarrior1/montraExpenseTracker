@@ -54,16 +54,20 @@ function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
       {
         title: 'today',
         data:
-          [...res.today].sort(
-            (a, b) => b.timeStamp.seconds - a.timeStamp.seconds,
-          ) ?? [],
+          res.today === undefined
+            ? []
+            : [...res.today].sort(
+                (a, b) => b.timeStamp.seconds - a.timeStamp.seconds,
+              ) ?? [],
       },
       {
         title: 'yesterday',
         data:
-          [...res.yesterday].sort(
-            (a, b) => b.timeStamp.seconds - a.timeStamp.seconds,
-          ) ?? [],
+          res.yesterday === undefined
+            ? []
+            : [...res.yesterday].sort(
+                (a, b) => b.timeStamp.seconds - a.timeStamp.seconds,
+              ) ?? [],
       },
     ];
     delete res.today;
@@ -117,6 +121,7 @@ function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
     }
   }
   return (
+    
     <SafeAreaView style={styles.safeView}>
       <TransactionHeader />
       <ScrollView>
