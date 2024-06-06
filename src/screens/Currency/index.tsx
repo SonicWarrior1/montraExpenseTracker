@@ -9,7 +9,6 @@ import firestore from '@react-native-firebase/firestore';
 function CurrencyScreen() {
   const code = useAppSelector(state => state.user.currentUser?.currency);
   const uid = useAppSelector(state => state.user.currentUser?.uid);
-  console.log(code);
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: COLORS.LIGHT[100]}}>
       <FlatList

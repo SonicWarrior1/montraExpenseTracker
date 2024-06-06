@@ -1,6 +1,7 @@
 {
     "svg.preview.background": "transparent",
     "conventionalCommits.scopes": [
-        "ExportData"
+        "ExportData",
+        "financial report"
     ]
 }

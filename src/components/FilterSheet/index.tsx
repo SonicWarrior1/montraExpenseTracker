@@ -16,6 +16,7 @@ import {
   setFilters,
   setSortFilter,
 } from '../../redux/reducers/transactionSlice';
+import SheetBackdrop from '../SheetBackDrop';
 
 function FilterSheet() {
   const snapPoints = useMemo(() => ['55%'], []);
@@ -39,6 +40,8 @@ function FilterSheet() {
         index={0}
         snapPoints={snapPoints}
         ref={ref}
+        backdropComponent={SheetBackdrop}
+        backgroundStyle={{borderTopLeftRadius: 32, borderTopRightRadius: 32}}
         onDismiss={() => {
           dispatch(openFilterSheet(false));
         }}>
@@ -239,4 +242,4 @@ function FilterSheet() {
   );
 }
 
-export default FilterSheet;
+export default React.memo(FilterSheet);

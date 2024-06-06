@@ -40,6 +40,8 @@ import Logout from '../assets/Svgs/logout.svg';
 import Upload from '../assets/Svgs/upload.svg';
 import Setting from '../assets/Svgs/settings.svg';
 import Download from '../assets/Svgs/download.svg';
+import LineChart from '../assets/Svgs/line chart.svg';
+import SortwithArrow from '../assets/Svgs/sort1.svg';
 import { COLORS } from './commonStyles';
 const iconStyle = (
   { width = 0,
@@ -96,6 +98,8 @@ export const ICONS = {
   Upload: (params: iconProps) => Upload({ ...iconStyle({ ...params }) }),
   Setting: (params: iconProps) => Setting({ ...iconStyle({ ...params }) }),
   Download: (params: iconProps) => Download({ ...iconStyle({ ...params }) }),
+  LineChart: (params: iconProps) => LineChart({ ...iconStyle({ ...params }) }),
+  SortwithArrow: (params: iconProps) => SortwithArrow({ ...iconStyle({ ...params }) }),
 };
 
 export const catIcons: { [key: string]: { icon: (params: iconProps) => React.ReactNode, color: string } } = {

@@ -11,6 +11,7 @@ import {
 } from 'react-native-image-picker';
 import {BottomSheetModalMethods} from '@gorhom/bottom-sheet/lib/typescript/types';
 import styles from './styles';
+import SheetBackdrop from '../SheetBackDrop';
 
 function FilePickerSheet({
   bottomSheetModalRef,
@@ -30,9 +31,6 @@ function FilePickerSheet({
   >;
 }>) {
   const snapPoints = useMemo(() => ['25%'], []);
-  const handleSheetChanges = useCallback((index: number) => {
-    console.log('handleSheetChanges', index);
-  }, []);
   const openImagePicker = useCallback(async () => {
     const options: ImageLibraryOptions = {
       mediaType: 'photo',
@@ -80,7 +78,8 @@ function FilePickerSheet({
       ref={bottomSheetModalRef}
       index={0}
       snapPoints={snapPoints}
-      onChange={handleSheetChanges}>
+      backdropComponent={SheetBackdrop}
+      backgroundStyle={{borderTopLeftRadius: 32, borderTopRightRadius: 32}}>
       <BottomSheetView style={styles.sheetView}>
         <SheetButtons title="Camera" icon={ICONS.Camera} onPress={openCamera} />
         <SheetButtons

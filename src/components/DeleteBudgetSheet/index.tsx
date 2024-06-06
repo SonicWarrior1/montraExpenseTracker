@@ -14,7 +14,8 @@ import {setLoading} from '../../redux/reducers/userSlice';
 import Toast from 'react-native-toast-message';
 import firestore, {deleteField} from '@react-native-firebase/firestore';
 import {RootStackParamList} from '../../defs/navigation';
-import { StackNavigationProp } from '@react-navigation/stack';
+import {StackNavigationProp} from '@react-navigation/stack';
+import SheetBackdrop from '../SheetBackDrop';
 function DeleteBudgetSheet({
   bottomSheetModalRef,
   navigation,
@@ -37,7 +38,9 @@ function DeleteBudgetSheet({
         enablePanDownToClose
         ref={bottomSheetModalRef}
         index={0}
-        snapPoints={snapPoints}>
+        snapPoints={snapPoints}
+        backdropComponent={SheetBackdrop}
+        backgroundStyle={{borderTopLeftRadius: 32, borderTopRightRadius: 32}}>
         <BottomSheetView style={styles.sheetView}>
           <Text style={styles.text1}>Remove this budget?</Text>
           <Text style={styles.text2}>

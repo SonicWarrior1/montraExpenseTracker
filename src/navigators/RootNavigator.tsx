@@ -23,10 +23,10 @@ import FinancialReport from '../screens/FinancialReport';
 import SettingsScreen from '../screens/Settings';
 import CurrencyScreen from '../screens/Currency';
 import ExportData from '../screens/ExportData';
-
 export const Stack = createStackNavigator<RootStackParamList>();
 
 function RootNavigator(): React.JSX.Element {
+ 
   const navigation = useNavigation();
   function headerLeft({canGoBack}: any, color: string) {
     return canGoBack ? (

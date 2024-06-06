@@ -4,16 +4,16 @@ import {
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import React, {useEffect, useMemo, useRef} from 'react';
-import {useAppDispatch, useAppSelector} from '../../redux/store'
+import {useAppDispatch, useAppSelector} from '../../redux/store';
 import {View} from 'react-native';
-import { openCatSheet } from '../../redux/reducers/transactionSlice';
+import {openCatSheet} from '../../redux/reducers/transactionSlice';
+import SheetBackdrop from '../SheetBackDrop';
 
 function CategorySelectionSheet() {
   const dispatch = useAppDispatch();
   const snapPoints = useMemo(() => ['35%'], []);
   const ref = useRef<BottomSheetModal>(null);
   const isOpen = useAppSelector(state => state.transaction.isCatOpen);
-  // console.log(isOpen);
   useEffect(() => {
     if (isOpen === true) {
       ref.current?.present();
@@ -30,7 +30,9 @@ function CategorySelectionSheet() {
         ref={ref}
         onDismiss={() => {
           dispatch(openCatSheet(false));
-        }}>
+        }}
+        backdropComponent={SheetBackdrop}
+        backgroundStyle={{borderTopLeftRadius: 32, borderTopRightRadius: 32}}>
         <BottomSheetView style={{paddingHorizontal: 20}}>
           <View></View>
         </BottomSheetView>

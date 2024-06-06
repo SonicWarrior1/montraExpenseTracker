@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {Dimensions, SafeAreaView, Text, View} from 'react-native';
 import styles from './styles';
 import {TouchableOpacity} from 'react-native-gesture-handler';
@@ -9,6 +9,7 @@ import {useAppDispatch, useAppSelector} from '../../redux/store';
 import {userLoggedIn} from '../../redux/reducers/userSlice';
 import firestore from '@react-native-firebase/firestore';
 import {ICONS} from '../../constants/icons';
+
 function Pin({route, navigation}: Readonly<PinSentScreenProps>) {
   const matrix = [
     [1, 2, 3],
@@ -18,12 +19,10 @@ function Pin({route, navigation}: Readonly<PinSentScreenProps>) {
   ];
   const screenWidth = Dimensions.get('screen').width;
   const [pin, setPin] = useState<number[]>([]);
-  console.log(route.params);
   const user = useAppSelector(state => state.user.currentUser);
-  const isSetup = user?.pin === '' ? true : false;
+  const isSetup = user?.pin === '';
   const oldPin = route.params.pin ?? '';
   const dispatch = useAppDispatch();
-  console.log(pin);
   return (
     <SafeAreaView style={styles.safeView}>
       <View style={styles.mainView}>
@@ -64,6 +63,7 @@ function Pin({route, navigation}: Readonly<PinSentScreenProps>) {
                   }}
                   onPress={async () => {
                     if (value === -1) {
+                      return;
                     } else if (value === 99) {
                       if (isSetup && oldPin === '') {
                         navigation.push(NAVIGATION.PIN, {
@@ -82,14 +82,12 @@ function Pin({route, navigation}: Readonly<PinSentScreenProps>) {
                         } else {
                           console.log("Pin doesn't match");
                         }
+                      } else if (pin.join('') === user?.pin) {
+                        navigation.replace(NAVIGATION.BottomTab);
+                        console.log('home');
                       } else {
-                        if (pin.join('') === user?.pin) {
-                          navigation.replace(NAVIGATION.BottomTab);
-                          console.log('home');
-                        } else {
-                          console.log('Incorrect Pin');
-                          setPin([]);
-                        }
+                        console.log('Incorrect Pin');
+                        setPin([]);
                       }
                     } else if (pin.length < 4) {
                       setPin([...pin, value]);

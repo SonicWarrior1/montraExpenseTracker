@@ -60,8 +60,12 @@ function ProfileScreen({navigation}: Readonly<ProfileScreenProps>) {
           <Pressable
             style={[styles.btn, {borderBottomWidth: 0}]}
             onPress={async () => {
-              await auth().signOut();
-              dispatch(userLoggedIn(undefined));
+              try {
+                await auth().signOut();
+                dispatch(userLoggedIn(undefined));
+              } catch (e) {
+                console.log(e);
+              }
             }}>
             <View style={[styles.colorBox, {backgroundColor: COLORS.RED[20]}]}>
               {ICONS.Logout({height: 24, width: 24, color: 'transparent'})}
