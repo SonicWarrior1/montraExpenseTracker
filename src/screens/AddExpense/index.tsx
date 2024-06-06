@@ -41,7 +41,6 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
   let transaction: transactionType | undefined;
   if (isEdit) {
     transaction = route.params.transaction;
-    console.log(transaction?.freq);
   }
   const month = new Date().getMonth();
   const backgroundColor =
@@ -250,7 +249,6 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
       totalBudget &&
       totalSpent >= totalBudget.limit * (totalBudget.percentage / 100)
     ) {
-      console.log('notify');
       try {
         const notificationId = uuid.v4();
         await firestore()
@@ -312,7 +310,6 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
           const totalSpent =
             UserFromJson(curr.data() as UserType)?.spend?.[month]?.[category] ??
             0 - transaction!.amount + Number(amount);
-          console.log(totalSpent);
           await handleNotify({curr, totalSpent});
         } else if (pageType === 'income') {
           await handleIncomeUpdate({curr});

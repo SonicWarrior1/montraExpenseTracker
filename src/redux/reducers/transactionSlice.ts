@@ -37,7 +37,6 @@ const TransactionSlice = createSlice({
             state.isFilterOpen = false;
         },
         setSortFilter(state, action) {
-            console.log(action)
             if (action.payload === 0) {
                 state.filters.sort = 'highest'
             } else if (action.payload === 1) {

@@ -47,7 +47,6 @@ function Login({navigation}: Readonly<LoginScreenProps>) {
             .doc(creds.user.uid)
             .get();
           const user = UserFromJson(data.data()!);
-          console.log(user);
           dispatch(userLoggedIn(user));
         }
       } catch (e) {

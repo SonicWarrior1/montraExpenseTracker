@@ -33,11 +33,9 @@ export default function StoryScreen({navigation}: StoryScreenProps) {
           item => item[1].limit <= user?.spend[new Date().getMonth()][item[0]],
         )
       : undefined;
-  console.log(biggestIncome, biggestSpend, budgetExceed);
   const conversion = useAppSelector(state => state.transaction.conversion);
   const currency = useAppSelector(state => state.user.currentUser?.currency);
   const [index, setIndex] = useState(0);
-  console.log('dsijfefmiosdmfsdmo', biggestSpend, biggestIncome);
   return (
     <SafeAreaView
       style={[
@@ -222,7 +220,6 @@ export default function StoryScreen({navigation}: StoryScreenProps) {
             width: screenWidth / 2,
           }}
           onPress={() => {
-            console.log('left');
             if (index > 0) {
               setIndex(index => index - 1);
             }
@@ -234,7 +231,6 @@ export default function StoryScreen({navigation}: StoryScreenProps) {
             width: screenWidth / 2,
           }}
           onPress={() => {
-            console.log('right');
             if (index < 3) {
               setIndex(index => index + 1);
             }

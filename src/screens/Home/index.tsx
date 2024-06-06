@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {
   Dimensions,
   FlatList,
@@ -14,19 +14,12 @@ import {currencies, NAVIGATION} from '../../constants/strings';
 import styles from './styles';
 import {COLORS} from '../../constants/commonStyles';
 import {HomeScreenProps} from '../../defs/navigation';
-import {LineChart} from 'react-native-gifted-charts';
 import {Timestamp} from '@react-native-firebase/firestore';
 import HomeHeader from '../../components/HomeHeader';
+import Graph from './atoms/graph';
 
 function Home({navigation, route}: Readonly<HomeScreenProps>) {
   const screenHeight = Dimensions.get('screen').height;
-  const startOfToday = new Date().setHours(0, 0, 0, 0) / 1000;
-  const startOfWeek = Math.floor(
-    (new Date().setHours(0, 0, 0, 0) - new Date().getDay() * 86400000) / 1000,
-  );
-  const startOfYear = Math.floor(
-    new Date(new Date().setMonth(0, 1)).setHours(0, 0, 0, 0) / 1000,
-  );
   const conversion = useAppSelector(state => state.transaction.conversion);
   const currency =
     useAppSelector(state => state.user.currentUser?.currency) ?? 'USD';
@@ -43,29 +36,8 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
   const totalIncome = Object.values(incomes ?? [])
     .reduce((a, b) => a + b, 0)
     .toFixed(2);
-  const [graphDay, setGraphDay] = useState(0);
   const data = useAppSelector(state => state.transaction.transactions);
-  const graphData = Object.values(data)
-    .filter(item => {
-      if (graphDay === 0) {
-        return (
-          item.timeStamp.seconds >= startOfToday && item.type === 'expense'
-        );
-      } else if (graphDay === 1) {
-        return item.timeStamp.seconds >= startOfWeek && item.type === 'expense';
-      } else if (graphDay === 2) {
-        return (
-          item.timeStamp.toDate().getMonth() === month &&
-          item.type === 'expense'
-        );
-      } else {
-        return item.timeStamp.seconds >= startOfYear && item.type === 'expense';
-      }
-    })
-    .sort((a, b) => a.timeStamp.seconds - b.timeStamp.seconds)
-    .map(item => {
-      return {value: item.amount};
-    });
+
   return (
     <View style={styles.mainView}>
       <LinearGradient colors={['#FFF6E5', '#F8EDD830']} style={styles.gradient}>
@@ -127,131 +99,7 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
       </LinearGradient>
       <View style={{flex: screenHeight / 490}}>
         <Text style={styles.graphTitle}>Spend Frequency</Text>
-        {graphData.length <= 1 ? (
-          <View
-            style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-            <Text
-              style={{
-                fontSize: 16,
-                fontWeight: '500',
-                color: COLORS.DARK[25],
-                textAlign: 'center',
-              }}>
-              Not enough data
-            </Text>
-          </View>
-        ) : (
-          <View style={{transform: [{translateX: -10}]}}>
-            <LineChart
-              height={150}
-              data={graphData}
-              areaChart
-              adjustToWidth
-              startFillColor1={COLORS.VIOLET[40]}
-              isAnimated={true}
-              initialSpacing={0}
-              width={Dimensions.get('screen').width}
-              hideDataPoints
-              thickness={8}
-              hideRules
-              hideYAxisText
-              hideAxesAndRules
-              color={COLORS.VIOLET[100]}
-              curveType={0}
-              curved={true}
-            />
-          </View>
-        )}
-        <View style={styles.dayRow}>
-          <Pressable
-            style={[
-              styles.filterBtn,
-              {
-                backgroundColor:
-                  graphDay === 0 ? COLORS.YELLOW[20] : COLORS.LIGHT[100],
-              },
-            ]}
-            onPress={() => {
-              setGraphDay(0);
-            }}>
-            <Text
-              style={[
-                styles.filterBtnText,
-                {
-                  color: graphDay === 0 ? COLORS.YELLOW[100] : COLORS.DARK[25],
-                  fontWeight: graphDay === 0 ? '700' : '500',
-                },
-              ]}>
-              Today
-            </Text>
-          </Pressable>
-          <Pressable
-            style={[
-              styles.filterBtn,
-              {
-                backgroundColor:
-                  graphDay === 1 ? COLORS.YELLOW[20] : COLORS.LIGHT[100],
-              },
-            ]}
-            onPress={() => {
-              setGraphDay(1);
-            }}>
-            <Text
-              style={[
-                styles.filterBtnText,
-                {
-                  color: graphDay === 1 ? COLORS.YELLOW[100] : COLORS.DARK[25],
-                  fontWeight: graphDay === 1 ? '700' : '500',
-                },
-              ]}>
-              Week
-            </Text>
-          </Pressable>
-          <Pressable
-            style={[
-              styles.filterBtn,
-              {
-                backgroundColor:
-                  graphDay === 2 ? COLORS.YELLOW[20] : COLORS.LIGHT[100],
-              },
-            ]}
-            onPress={() => {
-              setGraphDay(2);
-            }}>
-            <Text
-              style={[
-                styles.filterBtnText,
-                {
-                  color: graphDay === 2 ? COLORS.YELLOW[100] : COLORS.DARK[25],
-                  fontWeight: graphDay === 2 ? '700' : '500',
-                },
-              ]}>
-              Month
-            </Text>
-          </Pressable>
-          <Pressable
-            style={[
-              styles.filterBtn,
-              {
-                backgroundColor:
-                  graphDay === 3 ? COLORS.YELLOW[20] : COLORS.LIGHT[100],
-              },
-            ]}
-            onPress={() => {
-              setGraphDay(3);
-            }}>
-            <Text
-              style={[
-                styles.filterBtnText,
-                {
-                  color: graphDay === 3 ? COLORS.YELLOW[100] : COLORS.DARK[25],
-                  fontWeight: graphDay === 3 ? '700' : '500',
-                },
-              ]}>
-              Year
-            </Text>
-          </Pressable>
-        </View>
+        <Graph data={data} month={month} />
         <View style={styles.flexRow}>
           <Text style={styles.text3}>Recent Transaction</Text>
           <Pressable
@@ -266,7 +114,14 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
         <FlatList
           style={{paddingHorizontal: 20}}
           data={Object.values(data)
-            .filter(item => item.timeStamp.toDate().getMonth() === month)
+            .filter(item => {
+              console.log(item);
+              return (
+                Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+                  .toDate()
+                  ?.getMonth() === month
+              );
+            })
             .sort((a, b) => b.timeStamp.seconds - a.timeStamp.seconds)
             .slice(0, 2)}
           renderItem={({item}) => {

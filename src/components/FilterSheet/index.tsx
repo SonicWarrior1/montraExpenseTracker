@@ -242,4 +242,4 @@ function FilterSheet() {
   );
 }
 
-export default FilterSheet;
+export default React.memo(FilterSheet);

@@ -146,8 +146,9 @@ function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
                         ...item,
                         amount: Number(
                           (
-                            conversion['usd'][user!.currency.toLowerCase()] *
-                            item.amount
+                            conversion['usd'][
+                              (user?.currency ?? 'USD').toLowerCase()
+                            ] * item.amount
                           ).toFixed(2),
                         ),
                       },
@@ -184,10 +185,11 @@ function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
                         },
                       ]}>
                       {item.type === 'expense' ? '-' : '+'}{' '}
-                      {currencies[user!.currency].symbol}{' '}
+                      {currencies[user?.currency ?? 'USD'].symbol}{' '}
                       {(
-                        conversion['usd'][user!.currency.toLowerCase()] *
-                        item.amount
+                        conversion['usd'][
+                          (user?.currency ?? 'USD').toLowerCase()
+                        ] * item.amount
                       ).toFixed(2)}
                     </Text>
                     <Text style={styles.text2}>
