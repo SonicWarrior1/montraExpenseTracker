@@ -16,11 +16,9 @@ export function useInitialSetup() {
             .collection('users')
             .doc(user!.uid)
             .onSnapshot(snapshot => {
-                UserFromJson(snapshot.data() as UserType).then((user: UserType) => {
-                    console.log(typeof user, user)
-                    dispatch(userLoggedIn(user));
-                })
-
+                const user = UserFromJson(snapshot.data() as UserType)
+                console.log(user)
+                dispatch(userLoggedIn(user));
             });
         return () => unsubscribe();
 
@@ -31,11 +29,11 @@ export function useInitialSetup() {
             .doc(user!.uid)
             .collection('transactions')
             .orderBy('timeStamp', 'desc')
-            .onSnapshot(async (snapshot) => {
-                const data: transactionType[] = await Promise.all(snapshot.docs.map(
-                    async doc => (await TransFromJson(doc.data(), user!.uid)),
-                ))
-                    ;
+            .onSnapshot((snapshot) => {
+                const data: transactionType[] = snapshot.docs.map(
+                    doc => (TransFromJson(doc.data(), user!.uid)),
+                );
+                console.log(data)
                 const formatData = data.reduce(
                     (acc: { [key: string]: transactionType }, item) => {
                         acc[item.timeStamp.seconds] = item;

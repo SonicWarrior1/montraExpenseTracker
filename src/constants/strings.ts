@@ -20,7 +20,8 @@ export const NAVIGATION: {
     FinancialReport: 'FinancialReport',
     Settings: 'Settings',
     Currency: 'Currency',
-    ExportData: 'ExportData'
+    ExportData: 'ExportData',
+    Theme: 'Theme'
 } = {
     ONBOARDING: 'Onboarding',
     SIGNUP: 'Signup',
@@ -43,8 +44,8 @@ export const NAVIGATION: {
     FinancialReport: 'FinancialReport',
     Settings: 'Settings',
     Currency: 'Currency',
-    ExportData: 'ExportData'
-
+    ExportData: 'ExportData',
+    Theme: 'Theme'
 };
 
 export const STRINGS = {

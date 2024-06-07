@@ -97,7 +97,7 @@ function Signup({navigation}: Readonly<SignupScreenProps>) {
           .doc(creds.user.uid)
           .get();
         if (!res.exists) {
-          const user = await UserToJson({
+          const user = UserToJson({
             name: creds.user.displayName!,
             email: creds.user.email!,
             uid: creds.user.uid,
@@ -115,7 +115,7 @@ function Signup({navigation}: Readonly<SignupScreenProps>) {
             .collection('users')
             .doc(creds.user.uid)
             .get();
-          const user = await UserFromJson(data.data()!);
+          const user = UserFromJson(data.data()!);
           if (user) {
             dispatch(userLoggedIn(user));
           }

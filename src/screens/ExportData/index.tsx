@@ -9,8 +9,9 @@ import CustomButton from '../../components/CustomButton';
 import ReactNativeBlobUtil from 'react-native-blob-util';
 import uuid from 'react-native-uuid';
 import Toast from 'react-native-toast-message';
-import styles from './styles';
+import style from './styles';
 import {ICONS} from '../../constants/icons';
+import { useAppTheme } from '../../hooks/themeHook';
 function ExportData() {
   const data = useAppSelector(state => state.transaction.transactions);
   const [dataType, setDataType] = useState<'all' | 'expense' | 'income'>('all');
@@ -64,6 +65,8 @@ function ExportData() {
       console.log(e);
     }
   }, [data]);
+  const COLOR=useAppTheme();
+  const styles=style(COLOR)
   return (
     <SafeAreaView style={styles.safeView}>
       <View style={styles.mainView}>

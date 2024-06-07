@@ -1,15 +1,15 @@
 import { StyleSheet } from "react-native";
 import { COLORS } from "../../constants/commonStyles";
 
-const styles = StyleSheet.create({
+const styles = (COLOR: typeof COLORS) => StyleSheet.create({
     tabCtr: {
         height: 100,
-        backgroundColor: COLORS.LIGHT[80],
+        backgroundColor: COLOR.LIGHT[80],
         flexDirection: 'row',
         justifyContent: 'space-around',
     },
     animatedBtnOuter: {
-        backgroundColor: COLORS.PRIMARY.LIGHT,
+        backgroundColor: COLOR.LIGHT[40],
         width: 80,
         height: 80,
         borderRadius: 40,
@@ -19,7 +19,7 @@ const styles = StyleSheet.create({
     animatedBtn: {
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: COLORS.PRIMARY.VIOLET,
+        backgroundColor: COLOR.PRIMARY.VIOLET,
         width: 70,
         height: 70,
         borderRadius: 40,
@@ -30,7 +30,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 26,
         borderRadius: 40,
         borderWidth: 1,
-        borderColor: COLORS.LIGHT[20]
+        borderColor: COLOR.LIGHT[20]
     },
     filterBtnText: {
         fontWeight: '500',
@@ -39,13 +39,13 @@ const styles = StyleSheet.create({
     editBtn: {
         paddingVertical: 8,
         paddingHorizontal: 16,
-        backgroundColor: COLORS.VIOLET[20],
+        backgroundColor: COLOR.VIOLET[20],
         borderRadius: 40,
     },
     editBtnText: {
         fontWeight: '500',
         fontSize: 14,
-        color: COLORS.PRIMARY.VIOLET,
+        color: COLOR.PRIMARY.VIOLET,
     },
 })
 

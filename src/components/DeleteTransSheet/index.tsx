@@ -4,7 +4,7 @@ import {
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import {BottomSheetModalMethods} from '@gorhom/bottom-sheet/lib/typescript/types';
-import React, {useCallback, useMemo} from 'react';
+import React, {useMemo} from 'react';
 import {Text, View} from 'react-native';
 import {COLORS} from '../../constants/commonStyles';
 import CustomButton from '../CustomButton';
@@ -85,13 +85,13 @@ function DeleteTransactionSheet({
                         .collection('users')
                         .doc(uid)
                         .update({
-                          [`spend.${month}.${category}`]: await encrypt(
+                          [`spend.${month}.${category}`]: encrypt(
                             String(
                               (
                                 Number(
-                                  (
-                                    await UserFromJson(curr.data() as UserType)
-                                  ).spend[month][category] ?? 0,
+                                  UserFromJson(curr.data() as UserType).spend[
+                                    month
+                                  ][category] ?? 0,
                                 ) -
                                 amt / conversion['usd'][currency!.toLowerCase()]
                               ).toFixed(2),
@@ -104,13 +104,13 @@ function DeleteTransactionSheet({
                         .collection('users')
                         .doc(uid)
                         .update({
-                          [`income.${month}.${category}`]: await encrypt(
+                          [`income.${month}.${category}`]: encrypt(
                             String(
                               (
                                 Number(
-                                  (
-                                    await UserFromJson(curr.data() as UserType)
-                                  ).income[month][category] ?? 0,
+                                  UserFromJson(curr.data() as UserType).income[
+                                    month
+                                  ][category] ?? 0,
                                 ) -
                                 amt / conversion['usd'][currency!.toLowerCase()]
                               ).toFixed(2),

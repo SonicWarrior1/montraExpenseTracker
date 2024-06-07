@@ -48,7 +48,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
   let transaction: transactionType | undefined;
   if (isEdit) {
     transaction = route.params.transaction;
-    console.log(transaction)
+    console.log(transaction);
   }
   const month = new Date().getMonth();
   const backgroundColor =
@@ -59,7 +59,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
       title: pageType[0].toUpperCase() + pageType.slice(1),
     });
   }, []);
-
+  const conversion = useAppSelector(state => state.transaction.conversion);
   const expenseCat = useAppSelector(
     state => state.user.currentUser?.expenseCategory,
   );
@@ -89,7 +89,14 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
   );
   const [desc, setDesc] = useState(transaction ? transaction.desc : '');
   const [amount, setAmount] = useState(
-    transaction ? transaction.amount.toString() : '',
+    transaction
+      ? Number(
+          (
+            conversion['usd'][(currency ?? 'USD').toLowerCase()] *
+            transaction.amount
+          ).toFixed(2),
+        ).toString()
+      : '',
   );
   const [category, setCategory] = useState(
     transaction ? transaction.category : '',
@@ -108,8 +115,6 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
     }
     return {attachement, attachementType};
   }, [image, doc]);
-
-  const conversion = useAppSelector(state => state.transaction.conversion);
 
   async function handlePress() {
     setFormKey(true);
@@ -144,7 +149,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
       const curr = await firestore().collection('users').doc(uid).get();
       if (isEdit) {
         await updateTransaction({
-          trans: await trans,
+          trans: trans,
           transId: transaction?.id!,
           uid: uid!,
         });
@@ -160,9 +165,8 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
             uid: uid!,
           });
           const totalSpent =
-            (await UserFromJson(curr.data() as UserType))?.spend?.[month]?.[
-              category
-            ] ?? 0 - transaction!.amount + Number(amount);
+            UserFromJson(curr.data() as UserType)?.spend?.[month]?.[category] ??
+            0 - transaction!.amount + Number(amount);
           await handleNotify({
             curr: curr,
             totalSpent: totalSpent,
@@ -183,7 +187,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
           });
         }
       } else {
-        await addNewTransaction({id: id, trans: await trans, uid: uid!});
+        await addNewTransaction({id: id, trans: trans, uid: uid!});
         if (pageType === 'expense') {
           await handleNewExpense({
             curr: curr,
@@ -195,9 +199,8 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
             uid: uid!,
           });
           const totalSpent =
-            ((await UserFromJson(curr.data() as UserType))?.spend[month]?.[
-              category
-            ] ?? 0) + Number(amount);
+            (UserFromJson(curr.data() as UserType)?.spend[month]?.[category] ??
+              0) + Number(amount);
           await handleNotify({
             curr: curr,
             totalSpent: totalSpent,

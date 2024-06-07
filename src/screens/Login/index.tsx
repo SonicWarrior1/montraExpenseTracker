@@ -46,7 +46,7 @@ function Login({navigation}: Readonly<LoginScreenProps>) {
             .collection('users')
             .doc(creds.user.uid)
             .get();
-          const user = await UserFromJson(data.data()!);
+          const user = UserFromJson(data.data()!);
           dispatch(userLoggedIn(user));
         }
       } catch (e) {
@@ -92,7 +92,7 @@ function Login({navigation}: Readonly<LoginScreenProps>) {
             .collection('users')
             .doc(creds.user.uid)
             .get();
-          const user = await UserFromJson(data.data()!);
+          const user = UserFromJson(data.data()!);
           if (user) {
             dispatch(userLoggedIn(user));
           }

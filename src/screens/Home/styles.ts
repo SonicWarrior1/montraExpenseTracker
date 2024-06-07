@@ -1,8 +1,6 @@
 import { StyleSheet } from "react-native";
 import { COLORS } from "../../constants/commonStyles";
-
 const styles = StyleSheet.create({
-
     moneyCtr: {
         height: 80,
         borderRadius: 28,

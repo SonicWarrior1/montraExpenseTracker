@@ -7,10 +7,11 @@ import Animated, {
   withSequence,
   withTiming,
 } from 'react-native-reanimated';
-import styles from './styles';
+import style from './styles';
 import TabButton from './TabButton';
 import {NAVIGATION} from '../../constants/strings';
 import AnimatedBtn from './animatedButton';
+import { useAppTheme } from '../../hooks/themeHook';
 
 function CustomTab(props: Readonly<BottomTabBarProps>): React.JSX.Element {
   const deg = useSharedValue('-45deg');
@@ -59,7 +60,8 @@ function CustomTab(props: Readonly<BottomTabBarProps>): React.JSX.Element {
       deg.value = withTiming('-45deg');
     }
   }
-
+  const COLOR=useAppTheme()
+  const styles=style(COLOR)
   return (
     <View style={styles.tabCtr}>
       <TabButton

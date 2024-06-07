@@ -24,6 +24,7 @@ function Pin({route, navigation}: Readonly<PinSentScreenProps>) {
   const isSetup = user?.pin === '';
   const oldPin = route.params.pin ?? '';
   const dispatch = useAppDispatch();
+  // dispatch(setLoading(false))
   return (
     <SafeAreaView style={styles.safeView}>
       <View style={styles.mainView}>
@@ -78,7 +79,7 @@ function Pin({route, navigation}: Readonly<PinSentScreenProps>) {
                             .collection('users')
                             .doc(user?.uid)
                             .update({
-                              pin: await encrypt(pin.join(''), user.uid),
+                              pin: encrypt(pin.join(''), user.uid),
                             });
                           navigation.navigate(NAVIGATION.BottomTab);
                           dispatch(userLoggedIn({...user, pin: pin.join('')}));

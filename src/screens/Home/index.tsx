@@ -19,6 +19,7 @@ import HomeHeader from '../../components/HomeHeader';
 import Graph from './atoms/graph';
 
 function Home({navigation, route}: Readonly<HomeScreenProps>) {
+  
   const screenHeight = Dimensions.get('screen').height;
   const conversion = useAppSelector(state => state.transaction.conversion);
   const currency =

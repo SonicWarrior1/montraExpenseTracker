@@ -28,6 +28,7 @@ function TransactionDetails({
   navigation,
 }: Readonly<TransactionDetailScreenProps>) {
   const currency = useAppSelector(state => state.user.currentUser?.currency);
+  const conversion = useAppSelector(state => state.transaction.conversion);
   const bottomSheetModalRef = useRef<BottomSheetModalMethods>(null);
   const trans = useAppSelector(
     state =>
@@ -66,7 +67,13 @@ function TransactionDetails({
           ]}>
           <Sapcer height={Dimensions.get('screen').height * 0.075} />
           <Text style={styles.amt}>
-            {currencies[currency!].symbol ?? '$'} {trans.amount}
+            {currencies[currency!].symbol ?? '$'}{' '}
+            {Number(
+              (
+                conversion['usd'][(currency ?? 'USD').toLowerCase()] *
+                trans.amount
+              ).toFixed(2),
+            )}
           </Text>
           <Text style={styles.desc}>{trans.desc ?? ''}</Text>
           <Text style={styles.time}>

@@ -19,6 +19,7 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
   const isEdit = route.params.isEdit;
   let cat = undefined;
   let oldBudget = undefined;
+
   if (isEdit) {
     cat = route.params.category;
     oldBudget = useAppSelector(
@@ -30,7 +31,7 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
   const currency = useAppSelector(state => state.user.currentUser?.currency);
   const [amount, setAmount] = useState(
     isEdit
-      ? (conversion['usd'][currency!.toLowerCase()!] * oldBudget?.limit!)
+      ? (conversion['usd'][currency!.toLowerCase()] * oldBudget?.limit!)
           .toFixed(2)
           .toString()
       : '',
@@ -156,7 +157,7 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
                 .doc(uid)
                 .update({
                   [`budget.${month}.${category}`]: {
-                    limit: await encrypt(
+                    limit: encrypt(
                       String(
                         (
                           Number(amount) /
@@ -166,7 +167,7 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
                       uid!,
                     ),
                     alert: alert,
-                    percentage: await encrypt(String(sliderVal), uid!),
+                    percentage: encrypt(String(sliderVal), uid!),
                   },
                 });
               dispatch(setLoading(false));

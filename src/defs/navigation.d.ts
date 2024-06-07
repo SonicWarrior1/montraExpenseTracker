@@ -16,13 +16,14 @@ export type RootStackParamList = {
     TransactionDetail: { transaction: transactionType },
     DocView: { uri: string },
     CreateBudget: { isEdit: boolean, category?: string },
-    DetailBudget: { category: string ,month:number},
+    DetailBudget: { category: string, month: number },
     Notification: undefined,
     Story: undefined,
     FinancialReport: undefined,
     Settings: undefined,
     Currency: undefined
-    ExportData:undefined
+    ExportData: undefined
+    Theme: undefined
 }
 
 export type BottomParamList = {

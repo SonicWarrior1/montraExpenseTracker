@@ -3,6 +3,7 @@
     "conventionalCommits.scopes": [
         "ExportData",
         "financial report",
-        "encryption"
+        "encryption",
+        "Theme"
     ]
 }

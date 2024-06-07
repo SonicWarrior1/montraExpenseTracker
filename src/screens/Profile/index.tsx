@@ -7,11 +7,14 @@ import {userLoggedIn} from '../../redux/reducers/userSlice';
 import auth from '@react-native-firebase/auth';
 import {COLORS} from '../../constants/commonStyles';
 import {ICONS} from '../../constants/icons';
-import styles from './styles';
+import style from './styles';
+import {useAppTheme} from '../../hooks/themeHook';
 
 function ProfileScreen({navigation}: Readonly<ProfileScreenProps>) {
   const dispatch = useAppDispatch();
   const username = useAppSelector(state => state.user.currentUser?.name);
+  const COLOR = useAppTheme();
+  const styles = style(COLOR);
   return (
     <SafeAreaView style={styles.safeView}>
       <View style={styles.mainView}>
@@ -28,7 +31,12 @@ function ProfileScreen({navigation}: Readonly<ProfileScreenProps>) {
               <Text style={styles.text2}>{username}</Text>
             </View>
           </View>
-          {ICONS.Edit({height: 32, width: 32, color: 'transparent'})}
+          {ICONS.Edit({
+            height: 32,
+            width: 32,
+            color: 'transparent',
+            borderColor: COLOR.DARK[25],
+          })}
         </View>
         <View style={styles.card}>
           <Pressable style={styles.btn}>

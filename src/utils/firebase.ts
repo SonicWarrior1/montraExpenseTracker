@@ -7,7 +7,7 @@ import notifee from '@notifee/react-native';
 import uuid from 'react-native-uuid';
 import { encrypt } from "./encryption";
 import auth from '@react-native-firebase/auth';
-export async function createTransaction({
+export function createTransaction({
     id,
     url,
     attachementType,
@@ -42,24 +42,24 @@ export async function createTransaction({
     uid: string
 }) {
     return {
-        amount: await encrypt(String((Number(amount) / conversion['usd'][currency.toLowerCase()]).toFixed(2)), uid),
-        category: await encrypt(category, uid),
-        desc: await encrypt(desc, uid),
-        wallet: await encrypt(wallet, uid),
-        attachement: await encrypt(url, uid),
+        amount: encrypt(String((Number(amount) / conversion['usd'][currency.toLowerCase()]).toFixed(2)), uid),
+        category: encrypt(category, uid),
+        desc: encrypt(desc, uid),
+        wallet: encrypt(wallet, uid),
+        attachement: encrypt(url, uid),
         repeat: repeatData !== undefined,
         freq: repeatData ? {
-            freq: await encrypt(repeatData.freq, uid),
-            month: await encrypt(String(repeatData.month), uid),
-            day: await encrypt(String(repeatData.day), uid),
-            weekDay: await encrypt(String(repeatData.weekDay), uid),
-            end: await encrypt(repeatData.end, uid),
+            freq: encrypt(repeatData.freq, uid),
+            month: encrypt(String(repeatData.month), uid),
+            day: encrypt(String(repeatData.day), uid),
+            weekDay: encrypt(String(repeatData.weekDay), uid),
+            end: encrypt(repeatData.end, uid),
             date: repeatData.date,
         } : null,
         id: isEdit ? transaction.id : id,
         timeStamp: isEdit ? transaction.timeStamp : Timestamp.now(),
-        type: await encrypt(pageType, uid),
-        attachementType: await encrypt(attachementType, uid),
+        type: encrypt(pageType, uid),
+        attachementType: encrypt(attachementType, uid),
     };
 }
 export async function updateTransaction({ trans, uid, transId }: { trans: transactionType, uid: string, transId: string }) {
@@ -116,8 +116,8 @@ export async function handleIncomeUpdate({
         .doc(uid)
         .update({
             [`income.${month}.${category}`]:
-                await encrypt(String(((((
-                    await UserFromJson(curr.data() as UserType)
+                encrypt(String(((((
+                    UserFromJson(curr.data() as UserType)
                 ).income[month][category] ?? 0) -
                     transaction.amount +
                     Number(amount)) /
@@ -150,8 +150,8 @@ export async function handleNewIncome({
         .doc(uid)
         .update({
             [`income.${month}.${category}`]:
-                await encrypt(String(((((
-                    await UserFromJson(curr.data() as UserType)
+                encrypt(String(((((
+                    UserFromJson(curr.data() as UserType)
                 )?.income[month]?.[category] ?? 0) +
                     Number(amount)) /
                     conversion['usd'][currency.toLowerCase()]).toFixed(2)), uid),
@@ -186,8 +186,8 @@ export async function handleExpenseUpdate({
         .doc(uid)
         .update({
             [`spend.${month}.${category}`]:
-                await encrypt(String(((((
-                    await UserFromJson(curr.data() as UserType)
+                encrypt(String(((((
+                    UserFromJson(curr.data() as UserType)
                 ).spend[month][category] ?? 0) -
                     transaction.amount +
                     Number(amount)) /
@@ -221,8 +221,8 @@ export async function handleNewExpense({
         .doc(uid)
         .update({
             [`spend.${month}.${category}`]:
-                await encrypt(String(((((
-                    await UserFromJson(curr.data() as UserType)
+                encrypt(String(((((
+                    UserFromJson(curr.data() as UserType)
                 )?.spend[month]?.[category] ?? 0) +
                     Number(amount)) /
                     conversion['usd'][currency.toLowerCase()]).toFixed(2)), uid),
@@ -261,7 +261,7 @@ export async function handleNotify({
     month: number,
     category: string
 }) {
-    const totalBudget = (await UserFromJson(curr.data() as UserType))?.budget?.[
+    const totalBudget = (UserFromJson(curr.data() as UserType))?.budget?.[
         month
     ]?.[category];
     if (
@@ -275,8 +275,8 @@ export async function handleNotify({
                 .doc(uid)
                 .update({
                     [`notification.${notificationId}`]: {
-                        type: await encrypt('budget', uid),
-                        category: await encrypt(category, uid),
+                        type: encrypt('budget', uid),
+                        category: encrypt(category, uid),
                         id: notificationId,
                         time: Timestamp.now(),
                         read: false,
@@ -311,12 +311,13 @@ export async function singupUser({ name, email, pass }: { name: string, email: s
     try {
         const creds = await auth().createUserWithEmailAndPassword(email, pass);
         if (creds) {
-            const encrpytedUser = await UserToJson({
+            const encrpytedUser = UserToJson({
                 name: name,
                 email: email,
                 uid: creds.user.uid,
                 pin: '',
             });
+            console.log(encrpytedUser)
             await firestore()
                 .collection('users')
                 .doc(creds.user.uid)

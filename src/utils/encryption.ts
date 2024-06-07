@@ -1,10 +1,11 @@
-import Aes from 'react-native-aes-crypto';
-export async function encrypt(text: string, key: string) {
-    return await Aes.encrypt(text, key, key, 'aes-128-cbc')
+import CryptoJS from "react-native-crypto-js";
+
+export function encrypt(text: string, key: string) {
+    return CryptoJS.AES.encrypt(text, key).toString();
 }
-export async function decrypt(text: string, key: string) {
+export function decrypt(text: string, key: string) {
     try {
-        return await Aes.decrypt(text, key, key, 'aes-128-cbc')
+        return CryptoJS.AES.decrypt(text, key).toString(CryptoJS.enc.Utf8)
     } catch (e) {
         console.log(e)
         return undefined

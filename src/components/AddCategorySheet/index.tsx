@@ -1,4 +1,4 @@
-import React, {useCallback, useMemo, useState} from 'react';
+import React, {useMemo, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux/store';
 import {BottomSheetModal, BottomSheetView} from '@gorhom/bottom-sheet';
 import {BottomSheetModalMethods} from '@gorhom/bottom-sheet/lib/typescript/types';
@@ -63,10 +63,8 @@ function AddCategorySheet({
                   .collection('users')
                   .doc(uid)
                   .update({
-                    expenseCategory: await Promise.all(
-                      [...expenseCats!, cat].map(
-                        async item => await encrypt(item, uid!),
-                      ),
+                    expenseCategory: [...expenseCats!, cat].map( item =>
+                      encrypt(item, uid!),
                     ),
                   });
               } else if (type === 'income') {
@@ -75,10 +73,8 @@ function AddCategorySheet({
                   .collection('users')
                   .doc(uid)
                   .update({
-                    incomeCategory: await Promise.all(
-                      [...incomeCats!, cat].map(
-                        async item => await encrypt(item, uid!),
-                      ),
+                    incomeCategory: [...incomeCats!, cat].map(
+                       item => encrypt(item, uid!),
                     ),
                   });
               }

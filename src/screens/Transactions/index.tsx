@@ -1,6 +1,5 @@
 import React, {useState} from 'react';
 import {
-  Dimensions,
   Pressable,
   SafeAreaView,
   SectionList,
@@ -142,16 +141,7 @@ function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
                   style={styles.listItemCtr}
                   onPress={() => {
                     navigation.push('TransactionDetail', {
-                      transaction: {
-                        ...item,
-                        amount: Number(
-                          (
-                            conversion['usd'][
-                              (user?.currency ?? 'USD').toLowerCase()
-                            ] * item.amount
-                          ).toFixed(2),
-                        ),
-                      },
+                      transaction: item,
                     });
                   }}>
                   <View
