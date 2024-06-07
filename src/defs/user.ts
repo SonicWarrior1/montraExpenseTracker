@@ -1,4 +1,4 @@
-import { FirebaseFirestoreTypes, Timestamp } from "@react-native-firebase/firestore";
+import { Timestamp } from "@react-native-firebase/firestore"
 
 export type UserType = {
     name: string,
@@ -12,44 +12,4 @@ export type UserType = {
     income: { [month: string]: { [key: string]: number } },
     notification: { [id: string]: { category: string, type: string, id: string, time: Timestamp, read: boolean } },
     currency: string
-}
-export function UserToJson({
-    uid,
-    name,
-    email,
-    pin
-}: {
-    uid: string;
-    name: string;
-    email: string;
-    pin: string
-}): UserType {
-    return {
-        uid: uid,
-        name: name,
-        email: email,
-        pin: pin,
-        expenseCategory: ['add', 'food', 'bill', 'shopping', 'subscription', 'transportation'],
-        incomeCategory: ['add', 'salary', 'passive income'],
-        budget: {},
-        spend: {},
-        income: {},
-        notification: {},
-        currency: 'USD'
-    };
-}
-export function UserFromJson(json: FirebaseFirestoreTypes.DocumentData): UserType {
-    return {
-        uid: json.uid,
-        email: json.email,
-        name: json.name,
-        pin: json.pin ?? '',
-        expenseCategory: json.expenseCategory ?? ['add', 'food', 'bill', 'shopping', 'subscription', 'transportation'],
-        incomeCategory: json.incomeCategory ?? ['add', 'salary', 'passive income'],
-        budget: json.budget ?? {},
-        spend: json.spend ?? {},
-        income: json.income ?? {},
-        notification: json.notification ?? {},
-        currency: json.currency ?? 'USD'
-    }
 }

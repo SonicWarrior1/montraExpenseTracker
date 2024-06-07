@@ -2,6 +2,7 @@
     "svg.preview.background": "transparent",
     "conventionalCommits.scopes": [
         "ExportData",
-        "financial report"
+        "financial report",
+        "encryption"
     ]
 }

@@ -13,6 +13,7 @@ import firestore from '@react-native-firebase/firestore';
 import {setLoading} from '../../redux/reducers/userSlice';
 import {CreateBudgetScreenProps} from '../../defs/navigation';
 import {currencies} from '../../constants/strings';
+import {encrypt} from '../../utils/encryption';
 function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
   const month = new Date().getMonth();
   const isEdit = route.params.isEdit;
@@ -146,27 +147,34 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
         <CustomButton
           title="Continue"
           onPress={async () => {
+            console.log(conversion['usd']);
             if (amount !== '') {
-              try {
-                dispatch(setLoading(true));
-                await firestore()
-                  .collection('users')
-                  .doc(uid)
-                  .update({
-                    [`budget.${month}.${category}`]: {
-                      limit:
-                        Number(amount) /
-                        conversion['usd'][currency!.toLowerCase()!],
-                      alert: alert,
-                      percentage: sliderVal,
-                    },
-                  });
-                dispatch(setLoading(false));
-                navigation.pop();
-              } catch (e) {
-                console.log(e);
-                dispatch(setLoading(false));
-              }
+              // try {
+              dispatch(setLoading(true));
+              await firestore()
+                .collection('users')
+                .doc(uid)
+                .update({
+                  [`budget.${month}.${category}`]: {
+                    limit: await encrypt(
+                      String(
+                        (
+                          Number(amount) /
+                          conversion['usd'][currency!.toLowerCase()]
+                        ).toFixed(2),
+                      ),
+                      uid!,
+                    ),
+                    alert: alert,
+                    percentage: await encrypt(String(sliderVal), uid!),
+                  },
+                });
+              dispatch(setLoading(false));
+              navigation.pop();
+              // } catch (e) {
+              //   console.log(e);
+              //   dispatch(setLoading(false));
+              // }
             }
           }}
         />

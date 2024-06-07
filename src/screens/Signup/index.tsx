@@ -31,13 +31,14 @@ import {COLORS} from '../../constants/commonStyles';
 import {ICONS} from '../../constants/icons';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
-import {UserFromJson, UserToJson} from '../../defs/user.ts';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import {SignupScreenProps} from '../../defs/navigation';
 import {setLoading, userLoggedIn} from '../../redux/reducers/userSlice.ts';
 import {useAppDispatch} from '../../redux/store/index.ts';
 import Toast from 'react-native-toast-message';
-function Signup({navigation}: SignupScreenProps) {
+import {UserFromJson, UserToJson} from '../../utils/userFuncs.ts';
+import {singupUser} from '../../utils/firebase.ts';
+function Signup({navigation}: Readonly<SignupScreenProps>) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [pass, setPass] = useState('');
@@ -71,23 +72,12 @@ function Signup({navigation}: SignupScreenProps) {
     ) {
       try {
         dispatch(setLoading(true));
-        const creds = await auth().createUserWithEmailAndPassword(email, pass);
-        if (creds) {
-          await firestore()
-            .collection('users')
-            .doc(creds.user.uid)
-            .set(
-              UserToJson({
-                name: name,
-                email: email,
-                uid: creds.user.uid,
-                pin: '',
-              }),
-            );
-          dispatch(setLoading(false));
+        const res = await singupUser({name: name, email: email, pass: pass});
+        if (res) {
           Toast.show({text1: STRINGS.SignupSuccesful});
           navigation.replace(NAVIGATION.LOGIN);
         }
+        dispatch(setLoading(false));
       } catch (e) {
         console.log(e);
         dispatch(setLoading(false));
@@ -107,20 +97,25 @@ function Signup({navigation}: SignupScreenProps) {
           .doc(creds.user.uid)
           .get();
         if (!res.exists) {
-          const user = UserToJson({
+          const user = await UserToJson({
             name: creds.user.displayName!,
             email: creds.user.email!,
             uid: creds.user.uid,
             pin: '',
           });
           await firestore().collection('users').doc(creds.user.uid).set(user);
-          dispatch(userLoggedIn(user));
+          dispatch(userLoggedIn({
+            name: creds.user.displayName!,
+            email: creds.user.email!,
+            uid: creds.user.uid,
+            pin: '',
+          }));
         } else {
           const data = await firestore()
             .collection('users')
             .doc(creds.user.uid)
             .get();
-          const user = UserFromJson(data.data()!);
+          const user = await UserFromJson(data.data()!);
           if (user) {
             dispatch(userLoggedIn(user));
           }

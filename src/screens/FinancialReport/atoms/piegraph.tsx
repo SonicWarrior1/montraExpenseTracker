@@ -68,7 +68,9 @@ function Piegraph({
         },
       ]}>
       {(
-        transType === 'expense' ? spends.length !== 0 : incomes.length !== 0
+        transType === 'expense'
+          ? Number(totalSpend) !== 0
+          : Number(totalIncome) !== 0
       ) ? (
         <PieChart
           donut
@@ -85,7 +87,9 @@ function Piegraph({
           )}
         />
       ) : (
-        <Text>No Data</Text>
+        <View style={{height: 230, justifyContent: 'center'}}>
+          <Text>No Data</Text>
+        </View>
       )}
     </View>
   );

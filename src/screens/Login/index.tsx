@@ -22,7 +22,7 @@ import firestore from '@react-native-firebase/firestore';
 import {setLoading, userLoggedIn} from '../../redux/reducers/userSlice';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import {useAppDispatch} from '../../redux/store';
-import {UserFromJson, UserToJson} from '../../defs/user';
+import { UserFromJson, UserToJson } from '../../utils/userFuncs';
 
 function Login({navigation}: Readonly<LoginScreenProps>) {
   const [email, setEmail] = useState('');
@@ -46,7 +46,7 @@ function Login({navigation}: Readonly<LoginScreenProps>) {
             .collection('users')
             .doc(creds.user.uid)
             .get();
-          const user = UserFromJson(data.data()!);
+          const user = await UserFromJson(data.data()!);
           dispatch(userLoggedIn(user));
         }
       } catch (e) {
@@ -81,13 +81,18 @@ function Login({navigation}: Readonly<LoginScreenProps>) {
             pin: '',
           });
           await firestore().collection('users').doc(creds.user.uid).set(user);
-          dispatch(userLoggedIn(user));
+          dispatch(userLoggedIn({
+            name: creds.user.displayName!,
+            email: creds.user.email!,
+            uid: creds.user.uid,
+            pin: '',
+          }));
         } else {
           const data = await firestore()
             .collection('users')
             .doc(creds.user.uid)
             .get();
-          const user = UserFromJson(data.data()!);
+          const user = await UserFromJson(data.data()!);
           if (user) {
             dispatch(userLoggedIn(user));
           }

@@ -1,10 +1,11 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {FlatList, SafeAreaView, Text, View} from 'react-native';
 import {currencies} from '../../constants/strings';
 import {COLORS} from '../../constants/commonStyles';
 import BouncyCheckbox from 'react-native-bouncy-checkbox/build/dist/BouncyCheckbox';
 import {useAppSelector} from '../../redux/store';
 import firestore from '@react-native-firebase/firestore';
+import {decrypt, encrypt} from '../../utils/encryption';
 
 function CurrencyScreen() {
   const code = useAppSelector(state => state.user.currentUser?.currency);
@@ -34,7 +35,7 @@ function CurrencyScreen() {
                 await firestore()
                   .collection('users')
                   .doc(uid)
-                  .update({currency: item.code});
+                  .update({currency: await encrypt(item.code, uid!)});
               }}
             />
           </View>

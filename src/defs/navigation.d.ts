@@ -16,7 +16,7 @@ export type RootStackParamList = {
     TransactionDetail: { transaction: transactionType },
     DocView: { uri: string },
     CreateBudget: { isEdit: boolean, category?: string },
-    DetailBudget: { category: string },
+    DetailBudget: { category: string ,month:number},
     Notification: undefined,
     Story: undefined,
     FinancialReport: undefined,
