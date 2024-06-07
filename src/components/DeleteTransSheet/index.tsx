@@ -15,9 +15,11 @@ import {RootStackParamList} from '../../defs/navigation';
 import {setLoading} from '../../redux/reducers/userSlice';
 import styles from './styles';
 import {transactionType} from '../../defs/transaction';
-import {UserFromJson, UserType} from '../../defs/user';
+import {UserType} from '../../defs/user';
 import {StackNavigationProp} from '@react-navigation/stack';
 import SheetBackdrop from '../SheetBackDrop';
+import {UserFromJson} from '../../utils/userFuncs';
+import {encrypt} from '../../utils/encryption';
 function DeleteTransactionSheet({
   bottomSheetModalRef,
   id,
@@ -83,26 +85,38 @@ function DeleteTransactionSheet({
                         .collection('users')
                         .doc(uid)
                         .update({
-                          [`spend.${month}.${category}`]:
-                            Number(
-                              UserFromJson(curr.data() as UserType).spend[
-                                month
-                              ][category] ?? 0,
-                            ) -
-                            amt / conversion['usd'][currency!.toLowerCase()!],
+                          [`spend.${month}.${category}`]: await encrypt(
+                            String(
+                              (
+                                Number(
+                                  (
+                                    await UserFromJson(curr.data() as UserType)
+                                  ).spend[month][category] ?? 0,
+                                ) -
+                                amt / conversion['usd'][currency!.toLowerCase()]
+                              ).toFixed(2),
+                            ),
+                            uid!,
+                          ),
                         });
                     } else if (type === 'income') {
                       await firestore()
                         .collection('users')
                         .doc(uid)
                         .update({
-                          [`income.${month}.${category}`]:
-                            Number(
-                              UserFromJson(curr.data() as UserType).income[
-                                month
-                              ][category] ?? 0,
-                            ) -
-                            amt / conversion['usd'][currency!.toLowerCase()!],
+                          [`income.${month}.${category}`]: await encrypt(
+                            String(
+                              (
+                                Number(
+                                  (
+                                    await UserFromJson(curr.data() as UserType)
+                                  ).income[month][category] ?? 0,
+                                ) -
+                                amt / conversion['usd'][currency!.toLowerCase()]
+                              ).toFixed(2),
+                            ),
+                            uid!,
+                          ),
                         });
                     }
                     await firestore()

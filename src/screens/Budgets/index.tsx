@@ -12,6 +12,7 @@ import {COLORS} from '../../constants/commonStyles';
 
 function BudgetScreen({navigation}: Readonly<BudgetScreenProps>) {
   const [month, setMonth] = useState(new Date().getMonth());
+  console.log(month);
   const budgets = useAppSelector(
     state => state.user.currentUser?.budget[month],
   );
@@ -19,6 +20,7 @@ function BudgetScreen({navigation}: Readonly<BudgetScreenProps>) {
   const conversion = useAppSelector(state => state.transaction.conversion);
   const spend =
     useAppSelector(state => state.user.currentUser?.spend[month]) ?? {};
+  console.log('sdujfnsdjfnsdk', budgets, spend);
   return (
     <View style={styles.safeView}>
       <SafeAreaView style={styles.safeView}>
@@ -83,6 +85,7 @@ function BudgetScreen({navigation}: Readonly<BudgetScreenProps>) {
                   onPress={() => {
                     navigation.push(NAVIGATION.DetailBudget, {
                       category: key,
+                      month: month,
                     });
                   }}>
                   <View style={styles.catRow}>

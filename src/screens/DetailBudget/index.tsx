@@ -12,22 +12,24 @@ import DeleteBudgetSheet from '../../components/DeleteBudgetSheet';
 import {BottomSheetModalMethods} from '@gorhom/bottom-sheet/lib/typescript/types';
 import {COLORS} from '../../constants/commonStyles';
 
-function DetailBudget({navigation, route}: DetailBudgetScreenProps) {
+function DetailBudget({navigation, route}: Readonly<DetailBudgetScreenProps>) {
   const conversion = useAppSelector(state => state.transaction.conversion);
   const currency = useAppSelector(state => state.user.currentUser?.currency);
-  const month = new Date().getMonth();
+  const month = route.params.month;
   const budgets = useAppSelector(
     state => state.user.currentUser?.budget[month],
   );
   const spends = useAppSelector(state => state.user.currentUser?.spend[month]);
+  console.log(spends)
   const cat = route.params.category;
   const budget = budgets![cat] ?? {
     alert: false,
     limit: 0,
     percentage: 0,
   };
-  const spend = spends![cat] ?? 0;
+  const spend = spends?.[cat] ?? 0;
   const bottomSheetModalRef = useRef<BottomSheetModalMethods>(null);
+  console.log(spend ?? 0, budget.limit);
   const headerRight = () => {
     return (
       <Pressable

@@ -17,10 +17,7 @@ import {ICONS} from '../../constants/icons';
 import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import FilePickerSheet from '../../components/FilePickerSheet';
 import RepeatTransactionSheet from '../../components/RepeatTranscationSheet';
-import firestore, {
-  FirebaseFirestoreTypes,
-  Timestamp,
-} from '@react-native-firebase/firestore';
+import firestore, {Timestamp} from '@react-native-firebase/firestore';
 import {currencies, monthData, weekData} from '../../constants/strings';
 import CustomButton from '../../components/CustomButton';
 import {repeatDataType, transactionType} from '../../defs/transaction';
@@ -29,11 +26,21 @@ import {setLoading} from '../../redux/reducers/userSlice';
 import uuid from 'react-native-uuid';
 import Toast from 'react-native-toast-message';
 import {ExpenseScreenProps} from '../../defs/navigation';
-import storage from '@react-native-firebase/storage';
 import AddCategorySheet from '../../components/AddCategorySheet';
-import {UserFromJson, UserType} from '../../defs/user';
+import {UserType} from '../../defs/user';
 import {EmptyError} from '../../constants/errors';
-import notifee from '@notifee/react-native';
+import {UserFromJson} from '../../utils/userFuncs';
+import {
+  addNewTransaction,
+  createTransaction,
+  getAttachmentUrl,
+  handleExpenseUpdate,
+  handleIncomeUpdate,
+  handleNewExpense,
+  handleNewIncome,
+  handleNotify,
+  updateTransaction,
+} from '../../utils/firebase';
 
 function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
   const pageType = route.params.type;
@@ -41,6 +48,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
   let transaction: transactionType | undefined;
   if (isEdit) {
     transaction = route.params.transaction;
+    console.log(transaction)
   }
   const month = new Date().getMonth();
   const backgroundColor =
@@ -101,196 +109,8 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
     return {attachement, attachementType};
   }, [image, doc]);
 
-  async function getAttachmentUrl({
-    attachement,
-    id,
-  }: {
-    attachement: string;
-    id: string;
-  }) {
-    let url = '';
-    if (attachement !== '') {
-      if (!attachement?.startsWith('https://firebasestorage.googleapis.com')) {
-        await storage().ref(`users/${uid}/${id}`).putFile(attachement);
-        url = await storage().ref(`users/${uid}/${id}`).getDownloadURL();
-      } else {
-        url = attachement;
-      }
-    }
-    return url;
-  }
   const conversion = useAppSelector(state => state.transaction.conversion);
-  function createTransaction({
-    id,
-    url,
-    attachementType,
-  }: {
-    id: string;
-    url: string;
-    attachementType: transactionType['attachementType'];
-  }) {
-    return {
-      amount: Number(amount) / conversion['usd'][currency!.toLowerCase()],
-      category: category,
-      desc: desc,
-      wallet: wallet,
-      attachement: url,
-      repeat: repeatData !== undefined,
-      freq: repeatData ?? null,
-      id: isEdit ? transaction!.id : id,
-      timeStamp: isEdit ? transaction?.timeStamp! : Timestamp.now(),
-      type: pageType,
-      attachementType: attachementType,
-    };
-  }
 
-  async function updateTransaction({trans}: {trans: transactionType}) {
-    await firestore()
-      .collection('users')
-      .doc(uid)
-      .collection('transactions')
-      .doc(transaction!.id)
-      .update(trans);
-  }
-
-  async function addNewTransaction({
-    id,
-    trans,
-  }: {
-    id: string;
-    trans: transactionType;
-  }) {
-    await firestore()
-      .collection('users')
-      .doc(uid)
-      .collection('transactions')
-      .doc(id)
-      .set(trans);
-  }
-
-  async function handleIncomeUpdate({
-    curr,
-  }: {
-    curr: FirebaseFirestoreTypes.DocumentSnapshot<FirebaseFirestoreTypes.DocumentData>;
-  }) {
-    await firestore()
-      .collection('users')
-      .doc(uid)
-      .update({
-        [`income.${month}.${category}`]:
-          ((UserFromJson(curr.data() as UserType).income[month][category] ??
-            0) -
-            transaction!.amount +
-            Number(amount)) /
-          conversion['usd'][currency!.toLowerCase()],
-      });
-  }
-  async function handleNewIncome({
-    curr,
-  }: {
-    curr: FirebaseFirestoreTypes.DocumentSnapshot<FirebaseFirestoreTypes.DocumentData>;
-  }) {
-    await firestore()
-      .collection('users')
-      .doc(uid)
-      .update({
-        [`income.${month}.${category}`]:
-          ((UserFromJson(curr.data() as UserType)?.income[month]?.[category] ??
-            0) +
-            Number(amount)) /
-          conversion['usd'][currency!.toLowerCase()],
-      });
-  }
-
-  async function handleExpenseUpdate({
-    curr,
-  }: {
-    curr: FirebaseFirestoreTypes.DocumentSnapshot<FirebaseFirestoreTypes.DocumentData>;
-  }) {
-    await firestore()
-      .collection('users')
-      .doc(uid)
-      .update({
-        [`spend.${month}.${category}`]:
-          ((UserFromJson(curr.data() as UserType).spend[month][category] ?? 0) -
-            transaction!.amount +
-            Number(amount)) /
-          conversion['usd'][currency!.toLowerCase()],
-      });
-  }
-
-  async function handleNewExpense({
-    curr,
-  }: {
-    curr: FirebaseFirestoreTypes.DocumentSnapshot<FirebaseFirestoreTypes.DocumentData>;
-  }) {
-    await firestore()
-      .collection('users')
-      .doc(uid)
-      .update({
-        [`spend.${month}.${category}`]:
-          ((UserFromJson(curr.data() as UserType)?.spend[month]?.[category] ??
-            0) +
-            Number(amount)) /
-          conversion['usd'][currency!.toLowerCase()],
-      });
-  }
-  async function handleNotify({
-    curr,
-    totalSpent,
-  }: {
-    curr: FirebaseFirestoreTypes.DocumentSnapshot<FirebaseFirestoreTypes.DocumentData>;
-    totalSpent: number;
-  }) {
-    const totalBudget = UserFromJson(curr.data() as UserType)?.budget?.[
-      month
-    ]?.[category];
-    if (
-      totalBudget &&
-      totalSpent >= totalBudget.limit * (totalBudget.percentage / 100)
-    ) {
-      try {
-        const notificationId = uuid.v4();
-        await firestore()
-          .collection('users')
-          .doc(uid)
-          .update({
-            [`notification.${notificationId}`]: {
-              type: 'budget',
-              category: category,
-              id: notificationId,
-              time: Timestamp.now(),
-              read: false,
-            },
-          });
-        await notifee.requestPermission();
-
-        // Create a channel (required for Android)
-        const channelId = await notifee.createChannel({
-          id: 'default',
-          name: 'Default Channel',
-        });
-
-        // Display a notification
-        await notifee.displayNotification({
-          title:
-            category[0].toUpperCase() +
-            category.slice(1) +
-            ' budget has exceeded the limit',
-          body:
-            'Your ' +
-            category[0].toUpperCase() +
-            category.slice(1) +
-            ' budget has exceeded the limit',
-          android: {
-            channelId,
-          },
-        });
-      } catch (e) {
-        console.log(e);
-      }
-    }
-  }
   async function handlePress() {
     setFormKey(true);
     if (amount === '' || category === '' || wallet === '') {
@@ -300,30 +120,101 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
     const {attachement, attachementType} = getAttachmentAndType();
     try {
       const id = uuid.v4().toString();
-      const url = await getAttachmentUrl({attachement, id});
-      const trans = createTransaction({id, url, attachementType});
+      const url = await getAttachmentUrl({
+        attachement: attachement,
+        id: id,
+        uid: uid!,
+      });
+      const trans = createTransaction({
+        id: id,
+        url: url,
+        attachementType: attachementType,
+        amount: amount,
+        category: category,
+        conversion: conversion,
+        currency: currency!,
+        desc: desc,
+        isEdit: isEdit,
+        pageType: pageType,
+        repeatData: repeatData!,
+        transaction: transaction!,
+        wallet: wallet,
+        uid: uid!,
+      });
       const curr = await firestore().collection('users').doc(uid).get();
       if (isEdit) {
-        await updateTransaction({trans});
+        await updateTransaction({
+          trans: await trans,
+          transId: transaction?.id!,
+          uid: uid!,
+        });
         if (pageType === 'expense') {
-          await handleExpenseUpdate({curr});
+          await handleExpenseUpdate({
+            curr: curr,
+            amount: Number(amount),
+            category: category,
+            conversion: conversion,
+            currency: currency!,
+            month: month,
+            transaction: transaction!,
+            uid: uid!,
+          });
           const totalSpent =
-            UserFromJson(curr.data() as UserType)?.spend?.[month]?.[category] ??
-            0 - transaction!.amount + Number(amount);
-          await handleNotify({curr, totalSpent});
+            (await UserFromJson(curr.data() as UserType))?.spend?.[month]?.[
+              category
+            ] ?? 0 - transaction!.amount + Number(amount);
+          await handleNotify({
+            curr: curr,
+            totalSpent: totalSpent,
+            category: category,
+            month: month,
+            uid: uid!,
+          });
         } else if (pageType === 'income') {
-          await handleIncomeUpdate({curr});
+          await handleIncomeUpdate({
+            curr: curr,
+            amount: Number(amount),
+            category: category,
+            conversion: conversion,
+            currency: currency!,
+            month: month,
+            transaction: transaction!,
+            uid: uid!,
+          });
         }
       } else {
-        await addNewTransaction({id, trans});
+        await addNewTransaction({id: id, trans: await trans, uid: uid!});
         if (pageType === 'expense') {
-          await handleNewExpense({curr});
+          await handleNewExpense({
+            curr: curr,
+            amount: Number(amount),
+            category: category,
+            conversion: conversion,
+            currency: currency!,
+            month: month,
+            uid: uid!,
+          });
           const totalSpent =
-            (UserFromJson(curr.data() as UserType)?.spend[month]?.[category] ??
-              0) + Number(amount);
-          await handleNotify({curr, totalSpent});
+            ((await UserFromJson(curr.data() as UserType))?.spend[month]?.[
+              category
+            ] ?? 0) + Number(amount);
+          await handleNotify({
+            curr: curr,
+            totalSpent: totalSpent,
+            category: category,
+            month: month,
+            uid: uid!,
+          });
         } else if (pageType === 'income') {
-          await handleNewIncome({curr});
+          await handleNewIncome({
+            curr: curr,
+            amount: Number(amount),
+            category: category,
+            conversion: conversion,
+            currency: currency!,
+            month: month,
+            uid: uid!,
+          });
         }
       }
       Toast.show({text1: pageType + ' Added Succesfully'});

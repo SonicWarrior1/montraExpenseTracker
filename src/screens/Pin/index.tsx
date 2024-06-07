@@ -6,9 +6,10 @@ import {COLORS} from '../../constants/commonStyles';
 import {PinSentScreenProps} from '../../defs/navigation';
 import {NAVIGATION} from '../../constants/strings';
 import {useAppDispatch, useAppSelector} from '../../redux/store';
-import {userLoggedIn} from '../../redux/reducers/userSlice';
+import {setLoading, userLoggedIn} from '../../redux/reducers/userSlice';
 import firestore from '@react-native-firebase/firestore';
 import {ICONS} from '../../constants/icons';
+import {encrypt} from '../../utils/encryption';
 
 function Pin({route, navigation}: Readonly<PinSentScreenProps>) {
   const matrix = [
@@ -76,7 +77,9 @@ function Pin({route, navigation}: Readonly<PinSentScreenProps>) {
                           await firestore()
                             .collection('users')
                             .doc(user?.uid)
-                            .update({pin: pin.join('')});
+                            .update({
+                              pin: await encrypt(pin.join(''), user.uid),
+                            });
                           navigation.navigate(NAVIGATION.BottomTab);
                           dispatch(userLoggedIn({...user, pin: pin.join('')}));
                         } else {

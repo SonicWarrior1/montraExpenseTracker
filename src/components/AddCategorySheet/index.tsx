@@ -14,6 +14,7 @@ import {
 import {transactionType} from '../../defs/transaction';
 import styles from './styles';
 import SheetBackdrop from '../SheetBackDrop';
+import {encrypt} from '../../utils/encryption';
 
 function AddCategorySheet({
   bottomSheetModalRef,
@@ -62,7 +63,11 @@ function AddCategorySheet({
                   .collection('users')
                   .doc(uid)
                   .update({
-                    expenseCategory: [...expenseCats!, cat],
+                    expenseCategory: await Promise.all(
+                      [...expenseCats!, cat].map(
+                        async item => await encrypt(item, uid!),
+                      ),
+                    ),
                   });
               } else if (type === 'income') {
                 await dispatch(addIncomeCategory(cat));
@@ -70,7 +75,11 @@ function AddCategorySheet({
                   .collection('users')
                   .doc(uid)
                   .update({
-                    incomeCategory: [...incomeCats!, cat],
+                    incomeCategory: await Promise.all(
+                      [...incomeCats!, cat].map(
+                        async item => await encrypt(item, uid!),
+                      ),
+                    ),
                   });
               }
               dispatch(setLoading(false));

@@ -115,7 +115,6 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
           style={{paddingHorizontal: 20}}
           data={Object.values(data)
             .filter(item => {
-              console.log(item);
               return (
                 Timestamp.fromMillis(item.timeStamp.seconds * 1000)
                   .toDate()
