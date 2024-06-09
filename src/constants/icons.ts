@@ -42,6 +42,8 @@ import Setting from '../assets/Svgs/settings.svg';
 import Download from '../assets/Svgs/download.svg';
 import LineChart from '../assets/Svgs/line chart.svg';
 import SortwithArrow from '../assets/Svgs/sort1.svg';
+import Transfer2 from '../assets/Svgs/transfer.svg';
+import Success from '../assets/Svgs/success.svg';
 import { COLORS } from './commonStyles';
 const iconStyle = (
   { width = 0,
@@ -100,6 +102,8 @@ export const ICONS = {
   Download: (params: iconProps) => Download({ ...iconStyle({ ...params }) }),
   LineChart: (params: iconProps) => LineChart({ ...iconStyle({ ...params }) }),
   SortwithArrow: (params: iconProps) => SortwithArrow({ ...iconStyle({ ...params }) }),
+  Transfer2: (params: iconProps) => Transfer2({ ...iconStyle({ ...params }) }),
+  Success: (params: iconProps) => Success({ ...iconStyle({ ...params }) }),
 };
 
 export const catIcons: { [key: string]: { icon: (params: iconProps) => React.ReactNode, color: string } } = {
@@ -109,4 +113,4 @@ export const catIcons: { [key: string]: { icon: (params: iconProps) => React.Rea
   'shopping': { icon: ICONS.Shopping, color: COLORS.YELLOW[20] },
   'bill': { icon: ICONS.Bill, color: COLORS.VIOLET[20] },
   'subscription': { icon: ICONS.Bill, color: COLORS.VIOLET[20] },
-}
+};

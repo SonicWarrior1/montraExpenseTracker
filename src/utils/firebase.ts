@@ -1,11 +1,11 @@
-import firestore, { FirebaseFirestoreTypes, Timestamp } from "@react-native-firebase/firestore";
-import { repeatDataType, transactionType } from "../defs/transaction";
-import { UserFromJson, UserToJson } from "./userFuncs";
-import { UserType } from "../defs/user";
+import firestore, { FirebaseFirestoreTypes, Timestamp } from '@react-native-firebase/firestore';
+import { repeatDataType, transactionType } from '../defs/transaction';
+import { UserFromJson, UserToJson } from './userFuncs';
+import { UserType } from '../defs/user';
 import storage from '@react-native-firebase/storage';
 import notifee from '@notifee/react-native';
 import uuid from 'react-native-uuid';
-import { encrypt } from "./encryption";
+import { encrypt } from './encryption';
 import auth from '@react-native-firebase/auth';
 export function createTransaction({
     id,
@@ -20,7 +20,9 @@ export function createTransaction({
     isEdit,
     transaction,
     pageType,
-    uid
+    uid,
+    from,
+    to,
 }: {
     id: string;
     url: string;
@@ -38,11 +40,13 @@ export function createTransaction({
     repeatData: repeatDataType,
     isEdit: boolean,
     transaction: transactionType,
-    pageType: "income" | "expense" | "transfer",
-    uid: string
+    pageType: 'income' | 'expense' | 'transfer',
+    uid: string,
+    from: string,
+    to: string
 }) {
     return {
-        amount: encrypt(String((Number(amount) / conversion['usd'][currency.toLowerCase()]).toFixed(2)), uid),
+        amount: encrypt(String((Number(amount) / conversion.usd[currency.toLowerCase()]).toFixed(2)), uid),
         category: encrypt(category, uid),
         desc: encrypt(desc, uid),
         wallet: encrypt(wallet, uid),
@@ -60,6 +64,8 @@ export function createTransaction({
         timeStamp: isEdit ? transaction.timeStamp : Timestamp.now(),
         type: encrypt(pageType, uid),
         attachementType: encrypt(attachementType, uid),
+        from: encrypt(from, uid),
+        to: encrypt(to, uid),
     };
 }
 export async function updateTransaction({ trans, uid, transId }: { trans: transactionType, uid: string, transId: string }) {
@@ -74,7 +80,7 @@ export async function updateTransaction({ trans, uid, transId }: { trans: transa
 export async function addNewTransaction({
     id,
     trans,
-    uid
+    uid,
 }: {
     id: string;
     trans: transactionType;
@@ -96,7 +102,7 @@ export async function handleIncomeUpdate({
     transaction,
     amount,
     conversion,
-    currency
+    currency,
 }: {
     curr: FirebaseFirestoreTypes.DocumentSnapshot<FirebaseFirestoreTypes.DocumentData>;
     uid: string,
@@ -121,7 +127,7 @@ export async function handleIncomeUpdate({
                 ).income[month][category] ?? 0) -
                     transaction.amount +
                     Number(amount)) /
-                    conversion['usd'][currency.toLowerCase()]).toFixed(2)), uid),
+                    conversion.usd[currency.toLowerCase()]).toFixed(2)), uid),
         });
 }
 export async function handleNewIncome({
@@ -131,7 +137,7 @@ export async function handleNewIncome({
     category,
     amount,
     conversion,
-    currency
+    currency,
 }: {
     curr: FirebaseFirestoreTypes.DocumentSnapshot<FirebaseFirestoreTypes.DocumentData>;
     uid: string,
@@ -154,7 +160,7 @@ export async function handleNewIncome({
                     UserFromJson(curr.data() as UserType)
                 )?.income[month]?.[category] ?? 0) +
                     Number(amount)) /
-                    conversion['usd'][currency.toLowerCase()]).toFixed(2)), uid),
+                    conversion.usd[currency.toLowerCase()]).toFixed(2)), uid),
         });
 }
 
@@ -166,7 +172,7 @@ export async function handleExpenseUpdate({
     transaction,
     amount,
     conversion,
-    currency
+    currency,
 }: {
     curr: FirebaseFirestoreTypes.DocumentSnapshot<FirebaseFirestoreTypes.DocumentData>;
     uid: string,
@@ -191,7 +197,7 @@ export async function handleExpenseUpdate({
                 ).spend[month][category] ?? 0) -
                     transaction.amount +
                     Number(amount)) /
-                    conversion['usd'][currency.toLowerCase()]).toFixed(2)), uid),
+                    conversion.usd[currency.toLowerCase()]).toFixed(2)), uid),
         });
 }
 
@@ -202,7 +208,7 @@ export async function handleNewExpense({
     category,
     amount,
     conversion,
-    currency
+    currency,
 }: {
     curr: FirebaseFirestoreTypes.DocumentSnapshot<FirebaseFirestoreTypes.DocumentData>;
     uid: string,
@@ -225,13 +231,13 @@ export async function handleNewExpense({
                     UserFromJson(curr.data() as UserType)
                 )?.spend[month]?.[category] ?? 0) +
                     Number(amount)) /
-                    conversion['usd'][currency.toLowerCase()]).toFixed(2)), uid),
+                    conversion.usd[currency.toLowerCase()]).toFixed(2)), uid),
         });
 }
 export async function getAttachmentUrl({
     attachement,
     id,
-    uid
+    uid,
 }: {
     attachement: string;
     id: string;
@@ -253,7 +259,7 @@ export async function handleNotify({
     totalSpent,
     uid,
     month,
-    category
+    category,
 }: {
     curr: FirebaseFirestoreTypes.DocumentSnapshot<FirebaseFirestoreTypes.DocumentData>;
     totalSpent: number;
@@ -317,7 +323,7 @@ export async function singupUser({ name, email, pass }: { name: string, email: s
                 uid: creds.user.uid,
                 pin: '',
             });
-            console.log(encrpytedUser)
+            console.log(encrpytedUser);
             await firestore()
                 .collection('users')
                 .doc(creds.user.uid)
@@ -325,8 +331,8 @@ export async function singupUser({ name, email, pass }: { name: string, email: s
             return true;
         }
     } catch (e) {
-        console.log(e)
-        return false
+        console.log(e);
+        return false;
     }
-    return false
+    return false;
 }

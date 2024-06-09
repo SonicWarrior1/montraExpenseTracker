@@ -44,7 +44,7 @@ function DeleteBudgetSheet({
         .update({
           [`budget.${category}`]: deleteField(),
         });
-      Toast.show({text1: STRINGS.BudgetDeletedSuccesfully});
+      Toast.show({text1: STRINGS.BudgetDeletedSuccesfully,type:'custom'});
       dispatch(setLoading(false));
     } catch (e) {
       console.log(e);

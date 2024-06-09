@@ -121,12 +121,38 @@ export function NameValError({
     </>
   );
 }
+export function CompundEmptyError({
+  value1,
+  value2,
+  formKey,
+  errorText,
+  color = 'rgb(255,51,51)',
+  size = 12,
+}: Readonly<{
+  value1: string;
+  value2: string;
+  formKey: boolean;
+  errorText: string;
+  color?: string;
+  size?: number;
+}>) {
+  return (
+    <>
+      <Sapcer height={10} />
+      {(value1 === '' || value2 === '') && formKey && (
+        <Text style={[style.error, {color: color, fontSize: size}]}>
+          {errorText}
+        </Text>
+      )}
+    </>
+  );
+}
 export function EmptyError({
   value,
   formKey,
   errorText,
   color = 'rgb(255,51,51)',
-  size=12
+  size = 12,
 }: Readonly<{
   value: string;
   formKey: boolean;
@@ -138,7 +164,9 @@ export function EmptyError({
     <>
       <Sapcer height={10} />
       {value === '' && formKey && (
-        <Text style={[style.error, {color: color,fontSize:size}]}>{errorText}</Text>
+        <Text style={[style.error, {color: color, fontSize: size}]}>
+          {errorText}
+        </Text>
       )}
     </>
   );

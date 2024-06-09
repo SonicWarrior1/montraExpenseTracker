@@ -1,6 +1,6 @@
-import { FirebaseFirestoreTypes } from "@react-native-firebase/firestore";
-import { decrypt } from "./encryption";
-import { transactionType } from "../defs/transaction";
+import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
+import { decrypt } from './encryption';
+import { transactionType } from '../defs/transaction';
 
 export function TransFromJson(json: FirebaseFirestoreTypes.DocumentData, uid: string): transactionType {
     return {
@@ -11,16 +11,18 @@ export function TransFromJson(json: FirebaseFirestoreTypes.DocumentData, uid: st
         attachement: decrypt(json.attachement, uid),
         repeat: json.repeat,
         freq: json.freq ? {
-            freq: (decrypt(json.freq.freq, uid) as "yearly" | "monthly" | "weekly" | "daily"),
+            freq: (decrypt(json.freq.freq, uid) as 'yearly' | 'monthly' | 'weekly' | 'daily'),
             month: Number(decrypt(String(json.freq.month), uid)),
             day: Number(decrypt(String(json.freq.day), uid)),
             weekDay: Number(decrypt(String(json.freq.weekDay), uid)),
-            end: (decrypt(json.freq.end, uid) as "date" | "never"),
+            end: (decrypt(json.freq.end, uid) as 'date' | 'never'),
             date: json.freq.date,
         } : null,
         id: json.id,
         timeStamp: json.timeStamp,
         type: decrypt(json.type, uid) ?? json.type,
         attachementType: decrypt(json.attachementType, uid) ?? json.attachementType,
-    }
+        from: decrypt(json.from, uid) ?? json.from ?? '',
+        to: decrypt(json.to, uid) ?? json.to ?? '',
+    };
 }

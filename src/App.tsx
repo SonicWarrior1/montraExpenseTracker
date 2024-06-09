@@ -8,12 +8,14 @@ import {PersistGate} from 'redux-persist/integration/react';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import Loader from './components/Loader';
 import Toast from 'react-native-toast-message';
-import { enableFreeze, enableScreens } from 'react-native-screens';
+import {enableFreeze, enableScreens} from 'react-native-screens';
+import {toastConfig} from './components/customToast';
 
 enableFreeze(true);
 enableScreens(false);
 GoogleSignin.configure({
-  webClientId:"426728684733-08hbgavcdljaclium152ea992drr4ev3.apps.googleusercontent.com"
+  webClientId:
+    '426728684733-08hbgavcdljaclium152ea992drr4ev3.apps.googleusercontent.com',
 });
 function App(): React.JSX.Element {
   return (
@@ -23,7 +25,11 @@ function App(): React.JSX.Element {
           <Loader>
             <NavigationContainer>
               <RootNavigator />
-              <Toast/>
+              <Toast
+                position="bottom"
+                visibilityTime={2000}
+                config={toastConfig}
+              />
             </NavigationContainer>
           </Loader>
         </PersistGate>

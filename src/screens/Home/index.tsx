@@ -19,7 +19,6 @@ import HomeHeader from '../../components/HomeHeader';
 import Graph from './atoms/graph';
 
 function Home({navigation, route}: Readonly<HomeScreenProps>) {
-  
   const screenHeight = Dimensions.get('screen').height;
   const conversion = useAppSelector(state => state.transaction.conversion);
   const currency =
@@ -47,7 +46,7 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
           <Text style={styles.actText}>Account Balance</Text>
           <Text style={styles.amt}>
             {currencies[currency ?? 'USD'].symbol}
-            {(conversion['usd']?.[(currency ?? 'USD').toLowerCase()] * 9400)
+            {(conversion.usd?.[(currency ?? 'USD').toLowerCase()] * 9400)
               .toFixed(2)
               .toString()}
           </Text>
@@ -66,7 +65,7 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
                 <Text style={styles.text2}>
                   {currencies[currency].symbol}
                   {(
-                    conversion['usd']?.[currency.toLowerCase()] *
+                    conversion.usd?.[currency.toLowerCase()] *
                     Number(totalIncome)
                   )
                     .toFixed(2)
@@ -87,7 +86,7 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
                 <Text style={styles.text2}>
                   {currencies[currency].symbol}
                   {(
-                    conversion['usd']?.[currency.toLowerCase()] *
+                    conversion.usd?.[currency.toLowerCase()] *
                     Number(totalSpend)
                   )
                     .toFixed(2)
@@ -134,8 +133,7 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
                       ...item,
                       amount: Number(
                         (
-                          conversion['usd'][currency.toLowerCase()] *
-                          item.amount
+                          conversion.usd[currency.toLowerCase()] * item.amount
                         ).toFixed(2),
                       ),
                     },
@@ -154,8 +152,10 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
                 </View>
                 <View style={styles.catCtr}>
                   <Text style={styles.listtext1}>
-                    {item.category[0].toLocaleUpperCase() +
-                      item.category.slice(1)}
+                    {item.type === 'transfer'
+                      ? item.from + ' - ' + item.to
+                      : item.category[0].toLocaleUpperCase() +
+                        item.category.slice(1)}
                   </Text>
                   <Text style={styles.listtext2}>{item.desc}</Text>
                 </View>
@@ -168,13 +168,19 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
                         color:
                           item.type === 'expense'
                             ? COLORS.PRIMARY.RED
-                            : COLORS.PRIMARY.GREEN,
+                            : item.type === 'income'
+                            ? COLORS.PRIMARY.GREEN
+                            : COLORS.PRIMARY.BLUE,
                       },
                     ]}>
-                    {item.type === 'expense' ? '-' : '+'}{' '}
+                    {item.type === 'expense'
+                      ? '-'
+                      : item.type === 'income'
+                      ? '+'
+                      : ''}{' '}
                     {currencies[currency].symbol}{' '}
                     {(
-                      conversion['usd'][currency.toLowerCase()] * item.amount
+                      conversion.usd[currency.toLowerCase()] * item.amount
                     ).toFixed(2)}
                   </Text>
                   <Text style={styles.listtext2}>
