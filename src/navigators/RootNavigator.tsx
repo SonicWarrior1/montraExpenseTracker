@@ -54,7 +54,9 @@ function RootNavigator(): React.JSX.Element {
         headerBackTitleVisible: false,
         headerTitleAlign: 'center',
         headerShadowVisible: false,
-        headerLeft: props => headerLeft(props, 'black'),
+        headerStyle: {backgroundColor: COLORS.LIGHT[100]},
+        headerTitleStyle: {color: COLORS.DARK[100]},
+        headerLeft: props => headerLeft(props, COLORS.DARK[100]),
       }}>
       {isLoggedIn ? (
         <Stack.Group>
@@ -171,9 +173,10 @@ function RootNavigator(): React.JSX.Element {
             component={ExportData}
             options={{
               headerShown: true,
-              headerTitleStyle: {color: 'black'},
+              headerTitleStyle: {color: COLORS.DARK[100]},
+              headerStyle: {backgroundColor: COLORS.LIGHT[100]},
               title: 'Export Data',
-              headerLeft: props => headerLeft(props, 'black'),
+              headerLeft: props => headerLeft(props, COLORS.DARK[100]),
             }}
           />
           <Stack.Screen name={NAVIGATION.Story} component={StoryScreen} />

@@ -1,22 +1,23 @@
-import { StyleSheet } from "react-native";
-import { COLORS } from "../../constants/commonStyles";
+import { StyleSheet } from 'react-native';
+import { COLORS } from '../../constants/commonStyles';
 
-const styles = StyleSheet.create({
-    safeView: { flex: 1, backgroundColor: COLORS.PRIMARY.LIGHT },
+const styles = (COLOR:typeof COLORS)=> StyleSheet.create({
+    safeView: { flex: 1, backgroundColor: COLOR.LIGHT[100] },
     mainView: {
         flex: 1,
-        justifyContent: "center",
-        paddingHorizontal: 20
+        justifyContent: 'center',
+        paddingHorizontal: 20,
     },
     text1: {
         fontSize: 32,
-        textAlign: "center",
-        fontWeight: "bold"
+        textAlign: 'center',
+        fontWeight: 'bold',
+        color: COLOR.DARK[100],
     },
     text2: {
         fontSize: 16,
-        textAlign: "center",
-        color: "grey"
+        textAlign: 'center',
+        color: 'grey',
     },
     carouselCtr: { paddingHorizontal: 20 },
     progressDotCtr: {
@@ -29,5 +30,5 @@ const styles = StyleSheet.create({
 
         borderRadius: 10,
     },
-})
-export default styles
+});
+export default styles;

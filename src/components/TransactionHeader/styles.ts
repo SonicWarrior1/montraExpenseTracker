@@ -1,9 +1,9 @@
-import { Dimensions, StyleSheet } from "react-native";
-import { COLORS } from "../../constants/commonStyles";
+import { Dimensions, StyleSheet } from 'react-native';
+import { COLORS } from '../../constants/commonStyles';
 const screenHeight = Dimensions.get('screen').height;
-const styles = StyleSheet.create({
+const styles = (COLOR: typeof COLORS) => StyleSheet.create({
     header: {
-        backgroundColor: 'white',
+        backgroundColor: COLOR.PRIMARY.LIGHT,
         height: screenHeight * 0.06,
         width: '100%',
         flexDirection: 'row',
@@ -11,22 +11,22 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         paddingHorizontal: 16,
         paddingBottom: 10,
-        marginTop: 10
+        marginTop: 10,
     },
     dropdown: {
         borderWidth: 1,
         borderRadius: 20,
         height: 40,
         paddingHorizontal: 20,
-        borderColor: COLORS.LIGHT[20],
+        borderColor: COLOR.LIGHT[20],
         width: 120,
     },
     filterBtn: {
         padding: 10,
         borderWidth: 1,
         borderRadius: 8,
-        borderColor: COLORS.LIGHT[20],
-    }
-})
+        borderColor: COLOR.LIGHT[20],
+    },
+});
 
 export default styles;

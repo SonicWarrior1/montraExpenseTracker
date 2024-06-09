@@ -7,8 +7,7 @@ import {
   BottomSheetModalProvider,
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
-import {COLORS} from '../../constants/commonStyles';
-import styles from './styles';
+import style from './styles';
 import {useAppDispatch, useAppSelector} from '../../redux/store';
 import {
   openCatSheet,
@@ -17,7 +16,8 @@ import {
   setSortFilter,
 } from '../../redux/reducers/transactionSlice';
 import SheetBackdrop from '../SheetBackDrop';
-import { STRINGS } from '../../constants/strings';
+import {STRINGS} from '../../constants/strings';
+import {useAppTheme} from '../../hooks/themeHook';
 
 function FilterSheet() {
   const snapPoints = useMemo(() => ['55%'], []);
@@ -34,6 +34,8 @@ function FilterSheet() {
   const [filter, setFilter] = useState(-1);
   const [sort, setSort] = useState(-1);
   const dispatch = useAppDispatch();
+  const COLOR = useAppTheme();
+  const styles = style(COLOR);
   return (
     <BottomSheetModalProvider>
       <BottomSheetModal
@@ -43,6 +45,7 @@ function FilterSheet() {
         ref={ref}
         backdropComponent={SheetBackdrop}
         backgroundStyle={styles.sheetBack}
+        handleIndicatorStyle={{backgroundColor: COLOR.DARK[100]}}
         onDismiss={() => {
           dispatch(openFilterSheet(false));
         }}>
@@ -60,14 +63,16 @@ function FilterSheet() {
               <Text style={styles.editBtnText}>{STRINGS.Reset}</Text>
             </Pressable>
           </View>
-          <Text style={[styles.text1, {marginBottom: 10}]}>Filter By</Text>
+          <Text style={[styles.text1, {marginBottom: 10}]}>
+            {STRINGS.FilterBy}
+          </Text>
           <View style={styles.flexRow}>
             <Pressable
               style={[
                 styles.filterBtn,
                 {
                   backgroundColor:
-                    filter === 0 ? COLORS.VIOLET[20] : COLORS.LIGHT[100],
+                    filter === 0 ? COLOR.VIOLET[20] : COLOR.LIGHT[100],
                 },
               ]}
               onPress={() => {
@@ -76,7 +81,7 @@ function FilterSheet() {
               <Text
                 style={[
                   styles.filterBtnText,
-                  {color: filter === 0 ? COLORS.VIOLET[100] : COLORS.DARK[100]},
+                  {color: filter === 0 ? COLOR.VIOLET[100] : COLOR.DARK[100]},
                 ]}>
                 {STRINGS.Income}
               </Text>
@@ -86,7 +91,7 @@ function FilterSheet() {
                 styles.filterBtn,
                 {
                   backgroundColor:
-                    filter === 1 ? COLORS.VIOLET[20] : COLORS.LIGHT[100],
+                    filter === 1 ? COLOR.VIOLET[20] : COLOR.LIGHT[100],
                 },
               ]}
               onPress={() => {
@@ -95,7 +100,7 @@ function FilterSheet() {
               <Text
                 style={[
                   styles.filterBtnText,
-                  {color: filter === 1 ? COLORS.VIOLET[100] : COLORS.DARK[100]},
+                  {color: filter === 1 ? COLOR.VIOLET[100] : COLOR.DARK[100]},
                 ]}>
                 {STRINGS.Expense}
               </Text>
@@ -105,7 +110,7 @@ function FilterSheet() {
                 styles.filterBtn,
                 {
                   backgroundColor:
-                    filter === 2 ? COLORS.VIOLET[20] : COLORS.LIGHT[100],
+                    filter === 2 ? COLOR.VIOLET[20] : COLOR.LIGHT[100],
                 },
               ]}
               onPress={() => {
@@ -114,7 +119,7 @@ function FilterSheet() {
               <Text
                 style={[
                   styles.filterBtnText,
-                  {color: filter === 2 ? COLORS.VIOLET[100] : COLORS.DARK[100]},
+                  {color: filter === 2 ? COLOR.VIOLET[100] : COLOR.DARK[100]},
                 ]}>
                 {STRINGS.Transfer}
               </Text>
@@ -136,7 +141,7 @@ function FilterSheet() {
                 styles.filterBtn,
                 {
                   backgroundColor:
-                    sort === 0 ? COLORS.VIOLET[20] : COLORS.LIGHT[100],
+                    sort === 0 ? COLOR.VIOLET[20] : COLOR.LIGHT[100],
                 },
               ]}
               onPress={() => {
@@ -145,7 +150,7 @@ function FilterSheet() {
               <Text
                 style={[
                   styles.filterBtnText,
-                  {color: sort === 0 ? COLORS.VIOLET[100] : COLORS.DARK[100]},
+                  {color: sort === 0 ? COLOR.VIOLET[100] : COLOR.DARK[100]},
                 ]}>
                 {STRINGS.Highest}
               </Text>
@@ -155,7 +160,7 @@ function FilterSheet() {
                 styles.filterBtn,
                 {
                   backgroundColor:
-                    sort === 1 ? COLORS.VIOLET[20] : COLORS.LIGHT[100],
+                    sort === 1 ? COLOR.VIOLET[20] : COLOR.LIGHT[100],
                 },
               ]}
               onPress={() => {
@@ -164,7 +169,7 @@ function FilterSheet() {
               <Text
                 style={[
                   styles.filterBtnText,
-                  {color: sort === 1 ? COLORS.VIOLET[100] : COLORS.DARK[100]},
+                  {color: sort === 1 ? COLOR.VIOLET[100] : COLOR.DARK[100]},
                 ]}>
                 {STRINGS.Lowest}
               </Text>
@@ -174,7 +179,7 @@ function FilterSheet() {
                 styles.filterBtn,
                 {
                   backgroundColor:
-                    sort === 2 ? COLORS.VIOLET[20] : COLORS.LIGHT[100],
+                    sort === 2 ? COLOR.VIOLET[20] : COLOR.LIGHT[100],
                 },
               ]}
               onPress={() => {
@@ -183,7 +188,7 @@ function FilterSheet() {
               <Text
                 style={[
                   styles.filterBtnText,
-                  {color: sort === 2 ? COLORS.VIOLET[100] : COLORS.DARK[100]},
+                  {color: sort === 2 ? COLOR.VIOLET[100] : COLOR.DARK[100]},
                 ]}>
                 {STRINGS.Newest}
               </Text>
@@ -193,7 +198,7 @@ function FilterSheet() {
                 styles.filterBtn,
                 {
                   backgroundColor:
-                    sort === 3 ? COLORS.VIOLET[20] : COLORS.LIGHT[100],
+                    sort === 3 ? COLOR.VIOLET[20] : COLOR.LIGHT[100],
                 },
               ]}
               onPress={() => {
@@ -202,7 +207,7 @@ function FilterSheet() {
               <Text
                 style={[
                   styles.filterBtnText,
-                  {color: sort === 3 ? COLORS.VIOLET[100] : COLORS.DARK[100]},
+                  {color: sort === 3 ? COLOR.VIOLET[100] : COLOR.DARK[100]},
                 ]}>
                 {STRINGS.Oldest}
               </Text>

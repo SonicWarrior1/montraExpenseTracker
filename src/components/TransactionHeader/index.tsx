@@ -2,10 +2,11 @@ import React from 'react';
 import {Pressable, View} from 'react-native';
 import {ICONS} from '../../constants/icons';
 import {Dropdown} from 'react-native-element-dropdown';
-import styles from './styles';
+import style from './styles';
 import {useAppDispatch} from '../../redux/store';
 import {openFilterSheet} from '../../redux/reducers/transactionSlice';
 import {monthData, STRINGS} from '../../constants/strings';
+import {useAppTheme} from '../../hooks/themeHook';
 
 function TransactionHeader({
   month,
@@ -15,6 +16,8 @@ function TransactionHeader({
   setMonth: React.Dispatch<React.SetStateAction<number>>;
 }>) {
   const dispatch = useAppDispatch();
+  const COLOR = useAppTheme();
+  const styles = style(COLOR);
   return (
     <View style={styles.header}>
       <Dropdown
@@ -24,7 +27,6 @@ function TransactionHeader({
         )}
         renderRightIcon={() => <></>}
         placeholder={STRINGS.Month}
-        placeholderStyle={{marginLeft: 10}}
         value={monthData[month]}
         data={monthData}
         labelField={'label'}
@@ -32,13 +34,22 @@ function TransactionHeader({
         onChange={({value}) => {
           setMonth(value - 1);
         }}
+        itemTextStyle={{color: COLOR.DARK[100]}}
+        containerStyle={{backgroundColor: COLOR.LIGHT[100]}}
+        activeColor={COLOR.LIGHT[100]}
+        selectedTextStyle={{color: COLOR.DARK[100], marginLeft: 10}}
       />
       <Pressable
         style={styles.filterBtn}
         onPress={() => {
           dispatch(openFilterSheet(true));
         }}>
-        {ICONS.Filter({height: 20, width: 20})}
+        {ICONS.Filter({
+          height: 20,
+          width: 20,
+          color: COLOR.DARK[100],
+          borderColor: COLOR.DARK[100],
+        })}
       </Pressable>
     </View>
   );

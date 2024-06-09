@@ -1,8 +1,8 @@
 import { StyleSheet } from 'react-native';
 import { COLORS } from '../../constants/commonStyles';
 
-const styles = StyleSheet.create({
-    safeView: { flex: 1, backgroundColor: COLORS.PRIMARY.LIGHT },
+const styles = (COLOR: typeof COLORS) => StyleSheet.create({
+    safeView: { flex: 1, backgroundColor: COLOR.LIGHT[100] },
     mainView: {
         flex: 1,
         justifyContent: 'center',
@@ -11,9 +11,9 @@ const styles = StyleSheet.create({
     },
     orText: {
         fontWeight: 'bold',
-        color: COLORS.DARK[25],
+        color: COLOR.DARK[25],
     },
-    text: { fontWeight: 'bold', fontSize: 16 },
+    text: { fontWeight: 'bold', fontSize: 16,color:COLOR.DARK[100] },
     btn: {
         width: '100%',
         height: 50,
@@ -21,17 +21,17 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderRadius: 10,
         borderWidth: 1,
-        borderColor: COLORS.DARK[25],
+        borderColor: COLOR.DARK[25],
     },
     flex: { flex: 1 },
     googleRow: { flexDirection: 'row', alignItems: 'center', gap: 20 },
     forgotText: {
-        color: COLORS.PRIMARY.VIOLET,
+        color: COLOR.PRIMARY.VIOLET,
         fontSize: 18,
         fontWeight: '600',
     },
     signupText: {
-        color: COLORS.PRIMARY.VIOLET,
+        color: COLOR.PRIMARY.VIOLET,
         textDecorationLine: 'underline',
     },
 });

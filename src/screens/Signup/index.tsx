@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import styles from './styles';
+import style from './styles';
 import CustomInput from '../../components/CustomInput';
 import Sapcer from '../../components/Spacer';
 import {
@@ -38,6 +38,7 @@ import {useAppDispatch} from '../../redux/store/index.ts';
 import Toast from 'react-native-toast-message';
 import {UserFromJson, UserToJson} from '../../utils/userFuncs.ts';
 import {singupUser} from '../../utils/firebase.ts';
+import {useAppTheme} from '../../hooks/themeHook.ts';
 function Signup({navigation}: Readonly<SignupScreenProps>) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -104,12 +105,14 @@ function Signup({navigation}: Readonly<SignupScreenProps>) {
             pin: '',
           });
           await firestore().collection('users').doc(creds.user.uid).set(user);
-          dispatch(userLoggedIn({
-            name: creds.user.displayName!,
-            email: creds.user.email!,
-            uid: creds.user.uid,
-            pin: '',
-          }));
+          dispatch(
+            userLoggedIn({
+              name: creds.user.displayName!,
+              email: creds.user.email!,
+              uid: creds.user.uid,
+              pin: '',
+            }),
+          );
         } else {
           const data = await firestore()
             .collection('users')
@@ -127,19 +130,18 @@ function Signup({navigation}: Readonly<SignupScreenProps>) {
     dispatch(setLoading(false));
   }
   const [form, setForm] = useState(false);
+  const COLOR = useAppTheme();
+  const styles = style(COLOR);
   return (
     <SafeAreaView style={styles.safeView}>
-      <ScrollView
-        style={{flex: 1}}
-        contentContainerStyle={{
-          flex: 1,
-        }}>
+      <ScrollView style={styles.flex} contentContainerStyle={styles.flex}>
         <View style={styles.mainView}>
           <CustomInput
             placeholderText={STRINGS.Name}
             onChangeText={onChangeName}
             type="name"
             value={name}
+            inputColor={COLOR.DARK[100]}
           />
           <NameValError name={name} formKey={form} />
           <CustomInput
@@ -147,18 +149,21 @@ function Signup({navigation}: Readonly<SignupScreenProps>) {
             onChangeText={onChangeEmail}
             type="email"
             value={email}
+            inputColor={COLOR.DARK[100]}
           />
           <EmailValError email={email} formKey={form} />
           <CustomPassInput
             onChangeText={onChangePass}
             placeholderText={STRINGS.Password}
             value={pass}
+            inputColor={COLOR.DARK[100]}
           />
           <PassValidationError pass={pass} formKey={form} />
           <CustomPassInput
             onChangeText={onChangeConfirmPass}
             placeholderText={STRINGS.ConfrimPassword}
             value={confirmPass}
+            inputColor={COLOR.DARK[100]}
           />
           <ConfirmPassError
             pass={pass}
@@ -171,7 +176,7 @@ function Signup({navigation}: Readonly<SignupScreenProps>) {
             fillColor={
               !checked && form ? COLORS.RED[100] : COLORS.PRIMARY.VIOLET
             }
-            unFillColor="#FFFFFF"
+            unFillColor={COLOR.LIGHT[100]}
             iconStyle={{borderRadius: 5}}
             innerIconStyle={{borderWidth: 2, borderRadius: 5}}
             onPress={(isChecked: boolean) => {
@@ -180,7 +185,7 @@ function Signup({navigation}: Readonly<SignupScreenProps>) {
             isChecked={checked}
             textComponent={
               <View style={{flex: 1, marginLeft: 16}}>
-                <Text style={{}}>
+                <Text style={{color:COLOR.DARK[100]}}>
                   {STRINGS.BySigningUp}{' '}
                   <Text style={{color: COLORS.PRIMARY.VIOLET}}>
                     {STRINGS.Terms}

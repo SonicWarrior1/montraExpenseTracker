@@ -1,8 +1,8 @@
 import {StyleSheet} from 'react-native';
 import {COLORS} from '../../constants/commonStyles';
 
-const styles = StyleSheet.create({
-  safeView: {flex: 1, backgroundColor: COLORS.PRIMARY.LIGHT},
+const styles = (COLOR:typeof COLORS)=> StyleSheet.create({
+  safeView: {flex: 1, backgroundColor: COLOR.LIGHT[100]},
   mainView: {
     flex: 1,
     justifyContent: 'center',
@@ -13,6 +13,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: '600',
     alignSelf: 'flex-start',
+    color: COLOR.DARK[100],
   },
   flex: {
     flex: 1,

@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import styles from './styles';
+import style from './styles';
 import {catIcons, ICONS} from '../../constants/icons';
 import {Timestamp} from '@react-native-firebase/firestore';
 import {useAppSelector} from '../../redux/store';
@@ -17,6 +17,7 @@ import {ScrollView} from 'react-native-gesture-handler';
 import TransactionHeader from '../../components/TransactionHeader';
 import {TransactionScreenProps} from '../../defs/navigation';
 import {currencies, NAVIGATION, STRINGS} from '../../constants/strings';
+import { useAppTheme } from '../../hooks/themeHook';
 function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
   const [month, setMonth] = useState(new Date().getMonth());
   const user = useAppSelector(state => state.user.currentUser);
@@ -123,6 +124,8 @@ function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
       return x;
     }
   }
+  const COLOR = useAppTheme();
+  const styles = style(COLOR);
   return (
     <SafeAreaView style={styles.safeView}>
       <TransactionHeader month={month} setMonth={setMonth} />

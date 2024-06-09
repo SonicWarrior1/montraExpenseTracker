@@ -3,12 +3,13 @@ import {Dimensions, SafeAreaView, Text, View} from 'react-native';
 import Carousel from 'react-native-reanimated-carousel';
 
 import {ICONS} from '../../constants/icons';
-import styles from './styles';
+import style from './styles';
 import CustomButton from '../../components/CustomButton';
 import {NAVIGATION, STRINGS} from '../../constants/strings';
 import {COLORS} from '../../constants/commonStyles';
 import {OnboardingScreenProps} from '../../defs/navigation';
 import Sapcer from '../../components/Spacer';
+import { useAppTheme } from '../../hooks/themeHook';
 const screenWidth = Dimensions.get('screen').width;
 const screenHeight = Dimensions.get('screen').height;
 const data = [
@@ -43,6 +44,7 @@ function Onboarding({navigation}: Readonly<OnboardingScreenProps>) {
     navigation.navigate(NAVIGATION.LOGIN);
   }
   const [index, setIndex] = useState(0);
+  const styles = style(useAppTheme());
   return (
     <SafeAreaView style={styles.safeView}>
       <View style={styles.mainView}>

@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import styles from './styles';
+import style from './styles';
 import CustomInput from '../../components/CustomInput';
 import {EmailEmptyError, PassEmptyError} from '../../constants/errors';
 import CustomPassInput from '../../components/CustomPassInput';
@@ -23,6 +23,7 @@ import {setLoading, userLoggedIn} from '../../redux/reducers/userSlice';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import {useAppDispatch} from '../../redux/store';
 import { UserFromJson, UserToJson } from '../../utils/userFuncs';
+import { useAppTheme } from '../../hooks/themeHook';
 
 function Login({navigation}: Readonly<LoginScreenProps>) {
   const [email, setEmail] = useState('');
@@ -103,6 +104,8 @@ function Login({navigation}: Readonly<LoginScreenProps>) {
     }
     dispatch(setLoading(false));
   }
+  const COLOR = useAppTheme();
+  const styles = style(COLOR);
   return (
     <SafeAreaView style={styles.safeView}>
       <ScrollView
@@ -114,12 +117,14 @@ function Login({navigation}: Readonly<LoginScreenProps>) {
             onChangeText={onChangeEmail}
             type="email"
             value={email}
+            inputColor={COLOR.DARK[100]}
           />
           <EmailEmptyError email={email} formKey={form} />
           <CustomPassInput
             onChangeText={onChangePass}
             placeholderText={STRINGS.Password}
             value={pass}
+            inputColor={COLOR.DARK[100]}
           />
           <PassEmptyError pass={pass} formKey={form} />
           <Sapcer height={30} />
@@ -130,7 +135,7 @@ function Login({navigation}: Readonly<LoginScreenProps>) {
           <TouchableOpacity onPress={onGoogleButtonPress} style={[styles.btn]}>
             <View style={styles.googleRow}>
               {ICONS.Google({height: 25, width: 25})}
-              <Text style={[styles.text]}>{STRINGS.LoginGoogle}</Text>
+              <Text style={styles.text}>{STRINGS.LoginGoogle}</Text>
             </View>
           </TouchableOpacity>
           <Sapcer height={20} />
