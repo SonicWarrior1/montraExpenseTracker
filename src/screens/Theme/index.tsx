@@ -6,16 +6,17 @@ import firestore from '@react-native-firebase/firestore';
 import {encrypt} from '../../utils/encryption';
 import style from './styles';
 import { useAppTheme } from '../../hooks/themeHook';
+import { STRINGS } from '../../constants/strings';
 
 function ThemeScreen() {
   const theme = useAppSelector(state => state.user.currentUser?.theme);
   const uid = useAppSelector(state => state.user.currentUser?.uid);
-  const COLORS=useAppTheme();
+  const COLORS = useAppTheme();
   const styles = style(COLORS);
   return (
     <SafeAreaView style={styles.safeView}>
       <View style={styles.row}>
-        <Text style={styles.text}>Light</Text>
+        <Text style={styles.text}>{STRINGS.Light}</Text>
         <BouncyCheckbox
           style={{width: 28}}
           disableText={false}
@@ -30,7 +31,7 @@ function ThemeScreen() {
         />
       </View>
       <View style={styles.row}>
-        <Text style={styles.text}>Dark</Text>
+        <Text style={styles.text}>{STRINGS.Dark}</Text>
         <BouncyCheckbox
           style={{width: 28}}
           disableText={false}
@@ -45,7 +46,7 @@ function ThemeScreen() {
         />
       </View>
       <View style={styles.row}>
-        <Text style={styles.text}>Use Device Theme</Text>
+        <Text style={styles.text}>{STRINGS.UseDeviceTheme}</Text>
         <BouncyCheckbox
           style={{width: 28}}
           disableText={false}

@@ -1,18 +1,18 @@
-import { StyleSheet } from "react-native";
-import { COLORS } from "../../constants/commonStyles";
+import { StyleSheet } from 'react-native';
+import { COLORS } from '../../constants/commonStyles';
 
 const styles = StyleSheet.create({
     safeView: {
         flex: 1,
         paddingHorizontal: 30,
         backgroundColor: COLORS.LIGHT[100],
-        paddingBottom:20
+        paddingBottom:20,
     },
     mainView: {
         flex: 1,
         backgroundColor: COLORS.LIGHT[100],
-        alignItems: "center",
-        justifyContent: "flex-start",
+        alignItems: 'center',
+        justifyContent: 'flex-start',
     },
     catCtr: {
         flexDirection: 'row',
@@ -24,7 +24,7 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
         borderRadius: 24,
         columnGap: 7,
-        marginBottom: 20
+        marginBottom: 20,
     },
     colorBox: {
         padding: 8,
@@ -33,7 +33,7 @@ const styles = StyleSheet.create({
     },
     catText: { fontSize: 18, fontWeight: '600' },
     remainText: {
-        fontSize: 24, fontWeight: '600', marginBottom: 10
+        fontSize: 24, fontWeight: '600', marginBottom: 10,
     },
     amtText: { fontSize: 64, fontWeight: '600', marginBottom: 15 },
     limitCtr: {
@@ -44,11 +44,13 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
         borderRadius: 24,
         columnGap: 7,
-        marginTop: 40
+        marginTop: 40,
     },
     limitText: {
-        fontSize: 14, fontWeight: '600', color: COLORS.LIGHT[100]
-    }
-})
+        fontSize: 14, fontWeight: '600', color: COLORS.LIGHT[100],
+    },
+    progressbar:{width: '100%'},
+    marginRight:{marginRight: 15},
+});
 
-export default styles
+export default styles;

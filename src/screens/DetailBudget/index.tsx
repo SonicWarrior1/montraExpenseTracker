@@ -7,7 +7,7 @@ import {DetailBudgetScreenProps} from '../../defs/navigation';
 import {useAppSelector} from '../../redux/store';
 import {Bar} from 'react-native-progress';
 import CustomButton from '../../components/CustomButton';
-import {currencies, NAVIGATION} from '../../constants/strings';
+import {currencies, NAVIGATION, STRINGS} from '../../constants/strings';
 import DeleteBudgetSheet from '../../components/DeleteBudgetSheet';
 import {BottomSheetModalMethods} from '@gorhom/bottom-sheet/lib/typescript/types';
 import {COLORS} from '../../constants/commonStyles';
@@ -20,7 +20,6 @@ function DetailBudget({navigation, route}: Readonly<DetailBudgetScreenProps>) {
     state => state.user.currentUser?.budget[month],
   );
   const spends = useAppSelector(state => state.user.currentUser?.spend[month]);
-  console.log(spends)
   const cat = route.params.category;
   const budget = budgets![cat] ?? {
     alert: false,
@@ -36,7 +35,7 @@ function DetailBudget({navigation, route}: Readonly<DetailBudgetScreenProps>) {
         onPress={() => {
           bottomSheetModalRef.current?.present();
         }}
-        style={{marginRight: 15}}>
+        style={styles.marginRight}>
         {ICONS.Trash({height: 25, width: 25, color: 'black'})}
       </Pressable>
     );
@@ -65,29 +64,29 @@ function DetailBudget({navigation, route}: Readonly<DetailBudgetScreenProps>) {
             {cat[0].toUpperCase() + cat.slice(1)}
           </Text>
         </View>
-        <Text style={styles.remainText}>Remaining</Text>
+        <Text style={styles.remainText}>{STRINGS.Remaining}</Text>
         <Text style={styles.amtText}>
           {currencies[currency!].symbol}
           {budget.limit - spend < 0 || spend === undefined
             ? '0'
             : (
-                conversion['usd'][currency!.toLowerCase()!] *
+                conversion.usd[currency!.toLowerCase()!] *
                   Number(budget.limit.toFixed(2)) -
                 Number(spend.toFixed(2))
               ).toFixed(2)}
         </Text>
-        <View style={{width: '100%'}}>
+        <View style={styles.progressbar}>
           <Bar progress={(spend ?? 0) / budget.limit} height={8} width={null} />
         </View>
         {(spend ?? 0) >= budget.limit && (
           <View style={styles.limitCtr}>
             {ICONS.Alert({height: 20, width: 20, color: 'white'})}
-            <Text style={styles.limitText}>You've exceed the limit</Text>
+            <Text style={styles.limitText}>{STRINGS.LimitExceeded}</Text>
           </View>
         )}
       </View>
       <CustomButton
-        title="Edit"
+        title={STRINGS.Edit}
         onPress={() => {
           navigation.push(NAVIGATION.CreateBudget, {
             isEdit: true,

@@ -5,6 +5,8 @@ import {NotificationScreenProps} from '../../defs/navigation';
 import {ICONS} from '../../constants/icons';
 import firestore, {Timestamp} from '@react-native-firebase/firestore';
 import styles from './styles';
+import {encrypt} from '../../utils/encryption';
+import {STRINGS} from '../../constants/strings';
 
 function NotificationScreen({navigation}: Readonly<NotificationScreenProps>) {
   const notifications = useAppSelector(
@@ -27,7 +29,12 @@ function NotificationScreen({navigation}: Readonly<NotificationScreenProps>) {
           },
           val,
         ) => {
-          acc[val.id] = {...val, read: true};
+          acc[val.id] = {
+            ...val,
+            category: encrypt(val.category, uid!),
+            type: encrypt(val.type, uid!),
+            read: true,
+          };
           return acc;
         },
         {},
@@ -40,7 +47,7 @@ function NotificationScreen({navigation}: Readonly<NotificationScreenProps>) {
     } catch (e) {
       console.log(e);
     }
-  }, [notifications]);
+  }, [notifications, uid]);
   const handleDelete = useCallback(async () => {
     try {
       await firestore().collection('users').doc(uid).update({notification: {}});
@@ -48,7 +55,7 @@ function NotificationScreen({navigation}: Readonly<NotificationScreenProps>) {
     } catch (e) {
       console.log(e);
     }
-  }, []);
+  }, [uid]);
   return (
     <SafeAreaView style={styles.safeView}>
       <View style={styles.header}>
@@ -64,7 +71,7 @@ function NotificationScreen({navigation}: Readonly<NotificationScreenProps>) {
             borderColor: 'black',
           })}
         </Pressable>
-        <Text style={styles.headerTitle}>Notifications</Text>
+        <Text style={styles.headerTitle}>{STRINGS.Notifications}</Text>
         <Pressable
           style={{marginRight: 15}}
           onPress={() => {
@@ -76,9 +83,7 @@ function NotificationScreen({navigation}: Readonly<NotificationScreenProps>) {
       {notifications === undefined ||
       Object.values(notifications).length === 0 ? (
         <View style={styles.center}>
-          <Text style={styles.NoNotifText}>
-            There is no notification for now
-          </Text>
+          <Text style={styles.NoNotifText}>{STRINGS.NoNotification}</Text>
         </View>
       ) : (
         <FlatList
@@ -91,12 +96,12 @@ function NotificationScreen({navigation}: Readonly<NotificationScreenProps>) {
                 <View>
                   <Text style={styles.text1}>
                     {item.category[0].toUpperCase() + item.category.slice(1)}{' '}
-                    budget has exceeded the limit
+                    {STRINGS.BudgetExceed}
                   </Text>
                   <Text style={styles.text2}>
                     Your{' '}
                     {item.category[0].toUpperCase() + item.category.slice(1)}{' '}
-                    budget has exceeded the limit
+                    {STRINGS.BudgetExceed}
                   </Text>
                 </View>
                 <Text style={styles.text2}>
@@ -113,10 +118,10 @@ function NotificationScreen({navigation}: Readonly<NotificationScreenProps>) {
       {menu && (
         <View style={styles.menu}>
           <Pressable onPress={handleMarkRead}>
-            <Text>Mark all Read</Text>
+            <Text>{STRINGS.MarkAllRead}</Text>
           </Pressable>
           <Pressable onPress={handleDelete}>
-            <Text>Remove all</Text>
+            <Text>{STRINGS.RemoveAll}</Text>
           </Pressable>
         </View>
       )}

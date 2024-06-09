@@ -1,5 +1,5 @@
-import { StyleSheet } from "react-native";
-import { COLORS } from "../../constants/commonStyles";
+import { StyleSheet } from 'react-native';
+import { COLORS } from '../../constants/commonStyles';
 
 const styles = (COLOR: typeof COLORS) => StyleSheet.create({
     tabCtr: {
@@ -30,7 +30,7 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
         paddingHorizontal: 26,
         borderRadius: 40,
         borderWidth: 1,
-        borderColor: COLOR.LIGHT[20]
+        borderColor: COLOR.LIGHT[20],
     },
     filterBtnText: {
         fontWeight: '500',
@@ -47,6 +47,15 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
         fontSize: 14,
         color: COLOR.PRIMARY.VIOLET,
     },
-})
+    tabBtn:{
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: 70,
+      },
+      btnText:{
+        fontSize: 10,
+        fontWeight: '500',
+      },
+});
 
-export default styles
+export default styles;

@@ -15,6 +15,7 @@ import {
   currencies,
   monthData,
   NAVIGATION,
+  STRINGS,
   weekData,
 } from '../../constants/strings';
 import Sapcer from '../../components/Spacer';
@@ -22,6 +23,7 @@ import CustomButton from '../../components/CustomButton';
 import {BottomSheetModalMethods} from '@gorhom/bottom-sheet/lib/typescript/types';
 import DeleteTransactionSheet from '../../components/DeleteTransSheet';
 import {useAppSelector} from '../../redux/store';
+import {Timestamp} from '@react-native-firebase/firestore';
 
 function TransactionDetails({
   route,
@@ -70,38 +72,58 @@ function TransactionDetails({
             {currencies[currency!].symbol ?? '$'}{' '}
             {Number(
               (
-                conversion['usd'][(currency ?? 'USD').toLowerCase()] *
-                trans.amount
+                conversion.usd[(currency ?? 'USD').toLowerCase()] * trans.amount
               ).toFixed(2),
             )}
           </Text>
           <Text style={styles.desc}>{trans.desc ?? ''}</Text>
           <Text style={styles.time}>
-            {weekData[trans.timeStamp.toDate().getDay()].label}{' '}
-            {trans.timeStamp.toDate().getDate()}{' '}
-            {monthData[trans.timeStamp.toDate().getMonth()].label}{' '}
-            {trans.timeStamp.toDate().getFullYear()}{' '}
-            {trans.timeStamp.toDate().getHours()}:
-            {trans.timeStamp.toDate().getMinutes()}
+            {
+              weekData[
+                Timestamp.fromMillis(trans.timeStamp.seconds * 1000)
+                  .toDate()
+                  .getDay()
+              ].label
+            }{' '}
+            {Timestamp.fromMillis(trans.timeStamp.seconds * 1000)
+              .toDate()
+              .getDate()}{' '}
+            {
+              monthData[
+                Timestamp.fromMillis(trans.timeStamp.seconds * 1000)
+                  .toDate()
+                  .getMonth()
+              ].label
+            }{' '}
+            {Timestamp.fromMillis(trans.timeStamp.seconds * 1000)
+              .toDate()
+              .getFullYear()}{' '}
+            {Timestamp.fromMillis(trans.timeStamp.seconds * 1000)
+              .toDate()
+              .getHours()}
+            :
+            {Timestamp.fromMillis(trans.timeStamp.seconds * 1000)
+              .toDate()
+              .getMinutes()}
           </Text>
         </SafeAreaView>
         <View style={styles.bottomView}>
           <View style={styles.ctr}>
             <View style={styles.ctrColumn}>
-              <Text style={styles.text1}>Type</Text>
+              <Text style={styles.text1}>{STRINGS.Type}</Text>
               <Text style={styles.text2}>
                 {trans.type[0].toLocaleUpperCase() + trans.type.slice(1)}
               </Text>
             </View>
             <View style={styles.ctrColumn}>
-              <Text style={styles.text1}>Category</Text>
+              <Text style={styles.text1}>{STRINGS.Category}</Text>
               <Text style={styles.text2}>
                 {(trans.category ?? '')[0].toLocaleUpperCase() +
                   (trans.category ?? '').slice(1)}
               </Text>
             </View>
             <View style={styles.ctrColumn}>
-              <Text style={styles.text1}>Wallet</Text>
+              <Text style={styles.text1}>{STRINGS.Wallet}</Text>
               <Text style={styles.text2}>
                 {trans.wallet === undefined || trans.wallet === ''
                   ? ''
@@ -110,25 +132,20 @@ function TransactionDetails({
             </View>
           </View>
           <View style={styles.descCtr}>
-            <Text style={styles.descTitle}>Description</Text>
-            <Text style={styles.descText}>
-              Amet minim mollit non deserunt ullamco est sit aliqua dolor do
-              amet sint. Velit officia consequat duis enim velit mollit.
-              Exercitation veniam consequat sunt nostrud amet.
-            </Text>
+            <Text style={styles.descTitle}>{STRINGS.Description}</Text>
+            <Text style={styles.descText}>{STRINGS.SampleDesc}</Text>
             {trans.attachementType !== 'none' && (
               <View>
-                <Text style={styles.descTitle}>Attachement</Text>
+                <Text style={styles.descTitle}>{STRINGS.Attachement}</Text>
                 {trans.attachementType === 'image' ? (
-                  <Image
-                    source={{uri: trans.attachement}}
-                    style={{width: '100%', height: 150, borderRadius: 8}}
-                  />
+                  <Image source={{uri: trans.attachement}} style={styles.img} />
                 ) : (
                   <CustomButton
-                    title="View Document"
+                    title={STRINGS.ViewDocument}
                     onPress={() => {
-                      navigation.navigate('DocView', {uri: trans.attachement!});
+                      navigation.navigate(NAVIGATION.DocView, {
+                        uri: trans.attachement!,
+                      });
                     }}
                     backgroundColor={COLORS.VIOLET[20]}
                     textColor={COLORS.VIOLET[100]}
@@ -139,7 +156,7 @@ function TransactionDetails({
           </View>
           <View style={styles.btnView}>
             <CustomButton
-              title="Edit"
+              title={STRINGS.Edit}
               onPress={() => {
                 navigation.navigate(NAVIGATION.AddExpense, {
                   type: trans.type,

@@ -1,7 +1,7 @@
 import React from 'react';
 import {Pressable, SafeAreaView, Text, View} from 'react-native';
 import {SettingsScreenProps} from '../../defs/navigation';
-import {NAVIGATION} from '../../constants/strings';
+import {NAVIGATION, STRINGS} from '../../constants/strings';
 import {ICONS} from '../../constants/icons';
 import {useAppSelector} from '../../redux/store';
 import style from './styles';
@@ -18,14 +18,14 @@ function SettingsScreen({navigation}: Readonly<SettingsScreenProps>) {
         onPress={() => {
           navigation.navigate(NAVIGATION.Currency);
         }}
-        text="Currency"
+        text={STRINGS.Currency}
         subText={currency!}
       />
       <ButtonRow
         onPress={() => {
           navigation.navigate(NAVIGATION.Theme);
         }}
-        text="Theme"
+        text={STRINGS.Theme}
         subText={theme?.toLocaleUpperCase()!}
       />
     </SafeAreaView>

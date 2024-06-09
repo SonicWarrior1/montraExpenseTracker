@@ -8,9 +8,9 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import style from './styles';
-import TabButton from './TabButton';
-import {NAVIGATION} from '../../constants/strings';
-import AnimatedBtn from './animatedButton';
+import TabButton from './atoms/TabButton';
+import {NAVIGATION, STRINGS} from '../../constants/strings';
+import AnimatedBtn from './atoms/animatedButton';
 import { useAppTheme } from '../../hooks/themeHook';
 
 function CustomTab(props: Readonly<BottomTabBarProps>): React.JSX.Element {
@@ -60,24 +60,24 @@ function CustomTab(props: Readonly<BottomTabBarProps>): React.JSX.Element {
       deg.value = withTiming('-45deg');
     }
   }
-  const COLOR=useAppTheme()
-  const styles=style(COLOR)
+  const COLOR = useAppTheme();
+  const styles = style(COLOR);
   return (
     <View style={styles.tabCtr}>
       <TabButton
         icon={ICONS.Home}
         onPress={() => {
-          props.navigation.navigate('Home');
+          props.navigation.navigate(NAVIGATION.Home);
         }}
-        title="Home"
+        title={STRINGS.Home}
         isActive={props.state.index === 0}
       />
       <TabButton
         icon={ICONS.Transaction}
         onPress={() => {
-          props.navigation.navigate('Transaction');
+          props.navigation.navigate(NAVIGATION.Transaction);
         }}
-        title="Transaction"
+        title={STRINGS.Transaction}
         isActive={props.state.index === 1}
       />
       <AnimatedBtn
@@ -130,7 +130,7 @@ function CustomTab(props: Readonly<BottomTabBarProps>): React.JSX.Element {
         onPress={() => {
           props.navigation.navigate(NAVIGATION.Budget);
         }}
-        title="Budget"
+        title={STRINGS.Budget}
         isActive={props.state.index === 2}
       />
       <TabButton
@@ -138,7 +138,7 @@ function CustomTab(props: Readonly<BottomTabBarProps>): React.JSX.Element {
         onPress={() => {
           props.navigation.navigate(NAVIGATION.Profile);
         }}
-        title="Profile"
+        title={STRINGS.Profile}
         isActive={props.state.index === 3}
       />
     </View>

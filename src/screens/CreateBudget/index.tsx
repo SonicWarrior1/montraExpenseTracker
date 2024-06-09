@@ -12,13 +12,13 @@ import {Slider} from '@miblanchard/react-native-slider';
 import firestore from '@react-native-firebase/firestore';
 import {setLoading} from '../../redux/reducers/userSlice';
 import {CreateBudgetScreenProps} from '../../defs/navigation';
-import {currencies} from '../../constants/strings';
+import {currencies, STRINGS} from '../../constants/strings';
 import {encrypt} from '../../utils/encryption';
 function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
   const month = new Date().getMonth();
   const isEdit = route.params.isEdit;
-  let cat = undefined;
-  let oldBudget = undefined;
+  let cat;
+  let oldBudget;
 
   if (isEdit) {
     cat = route.params.category;
@@ -31,7 +31,7 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
   const currency = useAppSelector(state => state.user.currentUser?.currency);
   const [amount, setAmount] = useState(
     isEdit
-      ? (conversion['usd'][currency!.toLowerCase()] * oldBudget?.limit!)
+      ? (conversion.usd[currency!.toLowerCase()] * oldBudget?.limit!)
           .toFixed(2)
           .toString()
       : '',
@@ -51,7 +51,7 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
     <View style={styles.safeView}>
       <SafeAreaView style={styles.safeView}>
         <View style={styles.mainView}>
-          <Text style={styles.text1}>How much do you want to spend?</Text>
+          <Text style={styles.text1}>{STRINGS.HowMuchDoSpent}</Text>
           <View style={styles.moneyCtr}>
             <Text style={styles.text2}>{currencies[currency!].symbol}</Text>
             <TextInput
@@ -87,14 +87,14 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
             }
           }}
           value={category}
-          placeholder="Category"
+          placeholder={STRINGS.Category}
         />
         <Sapcer height={30} />
         <View style={styles.flexRow}>
           <View>
-            <Text style={styles.flexRowText1}>Receive Alert</Text>
+            <Text style={styles.flexRowText1}>{STRINGS.RecieveAlert}</Text>
             <Text style={styles.flexRowText2}>
-              Receive alert when it reaches {'\n'}some point.
+              {STRINGS.RecieveAlertWhen} {'\n'}{STRINGS.SomePoint}
             </Text>
           </View>
           <Switch
@@ -112,26 +112,14 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
           <Slider
             maximumValue={100}
             minimumValue={0}
-            trackStyle={{
-              height: 10,
-              borderRadius: 20,
-            }}
+            trackStyle={styles.sliderTrack}
             minimumTrackTintColor={COLORS.VIOLET[100]}
             maximumTrackTintColor={COLORS.LIGHT[20]}
             renderThumbComponent={() => (
               <View
-                style={{
-                  paddingHorizontal: 12,
-                  paddingVertical: 6,
-                  borderRadius: 24,
-                  backgroundColor: COLORS.VIOLET[100],
-                }}>
+                style={styles.thumb}>
                 <Text
-                  style={{
-                    fontSize: 14,
-                    color: COLORS.LIGHT[100],
-                    fontWeight: '500',
-                  }}>
+                  style={styles.thumbText}>
                   {sliderVal}%
                 </Text>
               </View>
@@ -146,11 +134,11 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
         )}
         <Sapcer height={30} />
         <CustomButton
-          title="Continue"
+          title={STRINGS.Continue}
           onPress={async () => {
-            console.log(conversion['usd']);
+            console.log(conversion.usd);
             if (amount !== '') {
-              // try {
+              try {
               dispatch(setLoading(true));
               await firestore()
                 .collection('users')
@@ -161,7 +149,7 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
                       String(
                         (
                           Number(amount) /
-                          conversion['usd'][currency!.toLowerCase()]
+                          conversion.usd[currency!.toLowerCase()]
                         ).toFixed(2),
                       ),
                       uid!,
@@ -172,10 +160,10 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
                 });
               dispatch(setLoading(false));
               navigation.pop();
-              // } catch (e) {
-              //   console.log(e);
-              //   dispatch(setLoading(false));
-              // }
+              } catch (e) {
+                console.log(e);
+                dispatch(setLoading(false));
+              }
             }
           }}
         />

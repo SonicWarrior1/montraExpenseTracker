@@ -55,14 +55,11 @@ function Onboarding({navigation}: Readonly<OnboardingScreenProps>) {
           onSnapToItem={index => {
             setIndex(index);
           }}
-          // onProgressChange={(offset, number) => {
-          //   console.log(number - index);
-          // }}
           renderItem={({item}) => (
             <View style={styles.carouselCtr}>
               {item.icon}
               <Text style={styles.text1}>{item.text1}</Text>
-              <View style={{height: screenHeight * 0.025}}></View>
+              <View style={{height: screenHeight * 0.025}} />
               <Text style={styles.text2}>{item.text2}</Text>
             </View>
           )}
@@ -82,7 +79,7 @@ function Onboarding({navigation}: Readonly<OnboardingScreenProps>) {
                         ? COLORS.PRIMARY.VIOLET
                         : COLORS.SECONDARY.VIOLET,
                   },
-                ]}></View>
+                ]} />
             );
           })}
         </View>

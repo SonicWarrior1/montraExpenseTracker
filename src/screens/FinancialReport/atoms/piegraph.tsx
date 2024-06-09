@@ -2,7 +2,7 @@ import React from 'react';
 import {Text, View} from 'react-native';
 import {PieChart} from 'react-native-gifted-charts';
 import styles from '../styles';
-import {currencies} from '../../../constants/strings';
+import {currencies, STRINGS} from '../../../constants/strings';
 
 function Piegraph({
   transType,
@@ -44,7 +44,7 @@ function Piegraph({
       <Text style={{fontSize: 32, fontWeight: '700'}}>
         {currencies[currency!].symbol}
         {(
-          conversion['usd']?.[currency!.toLowerCase()] *
+          conversion.usd?.[currency!.toLowerCase()] *
           Number(transType === 'expense' ? totalSpend : totalIncome)
         )
           .toFixed(2)
@@ -87,8 +87,8 @@ function Piegraph({
           )}
         />
       ) : (
-        <View style={{height: 230, justifyContent: 'center'}}>
-          <Text>No Data</Text>
+        <View style={styles.noDataCtr}>
+          <Text>{STRINGS.NoData}</Text>
         </View>
       )}
     </View>

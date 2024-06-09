@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {Pressable, Text, View} from 'react-native';
 import {ICONS} from '../../constants/icons';
 import CustomButton from '../CustomButton';
@@ -17,6 +17,7 @@ import {
   setSortFilter,
 } from '../../redux/reducers/transactionSlice';
 import SheetBackdrop from '../SheetBackDrop';
+import { STRINGS } from '../../constants/strings';
 
 function FilterSheet() {
   const snapPoints = useMemo(() => ['55%'], []);
@@ -41,13 +42,13 @@ function FilterSheet() {
         snapPoints={snapPoints}
         ref={ref}
         backdropComponent={SheetBackdrop}
-        backgroundStyle={{borderTopLeftRadius: 32, borderTopRightRadius: 32}}
+        backgroundStyle={styles.sheetBack}
         onDismiss={() => {
           dispatch(openFilterSheet(false));
         }}>
         <BottomSheetView style={{paddingHorizontal: 20}}>
           <View style={styles.sheetView}>
-            <Text style={styles.text1}>Filter Transaction</Text>
+            <Text style={styles.text1}>{STRINGS.FilterTransaction}</Text>
             <Pressable
               style={styles.editBtn}
               onPress={() => {
@@ -56,7 +57,7 @@ function FilterSheet() {
                 dispatch(setFilters(-1));
                 dispatch(setSortFilter(2));
               }}>
-              <Text style={styles.editBtnText}>Reset</Text>
+              <Text style={styles.editBtnText}>{STRINGS.Reset}</Text>
             </Pressable>
           </View>
           <Text style={[styles.text1, {marginBottom: 10}]}>Filter By</Text>
@@ -77,7 +78,7 @@ function FilterSheet() {
                   styles.filterBtnText,
                   {color: filter === 0 ? COLORS.VIOLET[100] : COLORS.DARK[100]},
                 ]}>
-                Income
+                {STRINGS.Income}
               </Text>
             </Pressable>
             <Pressable
@@ -96,7 +97,7 @@ function FilterSheet() {
                   styles.filterBtnText,
                   {color: filter === 1 ? COLORS.VIOLET[100] : COLORS.DARK[100]},
                 ]}>
-                Expense
+                {STRINGS.Expense}
               </Text>
             </Pressable>
             <Pressable
@@ -115,7 +116,7 @@ function FilterSheet() {
                   styles.filterBtnText,
                   {color: filter === 2 ? COLORS.VIOLET[100] : COLORS.DARK[100]},
                 ]}>
-                Transfer
+                {STRINGS.Transfer}
               </Text>
             </Pressable>
           </View>
@@ -127,7 +128,7 @@ function FilterSheet() {
                 marginTop: 10,
               },
             ]}>
-            Sort By
+            {STRINGS.SortBy}
           </Text>
           <View style={styles.wrapRow}>
             <Pressable
@@ -146,7 +147,7 @@ function FilterSheet() {
                   styles.filterBtnText,
                   {color: sort === 0 ? COLORS.VIOLET[100] : COLORS.DARK[100]},
                 ]}>
-                Highest
+                {STRINGS.Highest}
               </Text>
             </Pressable>
             <Pressable
@@ -165,7 +166,7 @@ function FilterSheet() {
                   styles.filterBtnText,
                   {color: sort === 1 ? COLORS.VIOLET[100] : COLORS.DARK[100]},
                 ]}>
-                Lowest
+                {STRINGS.Lowest}
               </Text>
             </Pressable>
             <Pressable
@@ -184,7 +185,7 @@ function FilterSheet() {
                   styles.filterBtnText,
                   {color: sort === 2 ? COLORS.VIOLET[100] : COLORS.DARK[100]},
                 ]}>
-                Newest
+                {STRINGS.Newest}
               </Text>
             </Pressable>
             <Pressable
@@ -203,7 +204,7 @@ function FilterSheet() {
                   styles.filterBtnText,
                   {color: sort === 3 ? COLORS.VIOLET[100] : COLORS.DARK[100]},
                 ]}>
-                Oldest
+                {STRINGS.Oldest}
               </Text>
             </Pressable>
           </View>
@@ -215,10 +216,10 @@ function FilterSheet() {
                 marginTop: 10,
               },
             ]}>
-            Category
+            {STRINGS.Category}
           </Text>
           <View style={styles.catRow}>
-            <Text style={styles.text1}>Choose Category</Text>
+            <Text style={styles.text1}>{STRINGS.ChooseCategory}</Text>
             <Pressable
               onPress={() => {
                 dispatch(openCatSheet(true));
@@ -230,7 +231,7 @@ function FilterSheet() {
             </Pressable>
           </View>
           <CustomButton
-            title="Apply"
+            title={STRINGS.Apply}
             onPress={() => {
               dispatch(setFilters(filter));
               dispatch(setSortFilter(sort));

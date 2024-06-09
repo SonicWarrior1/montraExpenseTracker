@@ -1,7 +1,8 @@
-import { StyleSheet } from "react-native";
-import { COLORS } from "../../constants/commonStyles";
+import { StyleSheet } from 'react-native';
+import { COLORS } from '../../constants/commonStyles';
 
-const styles=StyleSheet.create({
+const styles = StyleSheet.create({
+  flex: {flex: 1},
     sheetView:{
         alignItems: 'center',
         paddingTop: 15,
@@ -21,6 +22,7 @@ const styles=StyleSheet.create({
         textAlign: 'center',
         marginBottom: 20,
       },
-      BtnRow:{flexDirection: 'row', flex: 1, columnGap: 20}
-})
-export default styles
+      BtnRow:{flexDirection: 'row', flex: 1, columnGap: 20},
+      sheetBack:{borderTopLeftRadius: 32, borderTopRightRadius: 32},
+});
+export default styles;

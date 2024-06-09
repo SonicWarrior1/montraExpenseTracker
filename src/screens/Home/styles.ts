@@ -1,5 +1,5 @@
-import { StyleSheet } from "react-native";
-import { COLORS } from "../../constants/commonStyles";
+import { StyleSheet } from 'react-native';
+import { COLORS } from '../../constants/commonStyles';
 const styles = StyleSheet.create({
     moneyCtr: {
         height: 80,
@@ -33,7 +33,7 @@ const styles = StyleSheet.create({
     },
     filterBtnText: {
         fontSize: 14,
-        color: COLORS.YELLOW[100]
+        color: COLORS.YELLOW[100],
     }, listItemCtr: {
         marginVertical: 5,
         flexDirection: 'row',
@@ -112,7 +112,14 @@ const styles = StyleSheet.create({
         paddingVertical: 5,
     },
     text3: { fontSize: 18, fontWeight: '600' },
-    column: { alignItems: 'flex-end', rowGap: 5 }
-})
+    column: { alignItems: 'flex-end', rowGap: 5 },
+    emptyText:{
+        fontSize: 16,
+        fontWeight: '500',
+        color: COLORS.DARK[25],
+        textAlign: 'center',
+      },
+      emptyCtr:{height: 180, alignItems: 'center', justifyContent: 'center'},
+});
 
-export default styles
+export default styles;

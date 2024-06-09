@@ -1,4 +1,4 @@
-import React, {useMemo, useState} from 'react';
+import React, {useCallback, useMemo, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux/store';
 import {BottomSheetModal, BottomSheetView} from '@gorhom/bottom-sheet';
 import {BottomSheetModalMethods} from '@gorhom/bottom-sheet/lib/typescript/types';
@@ -15,6 +15,7 @@ import {transactionType} from '../../defs/transaction';
 import styles from './styles';
 import SheetBackdrop from '../SheetBackDrop';
 import {encrypt} from '../../utils/encryption';
+import {STRINGS} from '../../constants/strings';
 
 function AddCategorySheet({
   bottomSheetModalRef,
@@ -33,7 +34,34 @@ function AddCategorySheet({
   const dispatch = useAppDispatch();
   const snapPoints = useMemo(() => ['25%'], []);
   const [cat, setCat] = useState('');
-
+  const onPress = useCallback(async () => {
+    if (cat !== '') {
+      dispatch(setLoading(true));
+      if (type === 'expense') {
+        await dispatch(addExpenseCategory(cat));
+        await firestore()
+          .collection('users')
+          .doc(uid)
+          .update({
+            expenseCategory: [...expenseCats!, cat].map(item =>
+              encrypt(item, uid!),
+            ),
+          });
+      } else if (type === 'income') {
+        await dispatch(addIncomeCategory(cat));
+        await firestore()
+          .collection('users')
+          .doc(uid)
+          .update({
+            incomeCategory: [...incomeCats!, cat].map(item =>
+              encrypt(item, uid!),
+            ),
+          });
+      }
+      dispatch(setLoading(false));
+      bottomSheetModalRef.current?.dismiss();
+    }
+  }, [uid]);
   return (
     <BottomSheetModal
       enablePanDownToClose
@@ -41,10 +69,10 @@ function AddCategorySheet({
       index={0}
       snapPoints={snapPoints}
       backdropComponent={SheetBackdrop}
-      backgroundStyle={{borderTopLeftRadius: 32, borderTopRightRadius: 32}}>
+      backgroundStyle={styles.sheetBack}>
       <BottomSheetView style={styles.sheetView}>
         <CustomInput
-          placeholderText="Category Name"
+          placeholderText={STRINGS.CategoryName}
           onChangeText={(str: string) => {
             setCat(str);
           }}
@@ -52,37 +80,7 @@ function AddCategorySheet({
           value={cat}
         />
         <Sapcer height={20} />
-        <CustomButton
-          title="Add"
-          onPress={async () => {
-            if (cat !== '') {
-              dispatch(setLoading(true));
-              if (type === 'expense') {
-                await dispatch(addExpenseCategory(cat));
-                await firestore()
-                  .collection('users')
-                  .doc(uid)
-                  .update({
-                    expenseCategory: [...expenseCats!, cat].map( item =>
-                      encrypt(item, uid!),
-                    ),
-                  });
-              } else if (type === 'income') {
-                await dispatch(addIncomeCategory(cat));
-                await firestore()
-                  .collection('users')
-                  .doc(uid)
-                  .update({
-                    incomeCategory: [...incomeCats!, cat].map(
-                       item => encrypt(item, uid!),
-                    ),
-                  });
-              }
-              dispatch(setLoading(false));
-              bottomSheetModalRef.current?.dismiss();
-            }
-          }}
-        />
+        <CustomButton title={STRINGS.Add} onPress={onPress} />
       </BottomSheetView>
     </BottomSheetModal>
   );

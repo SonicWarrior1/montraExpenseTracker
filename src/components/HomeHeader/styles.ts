@@ -1,5 +1,5 @@
-import { StyleSheet } from "react-native";
-import { COLORS } from "../../constants/commonStyles";
+import { StyleSheet } from 'react-native';
+import { COLORS } from '../../constants/commonStyles';
 
 const styles = StyleSheet.create({
     dropdown: {
@@ -23,7 +23,19 @@ const styles = StyleSheet.create({
         borderRadius: 30,
         alignItems: 'center',
         justifyContent: 'center',
-    }, img: { height: 32, width: 32, borderRadius: 30 }
-})
+    }, img: { height: 32, width: 32, borderRadius: 30 },
+    notifCount: {
+        padding: 1,
+        height: 20,
+        width: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 10,
+        backgroundColor: COLORS.LIGHT[100],
+        position: 'absolute',
+        top: 15,
+        left: -5,
+    },
+});
 
-export default styles
+export default styles;

@@ -4,7 +4,7 @@ import {
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import {BottomSheetModalMethods} from '@gorhom/bottom-sheet/lib/typescript/types';
-import React, {useMemo} from 'react';
+import React, {useCallback, useMemo} from 'react';
 import {Text, View} from 'react-native';
 import {COLORS} from '../../constants/commonStyles';
 import CustomButton from '../CustomButton';
@@ -20,6 +20,7 @@ import {StackNavigationProp} from '@react-navigation/stack';
 import SheetBackdrop from '../SheetBackDrop';
 import {UserFromJson} from '../../utils/userFuncs';
 import {encrypt} from '../../utils/encryption';
+import {STRINGS} from '../../constants/strings';
 function DeleteTransactionSheet({
   bottomSheetModalRef,
   id,
@@ -45,6 +46,64 @@ function DeleteTransactionSheet({
   const dispatch = useAppDispatch();
   const snapPoints = useMemo(() => ['25%'], []);
   const month = new Date().getMonth();
+  const handleDelete = useCallback(async () => {
+    try {
+      dispatch(setLoading(true));
+      const curr = await firestore().collection('users').doc(uid).get();
+      if (type === 'expense') {
+        await firestore()
+          .collection('users')
+          .doc(uid)
+          .update({
+            [`spend.${month}.${category}`]: encrypt(
+              String(
+                (
+                  Number(
+                    UserFromJson(curr.data() as UserType).spend[month][
+                      category
+                    ] ?? 0,
+                  ) -
+                  amt / conversion.usd[currency!.toLowerCase()]
+                ).toFixed(2),
+              ),
+              uid!,
+            ),
+          });
+      } else if (type === 'income') {
+        await firestore()
+          .collection('users')
+          .doc(uid)
+          .update({
+            [`income.${month}.${category}`]: encrypt(
+              String(
+                (
+                  Number(
+                    UserFromJson(curr.data() as UserType).income[month][
+                      category
+                    ] ?? 0,
+                  ) -
+                  amt / conversion.usd[currency!.toLowerCase()]
+                ).toFixed(2),
+              ),
+              uid!,
+            ),
+          });
+      }
+      await firestore()
+        .collection('users')
+        .doc(uid)
+        .collection('transactions')
+        .doc(id)
+        .delete();
+      Toast.show({text1: STRINGS.TransactionDeletedSuccesfully});
+      bottomSheetModalRef.current?.dismiss();
+      navigation.pop();
+      dispatch(setLoading(false));
+    } catch (e) {
+      console.log(e);
+      dispatch(setLoading(false));
+    }
+  }, [uid, id]);
   return (
     <BottomSheetModalProvider>
       <BottomSheetModal
@@ -53,16 +112,14 @@ function DeleteTransactionSheet({
         index={0}
         snapPoints={snapPoints}
         backdropComponent={SheetBackdrop}
-        backgroundStyle={{borderTopLeftRadius: 32, borderTopRightRadius: 32}}>
+        backgroundStyle={styles.sheetBack}>
         <BottomSheetView style={styles.sheetView}>
-          <Text style={styles.text1}>Remove this Transaction?</Text>
-          <Text style={styles.text2}>
-            Are you sure do you wanna remove this transaction?
-          </Text>
+          <Text style={styles.text1}>{STRINGS.RemovethisTransaction}</Text>
+          <Text style={styles.text2}>{STRINGS.sureRemoveTransaction}</Text>
           <View style={styles.BtnRow}>
-            <View style={{flex: 1}}>
+            <View style={styles.flex}>
               <CustomButton
-                title="No"
+                title={STRINGS.No}
                 onPress={() => {
                   bottomSheetModalRef.current?.dismiss();
                 }}
@@ -70,71 +127,8 @@ function DeleteTransactionSheet({
                 textColor={COLORS.VIOLET[100]}
               />
             </View>
-            <View style={{flex: 1}}>
-              <CustomButton
-                title="Yes"
-                onPress={async () => {
-                  try {
-                    dispatch(setLoading(true));
-                    const curr = await firestore()
-                      .collection('users')
-                      .doc(uid)
-                      .get();
-                    if (type === 'expense') {
-                      await firestore()
-                        .collection('users')
-                        .doc(uid)
-                        .update({
-                          [`spend.${month}.${category}`]: encrypt(
-                            String(
-                              (
-                                Number(
-                                  UserFromJson(curr.data() as UserType).spend[
-                                    month
-                                  ][category] ?? 0,
-                                ) -
-                                amt / conversion['usd'][currency!.toLowerCase()]
-                              ).toFixed(2),
-                            ),
-                            uid!,
-                          ),
-                        });
-                    } else if (type === 'income') {
-                      await firestore()
-                        .collection('users')
-                        .doc(uid)
-                        .update({
-                          [`income.${month}.${category}`]: encrypt(
-                            String(
-                              (
-                                Number(
-                                  UserFromJson(curr.data() as UserType).income[
-                                    month
-                                  ][category] ?? 0,
-                                ) -
-                                amt / conversion['usd'][currency!.toLowerCase()]
-                              ).toFixed(2),
-                            ),
-                            uid!,
-                          ),
-                        });
-                    }
-                    await firestore()
-                      .collection('users')
-                      .doc(uid)
-                      .collection('transactions')
-                      .doc(id)
-                      .delete();
-                    Toast.show({text1: 'Transaction Deleted Succesfully'});
-                    bottomSheetModalRef.current?.dismiss();
-                    navigation.pop();
-                    dispatch(setLoading(false));
-                  } catch (e) {
-                    console.log(e);
-                    dispatch(setLoading(false));
-                  }
-                }}
-              />
+            <View style={styles.flex}>
+              <CustomButton title={STRINGS.Yes} onPress={handleDelete} />
             </View>
           </View>
         </BottomSheetView>

@@ -1,5 +1,5 @@
-import { StyleSheet } from "react-native";
-import { COLORS } from "../../constants/commonStyles";
+import { StyleSheet } from 'react-native';
+import { COLORS } from '../../constants/commonStyles';
 
 const styles = StyleSheet.create({
     sheetBtn: {
@@ -20,6 +20,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         gap: 10,
         marginTop: 20,
-      }
-})
-export default styles
+      },
+      sheetBack:{borderTopLeftRadius: 32, borderTopRightRadius: 32},
+});
+export default styles;

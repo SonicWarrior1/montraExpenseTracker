@@ -106,13 +106,11 @@ function Login({navigation}: Readonly<LoginScreenProps>) {
   return (
     <SafeAreaView style={styles.safeView}>
       <ScrollView
-        style={{flex: 1}}
-        contentContainerStyle={{
-          flex: 1,
-        }}>
+        style={styles.flex}
+        contentContainerStyle={styles.flex}>
         <View style={styles.mainView}>
           <CustomInput
-            placeholderText="Email"
+            placeholderText={STRINGS.Email}
             onChangeText={onChangeEmail}
             type="email"
             value={email}
@@ -120,19 +118,19 @@ function Login({navigation}: Readonly<LoginScreenProps>) {
           <EmailEmptyError email={email} formKey={form} />
           <CustomPassInput
             onChangeText={onChangePass}
-            placeholderText="Password"
+            placeholderText={STRINGS.Password}
             value={pass}
           />
           <PassEmptyError pass={pass} formKey={form} />
           <Sapcer height={30} />
           <CustomButton title={STRINGS.LOGIN} onPress={handleLogin} />
           <Sapcer height={10} />
-          <Text style={styles.orText}>Or With</Text>
+          <Text style={styles.orText}>{STRINGS.OrWith}</Text>
           <Sapcer height={10} />
           <TouchableOpacity onPress={onGoogleButtonPress} style={[styles.btn]}>
-            <View style={{flexDirection: 'row', alignItems: 'center', gap: 20}}>
+            <View style={styles.googleRow}>
               {ICONS.Google({height: 25, width: 25})}
-              <Text style={[styles.text]}>Log in with Google</Text>
+              <Text style={[styles.text]}>{STRINGS.LoginGoogle}</Text>
             </View>
           </TouchableOpacity>
           <Sapcer height={20} />
@@ -141,26 +139,19 @@ function Login({navigation}: Readonly<LoginScreenProps>) {
               navigation.push(NAVIGATION.FORGOTPASSWORD);
             }}>
             <Text
-              style={{
-                color: COLORS.PRIMARY.VIOLET,
-                fontSize: 18,
-                fontWeight: '600',
-              }}>
-              Forgot Password ?
+              style={styles.forgotText}>
+              {STRINGS.ForgotPassword}
             </Text>
           </Pressable>
           <Sapcer height={20} />
           <Text style={{color: COLORS.DARK[25]}}>
-            Don't have an account yet?{' '}
+            {STRINGS.DontHaveAccount}{' '}
             <Pressable
               onPress={() => {
                 navigation.navigate(NAVIGATION.SIGNUP);
               }}>
               <Text
-                style={{
-                  color: COLORS.PRIMARY.VIOLET,
-                  textDecorationLine: 'underline',
-                }}>
+                style={styles.signupText}>
                 {STRINGS.SIGNUP}
               </Text>
             </Pressable>

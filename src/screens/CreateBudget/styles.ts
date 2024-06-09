@@ -1,16 +1,15 @@
-import { Dimensions, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { COLORS } from '../../constants/commonStyles';
-const screenHeight = Dimensions.get('screen').height
 const styles = StyleSheet.create({
     safeView: { flex: 1, backgroundColor: COLORS.PRIMARY.VIOLET },
     mainView: {
         flex: 1,
-        justifyContent: 'flex-end'
+        justifyContent: 'flex-end',
     },
     text1: {
         opacity: 0.64,
-        alignSelf: "flex-start",
-        fontWeight: "600",
+        alignSelf: 'flex-start',
+        fontWeight: '600',
         color: COLORS.LIGHT[80],
         fontSize: 18, paddingHorizontal: 30,
     },
@@ -24,7 +23,7 @@ const styles = StyleSheet.create({
     moneyCtr: {
         flexDirection: 'row',
         alignSelf: 'flex-start',
-        alignItems: "center",
+        alignItems: 'center',
         paddingHorizontal: 30,
     },
     detailsCtr: {
@@ -39,7 +38,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        
+
     },
     flexRowText1: { fontWeight: '500', fontSize: 16 },
     flexRowText2: {
@@ -47,5 +46,17 @@ const styles = StyleSheet.create({
         fontSize: 13,
         color: COLORS.DARK[25],
     },
+    sliderTrack:{flex: 1, marginTop: 10, width: '100%'},
+    thumb:{
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 24,
+        backgroundColor: COLORS.VIOLET[100],
+      },
+      thumbText:{
+        fontSize: 14,
+        color: COLORS.LIGHT[100],
+        fontWeight: '500',
+      },
 });
 export default styles;

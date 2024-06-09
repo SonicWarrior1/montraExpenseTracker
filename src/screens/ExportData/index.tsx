@@ -3,7 +3,7 @@ import {Platform, SafeAreaView, Text, View} from 'react-native';
 import {useAppSelector} from '../../redux/store';
 import {jsonToCSV} from 'react-native-csv';
 import {Timestamp} from '@react-native-firebase/firestore';
-import {monthData, weekData} from '../../constants/strings';
+import {monthData, STRINGS, weekData} from '../../constants/strings';
 import CustomDropdown from '../../components/CustomDropDown';
 import CustomButton from '../../components/CustomButton';
 import ReactNativeBlobUtil from 'react-native-blob-util';
@@ -11,7 +11,7 @@ import uuid from 'react-native-uuid';
 import Toast from 'react-native-toast-message';
 import style from './styles';
 import {ICONS} from '../../constants/icons';
-import { useAppTheme } from '../../hooks/themeHook';
+import {useAppTheme} from '../../hooks/themeHook';
 function ExportData() {
   const data = useAppSelector(state => state.transaction.transactions);
   const [dataType, setDataType] = useState<'all' | 'expense' | 'income'>('all');
@@ -64,9 +64,9 @@ function ExportData() {
     } catch (e) {
       console.log(e);
     }
-  }, [data]);
-  const COLOR=useAppTheme();
-  const styles=style(COLOR)
+  }, [data, dataRange, dataType]);
+  const COLOR = useAppTheme();
+  const styles = style(COLOR);
   return (
     <SafeAreaView style={styles.safeView}>
       <View style={styles.mainView}>
@@ -85,7 +85,7 @@ function ExportData() {
             placeholder=""
             value={dataType}
           />
-          <Text style={styles.text}>When date range?</Text>
+          <Text style={styles.text}>{STRINGS.Whendaterange}</Text>
           <CustomDropdown
             data={['7', '15', '30'].map(item => {
               return {
@@ -99,7 +99,7 @@ function ExportData() {
             placeholder=""
             value={dataRange}
           />
-          <Text style={styles.text}>What format do you want to export?</Text>
+          <Text style={styles.text}>{STRINGS.WhatFormat}</Text>
           <CustomDropdown
             data={[
               'csv',
@@ -118,7 +118,7 @@ function ExportData() {
           />
         </View>
         <CustomButton
-          title="Export"
+          title={STRINGS.Export}
           onPress={handleExport}
           icon={ICONS.Download({height: 20, width: 20})}
         />

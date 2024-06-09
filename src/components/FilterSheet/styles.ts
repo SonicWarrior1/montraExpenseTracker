@@ -1,5 +1,5 @@
-import { StyleSheet } from "react-native";
-import { COLORS } from "../../constants/commonStyles";
+import { StyleSheet } from 'react-native';
+import { COLORS } from '../../constants/commonStyles';
 
 const styles = StyleSheet.create({
     filterBtn: {
@@ -7,7 +7,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 26,
         borderRadius: 40,
         borderWidth: 1,
-        borderColor: COLORS.LIGHT[20]
+        borderColor: COLORS.LIGHT[20],
     },
     filterBtnText: {
         fontWeight: '500',
@@ -57,7 +57,8 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontWeight: '500',
         color: COLORS.DARK[25],
-      }
-})
+      },
+      sheetBack:{borderTopLeftRadius: 32, borderTopRightRadius: 32},
+});
 
-export default styles
+export default styles;

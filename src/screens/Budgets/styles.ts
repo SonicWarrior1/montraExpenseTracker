@@ -1,7 +1,8 @@
-import { StyleSheet } from "react-native";
-import { COLORS } from "../../constants/commonStyles";
+import { StyleSheet } from 'react-native';
+import { COLORS } from '../../constants/commonStyles';
 
 const styles = StyleSheet.create({
+    scrollView: { flex: 1, marginTop: 10, width: '100%' },
     safeView: {
         flex: 1,
         backgroundColor: COLORS.PRIMARY.VIOLET,
@@ -11,14 +12,14 @@ const styles = StyleSheet.create({
         backgroundColor: COLORS.LIGHT[80],
         borderTopLeftRadius: 24,
         borderTopRightRadius: 24,
-        alignItems: "center",
-        justifyContent: "space-between",
+        alignItems: 'center',
+        justifyContent: 'space-between',
         paddingHorizontal: 10,
     },
     month: {
         fontSize: 24,
         color: COLORS.LIGHT[100],
-        fontWeight: "500"
+        fontWeight: '500',
     },
     monthRow: {
         flexDirection: 'row',
@@ -80,6 +81,6 @@ const styles = StyleSheet.create({
         fontWeight: '400',
         marginTop: 10,
         color: COLORS.PRIMARY.RED,
-    }
-})
-export default styles
+    },
+});
+export default styles;

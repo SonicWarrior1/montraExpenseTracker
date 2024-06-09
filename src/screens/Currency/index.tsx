@@ -5,26 +5,25 @@ import BouncyCheckbox from 'react-native-bouncy-checkbox/build/dist/BouncyCheckb
 import {useAppSelector} from '../../redux/store';
 import firestore from '@react-native-firebase/firestore';
 import {encrypt} from '../../utils/encryption';
-import { useAppTheme } from '../../hooks/themeHook';
+import {useAppTheme} from '../../hooks/themeHook';
 import style from './styles';
 
 function CurrencyScreen() {
-  const COLORS=useAppTheme();
+  const COLORS = useAppTheme();
   const code = useAppSelector(state => state.user.currentUser?.currency);
   const uid = useAppSelector(state => state.user.currentUser?.uid);
-  const styles=style(COLORS)
+  const styles = style(COLORS);
   return (
     <SafeAreaView style={styles.safeView}>
       <FlatList
         data={Object.values(currencies)}
         renderItem={({item}) => (
-          <View
-            style={styles.row}>
+          <View style={styles.row}>
             <Text style={styles.text}>
               {item.name} {'(' + item.code + ')'}{' '}
             </Text>
             <BouncyCheckbox
-              style={{width: 28}}
+              style={styles.checkbox}
               disableText={false}
               fillColor={COLORS.BLUE[100]}
               isChecked={code === item.code}

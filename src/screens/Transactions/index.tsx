@@ -16,7 +16,7 @@ import {COLORS} from '../../constants/commonStyles';
 import {ScrollView} from 'react-native-gesture-handler';
 import TransactionHeader from '../../components/TransactionHeader';
 import {TransactionScreenProps} from '../../defs/navigation';
-import {currencies, NAVIGATION} from '../../constants/strings';
+import {currencies, NAVIGATION, STRINGS} from '../../constants/strings';
 function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
   const [month, setMonth] = useState(new Date().getMonth());
   const user = useAppSelector(state => state.user.currentUser);
@@ -26,7 +26,12 @@ function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
     const startOfToday = new Date().setHours(0, 0, 0, 0) / 1000;
     const startOfYesterday = startOfToday - 24 * 60 * 60;
     const res = Object.values(data)
-      .filter(item => item.timeStamp.toDate().getMonth() === month)
+      .filter(
+        item =>
+          Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+            .toDate()
+            .getMonth() === month,
+      )
       .reduce((acc: {[key: string]: Array<transactionType>}, item) => {
         const itemTime = item.timeStamp.seconds;
         if (itemTime >= startOfToday) {
@@ -128,7 +133,7 @@ function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
             onPress={() => {
               navigation.navigate(NAVIGATION.Story);
             }}>
-            <Text style={styles.financialText}>See your financial report</Text>
+            <Text style={styles.financialText}>{STRINGS.SeeFinancialReport}</Text>
             {ICONS.ArrowRight({height: 20, width: 20})}
           </TouchableOpacity>
           <SectionList
@@ -140,7 +145,7 @@ function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
                 <Pressable
                   style={styles.listItemCtr}
                   onPress={() => {
-                    navigation.push('TransactionDetail', {
+                    navigation.push(NAVIGATION.TransactionDetail, {
                       transaction: item,
                     });
                   }}>
@@ -177,7 +182,7 @@ function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
                       {item.type === 'expense' ? '-' : '+'}{' '}
                       {currencies[user?.currency ?? 'USD'].symbol}{' '}
                       {(
-                        conversion['usd'][
+                        conversion.usd[
                           (user?.currency ?? 'USD').toLowerCase()
                         ] * item.amount
                       ).toFixed(2)}

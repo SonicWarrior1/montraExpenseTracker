@@ -1,10 +1,10 @@
-import React, {useCallback, useEffect, useState} from 'react';
-import {Dimensions, SafeAreaView, Text, View} from 'react-native';
+import React, {useState} from 'react';
+import {SafeAreaView, Text, View} from 'react-native';
 import styles from './styles';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import {COLORS} from '../../constants/commonStyles';
 import {PinSentScreenProps} from '../../defs/navigation';
-import {NAVIGATION} from '../../constants/strings';
+import {NAVIGATION, STRINGS} from '../../constants/strings';
 import {useAppDispatch, useAppSelector} from '../../redux/store';
 import {setLoading, userLoggedIn} from '../../redux/reducers/userSlice';
 import firestore from '@react-native-firebase/firestore';
@@ -18,7 +18,6 @@ function Pin({route, navigation}: Readonly<PinSentScreenProps>) {
     [7, 8, 9],
     [-1, 0, 99],
   ];
-  const screenWidth = Dimensions.get('screen').width;
   const [pin, setPin] = useState<number[]>([]);
   const user = useAppSelector(state => state.user.currentUser);
   const isSetup = user?.pin === '';
@@ -30,10 +29,10 @@ function Pin({route, navigation}: Readonly<PinSentScreenProps>) {
       <View style={styles.mainView}>
         <Text style={styles.text}>
           {isSetup && oldPin === ''
-            ? "Let's setup your PIN"
+            ? STRINGS.SetupPin
             : isSetup && oldPin
-            ? 'Ok. Re type your PIN again.'
-            : 'Enter Your Pin'}{' '}
+            ? STRINGS.RetypePin
+            : STRINGS.EnterPin}{' '}
         </Text>
         <View style={styles.progressDotCtr}>
           {[0, 1, 2, 3].map(i => {
@@ -47,22 +46,18 @@ function Pin({route, navigation}: Readonly<PinSentScreenProps>) {
                       pin.length > i ? 'white' : COLORS.VIOLET[100],
                     borderWidth: pin.length > i ? 0 : 4,
                   },
-                ]}></View>
+                ]}
+              />
             );
           })}
         </View>
         <View>
           {matrix.map((row, rowIndex) => (
-            <View style={{flexDirection: 'row'}} key={rowIndex}>
+            <View style={styles.flexRow} key={rowIndex}>
               {row.map((value, colIndex) => (
                 <TouchableOpacity
                   key={colIndex}
-                  style={{
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    width: screenWidth / 3,
-                    height: 125,
-                  }}
+                  style={styles.btn}
                   onPress={async () => {
                     if (value === -1) {
                       return;
@@ -101,12 +96,7 @@ function Pin({route, navigation}: Readonly<PinSentScreenProps>) {
                     ICONS.ArrowRight2({height: 30, width: 30})
                   ) : (
                     <Text
-                      style={{
-                        fontSize: 48,
-                        fontWeight: '500',
-                        color: 'white',
-                        //   height: 80,
-                      }}>
+                      style={styles.number}>
                       {value === -1 ? '' : value}
                     </Text>
                   )}

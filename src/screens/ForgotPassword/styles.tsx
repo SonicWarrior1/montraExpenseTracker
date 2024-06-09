@@ -14,5 +14,8 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     alignSelf: 'flex-start',
   },
+  flex: {
+    flex: 1,
+  },
 });
 export default styles;

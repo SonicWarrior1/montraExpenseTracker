@@ -3,7 +3,7 @@ import {Pressable, View} from 'react-native';
 import {ICONS} from '../../../constants/icons';
 import {Dropdown} from 'react-native-element-dropdown';
 import styles from '../styles';
-import {monthData} from '../../../constants/strings';
+import {monthData, STRINGS} from '../../../constants/strings';
 import {COLORS} from '../../../constants/commonStyles';
 
 function FinancialReportHeader({
@@ -29,7 +29,7 @@ function FinancialReportHeader({
           </View>
         )}
         renderRightIcon={() => <></>}
-        placeholder="Month"
+        placeholder={STRINGS.Month}
         value={monthData[month]}
         data={monthData}
         labelField={'label'}

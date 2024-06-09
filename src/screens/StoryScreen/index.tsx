@@ -8,7 +8,7 @@ import {catIcons, ICONS} from '../../constants/icons';
 import CustomButton from '../../components/CustomButton';
 import {StoryScreenProps} from '../../defs/navigation';
 import {useAppSelector} from '../../redux/store';
-import {currencies, NAVIGATION} from '../../constants/strings';
+import {currencies, NAVIGATION, STRINGS} from '../../constants/strings';
 
 export default function StoryScreen({navigation}: StoryScreenProps) {
   const screenHeight = Dimensions.get('screen').height;
@@ -84,7 +84,7 @@ export default function StoryScreen({navigation}: StoryScreenProps) {
         />
       </View>
       <View style={styles.mainView}>
-        {index !== 3 && <Text style={styles.title}>This Month</Text>}
+        {index !== 3 && <Text style={styles.title}>{STRINGS.ThisMonth}</Text>}
         <View style={{alignItems: 'center'}}>
           <Text
             style={[
@@ -95,15 +95,17 @@ export default function StoryScreen({navigation}: StoryScreenProps) {
               },
             ]}>
             {index === 0
-              ? 'You Spend 💸'
+              ? STRINGS.YouSpend
               : index === 1
-              ? 'You Earned 💰'
+              ? STRINGS.YouEarned
               : index === 2
               ? (budgetExceed === undefined ? 0 : budgetExceed.length) +
-                ' of 12 Budget is exceeds the limit'
-              : '“Financial freedom is freedom from fear.”'}
+                STRINGS.BudgetLimitExceed
+              : STRINGS.Quote}
           </Text>
-          {index === 3 && <Text style={styles.text2}>-Robert Kiyosaki</Text>}
+          {index === 3 && (
+            <Text style={styles.text2}>{STRINGS.QuoteAuthor}</Text>
+          )}
           {index === 2 && (
             <View style={styles.catRow}>
               {budgetExceed !== undefined &&
@@ -132,7 +134,7 @@ export default function StoryScreen({navigation}: StoryScreenProps) {
               {currencies[currency!].symbol}
               {index === 0
                 ? (
-                    conversion['usd'][currency!.toLowerCase()!] *
+                    conversion.usd[currency!.toLowerCase()!] *
                     Object.values(
                       user?.spend[new Date().getMonth()] ?? [],
                     ).reduce((acc, curr) => acc + curr, 0)
@@ -140,7 +142,7 @@ export default function StoryScreen({navigation}: StoryScreenProps) {
                     .toFixed(2)
                     .toString()
                 : (
-                    conversion['usd'][currency!.toLowerCase()!] *
+                    conversion.usd[currency!.toLowerCase()!] *
                     Object.values(
                       user?.income[new Date().getMonth()] ?? [],
                     ).reduce((acc, curr) => acc + curr, 0)
@@ -154,9 +156,7 @@ export default function StoryScreen({navigation}: StoryScreenProps) {
           (index === 1 && biggestIncome[0][0] !== '')) && (
           <View style={styles.card}>
             <Text style={styles.cardText}>
-              {index === 0
-                ? 'and your biggest spending is from'
-                : 'your biggest Income is from'}
+              {index === 0 ? STRINGS.BiggestSpending : STRINGS.BiggestIncome}
             </Text>
             <View style={styles.catCtr}>
               <View
@@ -195,13 +195,13 @@ export default function StoryScreen({navigation}: StoryScreenProps) {
               {currencies[currency!].symbol}
               {index === 0
                 ? (
-                    conversion['usd'][currency!.toLowerCase()!] *
+                    conversion.usd[currency!.toLowerCase()!] *
                     biggestSpend[0][1]
                   )
                     .toFixed(2)
                     .toString()
                 : (
-                    conversion['usd'][currency!.toLowerCase()!] *
+                    conversion.usd[currency!.toLowerCase()!] *
                     biggestIncome[0][1]
                   )
                     .toFixed(2)
@@ -240,7 +240,7 @@ export default function StoryScreen({navigation}: StoryScreenProps) {
       {index === 3 && (
         <View style={{paddingHorizontal: 16}}>
           <CustomButton
-            title="See the full detail"
+            title={STRINGS.SeeFullDetail}
             onPress={() => {
               navigation.replace(NAVIGATION.FinancialReport);
             }}

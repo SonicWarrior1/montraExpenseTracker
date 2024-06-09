@@ -1,6 +1,6 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet } from 'react-native';
 
-const styles=StyleSheet.create({
+const styles = StyleSheet.create({
     sheetView:{
         justifyContent: 'center',
         alignItems: 'center',
@@ -8,6 +8,8 @@ const styles=StyleSheet.create({
         marginTop: 20,
         paddingHorizontal: 15,
       },
-      flexRow:{flexDirection: 'row', columnGap: 10}
-})
-export default styles
+      flexRow:{flexDirection: 'row', columnGap: 10},
+      sheetBack:{borderTopLeftRadius: 32, borderTopRightRadius: 32},
+      flex:{flex: 1},
+});
+export default styles;

@@ -4,6 +4,7 @@ import {LineChart} from 'react-native-gifted-charts';
 import {COLORS} from '../../../constants/commonStyles';
 import {transactionType} from '../../../defs/transaction';
 import styles from '../styles';
+import { STRINGS } from '../../../constants/strings';
 
 function Graph({
   data,
@@ -47,15 +48,10 @@ function Graph({
     <>
       {graphData.length <= 1 ? (
         <View
-          style={{height: 180, alignItems: 'center', justifyContent: 'center'}}>
+          style={styles.emptyCtr}>
           <Text
-            style={{
-              fontSize: 16,
-              fontWeight: '500',
-              color: COLORS.DARK[25],
-              textAlign: 'center',
-            }}>
-            Not enough data
+            style={styles.emptyText}>
+            {STRINGS.NotEnoughData}
           </Text>
         </View>
       ) : (
@@ -100,7 +96,7 @@ function Graph({
                 fontWeight: graphDay === 0 ? '700' : '500',
               },
             ]}>
-            Today
+            {STRINGS.Today}
           </Text>
         </Pressable>
         <Pressable
@@ -122,7 +118,7 @@ function Graph({
                 fontWeight: graphDay === 1 ? '700' : '500',
               },
             ]}>
-            Week
+            {STRINGS.Week}
           </Text>
         </Pressable>
         <Pressable
@@ -144,7 +140,7 @@ function Graph({
                 fontWeight: graphDay === 2 ? '700' : '500',
               },
             ]}>
-            Month
+            {STRINGS.Month}
           </Text>
         </Pressable>
         <Pressable
@@ -166,7 +162,7 @@ function Graph({
                 fontWeight: graphDay === 3 ? '700' : '500',
               },
             ]}>
-            Year
+            {STRINGS.Year}
           </Text>
         </Pressable>
       </View>

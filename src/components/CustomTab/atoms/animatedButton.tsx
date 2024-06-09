@@ -1,9 +1,9 @@
-import Animated, { SharedValue } from "react-native-reanimated";
-import { iconProps } from "../../constants/icons";
-import style from "./styles";
-import { Pressable } from "react-native";
-import { COLORS } from "../../constants/commonStyles";
-import { useAppTheme } from "../../hooks/themeHook";
+import Animated, { SharedValue } from 'react-native-reanimated';
+import { iconProps } from '../../../constants/icons';
+import style from '../styles';
+import { Pressable } from 'react-native';
+import { COLORS } from '../../../constants/commonStyles';
+import { useAppTheme } from '../../../hooks/themeHook';
 
 function AnimatedBtn({
     translateX,
@@ -20,8 +20,8 @@ function AnimatedBtn({
     onPress: () => void;
     backgrounColor: string;
   }>) {
-  const COLOR=useAppTheme()
-  const styles=style(COLOR)
+  const COLOR = useAppTheme();
+  const styles = style(COLOR);
     return (
       <Animated.View
         style={[
@@ -42,4 +42,4 @@ function AnimatedBtn({
     );
   }
 
-  export default AnimatedBtn
+  export default AnimatedBtn;

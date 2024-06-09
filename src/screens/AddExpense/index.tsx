@@ -18,7 +18,7 @@ import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import FilePickerSheet from '../../components/FilePickerSheet';
 import RepeatTransactionSheet from '../../components/RepeatTranscationSheet';
 import firestore, {Timestamp} from '@react-native-firebase/firestore';
-import {currencies, monthData, weekData} from '../../constants/strings';
+import {currencies, monthData, STRINGS, weekData} from '../../constants/strings';
 import CustomButton from '../../components/CustomButton';
 import {repeatDataType, transactionType} from '../../defs/transaction';
 import {useAppDispatch, useAppSelector} from '../../redux/store';
@@ -58,7 +58,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
     navigation.setOptions({
       title: pageType[0].toUpperCase() + pageType.slice(1),
     });
-  }, []);
+  }, [pageType]);
   const conversion = useAppSelector(state => state.transaction.conversion);
   const expenseCat = useAppSelector(
     state => state.user.currentUser?.expenseCategory,
@@ -92,7 +92,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
     transaction
       ? Number(
           (
-            conversion['usd'][(currency ?? 'USD').toLowerCase()] *
+            conversion.usd[(currency ?? 'USD').toLowerCase()] *
             transaction.amount
           ).toFixed(2),
         ).toString()
@@ -233,7 +233,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
       <SafeAreaView
         style={[styles.safeView, {backgroundColor: backgroundColor}]}>
         <View style={styles.mainView}>
-          <Text style={styles.text1}>How much?</Text>
+          <Text style={styles.text1}>{STRINGS.HowMuch}</Text>
           <View style={styles.moneyCtr}>
             <Text style={styles.text2}>{currencies[currency!].symbol}</Text>
             <TextInput
@@ -249,7 +249,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
           </View>
           <View style={{left: 20}}>
             <EmptyError
-              errorText="Please fill an amount"
+              errorText={STRINGS.PleaseFillAnAmount}
               value={amount}
               formKey={formKey}
               color={COLORS.RED[100]}
@@ -279,15 +279,15 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
             }
           }}
           value={category}
-          placeholder="Category"
+          placeholder={STRINGS.Category}
         />
         <EmptyError
-          errorText="Please select a category"
+          errorText={STRINGS.PleaseSelectACategory}
           value={category}
           formKey={formKey}
         />
         <CustomInput
-          placeholderText="Description"
+          placeholderText={STRINGS.Description}
           onChangeText={(str: string) => {
             setDesc(str);
           }}
@@ -304,10 +304,10 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
             setWallet(val.value);
           }}
           value={wallet}
-          placeholder="Wallet"
+          placeholder={STRINGS.Wallet}
         />
         <EmptyError
-          errorText="Please select a wallet"
+          errorText={STRINGS.PleaseSelectAWallet}
           value={wallet}
           formKey={formKey}
         />
@@ -321,7 +321,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
               height: 20,
               width: 20,
             })}
-            <Text style={styles.attachementText}>Add Attachement</Text>
+            <Text style={styles.attachementText}>{STRINGS.AddAttachement}</Text>
           </Pressable>
         ) : doc === undefined ? (
           <View>
@@ -359,8 +359,8 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
         <Sapcer height={20} />
         <View style={styles.flexRow}>
           <View>
-            <Text style={styles.flexRowText1}>Repeat</Text>
-            <Text style={styles.flexRowText2}>Repeat Transaction</Text>
+            <Text style={styles.flexRowText1}>{STRINGS.Repeat}</Text>
+            <Text style={styles.flexRowText2}>{STRINGS.RepeatTransaction}</Text>
           </View>
           <Switch
             trackColor={{false: COLORS.VIOLET[20], true: COLORS.VIOLET[100]}}
@@ -382,7 +382,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
         {repeatData && (
           <View style={styles.flexRow}>
             <View>
-              <Text style={styles.flexRowText1}>Frequency</Text>
+              <Text style={styles.flexRowText1}>{STRINGS.Frequency}</Text>
               <Text style={styles.flexRowText2}>
                 {repeatData.freq[0].toUpperCase() + repeatData.freq.slice(1)}
                 {repeatData.freq !== 'daily' && ' - '}
@@ -397,7 +397,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
             </View>
             {repeatData.end === 'date' && (
               <View>
-                <Text style={styles.flexRowText1}>End After</Text>
+                <Text style={styles.flexRowText1}>{STRINGS.EndAfter}</Text>
                 <Text style={styles.flexRowText2}>
                   {isEdit
                     ? (repeatData.date as Timestamp)?.seconds !== undefined
@@ -422,7 +422,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
           </View>
         )}
         <Sapcer height={20} />
-        <CustomButton title="Continue" onPress={handlePress} />
+        <CustomButton title={STRINGS.Continue} onPress={handlePress} />
         <Sapcer height={20} />
       </View>
       <BottomSheetModalProvider>

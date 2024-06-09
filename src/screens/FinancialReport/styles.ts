@@ -1,5 +1,5 @@
-import { StyleSheet } from "react-native";
-import { COLORS } from "../../constants/commonStyles";
+import { StyleSheet } from 'react-native';
+import { COLORS } from '../../constants/commonStyles';
 
 const styles = StyleSheet.create({
     dropdown: {
@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
         columnGap: 7,
     },
     catText: { fontSize: 14, fontWeight: '500' },
-    catAmt: { fontSize: 24, fontWeight: "500" },
+    catAmt: { fontSize: 24, fontWeight: '500' },
     safeView: { flex: 1, backgroundColor: COLORS.LIGHT[100] },
     monthRow: {
         flexDirection: 'row',
@@ -111,7 +111,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-    }
-})
+    },
+    noDataCtr:{height: 230, justifyContent: 'center'},
+});
 
-export default styles
+export default styles;

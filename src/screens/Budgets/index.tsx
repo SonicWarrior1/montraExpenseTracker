@@ -5,7 +5,12 @@ import {ICONS} from '../../constants/icons';
 import CustomButton from '../../components/CustomButton';
 import Sapcer from '../../components/Spacer';
 import {BudgetScreenProps} from '../../defs/navigation';
-import {currencies, monthData, NAVIGATION} from '../../constants/strings';
+import {
+  currencies,
+  monthData,
+  NAVIGATION,
+  STRINGS,
+} from '../../constants/strings';
 import {useAppSelector} from '../../redux/store';
 import {Bar} from 'react-native-progress';
 import {COLORS} from '../../constants/commonStyles';
@@ -20,7 +25,6 @@ function BudgetScreen({navigation}: Readonly<BudgetScreenProps>) {
   const conversion = useAppSelector(state => state.transaction.conversion);
   const spend =
     useAppSelector(state => state.user.currentUser?.spend[month]) ?? {};
-  console.log('sdujfnsdjfnsdk', budgets, spend);
   return (
     <View style={styles.safeView}>
       <SafeAreaView style={styles.safeView}>
@@ -64,19 +68,19 @@ function BudgetScreen({navigation}: Readonly<BudgetScreenProps>) {
           <View style={styles.centerCtr}>
             {month < new Date().getMonth() ? (
               <Text style={styles.centerText}>
-                You don't have a budget for this month.
+                {STRINGS.NoBudgetForThisMonth}
               </Text>
             ) : (
               <>
-                <Text style={styles.centerText}>You don't have a budget.</Text>
+                <Text style={styles.centerText}>{STRINGS.NoBudget}</Text>
                 <Text style={styles.centerText}>
-                  Let's make one so you are in control.
+                  {STRINGS.CreateBudgetForThisMonth}
                 </Text>
               </>
             )}
           </View>
         ) : (
-          <ScrollView style={{flex: 1, marginTop: 10, width: '100%'}}>
+          <ScrollView style={styles.scrollView}>
             {Object.entries(budgets).map(([key, val]) => {
               return (
                 <Pressable
@@ -90,7 +94,7 @@ function BudgetScreen({navigation}: Readonly<BudgetScreenProps>) {
                   }}>
                   <View style={styles.catRow}>
                     <View style={styles.catCtr}>
-                      <View style={styles.colorBox}></View>
+                      <View style={styles.colorBox} />
                       <Text style={styles.catText}>
                         {key[0].toUpperCase() + key.slice(1)}
                       </Text>
@@ -108,11 +112,10 @@ function BudgetScreen({navigation}: Readonly<BudgetScreenProps>) {
                       ? '0'
                       : spend[key] === undefined
                       ? (
-                          conversion['usd'][currency!.toLowerCase()] * val.limit
+                          conversion.usd[currency!.toLowerCase()] * val.limit
                         ).toFixed(2)
                       : (
-                          conversion['usd'][currency!.toLowerCase()] *
-                            val.limit -
+                          conversion.usd[currency!.toLowerCase()] * val.limit -
                           (spend[key] ?? 0)
                         ).toFixed(2)}
                   </Text>
@@ -124,17 +127,17 @@ function BudgetScreen({navigation}: Readonly<BudgetScreenProps>) {
                   <Text style={styles.text2}>
                     {currencies[currency!].symbol}
                     {(
-                      conversion['usd'][currency!.toLowerCase()] *
+                      conversion.usd[currency!.toLowerCase()] *
                       (spend[key] ?? 0)
                     ).toFixed(2)}{' '}
                     of {currencies[currency!].symbol}
                     {(
-                      conversion['usd'][currency!.toLowerCase()] * val.limit
+                      conversion.usd[currency!.toLowerCase()] * val.limit
                     ).toFixed(2)}
                   </Text>
                   {(spend[key] ?? 0) >= val.limit && (
                     <Text style={styles.limitText}>
-                      You've exceed the limit!
+                      {STRINGS.LimitExceeded}
                     </Text>
                   )}
                 </Pressable>
@@ -144,7 +147,7 @@ function BudgetScreen({navigation}: Readonly<BudgetScreenProps>) {
         )}
         {month === new Date().getMonth() && (
           <CustomButton
-            title="Create a Budget"
+            title={STRINGS.CreateBudget}
             onPress={() => {
               navigation.push(NAVIGATION.CreateBudget, {isEdit: false});
             }}

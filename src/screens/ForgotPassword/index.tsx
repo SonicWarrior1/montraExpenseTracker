@@ -36,10 +36,8 @@ function ForgotPassword({navigation}: ForgotScreenProps) {
   return (
     <SafeAreaView style={styles.safeView}>
       <ScrollView
-        style={{flex: 1}}
-        contentContainerStyle={{
-          flex: 1,
-        }}>
+        style={styles.flex}
+        contentContainerStyle={styles.flex}>
         <View style={styles.mainView}>
           <Text style={styles.text}>{STRINGS.DontWorry}</Text>
           <Text style={styles.text}>{STRINGS.EnterEmailForReset}</Text>

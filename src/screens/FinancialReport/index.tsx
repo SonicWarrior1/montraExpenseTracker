@@ -58,7 +58,6 @@ function FinancialReport() {
       setCatColors(undefined);
     };
   }, [transType]);
-  console.log(totalSpend, totalIncome);
   return (
     <SafeAreaView style={styles.safeView}>
       <FinancialReportHeader

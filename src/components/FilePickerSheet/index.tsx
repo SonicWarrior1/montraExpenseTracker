@@ -1,7 +1,7 @@
 import {BottomSheetModal, BottomSheetView} from '@gorhom/bottom-sheet';
 import React, {useCallback, useMemo} from 'react';
 import {iconProps, ICONS} from '../../constants/icons';
-import {Pressable, Text, View} from 'react-native';
+import {Pressable, Text} from 'react-native';
 import {pickSingle} from 'react-native-document-picker';
 import {
   ImageLibraryOptions,
@@ -12,6 +12,7 @@ import {
 import {BottomSheetModalMethods} from '@gorhom/bottom-sheet/lib/typescript/types';
 import styles from './styles';
 import SheetBackdrop from '../SheetBackDrop';
+import { STRINGS } from '../../constants/strings';
 
 function FilePickerSheet({
   bottomSheetModalRef,
@@ -79,16 +80,16 @@ function FilePickerSheet({
       index={0}
       snapPoints={snapPoints}
       backdropComponent={SheetBackdrop}
-      backgroundStyle={{borderTopLeftRadius: 32, borderTopRightRadius: 32}}>
+      backgroundStyle={styles.sheetBack}>
       <BottomSheetView style={styles.sheetView}>
-        <SheetButtons title="Camera" icon={ICONS.Camera} onPress={openCamera} />
+        <SheetButtons title={STRINGS.Camera} icon={ICONS.Camera} onPress={openCamera} />
         <SheetButtons
-          title="Gallery"
+          title={STRINGS.Gallery}
           icon={ICONS.Gallery}
           onPress={openImagePicker}
         />
         <SheetButtons
-          title="Document"
+          title={STRINGS.Document}
           icon={ICONS.Document}
           onPress={docPicker}
         />

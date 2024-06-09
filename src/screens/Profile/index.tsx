@@ -1,7 +1,7 @@
 import React from 'react';
 import {Image, Pressable, SafeAreaView, Text, View} from 'react-native';
 import {ProfileScreenProps} from '../../defs/navigation';
-import {NAVIGATION} from '../../constants/strings';
+import {NAVIGATION, STRINGS} from '../../constants/strings';
 import {useAppDispatch, useAppSelector} from '../../redux/store';
 import {userLoggedIn} from '../../redux/reducers/userSlice';
 import auth from '@react-native-firebase/auth';
@@ -27,7 +27,7 @@ function ProfileScreen({navigation}: Readonly<ProfileScreenProps>) {
               />
             </View>
             <View>
-              <Text style={styles.text1}>Username</Text>
+              <Text style={styles.text1}>{STRINGS.Username}</Text>
               <Text style={styles.text2}>{username}</Text>
             </View>
           </View>
@@ -43,7 +43,7 @@ function ProfileScreen({navigation}: Readonly<ProfileScreenProps>) {
             <View style={styles.colorBox}>
               {ICONS.Wallet({height: 24, width: 24})}
             </View>
-            <Text style={styles.btnText}>Account</Text>
+            <Text style={styles.btnText}>{STRINGS.Account}</Text>
           </Pressable>
           <Pressable
             style={styles.btn}
@@ -53,7 +53,7 @@ function ProfileScreen({navigation}: Readonly<ProfileScreenProps>) {
             <View style={styles.colorBox}>
               {ICONS.Setting({height: 24, width: 24})}
             </View>
-            <Text style={styles.btnText}>Settings</Text>
+            <Text style={styles.btnText}>{STRINGS.Settings}</Text>
           </Pressable>
           <Pressable
             style={styles.btn}
@@ -63,7 +63,7 @@ function ProfileScreen({navigation}: Readonly<ProfileScreenProps>) {
             <View style={styles.colorBox}>
               {ICONS.Upload({height: 24, width: 24, color: 'transparent'})}
             </View>
-            <Text style={styles.btnText}>Export Data</Text>
+            <Text style={styles.btnText}>{STRINGS.ExportData}</Text>
           </Pressable>
           <Pressable
             style={[styles.btn, {borderBottomWidth: 0}]}
@@ -78,7 +78,7 @@ function ProfileScreen({navigation}: Readonly<ProfileScreenProps>) {
             <View style={[styles.colorBox, {backgroundColor: COLORS.RED[20]}]}>
               {ICONS.Logout({height: 24, width: 24, color: 'transparent'})}
             </View>
-            <Text style={styles.btnText}>Logout</Text>
+            <Text style={styles.btnText}>{STRINGS.Logout}</Text>
           </Pressable>
         </View>
       </View>

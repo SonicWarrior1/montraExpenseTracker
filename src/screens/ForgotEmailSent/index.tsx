@@ -17,10 +17,8 @@ function ForgotEmailSent({navigation, route}: ForgotSentScreenProps) {
   return (
     <SafeAreaView style={styles.safeView}>
       <ScrollView
-        style={{flex: 1}}
-        contentContainerStyle={{
-          flex: 1,
-        }}>
+        style={styles.flex}
+        contentContainerStyle={styles.flex}>
         <View style={styles.mainView}>
           <ICONS.EmailSent
             height={screenWidth * 0.7}

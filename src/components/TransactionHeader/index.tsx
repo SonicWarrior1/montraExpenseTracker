@@ -5,7 +5,7 @@ import {Dropdown} from 'react-native-element-dropdown';
 import styles from './styles';
 import {useAppDispatch} from '../../redux/store';
 import {openFilterSheet} from '../../redux/reducers/transactionSlice';
-import {monthData} from '../../constants/strings';
+import {monthData, STRINGS} from '../../constants/strings';
 
 function TransactionHeader({
   month,
@@ -23,7 +23,7 @@ function TransactionHeader({
           <View>{ICONS.ArrowDown({width: 15, height: 15})}</View>
         )}
         renderRightIcon={() => <></>}
-        placeholder="Month"
+        placeholder={STRINGS.Month}
         placeholderStyle={{marginLeft: 10}}
         value={monthData[month]}
         data={monthData}

@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet } from 'react-native';
 
 const styles = StyleSheet.create({
     btn: {
@@ -8,6 +8,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderRadius: 10,
 
-    }, text: {  fontWeight: 'bold', fontSize: 18 }
-})
-export default styles
+    }, text: { fontWeight: 'bold', fontSize: 18 },
+    btnCtr: { flexDirection: 'row', columnGap: 10, alignItems: 'center' },
+});
+export default styles;
