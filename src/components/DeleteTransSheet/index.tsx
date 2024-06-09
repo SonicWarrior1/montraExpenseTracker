@@ -95,7 +95,7 @@ function DeleteTransactionSheet({
         .collection('transactions')
         .doc(id)
         .delete();
-      Toast.show({text1: STRINGS.TransactionDeletedSuccesfully});
+      Toast.show({text1: STRINGS.TransactionDeletedSuccesfully,type:'custom'});
       bottomSheetModalRef.current?.dismiss();
       navigation.pop();
       dispatch(setLoading(false));

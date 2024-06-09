@@ -23,7 +23,7 @@ function Pin({route, navigation}: Readonly<PinSentScreenProps>) {
   const isSetup = user?.pin === '';
   const oldPin = route.params.pin ?? '';
   const dispatch = useAppDispatch();
-  // dispatch(setLoading(false))
+  dispatch(setLoading(false));
   return (
     <SafeAreaView style={styles.safeView}>
       <View style={styles.mainView}>

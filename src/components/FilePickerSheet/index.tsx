@@ -18,6 +18,7 @@ function FilePickerSheet({
   bottomSheetModalRef,
   setImage,
   setDoc,
+  onDismiss,
 }: Readonly<{
   bottomSheetModalRef: React.RefObject<BottomSheetModalMethods>;
   setImage: React.Dispatch<React.SetStateAction<string | undefined>>;
@@ -30,6 +31,7 @@ function FilePickerSheet({
       | undefined
     >
   >;
+  onDismiss?: () => void;
 }>) {
   const snapPoints = useMemo(() => ['25%'], []);
   const openImagePicker = useCallback(async () => {
@@ -80,7 +82,8 @@ function FilePickerSheet({
       index={0}
       snapPoints={snapPoints}
       backdropComponent={SheetBackdrop}
-      backgroundStyle={styles.sheetBack}>
+      backgroundStyle={styles.sheetBack}
+      onDismiss={onDismiss}>
       <BottomSheetView style={styles.sheetView}>
         <SheetButtons title={STRINGS.Camera} icon={ICONS.Camera} onPress={openCamera} />
         <SheetButtons

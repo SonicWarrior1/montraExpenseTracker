@@ -64,7 +64,9 @@ function TransactionDetails({
               backgroundColor:
                 trans.type === 'expense'
                   ? COLORS.PRIMARY.RED
-                  : COLORS.PRIMARY.GREEN,
+                  : trans.type === 'income'
+                  ? COLORS.PRIMARY.GREEN
+                  : COLORS.PRIMARY.BLUE,
             },
           ]}>
           <Sapcer height={Dimensions.get('screen').height * 0.075} />
@@ -115,21 +117,42 @@ function TransactionDetails({
                 {trans.type[0].toLocaleUpperCase() + trans.type.slice(1)}
               </Text>
             </View>
-            <View style={styles.ctrColumn}>
-              <Text style={styles.text1}>{STRINGS.Category}</Text>
-              <Text style={styles.text2}>
-                {(trans.category ?? '')[0].toLocaleUpperCase() +
-                  (trans.category ?? '').slice(1)}
-              </Text>
-            </View>
-            <View style={styles.ctrColumn}>
-              <Text style={styles.text1}>{STRINGS.Wallet}</Text>
-              <Text style={styles.text2}>
-                {trans.wallet === undefined || trans.wallet === ''
-                  ? ''
-                  : trans.wallet[0].toLocaleUpperCase() + trans.wallet.slice(1)}
-              </Text>
-            </View>
+            {trans.type === 'transfer' ? (
+              <>
+                <View style={styles.ctrColumn}>
+                  <Text style={styles.text1}>From</Text>
+                  <Text style={styles.text2}>
+                    {(trans.from ?? '')[0].toLocaleUpperCase() +
+                      (trans.from ?? '').slice(1)}
+                  </Text>
+                </View>
+                <View style={styles.ctrColumn}>
+                  <Text style={styles.text1}>To</Text>
+                  <Text style={styles.text2}>
+                    {trans.to[0].toLocaleUpperCase() + trans.to.slice(1)}
+                  </Text>
+                </View>
+              </>
+            ) : (
+              <>
+                <View style={styles.ctrColumn}>
+                  <Text style={styles.text1}>{STRINGS.Category}</Text>
+                  <Text style={styles.text2}>
+                    {(trans.category ?? '')[0].toLocaleUpperCase() +
+                      (trans.category ?? '').slice(1)}
+                  </Text>
+                </View>
+                <View style={styles.ctrColumn}>
+                  <Text style={styles.text1}>{STRINGS.Wallet}</Text>
+                  <Text style={styles.text2}>
+                    {trans.wallet === undefined || trans.wallet === ''
+                      ? ''
+                      : trans.wallet[0].toLocaleUpperCase() +
+                        trans.wallet.slice(1)}
+                  </Text>
+                </View>
+              </>
+            )}
           </View>
           <View style={styles.descCtr}>
             <Text style={styles.descTitle}>{STRINGS.Description}</Text>

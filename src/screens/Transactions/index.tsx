@@ -17,7 +17,7 @@ import {ScrollView} from 'react-native-gesture-handler';
 import TransactionHeader from '../../components/TransactionHeader';
 import {TransactionScreenProps} from '../../defs/navigation';
 import {currencies, NAVIGATION, STRINGS} from '../../constants/strings';
-import { useAppTheme } from '../../hooks/themeHook';
+import {useAppTheme} from '../../hooks/themeHook';
 function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
   const [month, setMonth] = useState(new Date().getMonth());
   const user = useAppSelector(state => state.user.currentUser);
@@ -136,7 +136,9 @@ function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
             onPress={() => {
               navigation.navigate(NAVIGATION.Story);
             }}>
-            <Text style={styles.financialText}>{STRINGS.SeeFinancialReport}</Text>
+            <Text style={styles.financialText}>
+              {STRINGS.SeeFinancialReport}
+            </Text>
             {ICONS.ArrowRight({height: 20, width: 20})}
           </TouchableOpacity>
           <SectionList
@@ -157,16 +159,25 @@ function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
                       styles.icon,
                       {
                         backgroundColor:
-                          catIcons[item.category]?.color ?? COLORS.LIGHT[20],
+                          item.type === 'transfer'
+                            ? COLORS.BLUE[80]
+                            : catIcons[item.category]?.color ??
+                              COLORS.LIGHT[20],
                       },
                     ]}>
-                    {catIcons[item.category]?.icon({height: 30, width: 30}) ??
-                      ICONS.Money({height: 30, width: 30})}
+                    {item.type === 'transfer'
+                      ? ICONS.Transfer({height: 30, width: 30})
+                      : catIcons[item.category]?.icon({
+                          height: 30,
+                          width: 30,
+                        }) ?? ICONS.Money({height: 30, width: 30})}
                   </View>
                   <View style={styles.catCtr}>
                     <Text style={styles.text1}>
-                      {item.category[0].toLocaleUpperCase() +
-                        item.category.slice(1)}
+                      {item.type === 'transfer'
+                        ? item.from + ' - ' + item.to
+                        : item.category[0].toLocaleUpperCase() +
+                          item.category.slice(1)}
                     </Text>
                     <Text style={styles.text2}>{item.desc}</Text>
                   </View>
@@ -179,10 +190,16 @@ function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
                           color:
                             item.type === 'expense'
                               ? COLORS.PRIMARY.RED
-                              : COLORS.PRIMARY.GREEN,
+                              : item.type === 'income'
+                              ? COLORS.PRIMARY.GREEN
+                              : COLORS.PRIMARY.BLUE,
                         },
                       ]}>
-                      {item.type === 'expense' ? '-' : '+'}{' '}
+                      {item.type === 'expense'
+                        ? '-'
+                        : item.type === 'income'
+                        ? '+'
+                        : ''}{' '}
                       {currencies[user?.currency ?? 'USD'].symbol}{' '}
                       {(
                         conversion.usd[

@@ -1,16 +1,15 @@
-import { Dimensions, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { COLORS } from '../../constants/commonStyles';
-const screenHeight=Dimensions.get('screen').height
 const styles = StyleSheet.create({
     safeView: { flex: 1, backgroundColor: COLORS.PRIMARY.RED },
     mainView: {
         flex: 1,
-        justifyContent: 'center'
+        justifyContent: 'center',
     },
     text1: {
         opacity: 0.64,
-        alignSelf: "flex-start",
-        fontWeight: "600",
+        alignSelf: 'flex-start',
+        fontWeight: '600',
         color: COLORS.LIGHT[80],
         fontSize: 18, paddingHorizontal: 30,
     },
@@ -32,7 +31,7 @@ const styles = StyleSheet.create({
     moneyCtr: {
         flexDirection: 'row',
         alignSelf: 'flex-start',
-        alignItems:"center",
+        alignItems: 'center',
         paddingHorizontal: 30,
     },
     detailsCtr: {
@@ -106,6 +105,21 @@ const styles = StyleSheet.create({
         fontWeight: '500',
         fontSize: 14,
         color: COLORS.PRIMARY.VIOLET,
-    }
+    },
+    transferRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        columnGap: 30,
+    },
+    transferIcon: {
+        backgroundColor: COLORS.LIGHT[100],
+        padding: 8,
+        borderWidth: 1,
+        borderRadius: 30,
+        position: 'absolute',
+        left: '44%',
+        borderColor: COLORS.LIGHT[20],
+    },
+    flex:{flex: 1},
 });
 export default styles;

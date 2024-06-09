@@ -1,4 +1,4 @@
-import { Timestamp } from "@react-native-firebase/firestore";
+import { Timestamp } from '@react-native-firebase/firestore';
 
 export type transactionType = {
     id: string,
@@ -11,7 +11,9 @@ export type transactionType = {
     freq: repeatDataType | null;
     timeStamp: Timestamp,
     type: 'expense' | 'income' | 'transfer',
-    attachementType: 'image' | 'doc' | 'none'
+    attachementType: 'image' | 'doc' | 'none',
+    from:string,
+    to:string
 }
 export type repeatDataType = {
     freq: 'yearly' | 'monthly' | 'weekly' | 'daily';

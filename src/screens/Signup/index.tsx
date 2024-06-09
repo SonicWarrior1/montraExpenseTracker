@@ -185,7 +185,7 @@ function Signup({navigation}: Readonly<SignupScreenProps>) {
             isChecked={checked}
             textComponent={
               <View style={{flex: 1, marginLeft: 16}}>
-                <Text style={{color:COLOR.DARK[100]}}>
+                <Text style={{color: COLOR.DARK[100]}}>
                   {STRINGS.BySigningUp}{' '}
                   <Text style={{color: COLORS.PRIMARY.VIOLET}}>
                     {STRINGS.Terms}

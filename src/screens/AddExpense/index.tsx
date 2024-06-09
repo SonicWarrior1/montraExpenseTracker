@@ -18,7 +18,12 @@ import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import FilePickerSheet from '../../components/FilePickerSheet';
 import RepeatTransactionSheet from '../../components/RepeatTranscationSheet';
 import firestore, {Timestamp} from '@react-native-firebase/firestore';
-import {currencies, monthData, STRINGS, weekData} from '../../constants/strings';
+import {
+  currencies,
+  monthData,
+  STRINGS,
+  weekData,
+} from '../../constants/strings';
 import CustomButton from '../../components/CustomButton';
 import {repeatDataType, transactionType} from '../../defs/transaction';
 import {useAppDispatch, useAppSelector} from '../../redux/store';
@@ -28,7 +33,7 @@ import Toast from 'react-native-toast-message';
 import {ExpenseScreenProps} from '../../defs/navigation';
 import AddCategorySheet from '../../components/AddCategorySheet';
 import {UserType} from '../../defs/user';
-import {EmptyError} from '../../constants/errors';
+import {CompundEmptyError, EmptyError} from '../../constants/errors';
 import {UserFromJson} from '../../utils/userFuncs';
 import {
   addNewTransaction,
@@ -52,7 +57,11 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
   }
   const month = new Date().getMonth();
   const backgroundColor =
-    pageType === 'expense' ? COLORS.PRIMARY.RED : COLORS.PRIMARY.GREEN;
+    pageType === 'expense'
+      ? COLORS.PRIMARY.RED
+      : pageType === 'transfer'
+      ? COLORS.PRIMARY.BLUE
+      : COLORS.PRIMARY.GREEN;
 
   useEffect(() => {
     navigation.setOptions({
@@ -88,6 +97,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
     transaction ? transaction.freq! : undefined,
   );
   const [desc, setDesc] = useState(transaction ? transaction.desc : '');
+  const [zindex, setZindex] = useState(1);
   const [amount, setAmount] = useState(
     transaction
       ? Number(
@@ -102,7 +112,8 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
     transaction ? transaction.category : '',
   );
   const [wallet, setWallet] = useState(transaction ? transaction.wallet : '');
-
+  const [from, setFrom] = useState(transaction ? transaction.from : '');
+  const [to, setTo] = useState(transaction ? transaction.to : '');
   const getAttachmentAndType = useCallback(() => {
     let attachement = '';
     let attachementType: transactionType['attachementType'] = 'none';
@@ -118,7 +129,13 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
 
   async function handlePress() {
     setFormKey(true);
-    if (amount === '' || category === '' || wallet === '') {
+    if (pageType === 'transfer' && (from === '' || to === '')) {
+      return;
+    }
+    if (
+      pageType !== 'transfer' &&
+      (amount === '' || category === '' || wallet === '')
+    ) {
       return;
     }
     dispatch(setLoading(true));
@@ -145,6 +162,8 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
         transaction: transaction!,
         wallet: wallet,
         uid: uid!,
+        from: from,
+        to: to,
       });
       const curr = await firestore().collection('users').doc(uid).get();
       if (isEdit) {
@@ -220,12 +239,12 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
           });
         }
       }
-      Toast.show({text1: pageType + ' Added Succesfully'});
+      Toast.show({text1: 'Transaction has been Added Succesfully',type:'custom'});
       navigation.pop();
+      dispatch(setLoading(false));
     } catch (e) {
-      console.log(e);
+      dispatch(setLoading(false));
     }
-    dispatch(setLoading(false));
   }
   const [formKey, setFormKey] = useState(false);
   return (
@@ -259,33 +278,72 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
         </View>
       </SafeAreaView>
       <View style={styles.detailsCtr}>
-        <CustomDropdown
-          data={(pageType === 'expense' ? expenseCat! : incomeCat!)?.map(
-            item => {
-              return {
-                label:
-                  item === 'add'
-                    ? 'Add new Category'
-                    : item[0].toUpperCase() + item.slice(1),
-                value: item,
-              };
-            },
-          )}
-          onChange={val => {
-            if (val.value === 'add') {
-              addCategorySheetRef.current?.present();
-            } else {
-              setCategory(val.value);
-            }
-          }}
-          value={category}
-          placeholder={STRINGS.Category}
-        />
-        <EmptyError
-          errorText={STRINGS.PleaseSelectACategory}
-          value={category}
-          formKey={formKey}
-        />
+        {pageType !== 'transfer' && (
+          <CustomDropdown
+            data={(pageType === 'expense' ? expenseCat! : incomeCat!)?.map(
+              item => {
+                return {
+                  label:
+                    item === 'add'
+                      ? 'Add new Category'
+                      : item[0].toUpperCase() + item.slice(1),
+                  value: item,
+                };
+              },
+            )}
+            onChange={val => {
+              if (val.value === 'add') {
+                addCategorySheetRef.current?.present();
+              } else {
+                setCategory(val.value);
+              }
+            }}
+            value={category}
+            placeholder={STRINGS.Category}
+          />
+        )}
+        {pageType === 'transfer' && (
+          <View style={styles.transferRow}>
+            <View style={styles.flex}>
+              <CustomInput
+                placeholderText={'From'}
+                onChangeText={(str: string) => {
+                  setFrom(str);
+                }}
+                type="name"
+                value={from}
+              />
+            </View>
+            <View style={[styles.transferIcon, {zIndex: zindex}]}>
+              {ICONS.Transfer2({height: 25, width: 25})}
+            </View>
+            <View style={styles.flex}>
+              <CustomInput
+                placeholderText={'To'}
+                onChangeText={(str: string) => {
+                  setTo(str);
+                }}
+                type="name"
+                value={to}
+              />
+            </View>
+          </View>
+        )}
+        {pageType === 'transfer' && (
+          <CompundEmptyError
+            errorText="Please fill both the fields."
+            value1={to}
+            value2={from}
+            formKey={formKey}
+          />
+        )}
+        {pageType !== 'transfer' && (
+          <EmptyError
+            errorText={STRINGS.PleaseSelectACategory}
+            value={category}
+            formKey={formKey}
+          />
+        )}
         <CustomInput
           placeholderText={STRINGS.Description}
           onChangeText={(str: string) => {
@@ -295,26 +353,31 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
           value={desc}
         />
         <Sapcer height={10} />
-        <CustomDropdown
-          data={[
-            {label: 'Paypal', value: 'paypal'},
-            {label: 'Chase', value: 'chase'},
-          ]}
-          onChange={val => {
-            setWallet(val.value);
-          }}
-          value={wallet}
-          placeholder={STRINGS.Wallet}
-        />
-        <EmptyError
-          errorText={STRINGS.PleaseSelectAWallet}
-          value={wallet}
-          formKey={formKey}
-        />
+        {pageType !== 'transfer' && (
+          <CustomDropdown
+            data={[
+              {label: 'Paypal', value: 'paypal'},
+              {label: 'Chase', value: 'chase'},
+            ]}
+            onChange={val => {
+              setWallet(val.value);
+            }}
+            value={wallet}
+            placeholder={STRINGS.Wallet}
+          />
+        )}
+        {pageType !== 'transfer' && (
+          <EmptyError
+            errorText={STRINGS.PleaseSelectAWallet}
+            value={wallet}
+            formKey={formKey}
+          />
+        )}
         {image === '' && doc === undefined ? (
           <Pressable
             style={styles.attachementCtr}
             onPress={() => {
+              setZindex(0);
               filePickSheetRef.current?.present();
             }}>
             {ICONS.Attachment({
@@ -357,28 +420,32 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
           </View>
         )}
         <Sapcer height={20} />
-        <View style={styles.flexRow}>
-          <View>
-            <Text style={styles.flexRowText1}>{STRINGS.Repeat}</Text>
-            <Text style={styles.flexRowText2}>{STRINGS.RepeatTransaction}</Text>
+        {pageType !== 'transfer' && (
+          <View style={styles.flexRow}>
+            <View>
+              <Text style={styles.flexRowText1}>{STRINGS.Repeat}</Text>
+              <Text style={styles.flexRowText2}>
+                {STRINGS.RepeatTransaction}
+              </Text>
+            </View>
+            <Switch
+              trackColor={{false: COLORS.VIOLET[20], true: COLORS.VIOLET[100]}}
+              ios_backgroundColor={COLORS.VIOLET[20]}
+              onValueChange={val => {
+                if (val) {
+                  repeatSheetRef.current?.present({
+                    isEdit: isEdit,
+                    transaction: transaction,
+                  });
+                } else {
+                  setRepeatData(undefined);
+                }
+              }}
+              value={repeatData !== undefined && repeatData !== null}
+            />
           </View>
-          <Switch
-            trackColor={{false: COLORS.VIOLET[20], true: COLORS.VIOLET[100]}}
-            ios_backgroundColor={COLORS.VIOLET[20]}
-            onValueChange={val => {
-              if (val) {
-                repeatSheetRef.current?.present({
-                  isEdit: isEdit,
-                  transaction: transaction,
-                });
-              } else {
-                setRepeatData(undefined);
-              }
-            }}
-            value={repeatData !== undefined && repeatData !== null}
-          />
-        </View>
-        <Sapcer height={20} />
+        )}
+        {pageType !== 'transfer' && <Sapcer height={20} />}
         {repeatData && (
           <View style={styles.flexRow}>
             <View>
@@ -427,6 +494,9 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
       </View>
       <BottomSheetModalProvider>
         <FilePickerSheet
+          onDismiss={() => {
+            setZindex(1);
+          }}
           bottomSheetModalRef={filePickSheetRef}
           setDoc={setDoc}
           setImage={setImage}

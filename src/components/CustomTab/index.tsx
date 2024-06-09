@@ -96,7 +96,13 @@ function CustomTab(props: Readonly<BottomTabBarProps>): React.JSX.Element {
       />
       <AnimatedBtn
         icon={ICONS.Transfer}
-        onPress={() => {}}
+        onPress={() => {
+          props.navigation.navigate(NAVIGATION.AddExpense, {
+            type: 'transfer',
+            isEdit: false,
+          });
+          handleAddBtnPress();
+        }}
         translateX={translate2X}
         translateY={translate2Y}
         backgrounColor={COLORS.PRIMARY.BLUE}
