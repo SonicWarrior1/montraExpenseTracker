@@ -93,7 +93,7 @@ function Pin({route, navigation}: Readonly<PinSentScreenProps>) {
                     }
                   }}>
                   {value === 99 ? (
-                    ICONS.ArrowRight2({height: 30, width: 30})
+                    ICONS.ArrowRight2({height: 30, width: 30,color:COLORS.LIGHT[100]})
                   ) : (
                     <Text
                       style={styles.number}>

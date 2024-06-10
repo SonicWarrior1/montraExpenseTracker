@@ -1,19 +1,23 @@
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {FlatList, Pressable, SafeAreaView, Text, View} from 'react-native';
 import {useAppSelector} from '../../redux/store';
 import {NotificationScreenProps} from '../../defs/navigation';
 import {ICONS} from '../../constants/icons';
 import firestore, {Timestamp} from '@react-native-firebase/firestore';
-import styles from './styles';
+import style from './styles';
 import {encrypt} from '../../utils/encryption';
 import {STRINGS} from '../../constants/strings';
+import {useAppTheme} from '../../hooks/themeHook';
 
 function NotificationScreen({navigation}: Readonly<NotificationScreenProps>) {
+  const COLOR = useAppTheme();
+  const styles = style(COLOR);
   const notifications = useAppSelector(
     state => state.user.currentUser?.notification,
   );
   const uid = useAppSelector(state => state.user.currentUser?.uid);
   const [menu, setMenu] = useState(false);
+
   const handleMarkRead = useCallback(async () => {
     try {
       const readNotifications = Object.values(notifications!).reduce(
@@ -56,6 +60,14 @@ function NotificationScreen({navigation}: Readonly<NotificationScreenProps>) {
       console.log(e);
     }
   }, [uid]);
+  useEffect(() => {
+    if (
+      Object.values(notifications!).filter(item => item.read === false)
+        .length !== 0
+    ) {
+      handleMarkRead();
+    }
+  });
   return (
     <SafeAreaView style={styles.safeView}>
       <View style={styles.header}>
@@ -67,8 +79,8 @@ function NotificationScreen({navigation}: Readonly<NotificationScreenProps>) {
           {ICONS.ArrowLeft({
             height: 25,
             width: 25,
-            color: 'black',
-            borderColor: 'black',
+            color: COLOR.DARK[100],
+            borderColor: COLOR.DARK[100],
           })}
         </Pressable>
         <Text style={styles.headerTitle}>{STRINGS.Notifications}</Text>
@@ -77,7 +89,7 @@ function NotificationScreen({navigation}: Readonly<NotificationScreenProps>) {
           onPress={() => {
             setMenu(menu => !menu);
           }}>
-          {ICONS.More({height: 20, width: 20})}
+          {ICONS.More({height: 20, width: 20, color: COLOR.DARK[100]})}
         </Pressable>
       </View>
       {notifications === undefined ||
@@ -118,10 +130,10 @@ function NotificationScreen({navigation}: Readonly<NotificationScreenProps>) {
       {menu && (
         <View style={styles.menu}>
           <Pressable onPress={handleMarkRead}>
-            <Text>{STRINGS.MarkAllRead}</Text>
+            <Text style={styles.menuText}>{STRINGS.MarkAllRead}</Text>
           </Pressable>
           <Pressable onPress={handleDelete}>
-            <Text>{STRINGS.RemoveAll}</Text>
+            <Text style={styles.menuText}>{STRINGS.RemoveAll}</Text>
           </Pressable>
         </View>
       )}

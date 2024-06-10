@@ -4,7 +4,7 @@ import Pdf from 'react-native-pdf';
 import {DocScreenProps} from '../../defs/navigation';
 import styles from './styles';
 
-function DocView({route}: DocScreenProps) {
+function DocView({route}: Readonly<DocScreenProps>) {
   const uri = route.params.uri;
   return (
     <SafeAreaView style={styles.flex}>

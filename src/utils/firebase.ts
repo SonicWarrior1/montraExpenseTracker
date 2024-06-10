@@ -46,7 +46,7 @@ export function createTransaction({
     to: string
 }) {
     return {
-        amount: encrypt(String((Number(amount) / conversion.usd[currency.toLowerCase()]).toFixed(2)), uid),
+        amount: encrypt(String((Number(amount) / conversion.usd[currency.toLowerCase()]).toFixed(1)), uid),
         category: encrypt(category, uid),
         desc: encrypt(desc, uid),
         wallet: encrypt(wallet, uid),
@@ -127,7 +127,7 @@ export async function handleIncomeUpdate({
                 ).income[month][category] ?? 0) -
                     transaction.amount +
                     Number(amount)) /
-                    conversion.usd[currency.toLowerCase()]).toFixed(2)), uid),
+                    conversion.usd[currency.toLowerCase()]).toFixed(1)), uid),
         });
 }
 export async function handleNewIncome({
@@ -160,7 +160,7 @@ export async function handleNewIncome({
                     UserFromJson(curr.data() as UserType)
                 )?.income[month]?.[category] ?? 0) +
                     Number(amount)) /
-                    conversion.usd[currency.toLowerCase()]).toFixed(2)), uid),
+                    conversion.usd[currency.toLowerCase()]).toFixed(1)), uid),
         });
 }
 
@@ -197,7 +197,7 @@ export async function handleExpenseUpdate({
                 ).spend[month][category] ?? 0) -
                     transaction.amount +
                     Number(amount)) /
-                    conversion.usd[currency.toLowerCase()]).toFixed(2)), uid),
+                    conversion.usd[currency.toLowerCase()]).toFixed(1)), uid),
         });
 }
 
@@ -231,7 +231,7 @@ export async function handleNewExpense({
                     UserFromJson(curr.data() as UserType)
                 )?.spend[month]?.[category] ?? 0) +
                     Number(amount)) /
-                    conversion.usd[currency.toLowerCase()]).toFixed(2)), uid),
+                    conversion.usd[currency.toLowerCase()]).toFixed(1)), uid),
         });
 }
 export async function getAttachmentUrl({

@@ -2,7 +2,7 @@ import React, {useRef, useState} from 'react';
 import {SafeAreaView, Switch, Text, TextInput, View} from 'react-native';
 import Sapcer from '../../components/Spacer';
 import CustomButton from '../../components/CustomButton';
-import styles from './styles';
+import style from './styles';
 import CustomDropdown from '../../components/CustomDropDown';
 import {useAppDispatch, useAppSelector} from '../../redux/store';
 import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
@@ -14,7 +14,11 @@ import {setLoading} from '../../redux/reducers/userSlice';
 import {CreateBudgetScreenProps} from '../../defs/navigation';
 import {currencies, STRINGS} from '../../constants/strings';
 import {encrypt} from '../../utils/encryption';
+import {useAppTheme} from '../../hooks/themeHook';
+import {EmptyError} from '../../constants/errors';
 function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
+  const COLOR = useAppTheme();
+  const styles = style(COLOR);
   const month = new Date().getMonth();
   const isEdit = route.params.isEdit;
   let cat;
@@ -32,7 +36,7 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
   const [amount, setAmount] = useState(
     isEdit
       ? (conversion.usd[currency!.toLowerCase()] * oldBudget?.limit!)
-          .toFixed(2)
+          .toFixed(1)
           .toString()
       : '',
   );
@@ -47,6 +51,7 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
   const uid = useAppSelector(state => state.user.currentUser?.uid);
   const addCategorySheetRef = useRef<BottomSheetModal>(null);
   const dispatch = useAppDispatch();
+  const [form, setForm] = useState(false);
   return (
     <View style={styles.safeView}>
       <SafeAreaView style={styles.safeView}>
@@ -56,13 +61,27 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
             <Text style={styles.text2}>{currencies[currency!].symbol}</Text>
             <TextInput
               style={styles.input}
-              maxLength={8}
+              maxLength={6}
               onChangeText={(str: string) => {
-                const numericValue = str.replace(/\D/g, '');
+                let numericValue = str.replace(/[^0-9.]+/g, '');
+                const decimalCount = numericValue.split('.').length - 1;
+                if (decimalCount > 1) {
+                  const parts = numericValue.split('.');
+                  numericValue = parts[0] + '.' + parts.slice(1).join('');
+                }
                 setAmount(numericValue);
               }}
               value={amount}
               keyboardType="numeric"
+            />
+          </View>
+          <View style={{left: 20}}>
+            <EmptyError
+              errorText={STRINGS.PleaseFillAnAmount}
+              value={amount}
+              formKey={form}
+              color={COLORS.RED[100]}
+              size={18}
             />
           </View>
           <Sapcer height={20} />
@@ -89,12 +108,18 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
           value={category}
           placeholder={STRINGS.Category}
         />
-        <Sapcer height={30} />
+        <EmptyError
+          errorText={STRINGS.PleaseSelectACategory}
+          value={category!}
+          formKey={form}
+        />
+        <Sapcer height={20} />
         <View style={styles.flexRow}>
           <View>
             <Text style={styles.flexRowText1}>{STRINGS.RecieveAlert}</Text>
             <Text style={styles.flexRowText2}>
-              {STRINGS.RecieveAlertWhen} {'\n'}{STRINGS.SomePoint}
+              {STRINGS.RecieveAlertWhen} {'\n'}
+              {STRINGS.SomePoint}
             </Text>
           </View>
           <Switch
@@ -114,20 +139,17 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
             minimumValue={0}
             trackStyle={styles.sliderTrack}
             minimumTrackTintColor={COLORS.VIOLET[100]}
-            maximumTrackTintColor={COLORS.LIGHT[20]}
+            maximumTrackTintColor={COLOR.LIGHT[40]}
             renderThumbComponent={() => (
-              <View
-                style={styles.thumb}>
-                <Text
-                  style={styles.thumbText}>
-                  {sliderVal}%
-                </Text>
+              <View style={styles.thumb}>
+                <Text style={styles.thumbText}>{sliderVal}%</Text>
               </View>
             )}
             value={sliderVal}
             onValueChange={val => {
               setSliderVal(Math.floor(val[0]));
             }}
+            // containerStyle={{backgroundColor: 'green'}}
           />
         ) : (
           <></>
@@ -137,29 +159,30 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
           title={STRINGS.Continue}
           onPress={async () => {
             console.log(conversion.usd);
-            if (amount !== '') {
+            setForm(true);
+            if (amount !== '' || category !== '') {
               try {
-              dispatch(setLoading(true));
-              await firestore()
-                .collection('users')
-                .doc(uid)
-                .update({
-                  [`budget.${month}.${category}`]: {
-                    limit: encrypt(
-                      String(
-                        (
-                          Number(amount) /
-                          conversion.usd[currency!.toLowerCase()]
-                        ).toFixed(2),
+                dispatch(setLoading(true));
+                await firestore()
+                  .collection('users')
+                  .doc(uid)
+                  .update({
+                    [`budget.${month}.${category}`]: {
+                      limit: encrypt(
+                        String(
+                          (
+                            Number(amount) /
+                            conversion.usd[currency!.toLowerCase()]
+                          ).toFixed(1),
+                        ),
+                        uid!,
                       ),
-                      uid!,
-                    ),
-                    alert: alert,
-                    percentage: encrypt(String(sliderVal), uid!),
-                  },
-                });
-              dispatch(setLoading(false));
-              navigation.pop();
+                      alert: alert,
+                      percentage: encrypt(String(sliderVal), uid!),
+                    },
+                  });
+                dispatch(setLoading(false));
+                navigation.pop();
               } catch (e) {
                 console.log(e);
                 dispatch(setLoading(false));

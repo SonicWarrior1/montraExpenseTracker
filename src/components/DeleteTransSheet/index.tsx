@@ -64,7 +64,7 @@ function DeleteTransactionSheet({
                     ] ?? 0,
                   ) -
                   amt / conversion.usd[currency!.toLowerCase()]
-                ).toFixed(2),
+                ).toFixed(1),
               ),
               uid!,
             ),
@@ -83,7 +83,7 @@ function DeleteTransactionSheet({
                     ] ?? 0,
                   ) -
                   amt / conversion.usd[currency!.toLowerCase()]
-                ).toFixed(2),
+                ).toFixed(1),
               ),
               uid!,
             ),

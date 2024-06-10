@@ -1,15 +1,15 @@
 import { StyleSheet } from 'react-native';
 import { COLORS } from '../../constants/commonStyles';
 
-const styles = StyleSheet.create({
+const styles = (COLOR: typeof COLORS) => StyleSheet.create({
     scrollView: { flex: 1, marginTop: 10, width: '100%' },
     safeView: {
         flex: 1,
-        backgroundColor: COLORS.PRIMARY.VIOLET,
+        backgroundColor: COLOR.PRIMARY.VIOLET,
     },
     mainView: {
         flex: 9,
-        backgroundColor: COLORS.LIGHT[80],
+        backgroundColor: COLOR.PRIMARY.LIGHT,
         borderTopLeftRadius: 24,
         borderTopRightRadius: 24,
         alignItems: 'center',
@@ -18,7 +18,7 @@ const styles = StyleSheet.create({
     },
     month: {
         fontSize: 24,
-        color: COLORS.LIGHT[100],
+        color: COLOR.LIGHT[100],
         fontWeight: '500',
     },
     monthRow: {
@@ -32,11 +32,11 @@ const styles = StyleSheet.create({
     centerText: {
         fontSize: 16,
         fontWeight: '500',
-        color: COLORS.DARK[25],
+        color: COLOR.DARK[25],
         textAlign: 'center',
     },
     listItemCtr: {
-        backgroundColor: COLORS.LIGHT[100],
+        backgroundColor: COLOR.LIGHT[100],
         marginVertical: 10,
         borderRadius: 16,
         padding: 16,
@@ -50,8 +50,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: COLORS.LIGHT[20],
-        backgroundColor: COLORS.LIGHT[80],
+        borderColor: COLOR.LIGHT[20],
+        backgroundColor: COLOR.LIGHT[80],
         paddingHorizontal: 10,
         paddingVertical: 5,
         borderRadius: 24,
@@ -61,26 +61,26 @@ const styles = StyleSheet.create({
         height: 14,
         width: 14,
         borderRadius: 10,
-        backgroundColor: COLORS.BLUE[100],
+        backgroundColor: COLOR.BLUE[100],
     },
-    catText: { fontSize: 14, fontWeight: '500' },
+    catText: { fontSize: 14, fontWeight: '500', color: COLOR.DARK[100] },
     text1: {
         fontSize: 24,
         fontWeight: '600',
         marginTop: 5,
-        marginBottom: 5,
+        marginBottom: 5, color: COLOR.DARK[100]
     },
     text2: {
         fontSize: 16,
         fontWeight: '500',
         marginTop: 5,
-        color: COLORS.DARK[25],
+        color: COLOR.DARK[25],
     },
     limitText: {
         fontSize: 14,
         fontWeight: '400',
         marginTop: 10,
-        color: COLORS.PRIMARY.RED,
+        color: COLOR.PRIMARY.RED,
     },
 });
 export default styles;

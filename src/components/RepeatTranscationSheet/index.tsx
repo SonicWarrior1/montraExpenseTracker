@@ -8,8 +8,9 @@ import {BottomSheetModalMethods} from '@gorhom/bottom-sheet/lib/typescript/types
 import CustomInput from '../CustomInput';
 import {monthData, STRINGS, weekData} from '../../constants/strings';
 import {repeatDataType} from '../../defs/transaction';
-import styles from './styles';
+import style from './styles';
 import SheetBackdrop from '../SheetBackDrop';
+import { useAppTheme } from '../../hooks/themeHook';
 
 function RepeatTransactionSheet({
   bottomSheetModalRef,
@@ -56,7 +57,8 @@ function RepeatTransactionSheet({
     return daysInYear;
   }, [year]);
   const daysInYear = generateDaysInYear;
-
+  const COLOR = useAppTheme();
+  const styles = style(COLOR);
   return (
     <BottomSheetModal
       enablePanDownToClose
@@ -64,7 +66,8 @@ function RepeatTransactionSheet({
       index={0}
       snapPoints={snapPoints}
       backdropComponent={SheetBackdrop}
-      backgroundStyle={styles.sheetBack}>
+      backgroundStyle={styles.sheetBack}
+      handleIndicatorStyle={{backgroundColor:COLOR.DARK[100]}}>
       <BottomSheetView style={styles.sheetView}>
         <View style={styles.flexRow}>
           <View style={styles.flex}>
@@ -162,6 +165,7 @@ function RepeatTransactionSheet({
                   setIsDateOpen(true);
                 }}
                 editable={false}
+                inputColor={COLOR.DARK[100]}
               />
               <DatePicker
                 modal
@@ -177,7 +181,6 @@ function RepeatTransactionSheet({
                 onCancel={() => {
                   setIsDateOpen(false);
                 }}
-                focusable={true}
               />
             </Pressable>
           )}

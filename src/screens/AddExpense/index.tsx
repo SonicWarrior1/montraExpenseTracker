@@ -8,7 +8,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import styles from './styles';
+import style from './styles';
 import CustomInput from '../../components/CustomInput';
 import {COLORS} from '../../constants/commonStyles';
 import Sapcer from '../../components/Spacer';
@@ -46,8 +46,11 @@ import {
   handleNotify,
   updateTransaction,
 } from '../../utils/firebase';
+import {useAppTheme} from '../../hooks/themeHook';
 
 function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
+  const COLOR = useAppTheme();
+  const styles = style(COLOR);
   const pageType = route.params.type;
   const isEdit = route.params.isEdit;
   let transaction: transactionType | undefined;
@@ -104,7 +107,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
           (
             conversion.usd[(currency ?? 'USD').toLowerCase()] *
             transaction.amount
-          ).toFixed(2),
+          ).toFixed(1),
         ).toString()
       : '',
   );
@@ -239,7 +242,10 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
           });
         }
       }
-      Toast.show({text1: 'Transaction has been Added Succesfully',type:'custom'});
+      Toast.show({
+        text1: 'Transaction has been Added Succesfully',
+        type: 'custom',
+      });
       navigation.pop();
       dispatch(setLoading(false));
     } catch (e) {
@@ -257,9 +263,14 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
             <Text style={styles.text2}>{currencies[currency!].symbol}</Text>
             <TextInput
               style={styles.input}
-              maxLength={8}
+              maxLength={6}
               onChangeText={(str: string) => {
-                const numericValue = str.replace(/\D/g, '');
+                let numericValue = str.replace(/[^0-9.]+/g, '');
+                const decimalCount = numericValue.split('.').length - 1;
+                if (decimalCount > 1) {
+                  const parts = numericValue.split('.');
+                  numericValue = parts[0] + '.' + parts.slice(1).join('');
+                }
                 setAmount(numericValue);
               }}
               value={amount}
@@ -312,6 +323,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
                 }}
                 type="name"
                 value={from}
+                inputColor={COLOR.DARK[100]}
               />
             </View>
             <View style={[styles.transferIcon, {zIndex: zindex}]}>
@@ -325,6 +337,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
                 }}
                 type="name"
                 value={to}
+                inputColor={COLOR.DARK[100]}
               />
             </View>
           </View>
@@ -351,6 +364,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
           }}
           type="name"
           value={desc}
+          inputColor={COLOR.DARK[100]}
         />
         <Sapcer height={10} />
         {pageType !== 'transfer' && (
@@ -383,6 +397,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
             {ICONS.Attachment({
               height: 20,
               width: 20,
+              color: COLOR.DARK[100],
             })}
             <Text style={styles.attachementText}>{STRINGS.AddAttachement}</Text>
           </Pressable>

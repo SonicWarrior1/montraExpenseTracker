@@ -5,6 +5,7 @@ import {
   SectionList,
   Text,
   TouchableOpacity,
+  useColorScheme,
   View,
 } from 'react-native';
 import style from './styles';
@@ -94,11 +95,25 @@ function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
 
   const data = filterDataByDate(transaction);
   const filters = useAppSelector(state => state.transaction.filters);
+  console.log(filters.cat);
   function applyFilters() {
-    const x =
-      filters.filter === 'none'
+    const catFiltered =
+      filters.cat.length === 0
         ? data
         : data.map(data => {
+            return {
+              title: data.title,
+              data: data.data.filter(item =>
+                filters.cat.length === 0
+                  ? true
+                  : filters.cat.includes(item.category),
+              ),
+            };
+          });
+    const x =
+      filters.filter === 'none'
+        ? catFiltered
+        : catFiltered.map(data => {
             return {
               title: data.title,
               data: data.data.filter(item => item.type === filters.filter),
@@ -126,6 +141,8 @@ function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
   }
   const COLOR = useAppTheme();
   const styles = style(COLOR);
+  const scheme = useColorScheme();
+  const theme = useAppSelector(state => state.user.currentUser?.theme);
   return (
     <SafeAreaView style={styles.safeView}>
       <TransactionHeader month={month} setMonth={setMonth} />
@@ -148,7 +165,15 @@ function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
             renderItem={({item}) => {
               return (
                 <Pressable
-                  style={styles.listItemCtr}
+                  style={[
+                    styles.listItemCtr,
+                    {
+                      backgroundColor:
+                        (theme === 'device' ? scheme : theme) === 'light'
+                          ? COLORS.LIGHT[40]
+                          : COLORS.DARK[100],
+                    },
+                  ]}
                   onPress={() => {
                     navigation.push(NAVIGATION.TransactionDetail, {
                       transaction: item,
@@ -205,7 +230,7 @@ function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
                         conversion.usd[
                           (user?.currency ?? 'USD').toLowerCase()
                         ] * item.amount
-                      ).toFixed(2)}
+                      ).toFixed(1)}
                     </Text>
                     <Text style={styles.text2}>
                       {Timestamp.fromMillis(item.timeStamp.seconds * 1000)

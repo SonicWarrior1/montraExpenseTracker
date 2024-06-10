@@ -75,8 +75,8 @@ function RootNavigator(): React.JSX.Element {
             options={{
               headerShown: true,
               headerTransparent: true,
-              headerTitleStyle: {color: 'white'},
-              headerLeft: props => headerLeft(props, 'white'),
+              headerTitleStyle: {color: COLORS.LIGHT[100]},
+              headerLeft: props => headerLeft(props, COLORS.LIGHT[100]),
             }}
           />
           <Stack.Screen
@@ -85,9 +85,9 @@ function RootNavigator(): React.JSX.Element {
             options={{
               headerShown: true,
               headerTransparent: true,
-              headerTitleStyle: {color: 'white'},
+              headerTitleStyle: {color: COLORS.LIGHT[100]},
               title: 'Detail Transaction',
-              headerLeft: props => headerLeft(props, 'white'),
+              headerLeft: props => headerLeft(props, COLORS.LIGHT[100]),
             }}
           />
           <Stack.Screen
@@ -106,9 +106,9 @@ function RootNavigator(): React.JSX.Element {
             options={{
               headerShown: true,
               headerTransparent: true,
-              headerTitleStyle: {color: 'white'},
+              headerTitleStyle: {color: COLORS.LIGHT[100]},
               title: 'Create Budget',
-              headerLeft: props => headerLeft(props, 'white'),
+              headerLeft: props => headerLeft(props, COLORS.LIGHT[100]),
             }}
           />
           <Stack.Screen
@@ -116,9 +116,9 @@ function RootNavigator(): React.JSX.Element {
             component={DetailBudget}
             options={{
               headerShown: true,
-              headerTitleStyle: {color: 'black'},
+              headerTitleStyle: {color: COLORS.DARK[100]},
               title: 'Detail Budget',
-              headerLeft: props => headerLeft(props, 'black'),
+              headerLeft: props => headerLeft(props, COLORS.DARK[100]),
             }}
           />
           <Stack.Screen
@@ -130,9 +130,9 @@ function RootNavigator(): React.JSX.Element {
             component={FinancialReport}
             options={{
               headerShown: true,
-              headerTitleStyle: {color: 'black'},
+              headerTitleStyle: {color: COLORS.DARK[100]},
               title: 'Financial Report',
-              headerLeft: props => headerLeft(props, 'black'),
+              headerLeft: props => headerLeft(props, COLORS.DARK[100]),
             }}
           />
           <Stack.Screen

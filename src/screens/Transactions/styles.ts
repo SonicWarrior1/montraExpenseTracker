@@ -44,7 +44,6 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
     listItemCtr: {
         marginVertical: 5,
         flexDirection: 'row',
-        backgroundColor: COLOR.LIGHT[60],
         borderRadius: 16,
         flex: 1,
         paddingVertical: 10,

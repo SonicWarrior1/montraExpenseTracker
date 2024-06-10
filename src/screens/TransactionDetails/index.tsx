@@ -7,7 +7,7 @@ import {
   Text,
   View,
 } from 'react-native';
-import styles from './styles';
+import style from './styles';
 import {TransactionDetailScreenProps} from '../../defs/navigation';
 import {COLORS} from '../../constants/commonStyles';
 import {ICONS} from '../../constants/icons';
@@ -24,6 +24,7 @@ import {BottomSheetModalMethods} from '@gorhom/bottom-sheet/lib/typescript/types
 import DeleteTransactionSheet from '../../components/DeleteTransSheet';
 import {useAppSelector} from '../../redux/store';
 import {Timestamp} from '@react-native-firebase/firestore';
+import {useAppTheme} from '../../hooks/themeHook';
 
 function TransactionDetails({
   route,
@@ -45,7 +46,7 @@ function TransactionDetails({
           bottomSheetModalRef.current?.present();
         }}
         style={{marginRight: 15}}>
-        {ICONS.Trash({height: 25, width: 25, color: 'white'})}
+        {ICONS.Trash({height: 25, width: 25, color: COLOR.LIGHT[100]})}
       </Pressable>
     );
   };
@@ -54,9 +55,11 @@ function TransactionDetails({
       headerRight: headerRight,
     });
   }, []);
+  const COLOR = useAppTheme();
+  const styles = style(COLOR);
   return (
     trans && (
-      <View style={{flex: 1}}>
+      <View style={{flex: 1, backgroundColor: COLOR.LIGHT[100]}}>
         <SafeAreaView
           style={[
             styles.safeView,
@@ -75,7 +78,7 @@ function TransactionDetails({
             {Number(
               (
                 conversion.usd[(currency ?? 'USD').toLowerCase()] * trans.amount
-              ).toFixed(2),
+              ).toFixed(1),
             )}
           </Text>
           <Text style={styles.desc}>{trans.desc ?? ''}</Text>

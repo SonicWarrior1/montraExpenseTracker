@@ -1,8 +1,9 @@
 import React from 'react';
 import {Text, View} from 'react-native';
 import {PieChart} from 'react-native-gifted-charts';
-import styles from '../styles';
+import style from '../styles';
 import {currencies, STRINGS} from '../../../constants/strings';
+import {useAppTheme} from '../../../hooks/themeHook';
 
 function Piegraph({
   transType,
@@ -39,15 +40,17 @@ function Piegraph({
   totalSpend: string;
   totalIncome: string;
 }>) {
+  const COLOR = useAppTheme();
+  const styles = style(COLOR);
   function labelComponent() {
     return (
-      <Text style={{fontSize: 32, fontWeight: '700'}}>
+      <Text style={{fontSize: 32, fontWeight: '700', color: COLOR.DARK[100]}}>
         {currencies[currency!].symbol}
         {(
           conversion.usd?.[currency!.toLowerCase()] *
           Number(transType === 'expense' ? totalSpend : totalIncome)
         )
-          .toFixed(2)
+          .toFixed(1)
           .toString()}
       </Text>
     );
@@ -77,18 +80,19 @@ function Piegraph({
           innerRadius={100}
           isAnimated={true}
           centerLabelComponent={labelComponent}
-          data={Object.entries(transType === 'expense' ? spends : incomes).map(
-            item => {
+          innerCircleColor={COLOR.LIGHT[100]}
+          data={Object.entries(transType === 'expense' ? spends : incomes)
+            .sort((a, b) => b[1] - a[1])
+            .map(item => {
               return {
                 value: item[1],
                 color: catColors![item[0]],
               };
-            },
-          )}
+            })}
         />
       ) : (
         <View style={styles.noDataCtr}>
-          <Text>{STRINGS.NoData}</Text>
+          <Text style={{color: COLOR.DARK[100]}}>{STRINGS.NoData}</Text>
         </View>
       )}
     </View>

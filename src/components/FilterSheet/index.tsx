@@ -10,6 +10,7 @@ import {
 import style from './styles';
 import {useAppDispatch, useAppSelector} from '../../redux/store';
 import {
+  clearCatFilter,
   openCatSheet,
   openFilterSheet,
   setFilters,
@@ -23,6 +24,7 @@ function FilterSheet() {
   const snapPoints = useMemo(() => ['55%'], []);
   const ref = useRef<BottomSheetModal>(null);
   const isOpen = useAppSelector(state => state.transaction.isFilterOpen);
+  const selectedCats = useAppSelector(state => state.transaction.filters.cat);
   console.log(isOpen);
   useEffect(() => {
     if (isOpen === true) {
@@ -59,6 +61,7 @@ function FilterSheet() {
                 setSort(-1);
                 dispatch(setFilters(-1));
                 dispatch(setSortFilter(2));
+                dispatch(clearCatFilter());
               }}>
               <Text style={styles.editBtnText}>{STRINGS.Reset}</Text>
             </Pressable>
@@ -227,12 +230,16 @@ function FilterSheet() {
             <Text style={styles.text1}>{STRINGS.ChooseCategory}</Text>
             <Pressable
               onPress={() => {
+                console.log('jdnk');
                 dispatch(openCatSheet(true));
               }}
               style={styles.pressable}>
-              <Text style={styles.text2}>0 Selected</Text>
-
-              {ICONS.ArrowRight({height: 20, width: 20})}
+              <Text style={styles.text2}>{selectedCats?.length?? 0} Selected</Text>
+              {ICONS.ArrowRight({
+                height: 20,
+                width: 20,
+                color: COLOR.DARK[100],
+              })}
             </Pressable>
           </View>
           <CustomButton

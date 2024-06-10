@@ -9,7 +9,6 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
         justifyContent: 'space-around',
     },
     animatedBtnOuter: {
-        backgroundColor: COLOR.LIGHT[40],
         width: 80,
         height: 80,
         borderRadius: 40,

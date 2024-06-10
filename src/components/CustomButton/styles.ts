@@ -6,7 +6,7 @@ const styles = StyleSheet.create({
         height: 50,
         justifyContent: 'center',
         alignItems: 'center',
-        borderRadius: 10,
+        borderRadius: 16,
 
     }, text: { fontWeight: 'bold', fontSize: 18 },
     btnCtr: { flexDirection: 'row', columnGap: 10, alignItems: 'center' },

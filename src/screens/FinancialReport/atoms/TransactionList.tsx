@@ -1,11 +1,12 @@
 import {Timestamp} from '@react-native-firebase/firestore';
 import React from 'react';
 import {FlatList, Pressable, Text, View} from 'react-native';
-import styles from '../styles';
+import style from '../styles';
 import {currencies} from '../../../constants/strings';
 import {COLORS} from '../../../constants/commonStyles';
 import {catIcons, ICONS} from '../../../constants/icons';
 import { transactionType } from '../../../defs/transaction';
+import { useAppTheme } from '../../../hooks/themeHook';
 
 function TransactionList({
   data,
@@ -26,6 +27,8 @@ function TransactionList({
   };
   currency: string | undefined;
 }>) {
+  const COLOR = useAppTheme();
+  const styles = style(COLOR);
   return (
     <FlatList
       style={{paddingHorizontal: 20}}
@@ -49,7 +52,7 @@ function TransactionList({
               //       (
               //         conversion['usd'][currency!.toLowerCase()] *
               //         item.amount
-              //       ).toFixed(2),
+              //       ).toFixed(1),
               //     ),
               //   },
               // });
@@ -87,7 +90,7 @@ function TransactionList({
                 {currencies[currency!].symbol}{' '}
                 {(
                   conversion['usd'][currency!.toLowerCase()] * item.amount
-                ).toFixed(2)}
+                ).toFixed(1)}
               </Text>
               <Text style={styles.text2}>
                 {Timestamp.fromMillis(item.timeStamp.seconds * 1000)

@@ -1,4 +1,4 @@
-import {Pressable, View} from 'react-native';
+import {Pressable, useColorScheme, View} from 'react-native';
 import {ICONS} from '../../constants/icons';
 import {COLORS} from '../../constants/commonStyles';
 import {BottomTabBarProps} from '@react-navigation/bottom-tabs';
@@ -11,7 +11,8 @@ import style from './styles';
 import TabButton from './atoms/TabButton';
 import {NAVIGATION, STRINGS} from '../../constants/strings';
 import AnimatedBtn from './atoms/animatedButton';
-import { useAppTheme } from '../../hooks/themeHook';
+import {useAppTheme} from '../../hooks/themeHook';
+import {useAppSelector} from '../../redux/store';
 
 function CustomTab(props: Readonly<BottomTabBarProps>): React.JSX.Element {
   const deg = useSharedValue('-45deg');
@@ -62,6 +63,8 @@ function CustomTab(props: Readonly<BottomTabBarProps>): React.JSX.Element {
   }
   const COLOR = useAppTheme();
   const styles = style(COLOR);
+  const scheme = useColorScheme();
+  const theme = useAppSelector(state => state.user.currentUser?.theme);
   return (
     <View style={styles.tabCtr}>
       <TabButton
@@ -125,7 +128,13 @@ function CustomTab(props: Readonly<BottomTabBarProps>): React.JSX.Element {
       <Animated.View
         style={[
           styles.animatedBtnOuter,
-          {transform: [{translateY: -15}, {rotateZ: deg}]},
+          {
+            transform: [{translateY: -15}, {rotateZ: deg}],
+            backgroundColor:
+              (theme === 'device' ? scheme : theme) === 'dark'
+                ? COLOR.LIGHT[40]
+                : COLOR.LIGHT[100],
+          },
         ]}>
         <Pressable style={styles.animatedBtn} onPress={handleAddBtnPress}>
           {ICONS.Close({height: 40, width: 40})}

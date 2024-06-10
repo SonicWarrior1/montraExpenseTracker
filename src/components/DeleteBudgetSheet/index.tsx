@@ -7,7 +7,7 @@ import React, {useCallback, useMemo} from 'react';
 import {Text, View} from 'react-native';
 import CustomButton from '../CustomButton';
 import {useAppDispatch, useAppSelector} from '../../redux/store';
-import styles from './styles';
+import style from './styles';
 import {BottomSheetModalMethods} from '@gorhom/bottom-sheet/lib/typescript/types';
 import {COLORS} from '../../constants/commonStyles';
 import {setLoading} from '../../redux/reducers/userSlice';
@@ -17,6 +17,7 @@ import {RootStackParamList} from '../../defs/navigation';
 import {StackNavigationProp} from '@react-navigation/stack';
 import SheetBackdrop from '../SheetBackDrop';
 import {STRINGS} from '../../constants/strings';
+import {useAppTheme} from '../../hooks/themeHook';
 function DeleteBudgetSheet({
   bottomSheetModalRef,
   navigation,
@@ -30,6 +31,8 @@ function DeleteBudgetSheet({
   >;
   category: string;
 }>) {
+  const COLOR = useAppTheme();
+  const styles = style(COLOR);
   const uid = useAppSelector(state => state.user.currentUser?.uid);
   const dispatch = useAppDispatch();
   const snapPoints = useMemo(() => ['30%'], []);
@@ -44,7 +47,7 @@ function DeleteBudgetSheet({
         .update({
           [`budget.${category}`]: deleteField(),
         });
-      Toast.show({text1: STRINGS.BudgetDeletedSuccesfully,type:'custom'});
+      Toast.show({text1: STRINGS.BudgetDeletedSuccesfully, type: 'custom'});
       dispatch(setLoading(false));
     } catch (e) {
       console.log(e);
@@ -59,7 +62,8 @@ function DeleteBudgetSheet({
         index={0}
         snapPoints={snapPoints}
         backdropComponent={SheetBackdrop}
-        backgroundStyle={styles.sheetBack}>
+        backgroundStyle={styles.sheetBack}
+        handleIndicatorStyle={{backgroundColor: COLOR.DARK[100]}}>
         <BottomSheetView style={styles.sheetView}>
           <Text style={styles.text1}>{STRINGS.Removebudget}</Text>
           <Text style={styles.text2}>{STRINGS.SureRemoveBudgetNo}</Text>

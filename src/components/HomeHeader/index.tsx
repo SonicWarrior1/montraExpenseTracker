@@ -4,14 +4,17 @@ import {Image, Pressable, Text, View} from 'react-native';
 import {Dropdown} from 'react-native-element-dropdown';
 import {monthData, NAVIGATION, STRINGS} from '../../constants/strings';
 import {ICONS} from '../../constants/icons';
-import styles from './styles';
+import style from './styles';
 import {useAppSelector} from '../../redux/store';
 import {HomeScreenProps} from '../../defs/navigation';
+import { useAppTheme } from '../../hooks/themeHook';
 
 function HomeHeader({navigation}: Readonly<HomeScreenProps>) {
   const notifications = useAppSelector(
     state => state.user.currentUser?.notification,
   );
+  const COLOR = useAppTheme();
+  const styles = style(COLOR);
   return (
     <View style={styles.ctr}>
       <View style={styles.imgCtr}>
@@ -28,12 +31,15 @@ function HomeHeader({navigation}: Readonly<HomeScreenProps>) {
         renderRightIcon={() => <></>}
         placeholder={STRINGS.Month}
         placeholderStyle={{marginLeft: 10}}
-        selectedTextStyle={{marginLeft: 10}}
+        selectedTextStyle={{marginLeft: 10,color: COLOR.DARK[100]}}
         value={monthData[new Date().getMonth()]}
         data={monthData}
         labelField={'label'}
         valueField={'value'}
         onChange={() => {}}
+        itemTextStyle={{color: COLOR.DARK[100]}}
+        containerStyle={{backgroundColor: COLOR.LIGHT[100]}}
+        activeColor={COLOR.LIGHT[100]}
       />
       <Pressable
         onPress={() => {
@@ -45,7 +51,7 @@ function HomeHeader({navigation}: Readonly<HomeScreenProps>) {
             <Text style={{color: COLORS.VIOLET[100]}}>
               {
                 Object.values(notifications ?? []).filter(item => !item.read)
-                  .length
+                  ?.length ??0
               }
             </Text>
           </View>

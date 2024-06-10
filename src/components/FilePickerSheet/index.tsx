@@ -10,9 +10,10 @@ import {
   launchCamera,
 } from 'react-native-image-picker';
 import {BottomSheetModalMethods} from '@gorhom/bottom-sheet/lib/typescript/types';
-import styles from './styles';
+import style from './styles';
 import SheetBackdrop from '../SheetBackDrop';
-import { STRINGS } from '../../constants/strings';
+import {STRINGS} from '../../constants/strings';
+import {useAppTheme} from '../../hooks/themeHook';
 
 function FilePickerSheet({
   bottomSheetModalRef,
@@ -75,6 +76,8 @@ function FilePickerSheet({
       console.log(e);
     }
   }, []);
+  const COLOR = useAppTheme();
+  const styles = style(COLOR);
   return (
     <BottomSheetModal
       enablePanDownToClose
@@ -83,9 +86,14 @@ function FilePickerSheet({
       snapPoints={snapPoints}
       backdropComponent={SheetBackdrop}
       backgroundStyle={styles.sheetBack}
-      onDismiss={onDismiss}>
+      onDismiss={onDismiss}
+      handleIndicatorStyle={{backgroundColor: COLOR.DARK[100]}}>
       <BottomSheetView style={styles.sheetView}>
-        <SheetButtons title={STRINGS.Camera} icon={ICONS.Camera} onPress={openCamera} />
+        <SheetButtons
+          title={STRINGS.Camera}
+          icon={ICONS.Camera}
+          onPress={openCamera}
+        />
         <SheetButtons
           title={STRINGS.Gallery}
           icon={ICONS.Gallery}
@@ -111,6 +119,8 @@ function SheetButtons({
   title: string;
   onPress: () => void;
 }>) {
+  const COLOR = useAppTheme();
+  const styles = style(COLOR);
   return (
     <Pressable style={styles.sheetBtn} onPress={onPress}>
       {icon({height: 30, width: 30})}

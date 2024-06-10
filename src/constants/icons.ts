@@ -26,7 +26,7 @@ import ArrowRight from '../assets/Svgs/arrow-right.svg';
 import Trash from '../assets/Svgs/trash.svg';
 import Alert from '../assets/Svgs/alert.svg';
 import Notification from '../assets/Svgs/notifiaction.svg';
-import ArrowRight2 from '../assets/Svgs/arrow right 2.svg';
+import ArrowRight2 from '../assets/Svgs/right-arrow-svgrepo-com.svg';
 import More from '../assets/Svgs/more-horizontal.svg';
 import Car from '../assets/Svgs/car.svg';
 import Bill from '../assets/Svgs/recurring bill.svg';

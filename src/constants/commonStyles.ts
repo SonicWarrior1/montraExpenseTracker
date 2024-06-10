@@ -5,7 +5,7 @@ export const COLORS = {
         BLUE: '#0077FF',
         GREEN: '#00A86B',
         RED: '#FD3C4A',
-        LIGHT: '#FFFFFF',
+        LIGHT: '#F7F9FA',
         DARK: '#0D0E0F',
     },
     SECONDARY: {

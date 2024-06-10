@@ -2,9 +2,10 @@ import React from 'react';
 import {Pressable, View} from 'react-native';
 import {ICONS} from '../../../constants/icons';
 import {Dropdown} from 'react-native-element-dropdown';
-import styles from '../styles';
+import style from '../styles';
 import {monthData, STRINGS} from '../../../constants/strings';
 import {COLORS} from '../../../constants/commonStyles';
+import {useAppTheme} from '../../../hooks/themeHook';
 
 function FinancialReportHeader({
   month,
@@ -19,6 +20,8 @@ function FinancialReportHeader({
   setGraph: React.Dispatch<React.SetStateAction<number>>;
   setType: React.Dispatch<React.SetStateAction<'transaction' | 'category'>>;
 }>) {
+  const COLOR = useAppTheme();
+  const styles = style(COLOR);
   return (
     <View style={styles.monthRow}>
       <Dropdown
@@ -37,6 +40,10 @@ function FinancialReportHeader({
         onChange={({value}) => {
           setMonth(value - 1);
         }}
+        itemTextStyle={{color: COLOR.DARK[100]}}
+        containerStyle={{backgroundColor: COLOR.LIGHT[100]}}
+        activeColor={COLOR.LIGHT[100]}
+        selectedTextStyle={{color: COLOR.DARK[100], marginLeft: 10}}
       />
       <View style={styles.graphBtnCtr}>
         <Pressable
@@ -46,7 +53,7 @@ function FinancialReportHeader({
               borderTopLeftRadius: 6,
               borderBottomLeftRadius: 6,
               backgroundColor:
-                graph === 0 ? COLORS.VIOLET[100] : COLORS.LIGHT[100],
+                graph === 0 ? COLOR.VIOLET[100] : COLOR.LIGHT[100],
             },
           ]}
           onPress={() => {
@@ -56,7 +63,7 @@ function FinancialReportHeader({
           {ICONS.LineChart({
             height: 20,
             width: 20,
-            color: graph === 0 ? COLORS.LIGHT[100] : COLORS.VIOLET[100],
+            color: graph === 0 ? COLOR.LIGHT[100] : COLOR.VIOLET[100],
           })}
         </Pressable>
         <Pressable
@@ -66,7 +73,7 @@ function FinancialReportHeader({
               borderTopRightRadius: 6,
               borderBottomRightRadius: 6,
               backgroundColor:
-                graph === 1 ? COLORS.VIOLET[100] : COLORS.LIGHT[100],
+                graph === 1 ? COLOR.VIOLET[100] : COLOR.LIGHT[100],
             },
           ]}
           onPress={() => {
@@ -76,7 +83,7 @@ function FinancialReportHeader({
           {ICONS.Pie({
             height: 20,
             width: 20,
-            color: graph === 1 ? COLORS.LIGHT[100] : COLORS.VIOLET[100],
+            color: graph === 1 ? COLOR.LIGHT[100] : COLOR.VIOLET[100],
           })}
         </Pressable>
       </View>

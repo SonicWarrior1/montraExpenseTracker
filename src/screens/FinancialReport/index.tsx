@@ -1,8 +1,14 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
-import {Pressable, SafeAreaView, Text, View} from 'react-native';
+import {
+  Pressable,
+  SafeAreaView,
+  Text,
+  useColorScheme,
+  View,
+} from 'react-native';
 import {COLORS} from '../../constants/commonStyles';
 import {ICONS} from '../../constants/icons';
-import styles from './styles';
+import style from './styles';
 import {Dropdown} from 'react-native-element-dropdown';
 import {useAppSelector} from '../../redux/store';
 import Sapcer from '../../components/Spacer';
@@ -11,6 +17,7 @@ import Linegraph from './atoms/linegraph';
 import Piegraph from './atoms/piegraph';
 import TransactionList from './atoms/TransactionList';
 import CategoryList from './atoms/CategoryList';
+import {useAppTheme} from '../../hooks/themeHook';
 
 function FinancialReport() {
   const getMyColor = useCallback(() => {
@@ -34,14 +41,14 @@ function FinancialReport() {
     () =>
       Object.values(spends)
         .reduce((a, b) => a + b, 0)
-        .toFixed(2),
+        .toFixed(1),
     [spends],
   );
   const totalIncome = useMemo(
     () =>
       Object.values(incomes)
         .reduce((a, b) => a + b, 0)
-        .toFixed(2),
+        .toFixed(1),
     [incomes],
   );
   useEffect(() => {
@@ -58,6 +65,10 @@ function FinancialReport() {
       setCatColors(undefined);
     };
   }, [transType]);
+  const COLOR = useAppTheme();
+  const styles = style(COLOR);
+  const scheme = useColorScheme();
+  const theme = useAppSelector(state => state.user.currentUser?.theme);
   return (
     <SafeAreaView style={styles.safeView}>
       <FinancialReportHeader
@@ -90,7 +101,16 @@ function FinancialReport() {
         />
       )}
       <View style={styles.typeRow}>
-        <View style={styles.innerTypeRow}>
+        <View
+          style={[
+            styles.innerTypeRow,
+            {
+              backgroundColor:
+                (theme === 'device' ? scheme : theme) === 'dark'
+                  ? COLORS.DARK[75]
+                  : COLOR.LIGHT[60],
+            },
+          ]}>
           <Pressable
             style={[
               styles.typeBtn,
@@ -98,7 +118,9 @@ function FinancialReport() {
                 backgroundColor:
                   transType === 'expense'
                     ? COLORS.VIOLET[100]
-                    : COLORS.LIGHT[60],
+                    : (theme === 'device' ? scheme : theme) === 'light'
+                    ? COLORS.LIGHT[60]
+                    : COLOR.DARK[75],
               },
             ]}
             onPress={() => {
@@ -111,7 +133,7 @@ function FinancialReport() {
                   color:
                     transType === 'expense'
                       ? COLORS.LIGHT[100]
-                      : COLORS.DARK[100],
+                      : COLOR.DARK[100],
                 },
               ]}>
               Expense
@@ -124,7 +146,9 @@ function FinancialReport() {
                 backgroundColor:
                   transType === 'income'
                     ? COLORS.VIOLET[100]
-                    : COLORS.LIGHT[60],
+                    : (theme === 'device' ? scheme : theme) === 'light'
+                    ? COLORS.LIGHT[60]
+                    : COLOR.DARK[75],
               },
             ]}
             onPress={() => {
@@ -137,7 +161,7 @@ function FinancialReport() {
                   color:
                     transType === 'income'
                       ? COLORS.LIGHT[100]
-                      : COLORS.DARK[100],
+                      : COLOR.DARK[100],
                 },
               ]}>
               Income
@@ -166,9 +190,13 @@ function FinancialReport() {
               (value as 'transaction' | 'category') === 'transaction' ? 0 : 1,
             );
           }}
+          itemTextStyle={{color: COLOR.DARK[100]}}
+          containerStyle={{backgroundColor: COLOR.LIGHT[100]}}
+          activeColor={COLOR.LIGHT[100]}
+          selectedTextStyle={{color: COLOR.DARK[100]}}
         />
         <Pressable style={styles.filterBtn} onPress={() => {}}>
-          {ICONS.SortwithArrow({height: 25, width: 25})}
+          {ICONS.SortwithArrow({height: 25, width: 25, color: COLOR.DARK[100]})}
         </Pressable>
       </View>
       <Sapcer height={10} />
