@@ -10,6 +10,7 @@ import Loader from './components/Loader';
 import Toast from 'react-native-toast-message';
 import {enableFreeze, enableScreens} from 'react-native-screens';
 import {toastConfig} from './components/customToast';
+import BootSplash from 'react-native-bootsplash';
 
 enableFreeze(true);
 enableScreens(false);
@@ -23,7 +24,7 @@ function App(): React.JSX.Element {
       <Provider store={store}>
         <PersistGate persistor={persistor}>
           <Loader>
-            <NavigationContainer>
+            <NavigationContainer onReady={() => BootSplash.hide({fade: true})}>
               <RootNavigator />
               <Toast
                 position="bottom"

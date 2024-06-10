@@ -1,13 +1,13 @@
 import { StyleSheet } from 'react-native';
 import { COLORS } from '../../constants/commonStyles';
 
-const styles = (COLORS:typeof COLORS) => StyleSheet.create({
+const styles = (COLOR:typeof COLORS) => StyleSheet.create({
     dropdown: {
         borderWidth: 1,
         borderRadius: 20,
         height: 40,
         paddingHorizontal: 20,
-        borderColor: COLORS.LIGHT[20],
+        borderColor: COLOR.LIGHT[20],
         minWidth: 120,
     }, ctr: {
         width: '100%',
@@ -16,10 +16,10 @@ const styles = (COLORS:typeof COLORS) => StyleSheet.create({
         paddingHorizontal: 10,
         alignItems: 'center',
     }, imgCtr: {
-        backgroundColor: COLORS.LIGHT[100],
+        backgroundColor: COLOR.LIGHT[100],
         padding: 2,
         borderWidth: 1,
-        borderColor: COLORS.VIOLET[100],
+        borderColor: COLOR.VIOLET[100],
         borderRadius: 30,
         alignItems: 'center',
         justifyContent: 'center',
@@ -31,7 +31,7 @@ const styles = (COLORS:typeof COLORS) => StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 10,
-        backgroundColor: COLORS.LIGHT[100],
+        backgroundColor: COLOR.LIGHT[100],
         position: 'absolute',
         top: 15,
         left: -5,

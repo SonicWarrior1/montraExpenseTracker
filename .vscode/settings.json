@@ -1,5 +1,5 @@
 {
-    "svg.preview.background": "transparent",
+    "svg.preview.background": "editor",
     "conventionalCommits.scopes": [
         "ExportData",
         "financial report",

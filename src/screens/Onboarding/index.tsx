@@ -9,9 +9,9 @@ import {NAVIGATION, STRINGS} from '../../constants/strings';
 import {COLORS} from '../../constants/commonStyles';
 import {OnboardingScreenProps} from '../../defs/navigation';
 import Sapcer from '../../components/Spacer';
-import { useAppTheme } from '../../hooks/themeHook';
+import {useAppTheme} from '../../hooks/themeHook';
 const screenWidth = Dimensions.get('screen').width;
-const screenHeight = Dimensions.get('screen').height;
+const screenHeight = Dimensions.get('window').height;
 const data = [
   {
     icon: (
@@ -48,53 +48,59 @@ function Onboarding({navigation}: Readonly<OnboardingScreenProps>) {
   return (
     <SafeAreaView style={styles.safeView}>
       <View style={styles.mainView}>
-        <Carousel
-          loop={false}
-          width={screenWidth - 40}
-          height={screenHeight * 0.6}
-          data={data}
-          scrollAnimationDuration={1000}
-          onSnapToItem={index => {
-            setIndex(index);
-          }}
-          renderItem={({item}) => (
-            <View style={styles.carouselCtr}>
-              {item.icon}
-              <Text style={styles.text1}>{item.text1}</Text>
-              <View style={{height: screenHeight * 0.025}} />
-              <Text style={styles.text2}>{item.text2}</Text>
-            </View>
-          )}
-        />
-        <View style={styles.progressDotCtr}>
-          {[0, 1, 2].map(i => {
-            return (
-              <View
-                key={i}
-                style={[
-                  styles.progressDot,
-                  {
-                    height: index == i ? 16 : 8,
-                    width: index == i ? 16 : 8,
-                    backgroundColor:
-                      index == i
-                        ? COLORS.PRIMARY.VIOLET
-                        : COLORS.SECONDARY.VIOLET,
-                  },
-                ]} />
-            );
-          })}
+        <View>
+          <Sapcer height={screenHeight * 0.045} />
+          <View style={{height: screenHeight * 0.6}}>
+            <Carousel
+              loop={false}
+              width={screenWidth - 40}
+              data={data}
+              scrollAnimationDuration={300}
+              onSnapToItem={index => {
+                setIndex(index);
+              }}
+              renderItem={({item}) => (
+                <View style={styles.carouselCtr}>
+                  {item.icon}
+                  <Text style={styles.text1}>{item.text1}</Text>
+                  <View style={{height: screenHeight * 0.025}} />
+                  <Text style={styles.text2}>{item.text2}</Text>
+                </View>
+              )}
+            />
+          </View>
+          <Sapcer height={screenHeight * 0.03} />
+          <View style={styles.progressDotCtr}>
+            {[0, 1, 2].map(i => {
+              return (
+                <View
+                  key={i}
+                  style={[
+                    styles.progressDot,
+                    {
+                      height: index == i ? 16 : 8,
+                      width: index == i ? 16 : 8,
+                      backgroundColor:
+                        index == i
+                          ? COLORS.PRIMARY.VIOLET
+                          : COLORS.SECONDARY.VIOLET,
+                    },
+                  ]}
+                />
+              );
+            })}
+          </View>
         </View>
-        <Sapcer height={screenHeight * 0.03} />
-        <CustomButton title={STRINGS.SIGNUP} onPress={handleSignup} />
-        <Sapcer height={screenHeight * 0.025} />
-        <CustomButton
-          title={STRINGS.LOGIN}
-          onPress={handleLogin}
-          backgroundColor={COLORS.SECONDARY.VIOLET}
-          textColor={COLORS.PRIMARY.VIOLET}
-        />
-        <Sapcer height={screenHeight * 0.08} />
+        <View style={{paddingBottom: screenHeight * 0.04}}>
+          <CustomButton title={STRINGS.SIGNUP} onPress={handleSignup} />
+          <Sapcer height={screenHeight * 0.015} />
+          <CustomButton
+            title={STRINGS.LOGIN}
+            onPress={handleLogin}
+            backgroundColor={COLORS.SECONDARY.VIOLET}
+            textColor={COLORS.PRIMARY.VIOLET}
+          />
+        </View>
       </View>
     </SafeAreaView>
   );

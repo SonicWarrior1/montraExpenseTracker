@@ -1,12 +1,16 @@
 import { StyleSheet } from 'react-native';
 import { COLORS } from '../../constants/commonStyles';
 
-const styles = (COLOR:typeof COLORS)=> StyleSheet.create({
-    safeView: { flex: 1, backgroundColor: COLOR.LIGHT[100] },
-    mainView: {
+const styles = (COLOR: typeof COLORS) => StyleSheet.create({
+    safeView: {
         flex: 1,
-        justifyContent: 'center',
+        backgroundColor: COLOR.LIGHT[100]
+    },
+    mainView: {
+        // flex: 1,
+        justifyContent: 'space-between',
         paddingHorizontal: 20,
+        flex: 1,
     },
     text1: {
         fontSize: 32,

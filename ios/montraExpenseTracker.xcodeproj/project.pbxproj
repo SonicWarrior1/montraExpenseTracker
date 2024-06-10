@@ -16,6 +16,7 @@
 		735547487A3993F1625677EA /* Pods_montraExpenseTracker.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BA73F5E771C26330F74CFF0A /* Pods_montraExpenseTracker.framework */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		9386783C2C005869008769F1 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9386783B2C005869008769F1 /* GoogleService-Info.plist */; };
+		DE1F185A9D7F4B4D8C40AB66 /* BootSplash.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 32C4845C3A0F44BB95A84695 /* BootSplash.storyboard */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -49,6 +50,7 @@
 		BA73F5E771C26330F74CFF0A /* Pods_montraExpenseTracker.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_montraExpenseTracker.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E68B7DA9EA90760ABE4DE302 /* Pods_montraExpenseTracker_montraExpenseTrackerTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_montraExpenseTracker_montraExpenseTrackerTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
+		32C4845C3A0F44BB95A84695 /* BootSplash.storyboard */ = {isa = PBXFileReference; name = "BootSplash.storyboard"; path = "montraExpenseTracker/BootSplash.storyboard"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -99,6 +101,7 @@
 				13B07FB71A68108700A75B9A /* main.m */,
 				13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */,
 				17BA29DB9536A4C17A9564E8 /* PrivacyInfo.xcprivacy */,
+				32C4845C3A0F44BB95A84695 /* BootSplash.storyboard */,
 			);
 			name = montraExpenseTracker;
 			sourceTree = "<group>";
@@ -254,6 +257,7 @@
 				9386783C2C005869008769F1 /* GoogleService-Info.plist in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				305F32DBE62F12B36B0670F2 /* PrivacyInfo.xcprivacy in Resources */,
+				DE1F185A9D7F4B4D8C40AB66 /* BootSplash.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
