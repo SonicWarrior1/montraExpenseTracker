@@ -3,7 +3,9 @@ import {Dimensions, Pressable, Text, View} from 'react-native';
 import {LineChart} from 'react-native-gifted-charts';
 import {COLORS} from '../../../constants/commonStyles';
 import {transactionType} from '../../../defs/transaction';
-import styles from '../styles';
+import style from '../styles';
+import {STRINGS} from '../../../constants/strings';
+import {useAppTheme} from '../../../hooks/themeHook';
 
 function Graph({
   data,
@@ -14,6 +16,8 @@ function Graph({
   };
   month: number;
 }>) {
+  const COLOR = useAppTheme();
+  const styles = style(COLOR);
   const [graphDay, setGraphDay] = useState(0);
   const startOfToday = new Date().setHours(0, 0, 0, 0) / 1000;
   const startOfWeek = Math.floor(
@@ -46,26 +50,18 @@ function Graph({
   return (
     <>
       {graphData.length <= 1 ? (
-        <View
-          style={{height: 180, alignItems: 'center', justifyContent: 'center'}}>
-          <Text
-            style={{
-              fontSize: 16,
-              fontWeight: '500',
-              color: COLORS.DARK[25],
-              textAlign: 'center',
-            }}>
-            Not enough data
-          </Text>
+        <View style={styles.emptyCtr}>
+          <Text style={styles.emptyText}>{STRINGS.NotEnoughData}</Text>
         </View>
       ) : (
         <View style={{transform: [{translateX: -10}]}}>
           <LineChart
-            height={150}
+            height={180}
             data={graphData}
             areaChart
             adjustToWidth
             startFillColor1={COLORS.VIOLET[40]}
+            endFillColor1={COLOR.LIGHT[100]}
             isAnimated={true}
             initialSpacing={0}
             width={Dimensions.get('screen').width}
@@ -75,8 +71,10 @@ function Graph({
             hideYAxisText
             hideAxesAndRules
             color={COLORS.VIOLET[100]}
-            curveType={0}
+            curveType={1}
             curved={true}
+            overflowBottom={-1}
+            onlyPositive
           />
         </View>
       )}
@@ -86,7 +84,7 @@ function Graph({
             styles.filterBtn,
             {
               backgroundColor:
-                graphDay === 0 ? COLORS.YELLOW[20] : COLORS.LIGHT[100],
+                graphDay === 0 ? COLOR.YELLOW[20] : COLOR.LIGHT[100],
             },
           ]}
           onPress={() => {
@@ -100,7 +98,7 @@ function Graph({
                 fontWeight: graphDay === 0 ? '700' : '500',
               },
             ]}>
-            Today
+            {STRINGS.Today}
           </Text>
         </Pressable>
         <Pressable
@@ -108,7 +106,7 @@ function Graph({
             styles.filterBtn,
             {
               backgroundColor:
-                graphDay === 1 ? COLORS.YELLOW[20] : COLORS.LIGHT[100],
+                graphDay === 1 ? COLOR.YELLOW[20] : COLOR.LIGHT[100],
             },
           ]}
           onPress={() => {
@@ -122,7 +120,7 @@ function Graph({
                 fontWeight: graphDay === 1 ? '700' : '500',
               },
             ]}>
-            Week
+            {STRINGS.Week}
           </Text>
         </Pressable>
         <Pressable
@@ -130,7 +128,7 @@ function Graph({
             styles.filterBtn,
             {
               backgroundColor:
-                graphDay === 2 ? COLORS.YELLOW[20] : COLORS.LIGHT[100],
+                graphDay === 2 ? COLOR.YELLOW[20] : COLOR.LIGHT[100],
             },
           ]}
           onPress={() => {
@@ -144,7 +142,7 @@ function Graph({
                 fontWeight: graphDay === 2 ? '700' : '500',
               },
             ]}>
-            Month
+            {STRINGS.Month}
           </Text>
         </Pressable>
         <Pressable
@@ -152,7 +150,7 @@ function Graph({
             styles.filterBtn,
             {
               backgroundColor:
-                graphDay === 3 ? COLORS.YELLOW[20] : COLORS.LIGHT[100],
+                graphDay === 3 ? COLOR.YELLOW[20] : COLOR.LIGHT[100],
             },
           ]}
           onPress={() => {
@@ -166,7 +164,7 @@ function Graph({
                 fontWeight: graphDay === 3 ? '700' : '500',
               },
             ]}>
-            Year
+            {STRINGS.Year}
           </Text>
         </Pressable>
       </View>

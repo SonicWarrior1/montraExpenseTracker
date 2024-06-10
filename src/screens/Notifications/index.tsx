@@ -1,17 +1,23 @@
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {FlatList, Pressable, SafeAreaView, Text, View} from 'react-native';
 import {useAppSelector} from '../../redux/store';
 import {NotificationScreenProps} from '../../defs/navigation';
 import {ICONS} from '../../constants/icons';
 import firestore, {Timestamp} from '@react-native-firebase/firestore';
-import styles from './styles';
+import style from './styles';
+import {encrypt} from '../../utils/encryption';
+import {STRINGS} from '../../constants/strings';
+import {useAppTheme} from '../../hooks/themeHook';
 
 function NotificationScreen({navigation}: Readonly<NotificationScreenProps>) {
+  const COLOR = useAppTheme();
+  const styles = style(COLOR);
   const notifications = useAppSelector(
     state => state.user.currentUser?.notification,
   );
   const uid = useAppSelector(state => state.user.currentUser?.uid);
   const [menu, setMenu] = useState(false);
+
   const handleMarkRead = useCallback(async () => {
     try {
       const readNotifications = Object.values(notifications!).reduce(
@@ -27,7 +33,12 @@ function NotificationScreen({navigation}: Readonly<NotificationScreenProps>) {
           },
           val,
         ) => {
-          acc[val.id] = {...val, read: true};
+          acc[val.id] = {
+            ...val,
+            category: encrypt(val.category, uid!),
+            type: encrypt(val.type, uid!),
+            read: true,
+          };
           return acc;
         },
         {},
@@ -40,7 +51,7 @@ function NotificationScreen({navigation}: Readonly<NotificationScreenProps>) {
     } catch (e) {
       console.log(e);
     }
-  }, [notifications]);
+  }, [notifications, uid]);
   const handleDelete = useCallback(async () => {
     try {
       await firestore().collection('users').doc(uid).update({notification: {}});
@@ -48,7 +59,15 @@ function NotificationScreen({navigation}: Readonly<NotificationScreenProps>) {
     } catch (e) {
       console.log(e);
     }
-  }, []);
+  }, [uid]);
+  useEffect(() => {
+    if (
+      Object.values(notifications!).filter(item => item.read === false)
+        .length !== 0
+    ) {
+      handleMarkRead();
+    }
+  });
   return (
     <SafeAreaView style={styles.safeView}>
       <View style={styles.header}>
@@ -60,25 +79,23 @@ function NotificationScreen({navigation}: Readonly<NotificationScreenProps>) {
           {ICONS.ArrowLeft({
             height: 25,
             width: 25,
-            color: 'black',
-            borderColor: 'black',
+            color: COLOR.DARK[100],
+            borderColor: COLOR.DARK[100],
           })}
         </Pressable>
-        <Text style={styles.headerTitle}>Notifications</Text>
+        <Text style={styles.headerTitle}>{STRINGS.Notifications}</Text>
         <Pressable
           style={{marginRight: 15}}
           onPress={() => {
             setMenu(menu => !menu);
           }}>
-          {ICONS.More({height: 20, width: 20})}
+          {ICONS.More({height: 20, width: 20, color: COLOR.DARK[100]})}
         </Pressable>
       </View>
       {notifications === undefined ||
       Object.values(notifications).length === 0 ? (
         <View style={styles.center}>
-          <Text style={styles.NoNotifText}>
-            There is no notification for now
-          </Text>
+          <Text style={styles.NoNotifText}>{STRINGS.NoNotification}</Text>
         </View>
       ) : (
         <FlatList
@@ -91,12 +108,12 @@ function NotificationScreen({navigation}: Readonly<NotificationScreenProps>) {
                 <View>
                   <Text style={styles.text1}>
                     {item.category[0].toUpperCase() + item.category.slice(1)}{' '}
-                    budget has exceeded the limit
+                    {STRINGS.BudgetExceed}
                   </Text>
                   <Text style={styles.text2}>
                     Your{' '}
                     {item.category[0].toUpperCase() + item.category.slice(1)}{' '}
-                    budget has exceeded the limit
+                    {STRINGS.BudgetExceed}
                   </Text>
                 </View>
                 <Text style={styles.text2}>
@@ -113,10 +130,10 @@ function NotificationScreen({navigation}: Readonly<NotificationScreenProps>) {
       {menu && (
         <View style={styles.menu}>
           <Pressable onPress={handleMarkRead}>
-            <Text>Mark all Read</Text>
+            <Text style={styles.menuText}>{STRINGS.MarkAllRead}</Text>
           </Pressable>
           <Pressable onPress={handleDelete}>
-            <Text>Remove all</Text>
+            <Text style={styles.menuText}>{STRINGS.RemoveAll}</Text>
           </Pressable>
         </View>
       )}

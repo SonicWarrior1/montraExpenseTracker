@@ -1,15 +1,16 @@
 import {BottomSheetModal, BottomSheetView} from '@gorhom/bottom-sheet';
-import React, {useCallback, useMemo, useState} from 'react';
+import React, {useMemo, useState} from 'react';
 import {Pressable, View} from 'react-native';
 import CustomDropdown from '../CustomDropDown';
 import DatePicker from 'react-native-date-picker';
 import CustomButton from '../CustomButton';
 import {BottomSheetModalMethods} from '@gorhom/bottom-sheet/lib/typescript/types';
 import CustomInput from '../CustomInput';
-import {monthData, weekData} from '../../constants/strings';
+import {monthData, STRINGS, weekData} from '../../constants/strings';
 import {repeatDataType} from '../../defs/transaction';
-import styles from './styles';
+import style from './styles';
 import SheetBackdrop from '../SheetBackDrop';
+import { useAppTheme } from '../../hooks/themeHook';
 
 function RepeatTransactionSheet({
   bottomSheetModalRef,
@@ -56,7 +57,8 @@ function RepeatTransactionSheet({
     return daysInYear;
   }, [year]);
   const daysInYear = generateDaysInYear;
-
+  const COLOR = useAppTheme();
+  const styles = style(COLOR);
   return (
     <BottomSheetModal
       enablePanDownToClose
@@ -64,10 +66,11 @@ function RepeatTransactionSheet({
       index={0}
       snapPoints={snapPoints}
       backdropComponent={SheetBackdrop}
-      backgroundStyle={{borderTopLeftRadius: 32, borderTopRightRadius: 32}}>
+      backgroundStyle={styles.sheetBack}
+      handleIndicatorStyle={{backgroundColor:COLOR.DARK[100]}}>
       <BottomSheetView style={styles.sheetView}>
         <View style={styles.flexRow}>
-          <View style={{flex: 1}}>
+          <View style={styles.flex}>
             <CustomDropdown
               data={[
                 {label: 'Yearly', value: 'yearly'},
@@ -83,19 +86,19 @@ function RepeatTransactionSheet({
             />
           </View>
           {freq === 'yearly' && (
-            <View style={{flex: 1}}>
+            <View style={styles.flex}>
               <CustomDropdown
                 data={monthData}
                 onChange={val => {
                   setMonth(val.value);
                 }}
-                placeholder="Month"
+                placeholder={STRINGS.Month}
                 value={month}
               />
             </View>
           )}
           {(freq === 'yearly' || freq === 'monthly') && (
-            <View style={{flex: 1}}>
+            <View style={styles.flex}>
               <CustomDropdown
                 data={
                   freq === 'monthly'
@@ -115,26 +118,26 @@ function RepeatTransactionSheet({
                 onChange={val => {
                   setDay(val.value);
                 }}
-                placeholder="Day"
+                placeholder={STRINGS.Day}
                 value={day}
               />
             </View>
           )}
           {freq === 'weekly' && (
-            <View style={{flex: 1}}>
+            <View style={styles.flex}>
               <CustomDropdown
                 data={weekData}
                 onChange={val => {
                   setWeekDay(val.value);
                 }}
-                placeholder="Day"
+                placeholder={STRINGS.Day}
                 value={weekDay}
               />
             </View>
           )}
         </View>
         <View style={styles.flexRow}>
-          <View style={{flex: 1}}>
+          <View style={styles.flex}>
             <CustomDropdown
               data={[
                 {label: 'Never', value: 'never'},
@@ -149,19 +152,20 @@ function RepeatTransactionSheet({
           </View>
           {end === 'date' && (
             <Pressable
-              style={{flex: 1}}
+              style={styles.flex}
               onPress={() => {
                 setIsDateOpen(true);
               }}>
               <CustomInput
                 value={date.toLocaleDateString()}
                 onChangeText={() => {}}
-                placeholderText="Date"
+                placeholderText={STRINGS.Date}
                 type="name"
                 onPress={() => {
                   setIsDateOpen(true);
                 }}
                 editable={false}
+                inputColor={COLOR.DARK[100]}
               />
               <DatePicker
                 modal
@@ -177,13 +181,12 @@ function RepeatTransactionSheet({
                 onCancel={() => {
                   setIsDateOpen(false);
                 }}
-                focusable={true}
               />
             </Pressable>
           )}
         </View>
         <CustomButton
-          title="Next"
+          title={STRINGS.Next}
           onPress={() => {
             setRepeatData({
               freq: freq ?? 'daily',

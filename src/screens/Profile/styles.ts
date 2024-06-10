@@ -1,13 +1,13 @@
 import { StyleSheet } from "react-native";
 import { COLORS } from "../../constants/commonStyles";
 
-const styles = StyleSheet.create({
+const styles = (COLOR: typeof COLORS) => StyleSheet.create({
     colorBox: {
         borderRadius: 10,
         justifyContent: "center",
         alignItems: "center",
         width: 52,
-        height: 52, backgroundColor: COLORS.VIOLET[20],
+        height: 52, backgroundColor: COLOR.VIOLET[20],
     },
     btn: {
         flexDirection: 'row',
@@ -16,9 +16,9 @@ const styles = StyleSheet.create({
         paddingHorizontal: 15,
         paddingVertical: 20,
         borderBottomWidth: 1,
-        borderColor: COLORS.LIGHT[20],
+        borderColor: COLOR.LIGHT[20],
     },
-    safeView: { flex: 1 },
+    safeView: { flex: 1, backgroundColor: COLOR.LIGHT[40] },
     mainView: { paddingHorizontal: 20, paddingVertical: 10 },
     nameRow: {
         flexDirection: 'row',
@@ -31,10 +31,10 @@ const styles = StyleSheet.create({
         columnGap: 15,
     },
     imgCtr: {
-        backgroundColor: 'white',
+        backgroundColor: COLOR.LIGHT[100],
         padding: 5,
         borderWidth: 1,
-        borderColor: COLORS.VIOLET[100],
+        borderColor: COLOR.VIOLET[100],
         borderRadius: 80,
         alignItems: 'center',
         justifyContent: 'center',
@@ -45,16 +45,16 @@ const styles = StyleSheet.create({
     text1: {
         fontSize: 14,
         fontWeight: '500',
-        color: COLORS.DARK[25],
+        color: COLOR.DARK[25],
         marginBottom: 10,
     },
-    text2: { fontSize: 24, fontWeight: '600' },
+    text2: { fontSize: 24, fontWeight: '600', color: COLOR.DARK[100] },
     card: {
-        backgroundColor: COLORS.LIGHT[100],
+        backgroundColor: COLOR.LIGHT[100],
         borderRadius: 24,
         marginTop: 30,
     },
-    btnText: {fontSize: 16, fontWeight: '500'}
+    btnText: { fontSize: 16, fontWeight: '500', color: COLOR.DARK[100] }
 })
 
 export default styles

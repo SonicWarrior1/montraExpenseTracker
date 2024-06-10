@@ -1,12 +1,12 @@
-import { StyleSheet } from "react-native";
-import { COLORS } from "../../constants/commonStyles";
+import { StyleSheet } from 'react-native';
+import { COLORS } from '../../constants/commonStyles';
 
-const styles = StyleSheet.create({
-    safeView: { flex: 1, backgroundColor: COLORS.PRIMARY.LIGHT },
+const styles = (COLOR: typeof COLORS) => StyleSheet.create({
+    safeView: { flex: 1, backgroundColor: COLOR.PRIMARY.LIGHT },
     mainView: {
         flex: 1,
-        alignItems: "center",
-        paddingHorizontal: 20
+        alignItems: 'center',
+        paddingHorizontal: 20,
     },
     financialBtn: {
         width: '100%',
@@ -14,28 +14,28 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         borderRadius: 10,
-        backgroundColor: COLORS.SECONDARY.VIOLET,
-        flexDirection: "row",
-        paddingHorizontal: 20
+        backgroundColor: COLOR.SECONDARY.VIOLET,
+        flexDirection: 'row',
+        paddingHorizontal: 20,
     },
-    financialText: { fontSize: 18, color: COLORS.PRIMARY.VIOLET },
+    financialText: { fontSize: 18, color: COLOR.PRIMARY.VIOLET },
     editBtn: {
         paddingVertical: 8,
         paddingHorizontal: 16,
-        backgroundColor: COLORS.VIOLET[20],
+        backgroundColor: COLOR.VIOLET[20],
         borderRadius: 40,
     },
     editBtnText: {
         fontWeight: '500',
         fontSize: 14,
-        color: COLORS.PRIMARY.VIOLET,
+        color: COLOR.PRIMARY.VIOLET,
     },
     filterBtn: {
         paddingVertical: 12,
         paddingHorizontal: 26,
         borderRadius: 40,
         borderWidth: 1,
-        borderColor: COLORS.LIGHT[20]
+        borderColor: COLOR.LIGHT[20],
     },
     filterBtnText: {
         fontWeight: '500',
@@ -44,7 +44,6 @@ const styles = StyleSheet.create({
     listItemCtr: {
         marginVertical: 5,
         flexDirection: 'row',
-        backgroundColor: COLORS.LIGHT[60],
         borderRadius: 16,
         flex: 1,
         paddingVertical: 10,
@@ -54,7 +53,7 @@ const styles = StyleSheet.create({
         columnGap: 5,
     }, icon: {
         padding: 10,
-        backgroundColor: COLORS.DARK[25],
+        backgroundColor: COLOR.DARK[25],
         borderRadius: 16,
     },
     catCtr: {
@@ -62,13 +61,13 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         rowGap: 5,
     },
-    text1: { fontSize: 16, fontWeight: '500' },
+    text1: { fontSize: 16, fontWeight: '500',color:COLOR.DARK[100] },
     text2: {
         fontSize: 13,
         fontWeight: '500',
-        color: COLORS.DARK[25],
+        color: COLOR.DARK[25],
     },
-    sectionHeader: { fontSize: 18, fontWeight: '600', padding: 8 }
-})
+    sectionHeader: { fontSize: 18, fontWeight: '600', padding: 8,color:COLOR.DARK[100]  },
+});
 
 export default styles;

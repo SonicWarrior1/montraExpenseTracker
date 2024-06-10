@@ -1,19 +1,17 @@
-import { StyleSheet } from "react-native";
-import { COLORS } from "../../constants/commonStyles";
-
-const styles = StyleSheet.create({
-
+import { StyleSheet } from 'react-native';
+import { COLORS } from '../../constants/commonStyles';
+const styles = (COLOR: typeof COLORS) => StyleSheet.create({
     moneyCtr: {
         height: 80,
         borderRadius: 28,
-        justifyContent: 'center',
         flexDirection: 'row',
-        paddingHorizontal: 18,
+        paddingHorizontal: 15,
         columnGap: 10,
         alignItems: 'center',
+        width:180,
     },
     iconCtr: {
-        backgroundColor: COLORS.LIGHT[100],
+        backgroundColor: COLOR.LIGHT[100],
         justifyContent: 'center',
         padding: 8,
         borderRadius: 16,
@@ -21,12 +19,14 @@ const styles = StyleSheet.create({
     text1: {
         fontSize: 14,
         fontWeight: '500',
-        color: COLORS.LIGHT[100],
+        color: COLOR.LIGHT[100],
     },
     text2: {
         fontSize: 22,
         fontWeight: '600',
-        color: COLORS.LIGHT[100],
+        color: COLOR.LIGHT[100],
+        maxWidth:100,
+        
     },
     filterBtn: {
         paddingVertical: 10,
@@ -35,11 +35,11 @@ const styles = StyleSheet.create({
     },
     filterBtnText: {
         fontSize: 14,
-        color: COLORS.YELLOW[100]
+        color: COLOR.YELLOW[100],
     }, listItemCtr: {
         marginVertical: 5,
         flexDirection: 'row',
-        backgroundColor: COLORS.LIGHT[60],
+        backgroundColor: COLOR.LIGHT[60],
         borderRadius: 16,
         flex: 1,
         paddingVertical: 10,
@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
         columnGap: 5,
     }, icon: {
         padding: 10,
-        backgroundColor: COLORS.DARK[25],
+        backgroundColor: COLOR.DARK[25],
         borderRadius: 16,
     },
     catCtr: {
@@ -57,28 +57,29 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         rowGap: 5,
     },
-    listtext1: { fontSize: 16, fontWeight: '500' },
+    listtext1: { fontSize: 16, fontWeight: '500', color: COLOR.DARK[100] },
     listtext2: {
         fontSize: 13,
         fontWeight: '500',
-        color: COLORS.DARK[25],
+        color: COLOR.DARK[25],
     }, editBtn: {
         paddingVertical: 8,
         paddingHorizontal: 16,
-        backgroundColor: COLORS.VIOLET[20],
+        backgroundColor: COLOR.VIOLET[20],
         borderRadius: 40,
     },
     editBtnText: {
         fontWeight: '500',
         fontSize: 14,
-        color: COLORS.PRIMARY.VIOLET,
+        color: COLOR.PRIMARY.VIOLET,
     },
-    mainView: { backgroundColor: 'white', flex: 1 },
+    mainView: { flex: 1 },
     gradient: {
         flex: 1,
         borderBottomLeftRadius: 32,
         borderBottomRightRadius: 32,
         paddingTop: 10,
+        paddingBottom: 20
     },
     safeView: {
         borderBottomLeftRadius: 32,
@@ -87,10 +88,10 @@ const styles = StyleSheet.create({
     }, actText: {
         fontSize: 14,
         fontWeight: '500',
-        color: COLORS.DARK[25],
-        marginTop: 10,
+        color: COLOR.DARK[25],
+        marginTop: 18,
     },
-    amt: { fontSize: 40, fontWeight: '600', marginTop: 7 },
+    amt: { fontSize: 40, fontWeight: '600', marginTop: 10, color: COLOR.DARK[100] },
     transRow: {
         flexDirection: 'row',
         justifyContent: 'center',
@@ -98,9 +99,9 @@ const styles = StyleSheet.create({
         width: '100%',
         paddingHorizontal: 15,
         columnGap: 15,
-        marginTop: 12,
+        marginTop: 18,
     },
-    graphTitle: { fontSize: 18, fontWeight: '600', paddingHorizontal: 20 },
+    graphTitle: { fontSize: 18, fontWeight: '600', paddingHorizontal: 20, color: COLOR.DARK[100], paddingVertical: 12 },
     dayRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -109,12 +110,20 @@ const styles = StyleSheet.create({
     flexRow: {
         flexDirection: 'row',
         paddingHorizontal: 20,
+
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingVertical: 5,
+        paddingVertical: 10,
     },
-    text3: { fontSize: 18, fontWeight: '600' },
-    column: { alignItems: 'flex-end', rowGap: 5 }
-})
+    text3: { fontSize: 18, fontWeight: '600', color: COLOR.DARK[100] },
+    column: { alignItems: 'flex-end', rowGap: 5 },
+    emptyText: {
+        fontSize: 16,
+        fontWeight: '500',
+        color: COLOR.DARK[25],
+        textAlign: 'center',
+    },
+    emptyCtr: { height: 210, alignItems: 'center', justifyContent: 'center' },
+});
 
-export default styles
+export default styles;

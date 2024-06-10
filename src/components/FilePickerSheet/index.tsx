@@ -1,7 +1,7 @@
 import {BottomSheetModal, BottomSheetView} from '@gorhom/bottom-sheet';
 import React, {useCallback, useMemo} from 'react';
 import {iconProps, ICONS} from '../../constants/icons';
-import {Pressable, Text, View} from 'react-native';
+import {Pressable, Text} from 'react-native';
 import {pickSingle} from 'react-native-document-picker';
 import {
   ImageLibraryOptions,
@@ -10,13 +10,16 @@ import {
   launchCamera,
 } from 'react-native-image-picker';
 import {BottomSheetModalMethods} from '@gorhom/bottom-sheet/lib/typescript/types';
-import styles from './styles';
+import style from './styles';
 import SheetBackdrop from '../SheetBackDrop';
+import {STRINGS} from '../../constants/strings';
+import {useAppTheme} from '../../hooks/themeHook';
 
 function FilePickerSheet({
   bottomSheetModalRef,
   setImage,
   setDoc,
+  onDismiss,
 }: Readonly<{
   bottomSheetModalRef: React.RefObject<BottomSheetModalMethods>;
   setImage: React.Dispatch<React.SetStateAction<string | undefined>>;
@@ -29,6 +32,7 @@ function FilePickerSheet({
       | undefined
     >
   >;
+  onDismiss?: () => void;
 }>) {
   const snapPoints = useMemo(() => ['25%'], []);
   const openImagePicker = useCallback(async () => {
@@ -72,6 +76,8 @@ function FilePickerSheet({
       console.log(e);
     }
   }, []);
+  const COLOR = useAppTheme();
+  const styles = style(COLOR);
   return (
     <BottomSheetModal
       enablePanDownToClose
@@ -79,16 +85,22 @@ function FilePickerSheet({
       index={0}
       snapPoints={snapPoints}
       backdropComponent={SheetBackdrop}
-      backgroundStyle={{borderTopLeftRadius: 32, borderTopRightRadius: 32}}>
+      backgroundStyle={styles.sheetBack}
+      onDismiss={onDismiss}
+      handleIndicatorStyle={{backgroundColor: COLOR.DARK[100]}}>
       <BottomSheetView style={styles.sheetView}>
-        <SheetButtons title="Camera" icon={ICONS.Camera} onPress={openCamera} />
         <SheetButtons
-          title="Gallery"
+          title={STRINGS.Camera}
+          icon={ICONS.Camera}
+          onPress={openCamera}
+        />
+        <SheetButtons
+          title={STRINGS.Gallery}
           icon={ICONS.Gallery}
           onPress={openImagePicker}
         />
         <SheetButtons
-          title="Document"
+          title={STRINGS.Document}
           icon={ICONS.Document}
           onPress={docPicker}
         />
@@ -107,6 +119,8 @@ function SheetButtons({
   title: string;
   onPress: () => void;
 }>) {
+  const COLOR = useAppTheme();
+  const styles = style(COLOR);
   return (
     <Pressable style={styles.sheetBtn} onPress={onPress}>
       {icon({height: 30, width: 30})}

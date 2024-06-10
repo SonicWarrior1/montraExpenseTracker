@@ -1,33 +1,29 @@
 import React from 'react';
 import {FlatList, SafeAreaView, Text, View} from 'react-native';
 import {currencies} from '../../constants/strings';
-import {COLORS} from '../../constants/commonStyles';
 import BouncyCheckbox from 'react-native-bouncy-checkbox/build/dist/BouncyCheckbox';
 import {useAppSelector} from '../../redux/store';
 import firestore from '@react-native-firebase/firestore';
-import {decrypt, encrypt} from '../../utils/encryption';
+import {encrypt} from '../../utils/encryption';
+import {useAppTheme} from '../../hooks/themeHook';
+import style from './styles';
 
 function CurrencyScreen() {
+  const COLORS = useAppTheme();
   const code = useAppSelector(state => state.user.currentUser?.currency);
   const uid = useAppSelector(state => state.user.currentUser?.uid);
+  const styles = style(COLORS);
   return (
-    <SafeAreaView style={{flex: 1, backgroundColor: COLORS.LIGHT[100]}}>
+    <SafeAreaView style={styles.safeView}>
       <FlatList
         data={Object.values(currencies)}
         renderItem={({item}) => (
-          <View
-            style={{
-              flexDirection: 'row',
-              paddingHorizontal: 20,
-              paddingVertical: 10,
-              justifyContent: 'space-between',
-              alignItems: 'center',
-            }}>
-            <Text style={{fontSize: 14, fontWeight: '500'}}>
+          <View style={styles.row}>
+            <Text style={styles.text}>
               {item.name} {'(' + item.code + ')'}{' '}
             </Text>
             <BouncyCheckbox
-              style={{width: 28}}
+              style={styles.checkbox}
               disableText={false}
               fillColor={COLORS.BLUE[100]}
               isChecked={code === item.code}
@@ -35,7 +31,7 @@ function CurrencyScreen() {
                 await firestore()
                   .collection('users')
                   .doc(uid)
-                  .update({currency: await encrypt(item.code, uid!)});
+                  .update({currency: encrypt(item.code, uid!)});
               }}
             />
           </View>

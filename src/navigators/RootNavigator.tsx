@@ -3,7 +3,7 @@ import Onboarding from '../screens/Onboarding';
 import {NAVIGATION} from '../constants/strings';
 import Signup from '../screens/Signup';
 import {ICONS} from '../constants/icons';
-import {Pressable, Settings} from 'react-native';
+import {Pressable} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import Login from '../screens/Login';
 import {useAppSelector} from '../redux/store';
@@ -23,10 +23,11 @@ import FinancialReport from '../screens/FinancialReport';
 import SettingsScreen from '../screens/Settings';
 import CurrencyScreen from '../screens/Currency';
 import ExportData from '../screens/ExportData';
+import ThemeScreen from '../screens/Theme';
+import {useAppTheme} from '../hooks/themeHook';
 export const Stack = createStackNavigator<RootStackParamList>();
 
 function RootNavigator(): React.JSX.Element {
- 
   const navigation = useNavigation();
   function headerLeft({canGoBack}: any, color: string) {
     return canGoBack ? (
@@ -45,6 +46,7 @@ function RootNavigator(): React.JSX.Element {
     ) : undefined;
   }
   const isLoggedIn = useAppSelector(state => state.user.currentUser);
+  const COLORS = useAppTheme();
   return (
     <Stack.Navigator
       screenOptions={{
@@ -52,7 +54,9 @@ function RootNavigator(): React.JSX.Element {
         headerBackTitleVisible: false,
         headerTitleAlign: 'center',
         headerShadowVisible: false,
-        headerLeft: props => headerLeft(props, 'black'),
+        headerStyle: {backgroundColor: COLORS.LIGHT[100]},
+        headerTitleStyle: {color: COLORS.DARK[100]},
+        headerLeft: props => headerLeft(props, COLORS.DARK[100]),
       }}>
       {isLoggedIn ? (
         <Stack.Group>
@@ -71,8 +75,8 @@ function RootNavigator(): React.JSX.Element {
             options={{
               headerShown: true,
               headerTransparent: true,
-              headerTitleStyle: {color: 'white'},
-              headerLeft: props => headerLeft(props, 'white'),
+              headerTitleStyle: {color: COLORS.LIGHT[100]},
+              headerLeft: props => headerLeft(props, COLORS.LIGHT[100]),
             }}
           />
           <Stack.Screen
@@ -81,9 +85,9 @@ function RootNavigator(): React.JSX.Element {
             options={{
               headerShown: true,
               headerTransparent: true,
-              headerTitleStyle: {color: 'white'},
+              headerTitleStyle: {color: COLORS.LIGHT[100]},
               title: 'Detail Transaction',
-              headerLeft: props => headerLeft(props, 'white'),
+              headerLeft: props => headerLeft(props, COLORS.LIGHT[100]),
             }}
           />
           <Stack.Screen
@@ -102,9 +106,9 @@ function RootNavigator(): React.JSX.Element {
             options={{
               headerShown: true,
               headerTransparent: true,
-              headerTitleStyle: {color: 'white'},
+              headerTitleStyle: {color: COLORS.LIGHT[100]},
               title: 'Create Budget',
-              headerLeft: props => headerLeft(props, 'white'),
+              headerLeft: props => headerLeft(props, COLORS.LIGHT[100]),
             }}
           />
           <Stack.Screen
@@ -112,9 +116,9 @@ function RootNavigator(): React.JSX.Element {
             component={DetailBudget}
             options={{
               headerShown: true,
-              headerTitleStyle: {color: 'black'},
+              headerTitleStyle: {color: COLORS.DARK[100]},
               title: 'Detail Budget',
-              headerLeft: props => headerLeft(props, 'black'),
+              headerLeft: props => headerLeft(props, COLORS.DARK[100]),
             }}
           />
           <Stack.Screen
@@ -126,9 +130,9 @@ function RootNavigator(): React.JSX.Element {
             component={FinancialReport}
             options={{
               headerShown: true,
-              headerTitleStyle: {color: 'black'},
+              headerTitleStyle: {color: COLORS.DARK[100]},
               title: 'Financial Report',
-              headerLeft: props => headerLeft(props, 'black'),
+              headerLeft: props => headerLeft(props, COLORS.DARK[100]),
             }}
           />
           <Stack.Screen
@@ -136,9 +140,10 @@ function RootNavigator(): React.JSX.Element {
             component={SettingsScreen}
             options={{
               headerShown: true,
-              headerTitleStyle: {color: 'black'},
+              headerTitleStyle: {color: COLORS.DARK[100]},
               title: 'Settings',
-              headerLeft: props => headerLeft(props, 'black'),
+              headerStyle: {backgroundColor: COLORS.LIGHT[100]},
+              headerLeft: props => headerLeft(props, COLORS.DARK[100]),
             }}
           />
           <Stack.Screen
@@ -146,9 +151,21 @@ function RootNavigator(): React.JSX.Element {
             component={CurrencyScreen}
             options={{
               headerShown: true,
-              headerTitleStyle: {color: 'black'},
+              headerTitleStyle: {color: COLORS.DARK[100]},
+              headerStyle: {backgroundColor: COLORS.LIGHT[100]},
               title: 'Currency',
-              headerLeft: props => headerLeft(props, 'black'),
+              headerLeft: props => headerLeft(props, COLORS.DARK[100]),
+            }}
+          />
+          <Stack.Screen
+            name={NAVIGATION.Theme}
+            component={ThemeScreen}
+            options={{
+              headerShown: true,
+              headerTitleStyle: {color: COLORS.DARK[100]},
+              title: 'Theme',
+              headerStyle: {backgroundColor: COLORS.LIGHT[100]},
+              headerLeft: props => headerLeft(props, COLORS.DARK[100]),
             }}
           />
           <Stack.Screen
@@ -156,9 +173,10 @@ function RootNavigator(): React.JSX.Element {
             component={ExportData}
             options={{
               headerShown: true,
-              headerTitleStyle: {color: 'black'},
+              headerTitleStyle: {color: COLORS.DARK[100]},
+              headerStyle: {backgroundColor: COLORS.LIGHT[100]},
               title: 'Export Data',
-              headerLeft: props => headerLeft(props, 'black'),
+              headerLeft: props => headerLeft(props, COLORS.DARK[100]),
             }}
           />
           <Stack.Screen name={NAVIGATION.Story} component={StoryScreen} />

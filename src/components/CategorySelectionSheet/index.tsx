@@ -5,15 +5,29 @@ import {
 } from '@gorhom/bottom-sheet';
 import React, {useEffect, useMemo, useRef} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux/store';
-import {View} from 'react-native';
-import {openCatSheet} from '../../redux/reducers/transactionSlice';
+import {Pressable, Text, View} from 'react-native';
+import {
+  openCatSheet,
+  setCatFilter,
+} from '../../redux/reducers/transactionSlice';
 import SheetBackdrop from '../SheetBackDrop';
+import style from './styles';
+import CustomButton from '../CustomButton';
+import { useAppTheme } from '../../hooks/themeHook';
 
 function CategorySelectionSheet() {
   const dispatch = useAppDispatch();
   const snapPoints = useMemo(() => ['35%'], []);
   const ref = useRef<BottomSheetModal>(null);
   const isOpen = useAppSelector(state => state.transaction.isCatOpen);
+  const selected = useAppSelector(state => state.transaction.filters.cat);
+  console.log(selected);
+  const incomeCats = useAppSelector(
+    state => state.user.currentUser?.incomeCategory,
+  );
+  const expenseCats = useAppSelector(
+    state => state.user.currentUser?.expenseCategory,
+  );
   useEffect(() => {
     if (isOpen === true) {
       ref.current?.present();
@@ -21,6 +35,8 @@ function CategorySelectionSheet() {
       ref.current?.close();
     }
   }, [isOpen]);
+  const COLOR=useAppTheme()
+  const styles=style(COLOR);
   return (
     <BottomSheetModalProvider>
       <BottomSheetModal
@@ -32,9 +48,47 @@ function CategorySelectionSheet() {
           dispatch(openCatSheet(false));
         }}
         backdropComponent={SheetBackdrop}
-        backgroundStyle={{borderTopLeftRadius: 32, borderTopRightRadius: 32}}>
+        backgroundStyle={styles.sheetBack}
+        handleIndicatorStyle={{backgroundColor:COLOR.DARK[100]}}>
         <BottomSheetView style={{paddingHorizontal: 20}}>
-          <View></View>
+          <View style={styles.row}>
+            {expenseCats
+              ?.slice(1)
+              ?.concat(incomeCats?.slice(1)!)
+              ?.map(item => (
+                <Pressable
+                  key={item}
+                  style={[
+                    styles.filterBtn,
+                    {
+                      backgroundColor: selected.includes(item)
+                        ? COLOR.VIOLET[20]
+                        : COLOR.LIGHT[100],
+                    },
+                  ]}
+                  onPress={() => {
+                    dispatch(setCatFilter(item));
+                  }}>
+                  <Text
+                    style={[
+                      styles.filterBtnText,
+                      {
+                        color: selected.includes(item)
+                          ? COLOR.VIOLET[100]
+                          : COLOR.DARK[100],
+                      },
+                    ]}>
+                    {item[0].toUpperCase() + item.slice(1)}
+                  </Text>
+                </Pressable>
+              ))}
+            <CustomButton
+              title="Continue"
+              onPress={() => {
+                dispatch(openCatSheet(false));
+              }}
+            />
+          </View>
         </BottomSheetView>
       </BottomSheetModal>
     </BottomSheetModalProvider>

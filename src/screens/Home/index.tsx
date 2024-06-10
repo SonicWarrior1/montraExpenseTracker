@@ -4,22 +4,24 @@ import {
   FlatList,
   Pressable,
   SafeAreaView,
+  ScrollView,
   Text,
+  useColorScheme,
   View,
 } from 'react-native';
 import {useAppSelector} from '../../redux/store';
 import LinearGradient from 'react-native-linear-gradient';
 import {catIcons, ICONS} from '../../constants/icons';
 import {currencies, NAVIGATION} from '../../constants/strings';
-import styles from './styles';
+import style from './styles';
 import {COLORS} from '../../constants/commonStyles';
 import {HomeScreenProps} from '../../defs/navigation';
 import {Timestamp} from '@react-native-firebase/firestore';
 import HomeHeader from '../../components/HomeHeader';
 import Graph from './atoms/graph';
+import {useAppTheme} from '../../hooks/themeHook';
 
 function Home({navigation, route}: Readonly<HomeScreenProps>) {
-  const screenHeight = Dimensions.get('screen').height;
   const conversion = useAppSelector(state => state.transaction.conversion);
   const currency =
     useAppSelector(state => state.user.currentUser?.currency) ?? 'USD';
@@ -29,25 +31,48 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
   );
   const totalSpend = Object.values(spends ?? [])
     .reduce((a, b) => a + b, 0)
-    .toFixed(2);
+    .toFixed(1);
   const incomes = useAppSelector(
     state => state.user.currentUser?.income?.[month],
   );
   const totalIncome = Object.values(incomes ?? [])
     .reduce((a, b) => a + b, 0)
-    .toFixed(2);
+    .toFixed(1);
   const data = useAppSelector(state => state.transaction.transactions);
-
+  const COLOR = useAppTheme();
+  const styles = style(COLOR);
+  const scheme = useColorScheme();
+  const theme = useAppSelector(state => state.user.currentUser?.theme);
   return (
-    <View style={styles.mainView}>
-      <LinearGradient colors={['#FFF6E5', '#F8EDD830']} style={styles.gradient}>
+    <ScrollView
+      style={{
+        backgroundColor:
+          (theme === 'device' ? scheme : theme) === 'light'
+            ? COLORS.LIGHT[100]
+            : COLORS.DARK[75],
+      }}
+      contentContainerStyle={[
+        {
+          backgroundColor:
+            (theme === 'device' ? scheme : theme) === 'light'
+              ? COLORS.LIGHT[100]
+              : COLORS.DARK[75],
+        },
+      ]}>
+      <LinearGradient
+        colors={
+          (theme === 'device' ? scheme : theme) === 'light'
+            ? ['#FFF6E5', '#F8EDD830']
+            : ['#F8EDD860', '#23222030']
+        }
+        style={styles.gradient}>
         <SafeAreaView style={styles.safeView}>
           <HomeHeader navigation={navigation} route={route} />
           <Text style={styles.actText}>Account Balance</Text>
           <Text style={styles.amt}>
             {currencies[currency ?? 'USD'].symbol}
-            {(conversion['usd']?.[(currency ?? 'USD').toLowerCase()] * 9400)
-              .toFixed(2)
+            {(conversion.usd?.[(currency ?? 'USD').toLowerCase()] * 9400)
+              .toFixed(1)
               .toString()}
           </Text>
           <View style={styles.transRow}>
@@ -62,13 +87,13 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
               </View>
               <View>
                 <Text style={styles.text1}>Income</Text>
-                <Text style={styles.text2}>
+                <Text style={styles.text2} numberOfLines={1}>
                   {currencies[currency].symbol}
                   {(
-                    conversion['usd']?.[currency.toLowerCase()] *
+                    conversion.usd?.[currency.toLowerCase()] *
                     Number(totalIncome)
                   )
-                    .toFixed(2)
+                    .toFixed(1)
                     .toString()}
                 </Text>
               </View>
@@ -83,13 +108,13 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
               </View>
               <View>
                 <Text style={styles.text1}>Expense</Text>
-                <Text style={styles.text2}>
+                <Text style={styles.text2} numberOfLines={1}>
                   {currencies[currency].symbol}
                   {(
-                    conversion['usd']?.[currency.toLowerCase()] *
+                    conversion.usd?.[currency.toLowerCase()] *
                     Number(totalSpend)
                   )
-                    .toFixed(2)
+                    .toFixed(1)
                     .toString()}
                 </Text>
               </View>
@@ -97,7 +122,7 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
           </View>
         </SafeAreaView>
       </LinearGradient>
-      <View style={{flex: screenHeight / 490}}>
+      <View style={{}}>
         <Text style={styles.graphTitle}>Spend Frequency</Text>
         <Graph data={data} month={month} />
         <View style={styles.flexRow}>
@@ -122,7 +147,8 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
               );
             })
             .sort((a, b) => b.timeStamp.seconds - a.timeStamp.seconds)
-            .slice(0, 2)}
+            .slice(0, 3)}
+          scrollEnabled={false}
           renderItem={({item}) => {
             return (
               <Pressable
@@ -133,9 +159,8 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
                       ...item,
                       amount: Number(
                         (
-                          conversion['usd'][currency.toLowerCase()] *
-                          item.amount
-                        ).toFixed(2),
+                          conversion.usd[currency.toLowerCase()] * item.amount
+                        ).toFixed(1),
                       ),
                     },
                   });
@@ -145,16 +170,24 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
                     styles.icon,
                     {
                       backgroundColor:
-                        catIcons[item.category]?.color ?? COLORS.LIGHT[20],
+                        item.type === 'transfer'
+                          ? COLORS.BLUE[80]
+                          : catIcons[item.category]?.color ?? COLORS.LIGHT[20],
                     },
                   ]}>
-                  {catIcons[item.category]?.icon({height: 30, width: 30}) ??
-                    ICONS.Money({height: 30, width: 30})}
+                  {item.type === 'transfer'
+                    ? ICONS.Transfer({height: 30, width: 30})
+                    : catIcons[item.category]?.icon({
+                        height: 30,
+                        width: 30,
+                      }) ?? ICONS.Money({height: 30, width: 30})}
                 </View>
                 <View style={styles.catCtr}>
                   <Text style={styles.listtext1}>
-                    {item.category[0].toLocaleUpperCase() +
-                      item.category.slice(1)}
+                    {item.type === 'transfer'
+                      ? item.from + ' - ' + item.to
+                      : item.category[0].toLocaleUpperCase() +
+                        item.category.slice(1)}
                   </Text>
                   <Text style={styles.listtext2}>{item.desc}</Text>
                 </View>
@@ -167,14 +200,21 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
                         color:
                           item.type === 'expense'
                             ? COLORS.PRIMARY.RED
-                            : COLORS.PRIMARY.GREEN,
+                            : item.type === 'income'
+                            ? COLORS.PRIMARY.GREEN
+                            : COLORS.PRIMARY.BLUE,
                       },
                     ]}>
-                    {item.type === 'expense' ? '-' : '+'}{' '}
+                    {item.type === 'expense'
+                      ? '-'
+                      : item.type === 'income'
+                      ? '+'
+                      : ''}{' '}
                     {currencies[currency].symbol}{' '}
                     {(
-                      conversion['usd'][currency.toLowerCase()] * item.amount
-                    ).toFixed(2)}
+                      (conversion?.usd?.[currency.toLowerCase()] ?? 1) *
+                      item.amount
+                    ).toFixed(1)}
                   </Text>
                   <Text style={styles.listtext2}>
                     {Timestamp.fromMillis(item.timeStamp.seconds * 1000)
@@ -198,7 +238,7 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
           }}
         />
       </View>
-    </View>
+    </ScrollView>
   );
 }
 

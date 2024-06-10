@@ -2,12 +2,13 @@ import React from 'react';
 import {SafeAreaView} from 'react-native';
 import Pdf from 'react-native-pdf';
 import {DocScreenProps} from '../../defs/navigation';
+import styles from './styles';
 
-function DocView({route}: DocScreenProps) {
+function DocView({route}: Readonly<DocScreenProps>) {
   const uri = route.params.uri;
   return (
-    <SafeAreaView style={{flex: 1}}>
-      <Pdf source={{uri}} style={{height: '100%', width: '100%'}} />
+    <SafeAreaView style={styles.flex}>
+      <Pdf source={{uri}} style={styles.docView} />
     </SafeAreaView>
   );
 }

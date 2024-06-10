@@ -33,7 +33,7 @@ function CustomButton({
       onPress={onPress}>
       {component ? (
         <View
-          style={{flexDirection: 'row', columnGap: 10, alignItems: 'center'}}>
+          style={styles.btnCtr}>
           {component}
           <Text style={[styles.text, {color: textColor}]}>{title}</Text>
         </View>

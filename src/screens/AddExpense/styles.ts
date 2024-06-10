@@ -1,43 +1,44 @@
-import { Dimensions, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { COLORS } from '../../constants/commonStyles';
-const screenHeight=Dimensions.get('screen').height
-const styles = StyleSheet.create({
-    safeView: { flex: 1, backgroundColor: COLORS.PRIMARY.RED },
+const styles = (COLOR: typeof COLORS) => StyleSheet.create({
+    safeView: { flex: 1, backgroundColor: COLOR.PRIMARY.RED },
     mainView: {
         flex: 1,
-        justifyContent: 'center'
+        justifyContent: 'center',
     },
     text1: {
         opacity: 0.64,
-        alignSelf: "flex-start",
-        fontWeight: "600",
-        color: COLORS.LIGHT[80],
-        fontSize: 18, paddingHorizontal: 30,
+        alignSelf: 'flex-start',
+        fontWeight: '600',
+        color: COLOR.LIGHT[80],
+        fontSize: 18,
+        paddingHorizontal: 30,
     },
-    text2: { color: 'white', fontSize: 64, fontWeight: '600' },
+    text2: { color: COLOR.LIGHT[100], fontSize: 64, fontWeight: '600' },
     input: {
         flex: 1,
         fontSize: 64,
-        color: 'white',
+        color: COLOR.LIGHT[100],
         fontWeight: '600',
+
     },
     dropdown: {
         borderWidth: 1,
         borderRadius: 20,
         height: 60,
         paddingHorizontal: 20,
-        borderColor: COLORS.LIGHT[20],
+        borderColor: COLOR.LIGHT[20],
         width: '100%',
     },
     moneyCtr: {
         flexDirection: 'row',
         alignSelf: 'flex-start',
-        alignItems:"center",
+        alignItems: 'center',
         paddingHorizontal: 30,
     },
     detailsCtr: {
         // flex: screenHeight * 0.003,
-        backgroundColor: 'white',
+        backgroundColor: COLOR.LIGHT[100],
         width: '100%',
         paddingHorizontal: 20,
         paddingVertical: 20,
@@ -50,13 +51,13 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderRadius: 20,
         borderStyle: 'dashed',
-        borderColor: COLORS.LIGHT[20],
+        borderColor: COLOR.LIGHT[20],
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
         gap: 10,
     },
-    attachementText: { color: COLORS.DARK[25], fontSize: 16 },
+    attachementText: { color: COLOR.DARK[25], fontSize: 16 },
     displayImg: {
         position: 'absolute',
         left: 90,
@@ -70,11 +71,11 @@ const styles = StyleSheet.create({
         width: 120,
         borderRadius: 24,
         alignItems: 'center',
-        backgroundColor: COLORS.VIOLET[20],
+        backgroundColor: COLOR.VIOLET[20],
     },
     sheetBtnText: {
         fontSize: 16,
-        color: COLORS.PRIMARY.VIOLET,
+        color: COLOR.PRIMARY.VIOLET,
         marginTop: 10,
     },
     closeIcon: {
@@ -90,22 +91,37 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
     },
-    flexRowText1: { fontWeight: '500', fontSize: 16 },
+    flexRowText1: { fontWeight: '500', fontSize: 16, color: COLOR.DARK[100] },
     flexRowText2: {
         fontWeight: '500',
         fontSize: 13,
-        color: COLORS.DARK[25],
+        color: COLOR.DARK[25],
     },
     editBtn: {
         paddingVertical: 8,
         paddingHorizontal: 16,
-        backgroundColor: COLORS.VIOLET[20],
+        backgroundColor: COLOR.VIOLET[20],
         borderRadius: 40,
     },
     editBtnText: {
         fontWeight: '500',
         fontSize: 14,
-        color: COLORS.PRIMARY.VIOLET,
-    }
+        color: COLOR.PRIMARY.VIOLET,
+    },
+    transferRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        columnGap: 30,
+    },
+    transferIcon: {
+        backgroundColor: COLOR.LIGHT[100],
+        padding: 8,
+        borderWidth: 1,
+        borderRadius: 30,
+        position: 'absolute',
+        left: '44%',
+        borderColor: COLOR.LIGHT[20],
+    },
+    flex: { flex: 1 },
 });
 export default styles;

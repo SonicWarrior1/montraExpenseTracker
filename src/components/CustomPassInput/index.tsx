@@ -3,6 +3,7 @@ import styles from './styles';
 import {useState} from 'react';
 import {COLORS} from '../../constants/commonStyles';
 import {ICONS} from '../../constants/icons';
+import {useAppTheme} from '../../hooks/themeHook';
 
 function CustomPassInput({
   value,
@@ -17,6 +18,7 @@ function CustomPassInput({
   inputColor?: string;
 }>) {
   const [showPass, setShowPass] = useState(true);
+  const COLOR = useAppTheme();
   return (
     <View style={styles.passInputContainer}>
       <TextInput
@@ -33,8 +35,17 @@ function CustomPassInput({
           setShowPass(pass => !pass);
         }}>
         {showPass
-          ? ICONS.Show({height: 20, width: 20, color: 'white'})
-          : ICONS.Hide({height: 18, width: 18, color: 'white'})}
+          ? ICONS.Show({
+              height: 20,
+              width: 20,
+              color: 'transparent',
+              borderColor: COLOR.DARK[100],
+            })
+          : ICONS.Hide({
+              height: 18,
+              width: 18,
+              color: COLOR.DARK[100],
+            })}
       </Pressable>
     </View>
   );

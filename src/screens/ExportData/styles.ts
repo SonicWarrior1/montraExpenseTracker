@@ -1,10 +1,10 @@
 import { StyleSheet } from "react-native";
 import { COLORS } from "../../constants/commonStyles";
 
-const styles = StyleSheet.create({
+const styles = (COLOR: typeof COLORS) => StyleSheet.create({
     safeView: {
         flex: 1,
-        backgroundColor: COLORS.LIGHT[100],
+        backgroundColor: COLOR.LIGHT[100],
     },
     mainView: {
         flex: 1,
@@ -12,7 +12,7 @@ const styles = StyleSheet.create({
         paddingVertical: 20,
         justifyContent: 'space-between',
     },
-    text:{fontSize: 16, fontWeight: '500', marginVertical: 10}
+    text: { fontSize: 16, fontWeight: '500', marginVertical: 10, color: COLOR.DARK[100] }
 })
 
 export default styles

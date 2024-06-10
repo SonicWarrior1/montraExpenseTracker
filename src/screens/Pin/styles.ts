@@ -1,13 +1,14 @@
-import { StyleSheet } from "react-native";
-import { COLORS } from "../../constants/commonStyles";
+import { Dimensions, StyleSheet } from 'react-native';
+import { COLORS } from '../../constants/commonStyles';
+const screenWidth = Dimensions.get('screen').width;
 
 const styles = StyleSheet.create({
-    safeView: { flex: 1, backgroundColor: COLORS.PRIMARY.VIOLET ,paddingTop:30},
+    safeView: { flex: 1, backgroundColor: COLORS.PRIMARY.VIOLET, paddingTop: 30 },
     mainView: {
         flex: 1,
-        justifyContent: "space-between",
-        alignItems: "center",
-        paddingHorizontal: 20
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingHorizontal: 20,
     },
     progressDotCtr: {
         flexDirection: 'row',
@@ -19,12 +20,24 @@ const styles = StyleSheet.create({
         height: 32,
         width: 32,
         borderRadius: 20,
-        borderColor: COLORS.VIOLET[20]
+        borderColor: COLORS.VIOLET[20],
     },
     text: {
         color: COLORS.LIGHT[80],
         fontSize: 18,
-        fontWeight: "600"
-    }
-})
+        fontWeight: '600',
+    },
+    flexRow: { flexDirection: 'row' },
+    btn: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: screenWidth / 3,
+        height: 125,
+    },
+    number: {
+        fontSize: 48,
+        fontWeight: '500',
+        color: 'white',
+    },
+});
 export default styles;

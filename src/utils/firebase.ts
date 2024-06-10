@@ -1,13 +1,13 @@
-import firestore, { FirebaseFirestoreTypes, Timestamp } from "@react-native-firebase/firestore";
-import { repeatDataType, transactionType } from "../defs/transaction";
-import { UserFromJson, UserToJson } from "./userFuncs";
-import { UserType } from "../defs/user";
+import firestore, { FirebaseFirestoreTypes, Timestamp } from '@react-native-firebase/firestore';
+import { repeatDataType, transactionType } from '../defs/transaction';
+import { UserFromJson, UserToJson } from './userFuncs';
+import { UserType } from '../defs/user';
 import storage from '@react-native-firebase/storage';
 import notifee from '@notifee/react-native';
 import uuid from 'react-native-uuid';
-import { encrypt } from "./encryption";
+import { encrypt } from './encryption';
 import auth from '@react-native-firebase/auth';
-export async function createTransaction({
+export function createTransaction({
     id,
     url,
     attachementType,
@@ -20,7 +20,9 @@ export async function createTransaction({
     isEdit,
     transaction,
     pageType,
-    uid
+    uid,
+    from,
+    to,
 }: {
     id: string;
     url: string;
@@ -38,28 +40,32 @@ export async function createTransaction({
     repeatData: repeatDataType,
     isEdit: boolean,
     transaction: transactionType,
-    pageType: "income" | "expense" | "transfer",
-    uid: string
+    pageType: 'income' | 'expense' | 'transfer',
+    uid: string,
+    from: string,
+    to: string
 }) {
     return {
-        amount: await encrypt(String((Number(amount) / conversion['usd'][currency.toLowerCase()]).toFixed(2)), uid),
-        category: await encrypt(category, uid),
-        desc: await encrypt(desc, uid),
-        wallet: await encrypt(wallet, uid),
-        attachement: await encrypt(url, uid),
+        amount: encrypt(String((Number(amount) / conversion.usd[currency.toLowerCase()]).toFixed(1)), uid),
+        category: encrypt(category, uid),
+        desc: encrypt(desc, uid),
+        wallet: encrypt(wallet, uid),
+        attachement: encrypt(url, uid),
         repeat: repeatData !== undefined,
         freq: repeatData ? {
-            freq: await encrypt(repeatData.freq, uid),
-            month: await encrypt(String(repeatData.month), uid),
-            day: await encrypt(String(repeatData.day), uid),
-            weekDay: await encrypt(String(repeatData.weekDay), uid),
-            end: await encrypt(repeatData.end, uid),
+            freq: encrypt(repeatData.freq, uid),
+            month: encrypt(String(repeatData.month), uid),
+            day: encrypt(String(repeatData.day), uid),
+            weekDay: encrypt(String(repeatData.weekDay), uid),
+            end: encrypt(repeatData.end, uid),
             date: repeatData.date,
         } : null,
         id: isEdit ? transaction.id : id,
         timeStamp: isEdit ? transaction.timeStamp : Timestamp.now(),
-        type: await encrypt(pageType, uid),
-        attachementType: await encrypt(attachementType, uid),
+        type: encrypt(pageType, uid),
+        attachementType: encrypt(attachementType, uid),
+        from: encrypt(from, uid),
+        to: encrypt(to, uid),
     };
 }
 export async function updateTransaction({ trans, uid, transId }: { trans: transactionType, uid: string, transId: string }) {
@@ -74,7 +80,7 @@ export async function updateTransaction({ trans, uid, transId }: { trans: transa
 export async function addNewTransaction({
     id,
     trans,
-    uid
+    uid,
 }: {
     id: string;
     trans: transactionType;
@@ -96,7 +102,7 @@ export async function handleIncomeUpdate({
     transaction,
     amount,
     conversion,
-    currency
+    currency,
 }: {
     curr: FirebaseFirestoreTypes.DocumentSnapshot<FirebaseFirestoreTypes.DocumentData>;
     uid: string,
@@ -116,12 +122,12 @@ export async function handleIncomeUpdate({
         .doc(uid)
         .update({
             [`income.${month}.${category}`]:
-                await encrypt(String(((((
-                    await UserFromJson(curr.data() as UserType)
+                encrypt(String(((((
+                    UserFromJson(curr.data() as UserType)
                 ).income[month][category] ?? 0) -
                     transaction.amount +
                     Number(amount)) /
-                    conversion['usd'][currency.toLowerCase()]).toFixed(2)), uid),
+                    conversion.usd[currency.toLowerCase()]).toFixed(1)), uid),
         });
 }
 export async function handleNewIncome({
@@ -131,7 +137,7 @@ export async function handleNewIncome({
     category,
     amount,
     conversion,
-    currency
+    currency,
 }: {
     curr: FirebaseFirestoreTypes.DocumentSnapshot<FirebaseFirestoreTypes.DocumentData>;
     uid: string,
@@ -150,11 +156,11 @@ export async function handleNewIncome({
         .doc(uid)
         .update({
             [`income.${month}.${category}`]:
-                await encrypt(String(((((
-                    await UserFromJson(curr.data() as UserType)
+                encrypt(String(((((
+                    UserFromJson(curr.data() as UserType)
                 )?.income[month]?.[category] ?? 0) +
                     Number(amount)) /
-                    conversion['usd'][currency.toLowerCase()]).toFixed(2)), uid),
+                    conversion.usd[currency.toLowerCase()]).toFixed(1)), uid),
         });
 }
 
@@ -166,7 +172,7 @@ export async function handleExpenseUpdate({
     transaction,
     amount,
     conversion,
-    currency
+    currency,
 }: {
     curr: FirebaseFirestoreTypes.DocumentSnapshot<FirebaseFirestoreTypes.DocumentData>;
     uid: string,
@@ -186,12 +192,12 @@ export async function handleExpenseUpdate({
         .doc(uid)
         .update({
             [`spend.${month}.${category}`]:
-                await encrypt(String(((((
-                    await UserFromJson(curr.data() as UserType)
+                encrypt(String(((((
+                    UserFromJson(curr.data() as UserType)
                 ).spend[month][category] ?? 0) -
                     transaction.amount +
                     Number(amount)) /
-                    conversion['usd'][currency.toLowerCase()]).toFixed(2)), uid),
+                    conversion.usd[currency.toLowerCase()]).toFixed(1)), uid),
         });
 }
 
@@ -202,7 +208,7 @@ export async function handleNewExpense({
     category,
     amount,
     conversion,
-    currency
+    currency,
 }: {
     curr: FirebaseFirestoreTypes.DocumentSnapshot<FirebaseFirestoreTypes.DocumentData>;
     uid: string,
@@ -221,17 +227,17 @@ export async function handleNewExpense({
         .doc(uid)
         .update({
             [`spend.${month}.${category}`]:
-                await encrypt(String(((((
-                    await UserFromJson(curr.data() as UserType)
+                encrypt(String(((((
+                    UserFromJson(curr.data() as UserType)
                 )?.spend[month]?.[category] ?? 0) +
                     Number(amount)) /
-                    conversion['usd'][currency.toLowerCase()]).toFixed(2)), uid),
+                    conversion.usd[currency.toLowerCase()]).toFixed(1)), uid),
         });
 }
 export async function getAttachmentUrl({
     attachement,
     id,
-    uid
+    uid,
 }: {
     attachement: string;
     id: string;
@@ -253,7 +259,7 @@ export async function handleNotify({
     totalSpent,
     uid,
     month,
-    category
+    category,
 }: {
     curr: FirebaseFirestoreTypes.DocumentSnapshot<FirebaseFirestoreTypes.DocumentData>;
     totalSpent: number;
@@ -261,7 +267,7 @@ export async function handleNotify({
     month: number,
     category: string
 }) {
-    const totalBudget = (await UserFromJson(curr.data() as UserType))?.budget?.[
+    const totalBudget = (UserFromJson(curr.data() as UserType))?.budget?.[
         month
     ]?.[category];
     if (
@@ -275,8 +281,8 @@ export async function handleNotify({
                 .doc(uid)
                 .update({
                     [`notification.${notificationId}`]: {
-                        type: await encrypt('budget', uid),
-                        category: await encrypt(category, uid),
+                        type: encrypt('budget', uid),
+                        category: encrypt(category, uid),
                         id: notificationId,
                         time: Timestamp.now(),
                         read: false,
@@ -311,12 +317,13 @@ export async function singupUser({ name, email, pass }: { name: string, email: s
     try {
         const creds = await auth().createUserWithEmailAndPassword(email, pass);
         if (creds) {
-            const encrpytedUser = await UserToJson({
+            const encrpytedUser = UserToJson({
                 name: name,
                 email: email,
                 uid: creds.user.uid,
                 pin: '',
             });
+            console.log(encrpytedUser);
             await firestore()
                 .collection('users')
                 .doc(creds.user.uid)
@@ -324,8 +331,8 @@ export async function singupUser({ name, email, pass }: { name: string, email: s
             return true;
         }
     } catch (e) {
-        console.log(e)
-        return false
+        console.log(e);
+        return false;
     }
-    return false
+    return false;
 }

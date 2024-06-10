@@ -3,14 +3,15 @@ import {Dimensions, SafeAreaView, Text, View} from 'react-native';
 import React, {useState} from 'react';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import {COLORS} from '../../constants/commonStyles';
-import styles from './styles';
+import style from './styles';
 import {catIcons, ICONS} from '../../constants/icons';
 import CustomButton from '../../components/CustomButton';
 import {StoryScreenProps} from '../../defs/navigation';
 import {useAppSelector} from '../../redux/store';
-import {currencies, NAVIGATION} from '../../constants/strings';
+import {currencies, NAVIGATION, STRINGS} from '../../constants/strings';
+import {useAppTheme} from '../../hooks/themeHook';
 
-export default function StoryScreen({navigation}: StoryScreenProps) {
+export default function StoryScreen({navigation}: Readonly<StoryScreenProps>) {
   const screenHeight = Dimensions.get('screen').height;
   const screenWidth = Dimensions.get('screen').width;
   const user = useAppSelector(state => state.user.currentUser);
@@ -36,6 +37,8 @@ export default function StoryScreen({navigation}: StoryScreenProps) {
   const conversion = useAppSelector(state => state.transaction.conversion);
   const currency = useAppSelector(state => state.user.currentUser?.currency);
   const [index, setIndex] = useState(0);
+  const COLOR = useAppTheme();
+  const styles = style(COLOR);
   return (
     <SafeAreaView
       style={[
@@ -54,7 +57,7 @@ export default function StoryScreen({navigation}: StoryScreenProps) {
           style={[
             styles.progressIndicator,
             {
-              opacity: index === 0 ? 1 : 0.6,
+              opacity: index === 0 ? 1 : 0.5,
             },
           ]}
         />
@@ -62,7 +65,7 @@ export default function StoryScreen({navigation}: StoryScreenProps) {
           style={[
             styles.progressIndicator,
             {
-              opacity: index === 1 ? 1 : 0.6,
+              opacity: index === 1 ? 1 : 0.5,
             },
           ]}
         />
@@ -70,7 +73,7 @@ export default function StoryScreen({navigation}: StoryScreenProps) {
           style={[
             styles.progressIndicator,
             {
-              opacity: index === 2 ? 1 : 0.6,
+              opacity: index === 2 ? 1 : 0.5,
             },
           ]}
         />
@@ -78,13 +81,13 @@ export default function StoryScreen({navigation}: StoryScreenProps) {
           style={[
             styles.progressIndicator,
             {
-              opacity: index === 3 ? 1 : 0.6,
+              opacity: index === 3 ? 1 : 0.5,
             },
           ]}
         />
       </View>
       <View style={styles.mainView}>
-        {index !== 3 && <Text style={styles.title}>This Month</Text>}
+        {index !== 3 && <Text style={styles.title}>{STRINGS.ThisMonth}</Text>}
         <View style={{alignItems: 'center'}}>
           <Text
             style={[
@@ -95,57 +98,58 @@ export default function StoryScreen({navigation}: StoryScreenProps) {
               },
             ]}>
             {index === 0
-              ? 'You Spend 💸'
+              ? STRINGS.YouSpend
               : index === 1
-              ? 'You Earned 💰'
+              ? STRINGS.YouEarned
               : index === 2
               ? (budgetExceed === undefined ? 0 : budgetExceed.length) +
-                ' of 12 Budget is exceeds the limit'
-              : '“Financial freedom is freedom from fear.”'}
+                STRINGS.BudgetLimitExceed
+              : STRINGS.Quote}
           </Text>
-          {index === 3 && <Text style={styles.text2}>-Robert Kiyosaki</Text>}
+          {index === 3 && (
+            <Text style={styles.text2}>{STRINGS.QuoteAuthor}</Text>
+          )}
           {index === 2 && (
             <View style={styles.catRow}>
-              {budgetExceed !== undefined &&
-                budgetExceed.map(item => (
-                  <View style={styles.catCtr} key={item?.[0]?.[0] ?? ''}>
-                    <View
-                      style={[
-                        styles.colorBox,
-                        {
-                          backgroundColor:
-                            catIcons[item?.[0]]?.color ?? COLORS.LIGHT[20],
-                        },
-                      ]}>
-                      {catIcons[item?.[0]]?.icon({height: 20, width: 20}) ??
-                        ICONS.Money({height: 20, width: 20})}
-                    </View>
-                    <Text style={styles.catText}>
-                      {item[0][0].toUpperCase() + item[0].slice(1)}
-                    </Text>
+              {budgetExceed?.map(item => (
+                <View style={styles.catCtr} key={item?.[0]?.[0] ?? ''}>
+                  <View
+                    style={[
+                      styles.colorBox,
+                      {
+                        backgroundColor:
+                          catIcons[item?.[0]]?.color ?? COLORS.LIGHT[20],
+                      },
+                    ]}>
+                    {catIcons[item?.[0]]?.icon({height: 20, width: 20}) ??
+                      ICONS.Money({height: 20, width: 20})}
                   </View>
-                ))}
+                  <Text style={styles.catText}>
+                    {item[0][0].toUpperCase() + item[0].slice(1)}
+                  </Text>
+                </View>
+              ))}
             </View>
           )}
           {(index === 0 || index === 1) && (
-            <Text style={styles.amt}>
+            <Text style={styles.amt} numberOfLines={1}>
               {currencies[currency!].symbol}
               {index === 0
                 ? (
-                    conversion['usd'][currency!.toLowerCase()!] *
+                    conversion.usd[currency!.toLowerCase()] *
                     Object.values(
                       user?.spend[new Date().getMonth()] ?? [],
                     ).reduce((acc, curr) => acc + curr, 0)
                   )
-                    .toFixed(2)
+                    .toFixed(1)
                     .toString()
                 : (
-                    conversion['usd'][currency!.toLowerCase()!] *
+                    conversion.usd[currency!.toLowerCase()] *
                     Object.values(
                       user?.income[new Date().getMonth()] ?? [],
                     ).reduce((acc, curr) => acc + curr, 0)
                   )
-                    .toFixed(2)
+                    .toFixed(1)
                     .toString()}
             </Text>
           )}
@@ -154,9 +158,7 @@ export default function StoryScreen({navigation}: StoryScreenProps) {
           (index === 1 && biggestIncome[0][0] !== '')) && (
           <View style={styles.card}>
             <Text style={styles.cardText}>
-              {index === 0
-                ? 'and your biggest spending is from'
-                : 'your biggest Income is from'}
+              {index === 0 ? STRINGS.BiggestSpending : STRINGS.BiggestIncome}
             </Text>
             <View style={styles.catCtr}>
               <View
@@ -191,20 +193,17 @@ export default function StoryScreen({navigation}: StoryScreenProps) {
                 </Text>
               )}
             </View>
-            <Text style={styles.amt2}>
+            <Text style={styles.amt2} numberOfLines={1}>
               {currencies[currency!].symbol}
               {index === 0
-                ? (
-                    conversion['usd'][currency!.toLowerCase()!] *
-                    biggestSpend[0][1]
-                  )
-                    .toFixed(2)
+                ? (conversion.usd[currency!.toLowerCase()] * biggestSpend[0][1])
+                    .toFixed(1)
                     .toString()
                 : (
-                    conversion['usd'][currency!.toLowerCase()!] *
+                    conversion.usd[currency!.toLowerCase()] *
                     biggestIncome[0][1]
                   )
-                    .toFixed(2)
+                    .toFixed(1)
                     .toString()}
             </Text>
           </View>
@@ -240,11 +239,11 @@ export default function StoryScreen({navigation}: StoryScreenProps) {
       {index === 3 && (
         <View style={{paddingHorizontal: 16}}>
           <CustomButton
-            title="See the full detail"
+            title={STRINGS.SeeFullDetail}
             onPress={() => {
               navigation.replace(NAVIGATION.FinancialReport);
             }}
-            backgroundColor={COLORS.LIGHT[100]}
+            backgroundColor={COLOR.LIGHT[100]}
             textColor={COLORS.VIOLET[100]}
           />
         </View>

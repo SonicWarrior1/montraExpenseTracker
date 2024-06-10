@@ -1,17 +1,17 @@
-import { StyleSheet } from "react-native";
-import { COLORS } from "../../constants/commonStyles";
+import { StyleSheet } from 'react-native';
+import { COLORS } from '../../constants/commonStyles';
 
-const styles = StyleSheet.create({
-    safeView: { flex: 1, backgroundColor: COLORS.PRIMARY.LIGHT },
+const styles = (COLOR: typeof COLORS) => StyleSheet.create({
+    safeView: { flex: 1, backgroundColor: COLOR.LIGHT[100] },
     mainView: {
         flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        paddingHorizontal: 20
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingHorizontal: 20,
     },
     orText: {
-        fontWeight: "bold",
-        color: COLORS.DARK[25]
+        fontWeight: 'bold',
+        color: COLOR.DARK[25],
     },
     btn: {
         width: '100%',
@@ -20,9 +20,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderRadius: 10,
         borderWidth: 1,
-        borderColor: COLORS.DARK[25]
-    }, 
-    text: { fontWeight: 'bold', fontSize: 16 },
-    googleBtn: { flexDirection: 'row', alignItems: 'center', gap: 20 }
-})
-export default styles
+        borderColor: COLOR.DARK[25],
+    },
+    text: { fontWeight: 'bold', fontSize: 16,color:COLOR.DARK[100] },
+    googleBtn: { flexDirection: 'row', alignItems: 'center', gap: 20 },
+    flex:{flex: 1},
+});
+export default styles;

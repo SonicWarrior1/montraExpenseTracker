@@ -1,17 +1,17 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 import { transactionType } from "../../defs/transaction";
 const initialState: {
     transactions: { [key: string]: transactionType },
     isFilterOpen: boolean,
     isCatOpen: boolean,
-    filters: { filter: 'income' | 'expense' | 'transfer' | 'none', sort: 'highest' | 'lowest' | 'newest' | 'oldest' },
+    filters: { filter: 'income' | 'expense' | 'transfer' | 'none', sort: 'highest' | 'lowest' | 'newest' | 'oldest', cat: string[] },
     conversion: { [key: string]: { [key: string]: number } }
 
 } = {
     transactions: {},
     isFilterOpen: false,
     isCatOpen: false,
-    filters: { filter: 'none', sort: 'newest' },
+    filters: { filter: 'none', sort: 'newest', cat: [] },
     conversion: {}
 }
 const TransactionSlice = createSlice({
@@ -48,6 +48,16 @@ const TransactionSlice = createSlice({
             }
             state.isFilterOpen = false;
         },
+        setCatFilter(state, action) {
+            if (state.filters.cat.includes(action.payload)) {
+                state.filters.cat = state.filters.cat.filter((item) => item != action.payload)
+            } else {
+                state.filters.cat.push(action.payload)
+            }
+        },
+        clearCatFilter(state){
+            state.filters.cat=[]
+        },
         setTransaction(state, action) {
             state.transactions = action.payload
         },
@@ -56,5 +66,5 @@ const TransactionSlice = createSlice({
         }
     }
 })
-export const { openFilterSheet, setFilters, openCatSheet, setSortFilter, setTransaction, setConversionData } = TransactionSlice.actions
+export const { openFilterSheet, setFilters, openCatSheet, setSortFilter, setTransaction, setConversionData ,setCatFilter,clearCatFilter} = TransactionSlice.actions
 export default TransactionSlice.reducer

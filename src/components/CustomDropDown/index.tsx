@@ -1,7 +1,8 @@
 import React from 'react';
 import {Dropdown} from 'react-native-element-dropdown';
 import {COLORS} from '../../constants/commonStyles';
-import styles from './styles';
+import style from './styles';
+import { useAppTheme } from '../../hooks/themeHook';
 
 function CustomDropdown({
   data,
@@ -16,6 +17,8 @@ function CustomDropdown({
   placeholder: string;
   onFocus?: () => void;
 }>) {
+  const COLOR = useAppTheme();
+  const styles = style(COLOR);
   return (
     <Dropdown
       style={styles.dropdown}
@@ -27,7 +30,11 @@ function CustomDropdown({
       onChange={onChange}
       valueField={'value'}
       onFocus={onFocus}
-    />
+      itemTextStyle={{color:COLOR.DARK[100]}}
+      containerStyle={{backgroundColor:COLOR.LIGHT[100]}}
+      activeColor={COLOR.LIGHT[100]}
+      selectedTextStyle={{color:COLOR.DARK[100]}}
+      />
   );
 }
 

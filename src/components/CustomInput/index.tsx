@@ -12,7 +12,7 @@ function CustomInput({
   type,
   placeholderText,
   maxLength = 100,
-  inputColor = COLORS.PRIMARY.DARK,
+  inputColor = COLORS.DARK[100],
   onBlur,
   flex,
   editable,

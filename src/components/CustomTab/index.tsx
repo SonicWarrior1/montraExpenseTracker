@@ -1,4 +1,4 @@
-import {Pressable, View} from 'react-native';
+import {Pressable, useColorScheme, View} from 'react-native';
 import {ICONS} from '../../constants/icons';
 import {COLORS} from '../../constants/commonStyles';
 import {BottomTabBarProps} from '@react-navigation/bottom-tabs';
@@ -7,10 +7,12 @@ import Animated, {
   withSequence,
   withTiming,
 } from 'react-native-reanimated';
-import styles from './styles';
-import TabButton from './TabButton';
-import {NAVIGATION} from '../../constants/strings';
-import AnimatedBtn from './animatedButton';
+import style from './styles';
+import TabButton from './atoms/TabButton';
+import {NAVIGATION, STRINGS} from '../../constants/strings';
+import AnimatedBtn from './atoms/animatedButton';
+import {useAppTheme} from '../../hooks/themeHook';
+import {useAppSelector} from '../../redux/store';
 
 function CustomTab(props: Readonly<BottomTabBarProps>): React.JSX.Element {
   const deg = useSharedValue('-45deg');
@@ -59,23 +61,26 @@ function CustomTab(props: Readonly<BottomTabBarProps>): React.JSX.Element {
       deg.value = withTiming('-45deg');
     }
   }
-
+  const COLOR = useAppTheme();
+  const styles = style(COLOR);
+  const scheme = useColorScheme();
+  const theme = useAppSelector(state => state.user.currentUser?.theme);
   return (
     <View style={styles.tabCtr}>
       <TabButton
         icon={ICONS.Home}
         onPress={() => {
-          props.navigation.navigate('Home');
+          props.navigation.navigate(NAVIGATION.Home);
         }}
-        title="Home"
+        title={STRINGS.Home}
         isActive={props.state.index === 0}
       />
       <TabButton
         icon={ICONS.Transaction}
         onPress={() => {
-          props.navigation.navigate('Transaction');
+          props.navigation.navigate(NAVIGATION.Transaction);
         }}
-        title="Transaction"
+        title={STRINGS.Transaction}
         isActive={props.state.index === 1}
       />
       <AnimatedBtn
@@ -94,7 +99,13 @@ function CustomTab(props: Readonly<BottomTabBarProps>): React.JSX.Element {
       />
       <AnimatedBtn
         icon={ICONS.Transfer}
-        onPress={() => {}}
+        onPress={() => {
+          props.navigation.navigate(NAVIGATION.AddExpense, {
+            type: 'transfer',
+            isEdit: false,
+          });
+          handleAddBtnPress();
+        }}
         translateX={translate2X}
         translateY={translate2Y}
         backgrounColor={COLORS.PRIMARY.BLUE}
@@ -117,7 +128,13 @@ function CustomTab(props: Readonly<BottomTabBarProps>): React.JSX.Element {
       <Animated.View
         style={[
           styles.animatedBtnOuter,
-          {transform: [{translateY: -15}, {rotateZ: deg}]},
+          {
+            transform: [{translateY: -15}, {rotateZ: deg}],
+            backgroundColor:
+              (theme === 'device' ? scheme : theme) === 'dark'
+                ? COLOR.LIGHT[40]
+                : COLOR.LIGHT[100],
+          },
         ]}>
         <Pressable style={styles.animatedBtn} onPress={handleAddBtnPress}>
           {ICONS.Close({height: 40, width: 40})}
@@ -128,7 +145,7 @@ function CustomTab(props: Readonly<BottomTabBarProps>): React.JSX.Element {
         onPress={() => {
           props.navigation.navigate(NAVIGATION.Budget);
         }}
-        title="Budget"
+        title={STRINGS.Budget}
         isActive={props.state.index === 2}
       />
       <TabButton
@@ -136,7 +153,7 @@ function CustomTab(props: Readonly<BottomTabBarProps>): React.JSX.Element {
         onPress={() => {
           props.navigation.navigate(NAVIGATION.Profile);
         }}
-        title="Profile"
+        title={STRINGS.Profile}
         isActive={props.state.index === 3}
       />
     </View>

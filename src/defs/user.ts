@@ -12,4 +12,5 @@ export type UserType = {
     income: { [month: string]: { [key: string]: number } },
     notification: { [id: string]: { category: string, type: string, id: string, time: Timestamp, read: boolean } },
     currency: string
+    theme: 'device' | 'light' | 'dark'
 }

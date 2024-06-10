@@ -4,7 +4,8 @@ import Sapcer from '../../../components/Spacer';
 import {Bar} from 'react-native-progress';
 import {COLORS} from '../../../constants/commonStyles';
 import {currencies} from '../../../constants/strings';
-import styles from '../styles';
+import style from '../styles';
+import {useAppTheme} from '../../../hooks/themeHook';
 
 function CategoryList({
   spends,
@@ -41,10 +42,14 @@ function CategoryList({
   totalSpend: string;
   totalIncome: string;
 }>) {
+  const COLOR = useAppTheme();
+  const styles = style(COLOR);
   return (
     <FlatList
       style={{paddingHorizontal: 20}}
-      data={Object.entries(transType === 'expense' ? spends : incomes)}
+      data={Object.entries(transType === 'expense' ? spends : incomes).sort(
+        (a, b) => b[1] - a[1],
+      )}
       renderItem={({item}) =>
         Number(item[1]) ? (
           <View>
@@ -72,7 +77,7 @@ function CategoryList({
                 {transType === 'expense' ? '- ' : '+ '}
                 {currencies[currency!].symbol}
                 {(conversion['usd']?.[currency!.toLowerCase()] * item[1])
-                  .toFixed(2)
+                  .toFixed(1)
                   .toString()}
               </Text>
             </View>
@@ -89,7 +94,7 @@ function CategoryList({
               animated
               borderRadius={20}
               borderWidth={0}
-              unfilledColor={COLORS.VIOLET[20]}
+              unfilledColor={COLOR.LIGHT[40]}
               color={catColors![item[0]]}
             />
             <Sapcer height={20} />

@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {SafeAreaView, ScrollView, Text, View} from 'react-native';
-import styles from './styles';
+import style from './styles';
 import Sapcer from '../../components/Spacer';
 import CustomInput from '../../components/CustomInput';
 import {EmailEmptyError} from '../../constants/errors';
@@ -8,6 +8,7 @@ import CustomButton from '../../components/CustomButton';
 import auth from '@react-native-firebase/auth';
 import {ForgotScreenProps} from '../../defs/navigation';
 import {NAVIGATION, STRINGS} from '../../constants/strings';
+import { useAppTheme } from '../../hooks/themeHook';
 
 function ForgotPassword({navigation}: ForgotScreenProps) {
   const [email, setEmail] = useState('');
@@ -33,13 +34,13 @@ function ForgotPassword({navigation}: ForgotScreenProps) {
       }
     }
   }
+  const COLOR = useAppTheme();
+  const styles = style(COLOR);
   return (
     <SafeAreaView style={styles.safeView}>
       <ScrollView
-        style={{flex: 1}}
-        contentContainerStyle={{
-          flex: 1,
-        }}>
+        style={styles.flex}
+        contentContainerStyle={styles.flex}>
         <View style={styles.mainView}>
           <Text style={styles.text}>{STRINGS.DontWorry}</Text>
           <Text style={styles.text}>{STRINGS.EnterEmailForReset}</Text>
@@ -49,6 +50,7 @@ function ForgotPassword({navigation}: ForgotScreenProps) {
             onChangeText={onChangeEmail}
             type="email"
             value={email}
+            inputColor={COLOR.DARK[100]}
           />
           <EmailEmptyError email={email} formKey={form} />
           <Sapcer height={20} />
