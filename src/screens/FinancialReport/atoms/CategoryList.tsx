@@ -50,6 +50,7 @@ function CategoryList({
       data={Object.entries(transType === 'expense' ? spends : incomes).sort(
         (a, b) => b[1] - a[1],
       )}
+      scrollEnabled={false}
       renderItem={({item}) =>
         Number(item[1]) ? (
           <View>

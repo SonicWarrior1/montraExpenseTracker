@@ -328,6 +328,7 @@ export async function singupUser({ name, email, pass }: { name: string, email: s
                 .collection('users')
                 .doc(creds.user.uid)
                 .set(encrpytedUser);
+            await creds.user.sendEmailVerification();
             return true;
         }
     } catch (e) {

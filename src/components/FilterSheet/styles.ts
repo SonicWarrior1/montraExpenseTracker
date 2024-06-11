@@ -1,5 +1,6 @@
 import { StyleSheet } from 'react-native';
 import { COLORS } from '../../constants/commonStyles';
+import { RFValue } from 'react-native-responsive-fontsize';
 
 const styles = (COLOR: typeof COLORS) => StyleSheet.create({
   filterBtn: {
@@ -11,7 +12,7 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
   },
   filterBtnText: {
     fontWeight: '500',
-    fontSize: 14,
+    fontSize: RFValue(13),
     color: COLOR.DARK[100],
   },
   editBtn: {
@@ -22,7 +23,7 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
   },
   editBtnText: {
     fontWeight: '500',
-    fontSize: 14,
+    fontSize: RFValue(13),
     color: COLOR.PRIMARY.VIOLET,
   },
   sheetView: {
@@ -30,8 +31,9 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 15,
+    paddingTop:10
   },
-  text1: { fontSize: 16, fontWeight: '600', color: COLOR.DARK[100] },
+  text1: { fontSize: RFValue(15), fontWeight: '600', color: COLOR.DARK[100] },
   flexRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -55,7 +57,7 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
     alignItems: 'center',
   },
   text2: {
-    fontSize: 14,
+    fontSize: RFValue(13),
     fontWeight: '500',
     color: COLOR.DARK[25],
   },

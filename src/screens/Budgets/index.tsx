@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useCallback, useState} from 'react';
 import {Pressable, SafeAreaView, ScrollView, Text, View} from 'react-native';
 import style from './styles';
 import {ICONS} from '../../constants/icons';
@@ -14,13 +14,15 @@ import {
 import {useAppSelector} from '../../redux/store';
 import {Bar} from 'react-native-progress';
 import {COLORS} from '../../constants/commonStyles';
-import { useAppTheme } from '../../hooks/themeHook';
+import {useAppTheme} from '../../hooks/themeHook';
 
 function BudgetScreen({navigation}: Readonly<BudgetScreenProps>) {
+  // constants
   const COLOR = useAppTheme();
-  const styles = style(COLOR)
+  const styles = style(COLOR);
+  // state
   const [month, setMonth] = useState(new Date().getMonth());
-  console.log(month);
+  // redux
   const budgets = useAppSelector(
     state => state.user.currentUser?.budget[month],
   );
@@ -28,8 +30,14 @@ function BudgetScreen({navigation}: Readonly<BudgetScreenProps>) {
   const conversion = useAppSelector(state => state.transaction.conversion);
   const spend =
     useAppSelector(state => state.user.currentUser?.spend[month]) ?? {};
+  // functions 
+  const getMyColor = useCallback(() => {
+    let n = (Math.random() * 0xfffff * 1000000).toString(16);
+    return '#' + n.slice(0, 6);
+  }, []);
   return (
     <View style={styles.safeView}>
+      <Sapcer height={30} />
       <SafeAreaView style={styles.safeView}>
         <View style={styles.monthRow}>
           <Pressable
@@ -66,6 +74,7 @@ function BudgetScreen({navigation}: Readonly<BudgetScreenProps>) {
           </Pressable>
         </View>
       </SafeAreaView>
+      <Sapcer height={25} />
       <View style={styles.mainView}>
         {budgets === undefined || Object.values(budgets).length === 0 ? (
           <View style={styles.centerCtr}>
@@ -85,6 +94,7 @@ function BudgetScreen({navigation}: Readonly<BudgetScreenProps>) {
         ) : (
           <ScrollView style={styles.scrollView}>
             {Object.entries(budgets).map(([key, val]) => {
+              const color = getMyColor();
               return (
                 <Pressable
                   key={key}
@@ -97,15 +107,17 @@ function BudgetScreen({navigation}: Readonly<BudgetScreenProps>) {
                   }}>
                   <View style={styles.catRow}>
                     <View style={styles.catCtr}>
-                      <View style={styles.colorBox} />
+                      <View
+                        style={[styles.colorBox, {backgroundColor: color}]}
+                      />
                       <Text style={styles.catText}>
                         {key[0].toUpperCase() + key.slice(1)}
                       </Text>
                     </View>
                     {(spend[key] ?? 0) >= val.limit &&
                       ICONS.Alert({
-                        height: 20,
-                        width: 20,
+                        height: 25,
+                        width: 25,
                         color: COLORS.PRIMARY.RED,
                       })}
                   </View>
@@ -126,6 +138,7 @@ function BudgetScreen({navigation}: Readonly<BudgetScreenProps>) {
                     progress={(spend[key] ?? 0) / val.limit}
                     height={8}
                     width={null}
+                    color={color}
                   />
                   <Text style={styles.text2}>
                     {currencies[currency!].symbol}

@@ -1,23 +1,26 @@
 import React, {useCallback, useState} from 'react';
 import {Platform, SafeAreaView, Text, View} from 'react-native';
+import style from './styles';
 import {useAppSelector} from '../../redux/store';
-import {jsonToCSV} from 'react-native-csv';
-import {Timestamp} from '@react-native-firebase/firestore';
 import {monthData, STRINGS, weekData} from '../../constants/strings';
 import CustomDropdown from '../../components/CustomDropDown';
 import CustomButton from '../../components/CustomButton';
+import {ICONS} from '../../constants/icons';
+import {useAppTheme} from '../../hooks/themeHook';
+// Third Party Libraries
+import {Timestamp} from '@react-native-firebase/firestore';
+import {jsonToCSV} from 'react-native-csv';
 import ReactNativeBlobUtil from 'react-native-blob-util';
 import uuid from 'react-native-uuid';
 import Toast from 'react-native-toast-message';
-import style from './styles';
-import {ICONS} from '../../constants/icons';
-import {useAppTheme} from '../../hooks/themeHook';
 function ExportData() {
+  // redux
   const data = useAppSelector(state => state.transaction.transactions);
+  // state
   const [dataType, setDataType] = useState<'all' | 'expense' | 'income'>('all');
   const [dataRange, setDataRange] = useState<7 | 15 | 30>(7);
   const [dataFormat, setDataFormat] = useState<'csv' | 'pdf'>('csv');
-
+  // functions
   const handleExport = useCallback(async () => {
     const daysAgo = new Date();
     daysAgo.setDate(daysAgo.getDate() - dataRange);
@@ -65,13 +68,14 @@ function ExportData() {
       console.log(e);
     }
   }, [data, dataRange, dataType]);
+  // constants
   const COLOR = useAppTheme();
   const styles = style(COLOR);
   return (
     <SafeAreaView style={styles.safeView}>
       <View style={styles.mainView}>
         <View>
-          <Text style={styles.text}>What data do your want to export?</Text>
+          <Text style={styles.text}>{STRINGS.WhatExport}</Text>
           <CustomDropdown
             data={['all', 'expense', 'income'].map(item => {
               return {

@@ -1,5 +1,5 @@
 import React from 'react';
-import {Pressable, Text, TouchableOpacity, View} from 'react-native';
+import {Text, TouchableOpacity, View} from 'react-native';
 import {COLORS} from '../../constants/commonStyles';
 import styles from './styles';
 
@@ -7,7 +7,7 @@ function CustomButton({
   backgroundColor = COLORS.PRIMARY.VIOLET,
   title,
   onPress,
-  textColor = COLORS.PRIMARY.LIGHT,
+  textColor = COLORS.LIGHT[100],
   borderWidth = 0,
   borderColor,
   icon: component,

@@ -2,6 +2,7 @@ import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {
   Pressable,
   SafeAreaView,
+  ScrollView,
   Text,
   useColorScheme,
   View,
@@ -18,6 +19,7 @@ import Piegraph from './atoms/piegraph';
 import TransactionList from './atoms/TransactionList';
 import CategoryList from './atoms/CategoryList';
 import {useAppTheme} from '../../hooks/themeHook';
+import {STRINGS} from '../../constants/strings';
 
 function FinancialReport() {
   const getMyColor = useCallback(() => {
@@ -70,7 +72,9 @@ function FinancialReport() {
   const scheme = useColorScheme();
   const theme = useAppSelector(state => state.user.currentUser?.theme);
   return (
-    <SafeAreaView style={styles.safeView}>
+    <ScrollView
+      contentContainerStyle={[styles.safeView]}
+      style={[styles.safeView, {paddingBottom: 20}]}>
       <FinancialReportHeader
         graph={graph}
         month={month}
@@ -164,7 +168,7 @@ function FinancialReport() {
                       : COLOR.DARK[100],
                 },
               ]}>
-              Income
+              {STRINGS.Income}
             </Text>
           </Pressable>
         </View>
@@ -180,7 +184,10 @@ function FinancialReport() {
           renderRightIcon={() => <></>}
           value={type}
           data={['transaction', 'category'].map(item => {
-            return {label: item[0].toUpperCase() + item.slice(1), value: item};
+            return {
+              label: item[0].toUpperCase() + item.slice(1),
+              value: item,
+            };
           })}
           labelField={'label'}
           valueField={'value'}
@@ -196,7 +203,11 @@ function FinancialReport() {
           selectedTextStyle={{color: COLOR.DARK[100]}}
         />
         <Pressable style={styles.filterBtn} onPress={() => {}}>
-          {ICONS.SortwithArrow({height: 25, width: 25, color: COLOR.DARK[100]})}
+          {ICONS.SortwithArrow({
+            height: 25,
+            width: 25,
+            color: COLOR.DARK[100],
+          })}
         </Pressable>
       </View>
       <Sapcer height={10} />
@@ -220,7 +231,7 @@ function FinancialReport() {
           transType={transType}
         />
       )}
-    </SafeAreaView>
+    </ScrollView>
   );
 }
 

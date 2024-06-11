@@ -8,7 +8,7 @@ import {ForgotSentScreenProps} from '../../defs/navigation';
 import { STRINGS} from '../../constants/strings';
 import { useAppTheme } from '../../hooks/themeHook';
 
-function ForgotEmailSent({navigation, route}: ForgotSentScreenProps) {
+function ForgotEmailSent({navigation, route}: Readonly<ForgotSentScreenProps>) {
   const screenWidth = Dimensions.get('screen').width;
   const screenHeight = Dimensions.get('screen').height;
   const email = route.params.email;
@@ -25,8 +25,7 @@ function ForgotEmailSent({navigation, route}: ForgotSentScreenProps) {
         <View style={styles.mainView}>
           <ICONS.EmailSent
             height={screenWidth * 0.7}
-            width={screenWidth * 0.7}
-          />
+            width={screenWidth * 0.7}          />
           <Text style={styles.text1}>{STRINGS.EmailOnWay}</Text>
           <Sapcer height={20} />
           <Text style={styles.text2}>

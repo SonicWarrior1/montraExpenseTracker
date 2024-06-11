@@ -44,7 +44,7 @@ function Piegraph({
   const styles = style(COLOR);
   function labelComponent() {
     return (
-      <Text style={{fontSize: 32, fontWeight: '700', color: COLOR.DARK[100]}}>
+      <Text style={styles.pieCenterText}>
         {currencies[currency!].symbol}
         {(
           conversion.usd?.[currency!.toLowerCase()] *

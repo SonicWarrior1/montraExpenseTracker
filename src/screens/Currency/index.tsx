@@ -1,5 +1,5 @@
 import React from 'react';
-import {FlatList, SafeAreaView, Text, View} from 'react-native';
+import {FlatList, Pressable, SafeAreaView, Text, View} from 'react-native';
 import {currencies} from '../../constants/strings';
 import BouncyCheckbox from 'react-native-bouncy-checkbox/build/dist/BouncyCheckbox';
 import {useAppSelector} from '../../redux/store';
@@ -9,16 +9,25 @@ import {useAppTheme} from '../../hooks/themeHook';
 import style from './styles';
 
 function CurrencyScreen() {
-  const COLORS = useAppTheme();
+  // redux
   const code = useAppSelector(state => state.user.currentUser?.currency);
   const uid = useAppSelector(state => state.user.currentUser?.uid);
+  // constants
+  const COLORS = useAppTheme();
   const styles = style(COLORS);
+  const userDoc = firestore().collection('users').doc(uid);
   return (
     <SafeAreaView style={styles.safeView}>
       <FlatList
         data={Object.values(currencies)}
         renderItem={({item}) => (
-          <View style={styles.row}>
+          <Pressable
+            style={styles.row}
+            onPress={async () => {
+              if (code !== item.code) {
+                await userDoc.update({currency: encrypt(item.code, uid!)});
+              }
+            }}>
             <Text style={styles.text}>
               {item.name} {'(' + item.code + ')'}{' '}
             </Text>
@@ -28,13 +37,12 @@ function CurrencyScreen() {
               fillColor={COLORS.BLUE[100]}
               isChecked={code === item.code}
               onPress={async () => {
-                await firestore()
-                  .collection('users')
-                  .doc(uid)
-                  .update({currency: encrypt(item.code, uid!)});
+                if (code !== item.code) {
+                  await userDoc.update({currency: encrypt(item.code, uid!)});
+                }
               }}
             />
-          </View>
+          </Pressable>
         )}
       />
     </SafeAreaView>

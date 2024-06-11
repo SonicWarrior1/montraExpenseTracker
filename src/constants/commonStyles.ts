@@ -135,3 +135,6 @@ export const DARKCOLORS = {
         100: '#0077FF',
     },
 };
+
+export const LightBackDropColor='rgba(0,0,0,0.5)'
+export const DarkBackDropColor='rgba(255,255,255,0.2)'

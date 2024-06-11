@@ -7,7 +7,7 @@ import {ICONS} from '../../constants/icons';
 import style from './styles';
 import {useAppSelector} from '../../redux/store';
 import {HomeScreenProps} from '../../defs/navigation';
-import { useAppTheme } from '../../hooks/themeHook';
+import {useAppTheme} from '../../hooks/themeHook';
 
 function HomeHeader({navigation}: Readonly<HomeScreenProps>) {
   const notifications = useAppSelector(
@@ -17,12 +17,14 @@ function HomeHeader({navigation}: Readonly<HomeScreenProps>) {
   const styles = style(COLOR);
   return (
     <View style={styles.ctr}>
-      <View style={styles.imgCtr}>
-        <Image
-          source={require('../../assets/Images/profileImg.jpeg')}
-          style={styles.img}
-        />
-      </View>
+      <Pressable onPress={()=>{navigation.jumpTo(NAVIGATION.Profile)}}>
+        <View style={styles.imgCtr}>
+          <Image
+            source={require('../../assets/Images/profileImg.jpeg')}
+            style={styles.img}
+          />
+        </View>
+      </Pressable>
       <Dropdown
         style={styles.dropdown}
         renderLeftIcon={() => (
@@ -31,7 +33,7 @@ function HomeHeader({navigation}: Readonly<HomeScreenProps>) {
         renderRightIcon={() => <></>}
         placeholder={STRINGS.Month}
         placeholderStyle={{marginLeft: 10}}
-        selectedTextStyle={{marginLeft: 10,color: COLOR.DARK[100]}}
+        selectedTextStyle={{marginLeft: 10, color: COLOR.DARK[100]}}
         value={monthData[new Date().getMonth()]}
         data={monthData}
         labelField={'label'}
@@ -49,10 +51,8 @@ function HomeHeader({navigation}: Readonly<HomeScreenProps>) {
         {notifications && (
           <View style={styles.notifCount}>
             <Text style={{color: COLORS.VIOLET[100]}}>
-              {
-                Object.values(notifications ?? []).filter(item => !item.read)
-                  ?.length ??0
-              }
+              {Object.values(notifications ?? []).filter(item => !item.read)
+                ?.length ?? 0}
             </Text>
           </View>
         )}

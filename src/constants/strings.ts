@@ -67,7 +67,7 @@ export const STRINGS = {
     OrWith: 'Or With',
     SignupWithGoogle: 'Sign Up with Google',
     AlreadyHaveAccount: 'Already have an Account?',
-    SignupSuccesful: 'Signup Succesful',
+    SignupSuccesful: 'A verification email has been sent to your account.',
     CategoryName: 'Category Name',
     Add: 'Add',
     Home: 'Home',
@@ -166,8 +166,14 @@ export const STRINGS = {
     Type: 'Type',
     Attachement: 'Attachement',
     SampleDesc: ' Amet minim mollit non deserunt ullamco est sit aliqua dolor do amet sint. Velit officia consequat duis enim velit mollit. Exercitation veniam consequat sunt nostrud amet.',
-    ViewDocument:'View Document',
-    SeeFinancialReport:'See your financial report',
+    ViewDocument: 'View Document',
+    SeeFinancialReport: 'See your financial report',
+    SpendFrequency: 'Spend Frequency',
+    RecentTransaction: 'Recent Transaction',
+    SeeAll: 'See All',
+    From: 'From',
+    To: 'To',
+    WhatExport: 'What data do your want to export?'
 };
 export const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w]{1,}$/;
 export const nameRegex = /^[a-zA-Z ]*$/;
@@ -219,3 +225,6 @@ export const currencies: { [key: string]: { name: string, symbol: string, code: 
     'DKK': { name: 'Danish Krone', symbol: 'kr', code: 'DKK' },
     'KRW': { name: 'South Korean Won', symbol: '₩', code: 'KRW' },
 };
+
+export const initialExpenseCategories = ['add', 'food', 'bill', 'shopping', 'subscription', 'transportation']
+export const initialIncomeCategories = ['add', 'salary', 'passive income']

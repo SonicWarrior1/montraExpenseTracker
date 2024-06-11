@@ -63,7 +63,7 @@ function Linegraph({
           initialSpacing={0}
           width={Dimensions.get('screen').width}
           hideDataPoints
-          thickness={8}
+          thickness={12}
           hideRules
           hideYAxisText
           hideAxesAndRules

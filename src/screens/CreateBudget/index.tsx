@@ -17,22 +17,24 @@ import {encrypt} from '../../utils/encryption';
 import {useAppTheme} from '../../hooks/themeHook';
 import {EmptyError} from '../../constants/errors';
 function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
+  // constants
   const COLOR = useAppTheme();
   const styles = style(COLOR);
   const month = new Date().getMonth();
   const isEdit = route.params.isEdit;
-  let cat;
+  let selectedCategory;
   let oldBudget;
-
   if (isEdit) {
-    cat = route.params.category;
+    selectedCategory = route.params.category;
     oldBudget = useAppSelector(
-      state => state.user.currentUser?.budget[month][cat!],
+      state => state.user.currentUser?.budget[month][selectedCategory!],
     );
   }
-
+  const dispatch = useAppDispatch();
+  // redux
   const conversion = useAppSelector(state => state.transaction.conversion);
   const currency = useAppSelector(state => state.user.currentUser?.currency);
+  // state
   const [amount, setAmount] = useState(
     isEdit
       ? (conversion.usd[currency!.toLowerCase()] * oldBudget?.limit!)
@@ -40,7 +42,7 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
           .toString()
       : '',
   );
-  const [category, setCategory] = useState(isEdit ? cat : '');
+  const [category, setCategory] = useState(isEdit ? selectedCategory : '');
   const [alert, setAlert] = useState(isEdit ? oldBudget?.alert : false);
   const [sliderVal, setSliderVal] = useState(
     isEdit ? oldBudget?.percentage : 0,
@@ -49,9 +51,9 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
     state => state.user.currentUser?.expenseCategory,
   );
   const uid = useAppSelector(state => state.user.currentUser?.uid);
-  const addCategorySheetRef = useRef<BottomSheetModal>(null);
-  const dispatch = useAppDispatch();
   const [form, setForm] = useState(false);
+  // ref
+  const addCategorySheetRef = useRef<BottomSheetModal>(null);
   return (
     <View style={styles.safeView}>
       <SafeAreaView style={styles.safeView}>
@@ -149,7 +151,6 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
             onValueChange={val => {
               setSliderVal(Math.floor(val[0]));
             }}
-            // containerStyle={{backgroundColor: 'green'}}
           />
         ) : (
           <></>
@@ -190,7 +191,7 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
             }
           }}
         />
-        <Sapcer height={40} />
+        <Sapcer height={20} />
       </View>
       <BottomSheetModalProvider>
         <AddCategorySheet

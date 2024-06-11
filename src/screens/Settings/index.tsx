@@ -1,10 +1,10 @@
 import React from 'react';
 import {Pressable, SafeAreaView, Text, View} from 'react-native';
+import style from './styles';
 import {SettingsScreenProps} from '../../defs/navigation';
 import {NAVIGATION, STRINGS} from '../../constants/strings';
 import {ICONS} from '../../constants/icons';
 import {useAppSelector} from '../../redux/store';
-import style from './styles';
 import {useAppTheme} from '../../hooks/themeHook';
 
 function SettingsScreen({navigation}: Readonly<SettingsScreenProps>) {

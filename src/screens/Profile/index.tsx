@@ -1,14 +1,14 @@
 import React from 'react';
 import {Image, Pressable, SafeAreaView, Text, View} from 'react-native';
+import style from './styles';
 import {ProfileScreenProps} from '../../defs/navigation';
 import {NAVIGATION, STRINGS} from '../../constants/strings';
 import {useAppDispatch, useAppSelector} from '../../redux/store';
 import {userLoggedIn} from '../../redux/reducers/userSlice';
-import auth from '@react-native-firebase/auth';
 import {COLORS} from '../../constants/commonStyles';
 import {ICONS} from '../../constants/icons';
-import style from './styles';
 import {useAppTheme} from '../../hooks/themeHook';
+import auth from '@react-native-firebase/auth';
 
 function ProfileScreen({navigation}: Readonly<ProfileScreenProps>) {
   const dispatch = useAppDispatch();

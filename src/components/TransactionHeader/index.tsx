@@ -1,12 +1,13 @@
 import React from 'react';
-import {Pressable, View} from 'react-native';
+import {Pressable, Text, View} from 'react-native';
 import {ICONS} from '../../constants/icons';
 import {Dropdown} from 'react-native-element-dropdown';
 import style from './styles';
-import {useAppDispatch} from '../../redux/store';
+import {useAppDispatch, useAppSelector} from '../../redux/store';
 import {openFilterSheet} from '../../redux/reducers/transactionSlice';
 import {monthData, STRINGS} from '../../constants/strings';
 import {useAppTheme} from '../../hooks/themeHook';
+import {COLORS} from '../../constants/commonStyles';
 
 function TransactionHeader({
   month,
@@ -18,6 +19,9 @@ function TransactionHeader({
   const dispatch = useAppDispatch();
   const COLOR = useAppTheme();
   const styles = style(COLOR);
+  // redux
+  const filters = useAppSelector(state => state.transaction.filters);
+
   return (
     <View style={styles.header}>
       <Dropdown
@@ -50,6 +54,16 @@ function TransactionHeader({
           color: COLOR.DARK[100],
           borderColor: COLOR.DARK[100],
         })}
+        {(filters.filter !== 'none' ? 1 : 0) +
+          (filters.cat.length > 0 ? filters.cat.length : 0) !==
+          0 && (
+          <View style={styles.notifCount}>
+            <Text style={{color: COLORS.LIGHT[100]}}>
+              {(filters.filter !== 'none' ? 1 : 0) +
+                (filters.cat.length > 0 ? filters.cat.length : 0)}
+            </Text>
+          </View>
+        )}
       </Pressable>
     </View>
   );

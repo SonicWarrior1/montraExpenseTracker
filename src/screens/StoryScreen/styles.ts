@@ -1,5 +1,6 @@
 import { StyleSheet } from 'react-native';
 import { COLORS } from '../../constants/commonStyles';
+import { RFValue } from 'react-native-responsive-fontsize';
 
 const styles = (COLOR: typeof COLORS) => StyleSheet.create({
     catCtr: {
@@ -18,7 +19,7 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
         padding: 8,
         borderRadius: 10,
     },
-    catText: { fontSize: 18, fontWeight: '600', color: COLOR.DARK[100] },
+    catText: { fontSize: RFValue(16), fontWeight: '600', color: COLOR.DARK[100] },
     safeView: {
         flex: 1,
         paddingBottom: 30,
@@ -44,25 +45,25 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
         paddingHorizontal: 16,
     },
     title: {
-        fontSize: 24,
+        fontSize: RFValue(24),
         fontWeight: '600',
         color: COLOR.LIGHT[100],
         opacity: 0.72,
     },
     text1: {
-        fontSize: 32,
+        fontSize: RFValue(32),
         fontWeight: '600',
         color: COLOR.LIGHT[100],
     },
     text2: {
-        fontSize: 24,
+        fontSize: RFValue(24),
         fontWeight: '600',
         color: COLOR.LIGHT[100],
         alignSelf: 'flex-start',
     },
     catRow: { flexDirection: 'row', columnGap: 15, marginTop: 30 },
     amt: {
-        fontSize: 64,
+        fontSize: RFValue(64),
         fontWeight: '700',
         color: COLOR.LIGHT[100],
         
@@ -70,7 +71,7 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
     card: {
         backgroundColor: COLOR.LIGHT[100],
         marginBottom: 60,
-        paddingVertical: 30,
+        paddingVertical: 15,
         paddingHorizontal: 10,
         width: '100%',
         justifyContent: 'center',
@@ -78,15 +79,15 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
         borderRadius: 20,
     },
     cardText: {
-        fontSize: 24,
+        fontSize: RFValue(24),
         fontWeight: '600',
         textAlign: 'center',
         marginBottom: 20,
-        paddingHorizontal: 60,
+        paddingHorizontal: 30,
         color: COLOR.DARK[100]
     },
     amt2: {
-        fontSize: 36,
+        fontSize: RFValue(36),
         fontWeight: '500',
         color: COLOR.DARK[100]
     },

@@ -20,25 +20,32 @@ import {
 } from '../../constants/strings';
 import Sapcer from '../../components/Spacer';
 import CustomButton from '../../components/CustomButton';
-import {BottomSheetModalMethods} from '@gorhom/bottom-sheet/lib/typescript/types';
 import DeleteTransactionSheet from '../../components/DeleteTransSheet';
 import {useAppSelector} from '../../redux/store';
-import {Timestamp} from '@react-native-firebase/firestore';
 import {useAppTheme} from '../../hooks/themeHook';
+// Third Party Libraries
+import {Timestamp} from '@react-native-firebase/firestore';
+import {BottomSheetModalMethods} from '@gorhom/bottom-sheet/lib/typescript/types';
 
 function TransactionDetails({
   route,
   navigation,
 }: Readonly<TransactionDetailScreenProps>) {
+  // constants
+  const COLOR = useAppTheme();
+  const styles = style(COLOR);
+  // redux
   const currency = useAppSelector(state => state.user.currentUser?.currency);
   const conversion = useAppSelector(state => state.transaction.conversion);
-  const bottomSheetModalRef = useRef<BottomSheetModalMethods>(null);
   const trans = useAppSelector(
     state =>
       state.transaction.transactions[
         route.params.transaction.timeStamp.seconds
       ],
   );
+  // ref
+  const bottomSheetModalRef = useRef<BottomSheetModalMethods>(null);
+  // functions
   const headerRight = () => {
     return (
       <Pressable
@@ -55,8 +62,7 @@ function TransactionDetails({
       headerRight: headerRight,
     });
   }, []);
-  const COLOR = useAppTheme();
-  const styles = style(COLOR);
+
   return (
     trans && (
       <View style={{flex: 1, backgroundColor: COLOR.LIGHT[100]}}>
@@ -123,14 +129,14 @@ function TransactionDetails({
             {trans.type === 'transfer' ? (
               <>
                 <View style={styles.ctrColumn}>
-                  <Text style={styles.text1}>From</Text>
+                  <Text style={styles.text1}>{STRINGS.From}</Text>
                   <Text style={styles.text2}>
                     {(trans.from ?? '')[0].toLocaleUpperCase() +
                       (trans.from ?? '').slice(1)}
                   </Text>
                 </View>
                 <View style={styles.ctrColumn}>
-                  <Text style={styles.text1}>To</Text>
+                  <Text style={styles.text1}>{STRINGS.To}</Text>
                   <Text style={styles.text2}>
                     {trans.to[0].toLocaleUpperCase() + trans.to.slice(1)}
                   </Text>

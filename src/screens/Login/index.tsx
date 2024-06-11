@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import {
+  Alert,
   Pressable,
   SafeAreaView,
   ScrollView,
@@ -17,38 +18,68 @@ import {COLORS} from '../../constants/commonStyles';
 import Sapcer from '../../components/Spacer';
 import {ICONS} from '../../constants/icons';
 import {LoginScreenProps} from '../../defs/navigation';
+import {setLoading, userLoggedIn} from '../../redux/reducers/userSlice';
+import {useAppDispatch} from '../../redux/store';
+import {UserFromJson, UserToJson} from '../../utils/userFuncs';
+import {useAppTheme} from '../../hooks/themeHook';
+// Third Party Libraries
+import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
-import {setLoading, userLoggedIn} from '../../redux/reducers/userSlice';
-import {GoogleSignin} from '@react-native-google-signin/google-signin';
-import {useAppDispatch} from '../../redux/store';
-import { UserFromJson, UserToJson } from '../../utils/userFuncs';
-import { useAppTheme } from '../../hooks/themeHook';
+import {RFValue} from 'react-native-responsive-fontsize';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 function Login({navigation}: Readonly<LoginScreenProps>) {
+  // constants
+  const dispatch = useAppDispatch();
+  const COLOR = useAppTheme();
+  const styles = style(COLOR);
+  const userCollection = firestore().collection('users');
+  // state
   const [email, setEmail] = useState('');
   const [pass, setPass] = useState('');
   const [form, setForm] = useState(false);
-  const dispatch = useAppDispatch();
+  // functions
   function onChangeEmail(str: string) {
     setEmail(str);
   }
   function onChangePass(str: string) {
     setPass(str);
   }
-  async function handleLogin() {
+  async function handleLogin() {+
     setForm(true);
     if (email !== '' && pass !== '') {
       try {
         dispatch(setLoading(true));
         const creds = await auth().signInWithEmailAndPassword(email, pass);
         if (creds) {
-          const data = await firestore()
-            .collection('users')
-            .doc(creds.user.uid)
-            .get();
-          const user = UserFromJson(data.data()!);
-          dispatch(userLoggedIn(user));
+          if (creds.user.emailVerified) {
+            const data = await userCollection.doc(creds.user.uid).get();
+            const user = UserFromJson(data.data()!);
+            dispatch(userLoggedIn(user));
+          } else {
+            Alert.alert('Please verify your email', '', [
+              {
+                text: 'Resend',
+                onPress: async () => {
+                  try {
+                    await creds.user.sendEmailVerification();
+                    await auth().signOut();
+                  } catch (e) {
+                    console.log(e);
+                    await auth().signOut();
+                  }
+                },
+              },
+              {
+                text: 'OK',
+                onPress: async () => {
+                  console.log('OK Pressed');
+                  await auth().signOut();
+                },
+              },
+            ]);
+          }
         }
       } catch (e) {
         console.log(e);
@@ -70,10 +101,7 @@ function Login({navigation}: Readonly<LoginScreenProps>) {
       // Sign-in the user with the credential
       const creds = await auth().signInWithCredential(googleCredential);
       if (creds) {
-        const res = await firestore()
-          .collection('users')
-          .doc(creds.user.uid)
-          .get();
+        const res = await userCollection.doc(creds.user.uid).get();
         if (!res.exists) {
           const user = UserToJson({
             name: creds.user.displayName!,
@@ -81,18 +109,17 @@ function Login({navigation}: Readonly<LoginScreenProps>) {
             uid: creds.user.uid,
             pin: '',
           });
-          await firestore().collection('users').doc(creds.user.uid).set(user);
-          dispatch(userLoggedIn({
-            name: creds.user.displayName!,
-            email: creds.user.email!,
-            uid: creds.user.uid,
-            pin: '',
-          }));
+          await userCollection.doc(creds.user.uid).set(user);
+          dispatch(
+            userLoggedIn({
+              name: creds.user.displayName!,
+              email: creds.user.email!,
+              uid: creds.user.uid,
+              pin: '',
+            }),
+          );
         } else {
-          const data = await firestore()
-            .collection('users')
-            .doc(creds.user.uid)
-            .get();
+          const data = await userCollection.doc(creds.user.uid).get();
           const user = UserFromJson(data.data()!);
           if (user) {
             dispatch(userLoggedIn(user));
@@ -104,13 +131,9 @@ function Login({navigation}: Readonly<LoginScreenProps>) {
     }
     dispatch(setLoading(false));
   }
-  const COLOR = useAppTheme();
-  const styles = style(COLOR);
   return (
     <SafeAreaView style={styles.safeView}>
-      <ScrollView
-        style={styles.flex}
-        contentContainerStyle={styles.flex}>
+      <KeyboardAwareScrollView style={styles.flex} contentContainerStyle={styles.flex}>
         <View style={styles.mainView}>
           <CustomInput
             placeholderText={STRINGS.Email}
@@ -127,7 +150,7 @@ function Login({navigation}: Readonly<LoginScreenProps>) {
             inputColor={COLOR.DARK[100]}
           />
           <PassEmptyError pass={pass} formKey={form} />
-          <Sapcer height={30} />
+          <Sapcer height={15} />
           <CustomButton title={STRINGS.LOGIN} onPress={handleLogin} />
           <Sapcer height={10} />
           <Text style={styles.orText}>{STRINGS.OrWith}</Text>
@@ -143,26 +166,20 @@ function Login({navigation}: Readonly<LoginScreenProps>) {
             onPress={() => {
               navigation.push(NAVIGATION.FORGOTPASSWORD);
             }}>
-            <Text
-              style={styles.forgotText}>
-              {STRINGS.ForgotPassword}
-            </Text>
+            <Text style={styles.forgotText}>{STRINGS.ForgotPassword}</Text>
           </Pressable>
           <Sapcer height={20} />
-          <Text style={{color: COLORS.DARK[25]}}>
+          <Text style={{color: COLORS.DARK[25], fontSize: RFValue(16)}}>
             {STRINGS.DontHaveAccount}{' '}
             <Pressable
               onPress={() => {
                 navigation.navigate(NAVIGATION.SIGNUP);
               }}>
-              <Text
-                style={styles.signupText}>
-                {STRINGS.SIGNUP}
-              </Text>
+              <Text style={styles.signupText}>{STRINGS.SIGNUP}</Text>
             </Pressable>
           </Text>
         </View>
-      </ScrollView>
+      </KeyboardAwareScrollView>
     </SafeAreaView>
   );
 }

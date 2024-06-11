@@ -39,31 +39,26 @@ function AddCategorySheet({
   );
   const dispatch = useAppDispatch();
   const snapPoints = useMemo(() => ['25%'], []);
-  const [cat, setCat] = useState('');
+  const [category, setCategory] = useState('');
   const onPress = useCallback(async () => {
-    if (cat !== '') {
+    const userDoc = firestore().collection('users').doc(uid);
+    if (category !== '') {
       dispatch(setLoading(true));
       try {
         if (type === 'expense') {
-          await dispatch(addExpenseCategory(cat));
-          await firestore()
-            .collection('users')
-            .doc(uid)
-            .update({
-              expenseCategory: [...expenseCats!, cat].map(item =>
-                encrypt(item, uid!),
-              ),
-            });
+          await dispatch(addExpenseCategory(category));
+          await userDoc.update({
+            expenseCategory: [...expenseCats!, category].map(item =>
+              encrypt(item, uid!),
+            ),
+          });
         } else if (type === 'income') {
-          await dispatch(addIncomeCategory(cat));
-          await firestore()
-            .collection('users')
-            .doc(uid)
-            .update({
-              incomeCategory: [...incomeCats!, cat].map(item =>
-                encrypt(item, uid!),
-              ),
-            });
+          await dispatch(addIncomeCategory(category));
+          await userDoc.update({
+            incomeCategory: [...incomeCats!, category].map(item =>
+              encrypt(item, uid!),
+            ),
+          });
         }
       } catch (e) {
         console.log(e);
@@ -86,19 +81,12 @@ function AddCategorySheet({
       handleIndicatorStyle={{backgroundColor: COLOR.DARK[100]}}>
       <BottomSheetView style={styles.sheetView}>
         <BottomSheetTextInput
-          style={{
-            borderWidth: 1,
-            borderRadius: 20,
-            height: 60,
-            paddingHorizontal: 20,
-            borderColor: COLORS.LIGHT[20],
-            width: '100%',
-          }}
+          style={styles.input}
           placeholder={STRINGS.CategoryName}
           keyboardType={'default'}
-          value={cat}
+          value={category}
           onChangeText={(str: string) => {
-            setCat(str);
+            setCategory(str);
           }}
           placeholderTextColor={COLORS.DARK[25]}
           autoCapitalize={'words'}

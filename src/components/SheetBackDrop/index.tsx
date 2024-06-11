@@ -2,6 +2,10 @@ import {useBottomSheetModal} from '@gorhom/bottom-sheet';
 import React from 'react';
 import {Pressable, useColorScheme} from 'react-native';
 import {useAppSelector} from '../../redux/store';
+import {
+  DarkBackDropColor,
+  LightBackDropColor,
+} from '../../constants/commonStyles';
 
 function SheetBackdrop() {
   const sheet = useBottomSheetModal();
@@ -15,8 +19,8 @@ function SheetBackdrop() {
         width: '100%',
         backgroundColor:
           (theme === 'device' ? scheme : theme) === 'dark'
-            ? 'rgba(255,255,255,0.2)'
-            : 'rgba(0,0,0,0.5)',
+            ? DarkBackDropColor
+            : LightBackDropColor,
         position: 'absolute',
       }}
       onPress={() => {

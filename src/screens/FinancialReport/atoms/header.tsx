@@ -61,8 +61,8 @@ function FinancialReportHeader({
             setType('transaction');
           }}>
           {ICONS.LineChart({
-            height: 20,
-            width: 20,
+            height: 25,
+            width: 25,
             color: graph === 0 ? COLOR.LIGHT[100] : COLOR.VIOLET[100],
           })}
         </Pressable>
@@ -81,8 +81,8 @@ function FinancialReportHeader({
             setType('category');
           }}>
           {ICONS.Pie({
-            height: 20,
-            width: 20,
+            height: 25,
+            width: 25,
             color: graph === 1 ? COLOR.LIGHT[100] : COLOR.VIOLET[100],
           })}
         </Pressable>

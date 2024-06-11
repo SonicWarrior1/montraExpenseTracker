@@ -21,7 +21,7 @@ import {STRINGS} from '../../constants/strings';
 import {useAppTheme} from '../../hooks/themeHook';
 
 function FilterSheet() {
-  const snapPoints = useMemo(() => ['55%'], []);
+  const snapPoints = useMemo(() => ['64%'], []);
   const ref = useRef<BottomSheetModal>(null);
   const isOpen = useAppSelector(state => state.transaction.isFilterOpen);
   const selectedCats = useAppSelector(state => state.transaction.filters.cat);
@@ -66,7 +66,7 @@ function FilterSheet() {
               <Text style={styles.editBtnText}>{STRINGS.Reset}</Text>
             </Pressable>
           </View>
-          <Text style={[styles.text1, {marginBottom: 10}]}>
+          <Text style={[styles.text1, {marginBottom: 15}]}>
             {STRINGS.FilterBy}
           </Text>
           <View style={styles.flexRow}>
@@ -132,8 +132,7 @@ function FilterSheet() {
             style={[
               styles.text1,
               {
-                marginBottom: 10,
-                marginTop: 10,
+                marginVertical: 15
               },
             ]}>
             {STRINGS.SortBy}
@@ -220,25 +219,29 @@ function FilterSheet() {
             style={[
               styles.text1,
               {
-                marginBottom: 15,
-                marginTop: 10,
+                marginBottom: 25,
+                marginTop: 15,
               },
             ]}>
             {STRINGS.Category}
           </Text>
           <View style={styles.catRow}>
-            <Text style={styles.text1}>{STRINGS.ChooseCategory}</Text>
+            <Text style={[styles.text1, {fontWeight: '500'}]}>
+              {STRINGS.ChooseCategory}
+            </Text>
             <Pressable
               onPress={() => {
-                console.log('jdnk');
                 dispatch(openCatSheet(true));
               }}
               style={styles.pressable}>
-              <Text style={styles.text2}>{selectedCats?.length?? 0} Selected</Text>
+              <Text style={styles.text2}>
+                {selectedCats?.length ?? 0} Selected
+              </Text>
               {ICONS.ArrowRight({
-                height: 20,
-                width: 20,
-                color: COLOR.DARK[100],
+                height: 25,
+                width: 25,
+                color: COLOR.VIOLET[100],
+                borderColor:COLOR.VIOLET[100]
               })}
             </Pressable>
           </View>

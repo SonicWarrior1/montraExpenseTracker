@@ -5,14 +5,17 @@ import {useAppSelector} from '../../redux/store';
 import firestore from '@react-native-firebase/firestore';
 import {encrypt} from '../../utils/encryption';
 import style from './styles';
-import { useAppTheme } from '../../hooks/themeHook';
-import { STRINGS } from '../../constants/strings';
+import {useAppTheme} from '../../hooks/themeHook';
+import {STRINGS} from '../../constants/strings';
 
 function ThemeScreen() {
+  // redux
   const theme = useAppSelector(state => state.user.currentUser?.theme);
   const uid = useAppSelector(state => state.user.currentUser?.uid);
+  // constants
   const COLORS = useAppTheme();
   const styles = style(COLORS);
+  const userDoc = firestore().collection('users').doc(uid);
   return (
     <SafeAreaView style={styles.safeView}>
       <View style={styles.row}>
@@ -23,10 +26,7 @@ function ThemeScreen() {
           fillColor={COLORS.BLUE[100]}
           isChecked={theme === 'light'}
           onPress={async () => {
-            await firestore()
-              .collection('users')
-              .doc(uid)
-              .update({theme:  encrypt('light', uid!)});
+            await userDoc.update({theme: encrypt('light', uid!)});
           }}
         />
       </View>
@@ -38,10 +38,7 @@ function ThemeScreen() {
           fillColor={COLORS.BLUE[100]}
           isChecked={theme === 'dark'}
           onPress={async () => {
-            await firestore()
-              .collection('users')
-              .doc(uid)
-              .update({theme:  encrypt('dark', uid!)});
+            await userDoc.update({theme: encrypt('dark', uid!)});
           }}
         />
       </View>
@@ -53,10 +50,7 @@ function ThemeScreen() {
           fillColor={COLORS.BLUE[100]}
           isChecked={theme === 'device'}
           onPress={async () => {
-            await firestore()
-              .collection('users')
-              .doc(uid)
-              .update({theme:  encrypt('device', uid!)});
+            await userDoc.update({theme: encrypt('device', uid!)});
           }}
         />
       </View>

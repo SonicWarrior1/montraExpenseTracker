@@ -18,7 +18,6 @@ import {
   testInput,
 } from '../../constants/errors';
 import CustomPassInput from '../../components/CustomPassInput';
-import BouncyCheckbox from 'react-native-bouncy-checkbox/build/dist/BouncyCheckbox';
 import CustomButton from '../../components/CustomButton';
 import {
   emailRegex,
@@ -29,23 +28,33 @@ import {
 } from '../../constants/strings';
 import {COLORS} from '../../constants/commonStyles';
 import {ICONS} from '../../constants/icons';
-import auth from '@react-native-firebase/auth';
-import firestore from '@react-native-firebase/firestore';
-import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import {SignupScreenProps} from '../../defs/navigation';
 import {setLoading, userLoggedIn} from '../../redux/reducers/userSlice.ts';
 import {useAppDispatch} from '../../redux/store/index.ts';
-import Toast from 'react-native-toast-message';
 import {UserFromJson, UserToJson} from '../../utils/userFuncs.ts';
 import {singupUser} from '../../utils/firebase.ts';
 import {useAppTheme} from '../../hooks/themeHook.ts';
+// Third party libraries
+import BouncyCheckbox from 'react-native-bouncy-checkbox/build/dist/BouncyCheckbox';
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
+import {GoogleSignin} from '@react-native-google-signin/google-signin';
+import Toast from 'react-native-toast-message';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 function Signup({navigation}: Readonly<SignupScreenProps>) {
+  // constants
+  const dispatch = useAppDispatch();
+  const COLOR = useAppTheme();
+  const styles = style(COLOR);
+  const userCollection = firestore().collection('users');
+  // state
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [pass, setPass] = useState('');
   const [confirmPass, setconfirmPass] = useState('');
   const [checked, setChecked] = useState(false);
-
+  const [form, setForm] = useState(false);
+  // functions
   function onChangeName(str: string) {
     setName(str);
   }
@@ -58,7 +67,6 @@ function Signup({navigation}: Readonly<SignupScreenProps>) {
   function onChangeConfirmPass(str: string) {
     setconfirmPass(str);
   }
-  const dispatch = useAppDispatch();
 
   async function handleSignup() {
     setForm(true);
@@ -75,7 +83,7 @@ function Signup({navigation}: Readonly<SignupScreenProps>) {
         dispatch(setLoading(true));
         const res = await singupUser({name: name, email: email, pass: pass});
         if (res) {
-          Toast.show({text1: STRINGS.SignupSuccesful});
+          Toast.show({text1: STRINGS.SignupSuccesful, visibilityTime: 2000});
           navigation.replace(NAVIGATION.LOGIN);
         }
         dispatch(setLoading(false));
@@ -85,6 +93,7 @@ function Signup({navigation}: Readonly<SignupScreenProps>) {
       }
     }
   }
+
   async function onGoogleButtonPress() {
     try {
       dispatch(setLoading(true));
@@ -93,10 +102,7 @@ function Signup({navigation}: Readonly<SignupScreenProps>) {
       const googleCredential = auth.GoogleAuthProvider.credential(idToken);
       const creds = await auth().signInWithCredential(googleCredential);
       if (creds) {
-        const res = await firestore()
-          .collection('users')
-          .doc(creds.user.uid)
-          .get();
+        const res = await userCollection.doc(creds.user.uid).get();
         if (!res.exists) {
           const user = UserToJson({
             name: creds.user.displayName!,
@@ -104,7 +110,7 @@ function Signup({navigation}: Readonly<SignupScreenProps>) {
             uid: creds.user.uid,
             pin: '',
           });
-          await firestore().collection('users').doc(creds.user.uid).set(user);
+          await userCollection.doc(creds.user.uid).set(user);
           dispatch(
             userLoggedIn({
               name: creds.user.displayName!,
@@ -114,10 +120,7 @@ function Signup({navigation}: Readonly<SignupScreenProps>) {
             }),
           );
         } else {
-          const data = await firestore()
-            .collection('users')
-            .doc(creds.user.uid)
-            .get();
+          const data = await userCollection.doc(creds.user.uid).get();
           const user = UserFromJson(data.data()!);
           if (user) {
             dispatch(userLoggedIn(user));
@@ -129,12 +132,11 @@ function Signup({navigation}: Readonly<SignupScreenProps>) {
     }
     dispatch(setLoading(false));
   }
-  const [form, setForm] = useState(false);
-  const COLOR = useAppTheme();
-  const styles = style(COLOR);
   return (
     <SafeAreaView style={styles.safeView}>
-      <ScrollView style={styles.flex} contentContainerStyle={styles.flex}>
+      <KeyboardAwareScrollView
+        style={styles.flex}
+        contentContainerStyle={styles.flex}>
         <View style={styles.mainView}>
           <CustomInput
             placeholderText={STRINGS.Name}
@@ -170,7 +172,6 @@ function Signup({navigation}: Readonly<SignupScreenProps>) {
             confirmPass={confirmPass}
             formKey={form}
           />
-          <Sapcer height={10} />
           <BouncyCheckbox
             size={25}
             fillColor={
@@ -207,23 +208,17 @@ function Signup({navigation}: Readonly<SignupScreenProps>) {
             </View>
           </TouchableOpacity>
           <Sapcer height={10} />
-          <Text style={{color: COLORS.DARK[25]}}>
+          <Text style={styles.text2}>
             {STRINGS.AlreadyHaveAccount}{' '}
             <Pressable
               onPress={() => {
                 navigation.navigate(NAVIGATION.LOGIN);
               }}>
-              <Text
-                style={{
-                  color: COLORS.PRIMARY.VIOLET,
-                  textDecorationLine: 'underline',
-                }}>
-                {STRINGS.LOGIN}
-              </Text>
+              <Text style={styles.text3}>{STRINGS.LOGIN}</Text>
             </Pressable>
           </Text>
         </View>
-      </ScrollView>
+      </KeyboardAwareScrollView>
     </SafeAreaView>
   );
 }

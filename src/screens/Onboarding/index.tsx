@@ -1,56 +1,54 @@
 import React, {useState} from 'react';
-import {Dimensions, SafeAreaView, Text, View} from 'react-native';
+import {Dimensions, Platform, SafeAreaView, Text, View} from 'react-native';
+import style from './styles';
+import {NAVIGATION, STRINGS} from '../../constants/strings';
+import {OnboardingScreenProps} from '../../defs/navigation';
+import {COLORS} from '../../constants/commonStyles';
+import {ICONS} from '../../constants/icons';
+import {useAppTheme} from '../../hooks/themeHook';
+import Sapcer from '../../components/Spacer';
+import CustomButton from '../../components/CustomButton';
+// Third party libraries
 import Carousel from 'react-native-reanimated-carousel';
 
-import {ICONS} from '../../constants/icons';
-import style from './styles';
-import CustomButton from '../../components/CustomButton';
-import {NAVIGATION, STRINGS} from '../../constants/strings';
-import {COLORS} from '../../constants/commonStyles';
-import {OnboardingScreenProps} from '../../defs/navigation';
-import Sapcer from '../../components/Spacer';
-import {useAppTheme} from '../../hooks/themeHook';
 const screenWidth = Dimensions.get('screen').width;
 const screenHeight = Dimensions.get('window').height;
 const data = [
   {
-    icon: (
-      <ICONS.Onboard1 height={screenWidth * 0.75} width={screenWidth * 0.65} />
-    ),
+    icon: ICONS.Onboard1,
     text1: 'Gain total control of your money',
     text2: 'Become your own money manager and make every cent count',
   },
   {
-    icon: (
-      <ICONS.Onboard2 height={screenWidth * 0.75} width={screenWidth * 0.65} />
-    ),
+    icon: ICONS.Onboard2,
     text1: 'Know where your money goes',
     text2:
       'Track your transaction easily,with categories and financial report ',
   },
   {
-    icon: (
-      <ICONS.Onboard3 height={screenWidth * 0.75} width={screenWidth * 0.65} />
-    ),
+    icon: ICONS.Onboard3,
     text1: 'Planning ahead',
     text2: 'Setup your budget for each category so you in control',
   },
 ];
 function Onboarding({navigation}: Readonly<OnboardingScreenProps>) {
+  // constants
+  const styles = style(useAppTheme());
+  // state
+  const [index, setIndex] = useState(0);
+  // functions
   function handleSignup() {
     navigation.navigate(NAVIGATION.SIGNUP);
   }
   function handleLogin() {
     navigation.navigate(NAVIGATION.LOGIN);
   }
-  const [index, setIndex] = useState(0);
-  const styles = style(useAppTheme());
   return (
     <SafeAreaView style={styles.safeView}>
       <View style={styles.mainView}>
         <View>
-          <Sapcer height={screenHeight * 0.045} />
-          <View style={{height: screenHeight * 0.6}}>
+          {Platform.OS !== 'ios' && <Sapcer height={screenHeight * 0.035} />}
+          <View style={{height: screenHeight * 0.66}}>
             <Carousel
               loop={false}
               width={screenWidth - 40}
@@ -61,15 +59,24 @@ function Onboarding({navigation}: Readonly<OnboardingScreenProps>) {
               }}
               renderItem={({item}) => (
                 <View style={styles.carouselCtr}>
-                  {item.icon}
-                  <Text style={styles.text1}>{item.text1}</Text>
-                  <View style={{height: screenHeight * 0.025}} />
-                  <Text style={styles.text2}>{item.text2}</Text>
+                  {item.icon({
+                    height: screenWidth * 0.8,
+                    width: screenWidth * 0.7,
+                  })}
+                  <View>
+                    <Text style={styles.text1}>{item.text1}</Text>
+                    <View style={{height: screenHeight * 0.025}} />
+                    <Text style={styles.text2}>{item.text2}</Text>
+                  </View>
                 </View>
               )}
             />
           </View>
-          <Sapcer height={screenHeight * 0.03} />
+          <Sapcer
+            height={
+              Platform.OS !== 'ios' ? screenHeight * 0.05 : screenHeight * 0.03
+            }
+          />
           <View style={styles.progressDotCtr}>
             {[0, 1, 2].map(i => {
               return (
@@ -91,7 +98,11 @@ function Onboarding({navigation}: Readonly<OnboardingScreenProps>) {
             })}
           </View>
         </View>
-        <View style={{paddingBottom: screenHeight * 0.04}}>
+        <View
+          style={{
+            paddingBottom: screenHeight * 0.03,
+            paddingTop: screenHeight * 0.03,
+          }}>
           <CustomButton title={STRINGS.SIGNUP} onPress={handleSignup} />
           <Sapcer height={screenHeight * 0.015} />
           <CustomButton

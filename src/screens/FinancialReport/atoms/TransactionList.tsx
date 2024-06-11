@@ -5,8 +5,8 @@ import style from '../styles';
 import {currencies} from '../../../constants/strings';
 import {COLORS} from '../../../constants/commonStyles';
 import {catIcons, ICONS} from '../../../constants/icons';
-import { transactionType } from '../../../defs/transaction';
-import { useAppTheme } from '../../../hooks/themeHook';
+import {transactionType} from '../../../defs/transaction';
+import {useAppTheme} from '../../../hooks/themeHook';
 
 function TransactionList({
   data,
@@ -35,28 +35,16 @@ function TransactionList({
       data={Object.values(data)
         .filter(
           item =>
-            item.timeStamp.toDate().getMonth() === month &&
-            item.type === transType,
+            Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+              .toDate()
+              .getMonth() === month && item.type === transType,
         )
         .sort((a, b) => b.timeStamp.seconds - a.timeStamp.seconds)
         .slice(0, 4)}
+      scrollEnabled={false}
       renderItem={({item}) => {
         return (
-          <Pressable
-            style={styles.listItemCtr}
-            onPress={() => {
-              // navigation.push('TransactionDetail', {
-              //   transaction: {
-              //     ...item,
-              //     amount: Number(
-              //       (
-              //         conversion['usd'][currency!.toLowerCase()] *
-              //         item.amount
-              //       ).toFixed(1),
-              //     ),
-              //   },
-              // });
-            }}>
+          <Pressable style={styles.listItemCtr}>
             <View
               style={[
                 styles.icon,
@@ -72,7 +60,9 @@ function TransactionList({
               <Text style={styles.text1}>
                 {item.category[0].toLocaleUpperCase() + item.category.slice(1)}
               </Text>
-              <Text style={styles.text2}>{item.desc}</Text>
+              <Text style={styles.text2} numberOfLines={1}>
+                {item.desc}
+              </Text>
             </View>
             <View style={{alignItems: 'flex-end', rowGap: 5}}>
               <Text

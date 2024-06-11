@@ -1,5 +1,6 @@
 import { StyleSheet } from "react-native";
 import { COLORS } from "../../constants/commonStyles";
+import { RFValue } from "react-native-responsive-fontsize";
 
 const styles = StyleSheet.create({
     passInputContainer: {
@@ -8,7 +9,7 @@ const styles = StyleSheet.create({
         height: 60,
         paddingLeft: 20,
         borderColor: COLORS.LIGHT[20],
-        color: COLORS.PRIMARY.LIGHT,
+        color: COLORS.LIGHT[100],
         flexDirection: 'row',
         alignItems: 'center',
         paddingRight: 12,
@@ -16,6 +17,7 @@ const styles = StyleSheet.create({
     passInput: {
         color: COLORS.PRIMARY.DARK,
         flex: 1,
+        fontSize: RFValue(14)
     },
 })
 

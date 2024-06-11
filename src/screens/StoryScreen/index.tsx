@@ -1,7 +1,5 @@
-/* eslint-disable react-native/no-inline-styles */
-import {Dimensions, SafeAreaView, Text, View} from 'react-native';
+import {Dimensions, SafeAreaView, Text, TouchableOpacity, View} from 'react-native';
 import React, {useState} from 'react';
-import {TouchableOpacity} from 'react-native-gesture-handler';
 import {COLORS} from '../../constants/commonStyles';
 import style from './styles';
 import {catIcons, ICONS} from '../../constants/icons';
@@ -12,9 +10,15 @@ import {currencies, NAVIGATION, STRINGS} from '../../constants/strings';
 import {useAppTheme} from '../../hooks/themeHook';
 
 export default function StoryScreen({navigation}: Readonly<StoryScreenProps>) {
+  // redux
+  const user = useAppSelector(state => state.user.currentUser);
+  const conversion = useAppSelector(state => state.transaction.conversion);
+  const currency = useAppSelector(state => state.user.currentUser?.currency);
+  // constants
   const screenHeight = Dimensions.get('screen').height;
   const screenWidth = Dimensions.get('screen').width;
-  const user = useAppSelector(state => state.user.currentUser);
+  const COLOR = useAppTheme();
+  const styles = style(COLOR);
   const biggestSpend: [string, number][] =
     user?.spend[new Date().getMonth()] !== undefined
       ? Object.entries(user?.spend[new Date().getMonth()]).sort(
@@ -34,11 +38,9 @@ export default function StoryScreen({navigation}: Readonly<StoryScreenProps>) {
           item => item[1].limit <= user?.spend[new Date().getMonth()][item[0]],
         )
       : undefined;
-  const conversion = useAppSelector(state => state.transaction.conversion);
-  const currency = useAppSelector(state => state.user.currentUser?.currency);
+  // state
   const [index, setIndex] = useState(0);
-  const COLOR = useAppTheme();
-  const styles = style(COLOR);
+
   return (
     <SafeAreaView
       style={[

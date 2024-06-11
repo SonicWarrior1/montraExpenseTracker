@@ -1,5 +1,6 @@
 import { StyleSheet } from "react-native";
 import { COLORS } from "../../constants/commonStyles";
+import { RFValue } from "react-native-responsive-fontsize";
 
 const styles = (COLOR: typeof COLORS) => StyleSheet.create({
     safeView: { flex: 1, backgroundColor: COLOR.LIGHT[100] },
@@ -9,25 +10,27 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
         alignItems: 'center',
         marginBottom: 15,
         marginTop: 15,
-    }, headerTitle: { fontSize: 18, fontWeight: '600', color: COLOR.DARK[100], },
+    }, headerTitle: { fontSize: RFValue(18), fontWeight: '600', color: COLOR.DARK[100], },
     center: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
     },
-    NoNotifText: { fontSize: 14, fontWeight: '500', color: COLOR.DARK[25] },
+    NoNotifText: { fontSize: RFValue(14), fontWeight: '500', color: COLOR.DARK[25] },
     ctr: {
         flexDirection: 'row',
         paddingHorizontal: 20,
         borderBottomWidth: 1,
         borderColor: COLOR.LIGHT[20],
+        backgroundColor:COLOR.LIGHT[100],
         paddingVertical: 10,
+        // columnGap:10,
         justifyContent: 'space-between',
         alignItems: 'center',
     },
-    text1: { fontSize: 16, fontWeight: '500', color: COLOR.DARK[100], },
+    text1: { fontSize: RFValue(16), fontWeight: '500', color: COLOR.DARK[100], marginBottom: 5 },
     text2: {
-        fontSize: 13,
+        fontSize: RFValue(13),
         fontWeight: '500',
         color: COLOR.DARK[25],
         marginTop: 5,
@@ -50,6 +53,12 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
             width: 1,
         },
     },
-    menuText: { color: COLOR.DARK[100] }
+    menuText: { color: COLOR.DARK[100] },
+    delete:{
+        backgroundColor: 'red',
+        paddingHorizontal: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
+      }
 })
 export default styles

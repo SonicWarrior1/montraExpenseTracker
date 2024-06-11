@@ -1,5 +1,6 @@
 import { StyleSheet } from 'react-native';
 import { COLORS } from '../../constants/commonStyles';
+import { RFValue } from 'react-native-responsive-fontsize';
 
 const styles = (COLOR: typeof COLORS) => StyleSheet.create({
     safeView: {
@@ -14,19 +15,19 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: 20,
     },
-    amt: { fontSize: 48, fontWeight: '700', color: COLOR.LIGHT[100] },
-    desc: { fontSize: 16, fontWeight: '500', color: COLOR.LIGHT[80], marginTop: 10 },
-    time: { fontSize: 13, fontWeight: '500', color: COLOR.LIGHT[80], marginTop: 10 },
-    text1: { color: COLOR.DARK[25], fontSize: 14, fontWeight: '500' },
-    text2: { fontSize: 16, fontWeight: '600', color: COLOR.DARK[100] },
+    amt: { fontSize: RFValue(48), fontWeight: '700', color: COLOR.LIGHT[100] },
+    desc: { fontSize: (16), fontWeight: '500', color: COLOR.LIGHT[80], marginTop: 10 },
+    time: { fontSize: (13), fontWeight: '500', color: COLOR.LIGHT[80], marginTop: 10 },
+    text1: { color: COLOR.DARK[25], fontSize: RFValue(13), fontWeight: '500' },
+    text2: { fontSize: RFValue(15), fontWeight: '600', color: COLOR.DARK[100] },
     descTitle: {
-        fontSize: 16,
+        fontSize: RFValue(16),
         fontWeight: '600',
         color: COLOR.DARK[25],
         marginBottom: 10,
     },
     descText: {
-        fontSize: 16, fontWeight: '600', marginBottom: 20, color: COLOR.DARK[100]
+        fontSize: RFValue(16), fontWeight: '600', marginBottom: 20, color: COLOR.DARK[100]
     },
     bottomView: {
         flex: 2,

@@ -1,6 +1,7 @@
 import { FirebaseFirestoreTypes, Timestamp } from "@react-native-firebase/firestore";
 import { UserType } from "../defs/user";
 import { decrypt, encrypt } from "./encryption";
+import { initialExpenseCategories, initialIncomeCategories } from "../constants/strings";
 
 export function UserToJson({
     uid,
@@ -18,8 +19,8 @@ export function UserToJson({
         name: encrypt(name, uid),
         email: encrypt(email, uid),
         pin: '',
-        expenseCategory: ['add', 'food', 'bill', 'shopping', 'subscription', 'transportation'].map((item) => encrypt(item, uid)),
-        incomeCategory: ['add', 'salary', 'passive income'].map((item) => encrypt(item, uid)),
+        expenseCategory: initialExpenseCategories.map((item) => encrypt(item, uid)),
+        incomeCategory: initialIncomeCategories.map((item) => encrypt(item, uid)),
         budget: {},
         spend: {},
         income: {},
@@ -34,8 +35,8 @@ export function UserFromJson(json: FirebaseFirestoreTypes.DocumentData): UserTyp
         email: decrypt(json.email, json.uid) ?? json.email,
         name: decrypt(json.name, json.uid) ?? json.name,
         pin: json.pin !== '' ? decrypt(json.pin, json.uid) ?? json.pin : '',
-        expenseCategory: json.expenseCategory.map((item: string) => decrypt(item, json.uid)) ?? ['add', 'food', 'bill', 'shopping', 'subscription', 'transportation'],
-        incomeCategory: json.incomeCategory.map((item: string) => decrypt(item, json.uid)) ?? ['add', 'salary', 'passive income'],
+        expenseCategory: json.expenseCategory.map((item: string) => decrypt(item, json.uid)) ?? initialExpenseCategories,
+        incomeCategory: json.incomeCategory.map((item: string) => decrypt(item, json.uid)) ?? initialIncomeCategories,
         budget: Object.fromEntries(Object.entries<{ [key: string]: { alert: boolean, limit: string, percentage: string } }>(json.budget).map(([key, value]) => {
             return [key, Object.assign({}, ...Object.entries(value).map(([subKey, subValue]) => {
                 return {
