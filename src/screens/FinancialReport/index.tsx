@@ -22,15 +22,19 @@ import {useAppTheme} from '../../hooks/themeHook';
 import {STRINGS} from '../../constants/strings';
 
 function FinancialReport() {
+  // functions
   const getMyColor = useCallback(() => {
     let n = (Math.random() * 0xfffff * 1000000).toString(16);
     return '#' + n.slice(0, 6);
   }, []);
+  // state
   const [month, setMonth] = useState(new Date().getMonth());
   const [graph, setGraph] = useState(0);
   const [transType, setTransType] = useState<'expense' | 'income'>('expense');
   const [type, setType] = useState<'transaction' | 'category'>('transaction');
   const [catColors, setCatColors] = useState<{[key: string]: string}>();
+  const [sort, setSort] = useState(false);
+  // redux
   const spends =
     useAppSelector(state => state.user.currentUser?.spend?.[month]) ?? [];
   const incomes =
@@ -39,6 +43,7 @@ function FinancialReport() {
   const {conversion, transactions: data} = useAppSelector(
     state => state.transaction,
   );
+  //
   const totalSpend = useMemo(
     () =>
       Object.values(spends)
@@ -202,7 +207,19 @@ function FinancialReport() {
           activeColor={COLOR.LIGHT[100]}
           selectedTextStyle={{color: COLOR.DARK[100]}}
         />
-        <Pressable style={styles.filterBtn} onPress={() => {}}>
+        <Pressable
+          style={[
+            styles.filterBtn,
+            {
+              transform: [
+                {rotateZ: sort ? '-180deg' : '0deg'},
+                {rotateY: sort ? '180deg' : '0deg'},
+              ],
+            },
+          ]}
+          onPress={() => {
+            setSort(sort => !sort);
+          }}>
           {ICONS.SortwithArrow({
             height: 25,
             width: 25,
@@ -218,6 +235,7 @@ function FinancialReport() {
           data={data}
           month={month}
           transType={transType}
+          sort={sort}
         />
       ) : (
         <CategoryList
@@ -229,6 +247,7 @@ function FinancialReport() {
           totalIncome={totalIncome}
           totalSpend={totalSpend}
           transType={transType}
+          sort={sort}
         />
       )}
     </ScrollView>

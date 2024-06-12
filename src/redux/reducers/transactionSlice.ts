@@ -6,13 +6,14 @@ const initialState: {
     isCatOpen: boolean,
     filters: { filter: 'income' | 'expense' | 'transfer' | 'none', sort: 'highest' | 'lowest' | 'newest' | 'oldest', cat: string[] },
     conversion: { [key: string]: { [key: string]: number } }
-
+    isLogoutOpen: boolean
 } = {
     transactions: {},
     isFilterOpen: false,
     isCatOpen: false,
     filters: { filter: 'none', sort: 'newest', cat: [] },
-    conversion: {}
+    conversion: {},
+    isLogoutOpen: false
 }
 const TransactionSlice = createSlice({
     name: "transaction",
@@ -23,6 +24,9 @@ const TransactionSlice = createSlice({
         },
         openCatSheet(state, action) {
             state.isCatOpen = action.payload;
+        },
+        openLogoutSheet(state, action) {
+            state.isLogoutOpen = action.payload;
         },
         setFilters(state, action) {
             if (action.payload === 0) {
@@ -55,8 +59,8 @@ const TransactionSlice = createSlice({
                 state.filters.cat.push(action.payload)
             }
         },
-        clearCatFilter(state){
-            state.filters.cat=[]
+        clearCatFilter(state) {
+            state.filters.cat = []
         },
         setTransaction(state, action) {
             state.transactions = action.payload
@@ -66,5 +70,5 @@ const TransactionSlice = createSlice({
         }
     }
 })
-export const { openFilterSheet, setFilters, openCatSheet, setSortFilter, setTransaction, setConversionData ,setCatFilter,clearCatFilter} = TransactionSlice.actions
+export const { openFilterSheet, setFilters, openCatSheet, setSortFilter, setTransaction, setConversionData, setCatFilter, clearCatFilter,openLogoutSheet } = TransactionSlice.actions
 export default TransactionSlice.reducer

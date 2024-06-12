@@ -144,7 +144,7 @@ function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
       return x;
     }
   }
-
+  console.log(applyFilters());
   const theme = useAppSelector(state => state.user.currentUser?.theme);
   return (
     <SafeAreaView
@@ -175,53 +175,56 @@ function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
               borderColor: COLOR.VIOLET[100],
             })}
           </TouchableOpacity>
-          <SectionList
-            scrollEnabled={false}
-            style={{width: '100%'}}
-            sections={applyFilters()}
-            ListEmptyComponent={() => (
-              <View
-                style={{
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}>
-                <Text style={styles.emptyText}> No Transactions</Text>
-              </View>
-            )}
-            renderItem={({item}) => (
-              <TransactionItem
-                item={item}
-                navigation={navigation}
-                scheme={scheme}
-                theme={theme}
-              />
-            )}
-            renderSectionHeader={({section: {title, data}}) =>
-              data.length === 0 ? (
-                <View />
-              ) : (
-                <Text style={styles.sectionHeader}>
-                  {title !== 'today' && title !== 'yesterday'
-                    ? Timestamp.fromMillis(Number(title) * 1000)
-                        .toDate()
-                        .getDate()
-                        .toString() +
-                      '/' +
-                      (
+          {applyFilters().length === 2 &&
+          applyFilters()[0].data.length === 0 &&
+          applyFilters()[1].data.length === 0 ? (
+            <View
+              style={{
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+              <Text style={styles.emptyText}> No Transactions</Text>
+            </View>
+          ) : (
+            <SectionList
+              scrollEnabled={false}
+              style={{width: '100%'}}
+              sections={applyFilters()}
+              renderItem={({item}) => (
+                <TransactionItem
+                  item={item}
+                  navigation={navigation}
+                  scheme={scheme}
+                  theme={theme}
+                />
+              )}
+              renderSectionHeader={({section: {title, data}}) =>
+                data.length === 0 ? (
+                  <View />
+                ) : (
+                  <Text style={styles.sectionHeader}>
+                    {title !== 'today' && title !== 'yesterday'
+                      ? Timestamp.fromMillis(Number(title) * 1000)
+                          .toDate()
+                          .getDate()
+                          .toString() +
+                        '/' +
+                        (
+                          Timestamp.fromMillis(Number(title) * 1000)
+                            .toDate()
+                            .getMonth() + 1
+                        ).toString() +
+                        '/' +
                         Timestamp.fromMillis(Number(title) * 1000)
                           .toDate()
-                          .getMonth() + 1
-                      ).toString() +
-                      '/' +
-                      Timestamp.fromMillis(Number(title) * 1000)
-                        .toDate()
-                        .getFullYear()
-                        .toString()
-                    : title[0].toUpperCase() + title.slice(1)}
-                </Text>
-              )
-            }
-          />
+                          .getFullYear()
+                          .toString()
+                      : title[0].toUpperCase() + title.slice(1)}
+                  </Text>
+                )
+              }
+            />
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>

@@ -3,7 +3,6 @@ import {
   Alert,
   Pressable,
   SafeAreaView,
-  ScrollView,
   Text,
   TouchableOpacity,
   View,
@@ -14,7 +13,6 @@ import {EmailEmptyError, PassEmptyError} from '../../constants/errors';
 import CustomPassInput from '../../components/CustomPassInput';
 import CustomButton from '../../components/CustomButton';
 import {NAVIGATION, STRINGS} from '../../constants/strings';
-import {COLORS} from '../../constants/commonStyles';
 import Sapcer from '../../components/Spacer';
 import {ICONS} from '../../constants/icons';
 import {LoginScreenProps} from '../../defs/navigation';
@@ -24,10 +22,10 @@ import {UserFromJson, UserToJson} from '../../utils/userFuncs';
 import {useAppTheme} from '../../hooks/themeHook';
 // Third Party Libraries
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
-import auth from '@react-native-firebase/auth';
+import auth, {FirebaseAuthTypes} from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
-import {RFValue} from 'react-native-responsive-fontsize';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import Toast from 'react-native-toast-message';
 
 function Login({navigation}: Readonly<LoginScreenProps>) {
   // constants
@@ -46,7 +44,7 @@ function Login({navigation}: Readonly<LoginScreenProps>) {
   function onChangePass(str: string) {
     setPass(str);
   }
-  async function handleLogin() {+
+  async function handleLogin() {
     setForm(true);
     if (email !== '' && pass !== '') {
       try {
@@ -58,31 +56,37 @@ function Login({navigation}: Readonly<LoginScreenProps>) {
             const user = UserFromJson(data.data()!);
             dispatch(userLoggedIn(user));
           } else {
-            Alert.alert('Please verify your email', '', [
-              {
-                text: 'Resend',
-                onPress: async () => {
-                  try {
-                    await creds.user.sendEmailVerification();
-                    await auth().signOut();
-                  } catch (e) {
-                    console.log(e);
-                    await auth().signOut();
-                  }
+            Alert.alert(
+              'Please verify your email',
+              'A verification email has already been sent to your registered email address, so verify your email before login',
+              [
+                {
+                  text: 'Resend',
+                  onPress: async () => {
+                    try {
+                      await creds.user.sendEmailVerification();
+                      await auth().signOut();
+                    } catch (e) {
+                      console.log(e);
+                      await auth().signOut();
+                    }
+                  },
                 },
-              },
-              {
-                text: 'OK',
-                onPress: async () => {
-                  console.log('OK Pressed');
-                  await auth().signOut();
+                {
+                  text: 'OK',
+                  onPress: async () => {
+                    console.log('OK Pressed');
+                    await auth().signOut();
+                  },
                 },
-              },
-            ]);
+              ],
+            );
           }
         }
-      } catch (e) {
+      } catch (e: any) {
+        const error: FirebaseAuthTypes.NativeFirebaseAuthError = e;
         console.log(e);
+        Toast.show({text1: error.nativeErrorMessage, type: 'error'});
       }
       dispatch(setLoading(false));
     }
@@ -133,7 +137,7 @@ function Login({navigation}: Readonly<LoginScreenProps>) {
   }
   return (
     <SafeAreaView style={styles.safeView}>
-      <KeyboardAwareScrollView style={styles.flex} contentContainerStyle={styles.flex}>
+      <KeyboardAwareScrollView enableOnAndroid={true}>
         <View style={styles.mainView}>
           <CustomInput
             placeholderText={STRINGS.Email}
@@ -169,15 +173,15 @@ function Login({navigation}: Readonly<LoginScreenProps>) {
             <Text style={styles.forgotText}>{STRINGS.ForgotPassword}</Text>
           </Pressable>
           <Sapcer height={20} />
-          <Text style={{color: COLORS.DARK[25], fontSize: RFValue(16)}}>
-            {STRINGS.DontHaveAccount}{' '}
+          <View style={{flexDirection: 'row'}}>
+            <Text style={styles.dontHaveAcc}>{STRINGS.DontHaveAccount} </Text>
             <Pressable
               onPress={() => {
                 navigation.navigate(NAVIGATION.SIGNUP);
               }}>
               <Text style={styles.signupText}>{STRINGS.SIGNUP}</Text>
             </Pressable>
-          </Text>
+          </View>
         </View>
       </KeyboardAwareScrollView>
     </SafeAreaView>

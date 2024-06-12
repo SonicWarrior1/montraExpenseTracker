@@ -134,9 +134,7 @@ function Signup({navigation}: Readonly<SignupScreenProps>) {
   }
   return (
     <SafeAreaView style={styles.safeView}>
-      <KeyboardAwareScrollView
-        style={styles.flex}
-        contentContainerStyle={styles.flex}>
+      <KeyboardAwareScrollView enableOnAndroid={true}>
         <View style={styles.mainView}>
           <CustomInput
             placeholderText={STRINGS.Name}
@@ -208,15 +206,15 @@ function Signup({navigation}: Readonly<SignupScreenProps>) {
             </View>
           </TouchableOpacity>
           <Sapcer height={10} />
-          <Text style={styles.text2}>
-            {STRINGS.AlreadyHaveAccount}{' '}
+          <View style={{flexDirection: 'row'}}>
+            <Text style={styles.text2}>{STRINGS.AlreadyHaveAccount} </Text>
             <Pressable
               onPress={() => {
                 navigation.navigate(NAVIGATION.LOGIN);
               }}>
               <Text style={styles.text3}>{STRINGS.LOGIN}</Text>
             </Pressable>
-          </Text>
+          </View>
         </View>
       </KeyboardAwareScrollView>
     </SafeAreaView>

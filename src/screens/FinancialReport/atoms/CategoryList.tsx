@@ -16,6 +16,7 @@ function CategoryList({
   conversion,
   totalSpend,
   totalIncome,
+  sort,
 }: Readonly<{
   spends:
     | never[]
@@ -41,16 +42,28 @@ function CategoryList({
   };
   totalSpend: string;
   totalIncome: string;
+  sort: boolean;
 }>) {
   const COLOR = useAppTheme();
   const styles = style(COLOR);
+  const listData = Object.entries(
+    transType === 'expense' ? spends : incomes,
+  ).sort((a, b) => b[1] - a[1]);
+  if (sort) {
+    listData.reverse();
+  }
   return (
     <FlatList
       style={{paddingHorizontal: 20}}
-      data={Object.entries(transType === 'expense' ? spends : incomes).sort(
-        (a, b) => b[1] - a[1],
-      )}
+      data={listData}
       scrollEnabled={false}
+      ListEmptyComponent={() => {
+        return (
+          <View style={{justifyContent: 'center', alignItems: 'center'}}>
+            <Text style={styles.emptyText}>No Data for this Month</Text>
+          </View>
+        );
+      }}
       renderItem={({item}) =>
         Number(item[1]) ? (
           <View>

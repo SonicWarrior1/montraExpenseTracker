@@ -44,35 +44,55 @@ function Linegraph({
           .toString()}
       </Text>
       <View style={styles.graphView}>
-        <LineChart
-          data={Object.values(data)
-            .filter(
-              item =>
-                item.timeStamp.toDate().getMonth() === month &&
-                item.type === transType,
-            )
-            .sort((a, b) => a.timeStamp.seconds - b.timeStamp.seconds)
-            .map(item => {
-              return {value: item.amount};
-            })}
-          areaChart
-          adjustToWidth
-          startFillColor1={COLORS.VIOLET[40]}
-          endFillColor1={COLOR.LIGHT[100]}
-          isAnimated={true}
-          initialSpacing={0}
-          width={Dimensions.get('screen').width}
-          hideDataPoints
-          thickness={12}
-          hideRules
-          hideYAxisText
-          hideAxesAndRules
-          color={COLORS.VIOLET[100]}
-          curveType={1}
-          curved={true}
-          overflowBottom={-1}
-          onlyPositive
-        />
+        {Object.values(data)
+          .filter(
+            item =>
+              item.timeStamp.toDate().getMonth() === month &&
+              item.type === transType,
+          )
+          .sort((a, b) => a.timeStamp.seconds - b.timeStamp.seconds)
+          .map(item => {
+            return {value: item.amount};
+          }).length <= 1 ? (
+          <View
+            style={{
+              height: 230,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            <Text style={styles.emptyText}>Not Enough Data</Text>
+          </View>
+        ) : (
+          <LineChart
+            data={Object.values(data)
+              .filter(
+                item =>
+                  item.timeStamp.toDate().getMonth() === month &&
+                  item.type === transType,
+              )
+              .sort((a, b) => a.timeStamp.seconds - b.timeStamp.seconds)
+              .map(item => {
+                return {value: item.amount};
+              })}
+            areaChart
+            adjustToWidth
+            startFillColor1={COLORS.VIOLET[40]}
+            endFillColor1={COLOR.LIGHT[100]}
+            isAnimated={true}
+            initialSpacing={0}
+            width={Dimensions.get('screen').width}
+            hideDataPoints
+            thickness={12}
+            hideRules
+            hideYAxisText
+            hideAxesAndRules
+            color={COLORS.VIOLET[100]}
+            curveType={1}
+            curved={true}
+            overflowBottom={-1}
+            onlyPositive
+          />
+        )}
       </View>
     </>
   );

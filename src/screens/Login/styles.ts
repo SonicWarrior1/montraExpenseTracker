@@ -6,8 +6,7 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
     safeView: { flex: 1, backgroundColor: COLOR.LIGHT[100] },
     mainView: {
         flex: 1,
-        // justifyContent: 'center',
-        paddingTop:Dimensions.get('screen').height * 0.085,
+        paddingTop: Dimensions.get('screen').height * 0.085,
         alignItems: 'center',
         paddingHorizontal: 20,
     },
@@ -37,6 +36,8 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
         color: COLOR.PRIMARY.VIOLET,
         textDecorationLine: 'underline',
         fontSize: RFValue(16),
+        fontWeight: "500"
     },
+    dontHaveAcc: { color: COLORS.DARK[25], fontSize: RFValue(16), fontWeight: "500" }
 });
 export default styles;

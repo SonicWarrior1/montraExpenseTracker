@@ -7,10 +7,10 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
         borderWidth: 1,
         borderRadius: 20,
         height: 40,
-        fontSize: 14,
+        fontSize: RFValue(14),
         paddingHorizontal: 20,
         borderColor: COLOR.LIGHT[20],
-        width: 120,
+        width: 160,
     },
     listItemCtr: {
         marginVertical: 5,
@@ -64,9 +64,10 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
     safeView: { backgroundColor: COLOR.LIGHT[100] },
     monthRow: {
         flexDirection: 'row',
+        alignItems: "center",
         justifyContent: 'space-between',
         paddingHorizontal: 20,
-        paddingVertical: 10
+        paddingVertical: 10,
     },
     graphBtnCtr: { flexDirection: 'row', borderWidth: 1, borderRadius: 8, borderColor: COLOR.LIGHT[40] },
     graphBtn: {
@@ -115,7 +116,8 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
         alignItems: 'center',
     },
     noDataCtr: { height: 230, justifyContent: 'center' },
-    pieCenterText: { fontSize: 32, fontWeight: '700', color: COLOR.DARK[100] }
+    pieCenterText: { fontSize: 32, fontWeight: '700', color: COLOR.DARK[100] },
+    emptyText:{fontSize: 16, fontWeight: '500', color: COLOR.DARK[25]}
 });
 
 export default styles;

@@ -25,7 +25,6 @@ function FilterSheet() {
   const ref = useRef<BottomSheetModal>(null);
   const isOpen = useAppSelector(state => state.transaction.isFilterOpen);
   const selectedCats = useAppSelector(state => state.transaction.filters.cat);
-  console.log(isOpen);
   useEffect(() => {
     if (isOpen === true) {
       ref.current?.present();

@@ -14,6 +14,7 @@ function TransactionList({
   month,
   conversion,
   currency,
+  sort,
 }: Readonly<{
   data: {
     [key: string]: transactionType;
@@ -26,22 +27,37 @@ function TransactionList({
     };
   };
   currency: string | undefined;
+  sort: boolean;
 }>) {
   const COLOR = useAppTheme();
   const styles = style(COLOR);
+  const listData = Object.values(data)
+    .filter(
+      item =>
+        Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+          .toDate()
+          .getMonth() === month && item.type === transType,
+    )
+    .sort((a, b) => b.timeStamp.seconds - a.timeStamp.seconds)
+    .slice(0, 4);
+  if (sort) {
+    listData.reverse();
+  }
   return (
     <FlatList
       style={{paddingHorizontal: 20}}
-      data={Object.values(data)
-        .filter(
-          item =>
-            Timestamp.fromMillis(item.timeStamp.seconds * 1000)
-              .toDate()
-              .getMonth() === month && item.type === transType,
-        )
-        .sort((a, b) => b.timeStamp.seconds - a.timeStamp.seconds)
-        .slice(0, 4)}
+      data={listData}
       scrollEnabled={false}
+      ListEmptyComponent={() => {
+        return (
+          <View style={{justifyContent: 'center', alignItems: 'center'}}>
+            <Text
+              style={styles.emptyText}>
+              No Transactions for this Month
+            </Text>
+          </View>
+        );
+      }}
       renderItem={({item}) => {
         return (
           <Pressable style={styles.listItemCtr}>

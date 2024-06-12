@@ -1,5 +1,6 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {
+  Dimensions,
   Image,
   Pressable,
   SafeAreaView,
@@ -263,13 +264,26 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
 
   return (
     <KeyboardAwareScrollView
-      contentContainerStyle={[
-        styles.safeView,
-        {backgroundColor: backgroundColor},
-      ]}>
+      style={[{backgroundColor: backgroundColor}]}
+      contentContainerStyle={[{backgroundColor: backgroundColor, flexGrow: 1}]}
+      enableOnAndroid={true}>
       <SafeAreaView
-        style={[styles.safeView, {backgroundColor: backgroundColor}]}>
-        <View style={styles.mainView}>
+        style={[
+          styles.safeView,
+          {
+            backgroundColor: backgroundColor,
+          },
+        ]}>
+        <View
+          style={[
+            styles.mainView,
+            {
+              height:
+                pageType === 'transfer'
+                  ? Dimensions.get('screen').height / 2
+                  : Dimensions.get('screen').height / 3.2,
+            },
+          ]}>
           <Text style={styles.text1}>{STRINGS.HowMuch}</Text>
           <View style={styles.moneyCtr}>
             <Text style={styles.text2}>{currencies[currency!].symbol}</Text>

@@ -1,12 +1,11 @@
-import { StyleSheet } from 'react-native';
+import { Dimensions, StyleSheet } from 'react-native';
 import { COLORS } from '../../constants/commonStyles';
 import { RFValue } from 'react-native-responsive-fontsize';
 const styles = (COLOR: typeof COLORS) => StyleSheet.create({
     safeView: { flex: 1, backgroundColor: COLOR.PRIMARY.VIOLET },
     mainView: {
-        flex: 1,
+        height: Dimensions.get('screen').height / 1.85,
         justifyContent: 'flex-end',
-
     },
     text1: {
         opacity: 0.64,

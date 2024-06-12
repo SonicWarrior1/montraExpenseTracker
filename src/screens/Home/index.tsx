@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
   FlatList,
   Pressable,
@@ -22,6 +22,7 @@ import {Timestamp} from '@react-native-firebase/firestore';
 import LinearGradient from 'react-native-linear-gradient';
 
 function Home({navigation, route}: Readonly<HomeScreenProps>) {
+  const [month, setMonth] = useState(new Date().getMonth());
   // redux
   const conversion = useAppSelector(state => state.transaction.conversion);
   const currency =
@@ -35,7 +36,6 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
   const data = useAppSelector(state => state.transaction.transactions);
   const theme = useAppSelector(state => state.user.currentUser?.theme);
   // constants
-  const month = new Date().getMonth();
   const totalSpend = Object.values(spends ?? [])
     .reduce((a, b) => a + b, 0)
     .toFixed(1);
@@ -70,7 +70,7 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
         }
         style={styles.gradient}>
         <SafeAreaView style={styles.safeView}>
-          <HomeHeader navigation={navigation} route={route} />
+          <HomeHeader props={{navigation, route}} setMonth={setMonth} />
           <Text style={styles.actText}>Account Balance</Text>
           <Text style={styles.amt}>
             {currencies[currency ?? 'USD'].symbol}

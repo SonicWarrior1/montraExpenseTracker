@@ -92,7 +92,7 @@ function Piegraph({
         />
       ) : (
         <View style={styles.noDataCtr}>
-          <Text style={{color: COLOR.DARK[100]}}>{STRINGS.NoData}</Text>
+          <Text style={styles.emptyText}>{STRINGS.NoData}</Text>
         </View>
       )}
     </View>

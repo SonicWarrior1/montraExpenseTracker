@@ -6,7 +6,7 @@ const styles = (COLOR: typeof COLORS) =>
     dropdown: {
       borderWidth: 1,
       borderRadius: 20,
-      height: Dimensions.get('screen').height * 0.07,
+      height: Dimensions.get('screen').width * 0.15,
       paddingHorizontal: 20,
       borderColor: '#F1F1FA',
       width: '100%',
