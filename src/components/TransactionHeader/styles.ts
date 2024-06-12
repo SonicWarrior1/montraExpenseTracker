@@ -3,15 +3,15 @@ import { COLORS } from '../../constants/commonStyles';
 const screenHeight = Dimensions.get('screen').height;
 const styles = (COLOR: typeof COLORS) => StyleSheet.create({
     header: {
-        backgroundColor: COLOR.PRIMARY.LIGHT,
+        backgroundColor: "transparent",
         height: screenHeight * 0.06,
         width: '100%',
         flexDirection: 'row',
         alignItems: 'flex-end',
         justifyContent: 'space-between',
         paddingHorizontal: 16,
-        paddingBottom: 10,
-        marginTop: 10,
+        paddingBottom: 20,
+        marginTop: 20,
     },
     dropdown: {
         borderWidth: 1,
@@ -26,6 +26,16 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
         borderWidth: 1,
         borderRadius: 8,
         borderColor: COLOR.LIGHT[20],
+    },
+    notifCount: {
+        height: 25,
+        width: 25,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 20,
+        backgroundColor: COLOR.VIOLET[100],
+        position: 'absolute',
+        right: 0,
     },
 });
 

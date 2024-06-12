@@ -13,14 +13,15 @@ import {useAppDispatch, useAppSelector} from '../../redux/store';
 import Toast from 'react-native-toast-message';
 import {RootStackParamList} from '../../defs/navigation';
 import {setLoading} from '../../redux/reducers/userSlice';
-import styles from './styles';
+import style from './styles';
 import {transactionType} from '../../defs/transaction';
 import {UserType} from '../../defs/user';
-import {StackNavigationProp} from '@react-navigation/stack';
 import SheetBackdrop from '../SheetBackDrop';
 import {UserFromJson} from '../../utils/userFuncs';
 import {encrypt} from '../../utils/encryption';
 import {STRINGS} from '../../constants/strings';
+import {useAppTheme} from '../../hooks/themeHook';
+import {StackNavigationProp} from '@react-navigation/stack';
 function DeleteTransactionSheet({
   bottomSheetModalRef,
   id,
@@ -40,62 +41,60 @@ function DeleteTransactionSheet({
   amt: number;
   category: string;
 }>) {
+  // redux
   const conversion = useAppSelector(state => state.transaction.conversion);
   const currency = useAppSelector(state => state.user.currentUser?.currency);
   const uid = useAppSelector(state => state.user.currentUser?.uid);
+  // constants
   const dispatch = useAppDispatch();
-  const snapPoints = useMemo(() => ['25%'], []);
+  const snapPoints = useMemo(() => ['30%'], []);
   const month = new Date().getMonth();
+  const COLOR = useAppTheme();
+  const styles = style(COLOR);
+  // functions
   const handleDelete = useCallback(async () => {
+    const userDoc = firestore().collection('users').doc(uid);
     try {
       dispatch(setLoading(true));
-      const curr = await firestore().collection('users').doc(uid).get();
+      const curr = await userDoc.get();
       if (type === 'expense') {
-        await firestore()
-          .collection('users')
-          .doc(uid)
-          .update({
-            [`spend.${month}.${category}`]: encrypt(
-              String(
-                (
-                  Number(
-                    UserFromJson(curr.data() as UserType).spend[month][
-                      category
-                    ] ?? 0,
-                  ) -
-                  amt / conversion.usd[currency!.toLowerCase()]
-                ).toFixed(1),
-              ),
-              uid!,
+        await userDoc.update({
+          [`spend.${month}.${category}`]: encrypt(
+            String(
+              (
+                Number(
+                  UserFromJson(curr.data() as UserType).spend[month][
+                    category
+                  ] ?? 0,
+                ) -
+                amt / conversion.usd[currency!.toLowerCase()]
+              ).toFixed(1),
             ),
-          });
+            uid!,
+          ),
+        });
       } else if (type === 'income') {
-        await firestore()
-          .collection('users')
-          .doc(uid)
-          .update({
-            [`income.${month}.${category}`]: encrypt(
-              String(
-                (
-                  Number(
-                    UserFromJson(curr.data() as UserType).income[month][
-                      category
-                    ] ?? 0,
-                  ) -
-                  amt / conversion.usd[currency!.toLowerCase()]
-                ).toFixed(1),
-              ),
-              uid!,
+        await userDoc.update({
+          [`income.${month}.${category}`]: encrypt(
+            String(
+              (
+                Number(
+                  UserFromJson(curr.data() as UserType).income[month][
+                    category
+                  ] ?? 0,
+                ) -
+                amt / conversion.usd[currency!.toLowerCase()]
+              ).toFixed(1),
             ),
-          });
+            uid!,
+          ),
+        });
       }
-      await firestore()
-        .collection('users')
-        .doc(uid)
-        .collection('transactions')
-        .doc(id)
-        .delete();
-      Toast.show({text1: STRINGS.TransactionDeletedSuccesfully,type:'custom'});
+      await userDoc.collection('transactions').doc(id).delete();
+      Toast.show({
+        text1: STRINGS.TransactionDeletedSuccesfully,
+        type: 'custom',
+      });
       bottomSheetModalRef.current?.dismiss();
       navigation.pop();
       dispatch(setLoading(false));
@@ -112,7 +111,8 @@ function DeleteTransactionSheet({
         index={0}
         snapPoints={snapPoints}
         backdropComponent={SheetBackdrop}
-        backgroundStyle={styles.sheetBack}>
+        backgroundStyle={styles.sheetBack}
+        handleIndicatorStyle={{backgroundColor: COLOR.DARK[100]}}>
         <BottomSheetView style={styles.sheetView}>
           <Text style={styles.text1}>{STRINGS.RemovethisTransaction}</Text>
           <Text style={styles.text2}>{STRINGS.sureRemoveTransaction}</Text>

@@ -14,6 +14,7 @@ import style from './styles';
 import SheetBackdrop from '../SheetBackDrop';
 import {STRINGS} from '../../constants/strings';
 import {useAppTheme} from '../../hooks/themeHook';
+import SheetButtons from '../SheetButton';
 
 function FilePickerSheet({
   bottomSheetModalRef,
@@ -110,21 +111,4 @@ function FilePickerSheet({
 }
 
 export default FilePickerSheet;
-function SheetButtons({
-  icon,
-  title,
-  onPress,
-}: Readonly<{
-  icon: (params: iconProps) => React.ReactNode;
-  title: string;
-  onPress: () => void;
-}>) {
-  const COLOR = useAppTheme();
-  const styles = style(COLOR);
-  return (
-    <Pressable style={styles.sheetBtn} onPress={onPress}>
-      {icon({height: 30, width: 30})}
-      <Text style={styles.sheetBtnText}>{title}</Text>
-    </Pressable>
-  );
-}
+

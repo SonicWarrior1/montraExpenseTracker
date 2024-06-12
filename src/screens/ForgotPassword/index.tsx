@@ -5,21 +5,31 @@ import Sapcer from '../../components/Spacer';
 import CustomInput from '../../components/CustomInput';
 import {EmailEmptyError} from '../../constants/errors';
 import CustomButton from '../../components/CustomButton';
-import auth from '@react-native-firebase/auth';
 import {ForgotScreenProps} from '../../defs/navigation';
 import {NAVIGATION, STRINGS} from '../../constants/strings';
-import { useAppTheme } from '../../hooks/themeHook';
+import {useAppTheme} from '../../hooks/themeHook';
+// Third Party Libraries
+import auth from '@react-native-firebase/auth';
+import {useAppDispatch} from '../../redux/store';
+import {setLoading} from '../../redux/reducers/userSlice';
 
-function ForgotPassword({navigation}: ForgotScreenProps) {
+function ForgotPassword({navigation}: Readonly<ForgotScreenProps>) {
+  // constants
+  const COLOR = useAppTheme();
+  const styles = style(COLOR);
+  const dispatch = useAppDispatch();
+  // state
   const [email, setEmail] = useState('');
+  const [form, setForm] = useState(false);
+  // functions
   function onChangeEmail(str: string) {
     setEmail(str);
   }
-  const [form, setForm] = useState(false);
   async function handleForgot() {
     setForm(true);
     if (email !== '') {
       try {
+        dispatch(setLoading(true));
         await auth().sendPasswordResetEmail(email);
         navigation.reset({
           index: 2,
@@ -29,18 +39,17 @@ function ForgotPassword({navigation}: ForgotScreenProps) {
             {name: NAVIGATION.FORGOTEMAILSENT, params: {email: email}},
           ],
         });
+        dispatch(setLoading(false));
       } catch (e) {
         console.log(e);
+        dispatch(setLoading(false));
       }
     }
   }
-  const COLOR = useAppTheme();
-  const styles = style(COLOR);
+
   return (
     <SafeAreaView style={styles.safeView}>
-      <ScrollView
-        style={styles.flex}
-        contentContainerStyle={styles.flex}>
+      <ScrollView style={styles.flex} contentContainerStyle={styles.flex}>
         <View style={styles.mainView}>
           <Text style={styles.text}>{STRINGS.DontWorry}</Text>
           <Text style={styles.text}>{STRINGS.EnterEmailForReset}</Text>

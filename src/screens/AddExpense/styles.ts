@@ -1,27 +1,29 @@
-import { StyleSheet } from 'react-native';
+import { Dimensions, StyleSheet } from 'react-native';
 import { COLORS } from '../../constants/commonStyles';
+import { RFValue } from 'react-native-responsive-fontsize';
 const styles = (COLOR: typeof COLORS) => StyleSheet.create({
     safeView: { flex: 1, backgroundColor: COLOR.PRIMARY.RED },
     mainView: {
-        flex: 1,
-        justifyContent: 'center',
+        // flex: 1,
+        
+        justifyContent: 'flex-end',
     },
     text1: {
         opacity: 0.64,
         alignSelf: 'flex-start',
         fontWeight: '600',
         color: COLOR.LIGHT[80],
-        fontSize: 18,
+        fontSize: RFValue(18),
         paddingHorizontal: 30,
     },
-    text2: { color: COLOR.LIGHT[100], fontSize: 64, fontWeight: '600' },
+    text2: { color: COLOR.LIGHT[100], fontSize: RFValue(64), fontWeight: '600' },
     input: {
         flex: 1,
-        fontSize: 64,
+        fontSize: RFValue(64),
         color: COLOR.LIGHT[100],
         fontWeight: '600',
-
     },
+    amtError: { left: 20, paddingBottom: 10 },
     dropdown: {
         borderWidth: 1,
         borderRadius: 20,
@@ -37,11 +39,10 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
         paddingHorizontal: 30,
     },
     detailsCtr: {
-        // flex: screenHeight * 0.003,
         backgroundColor: COLOR.LIGHT[100],
         width: '100%',
         paddingHorizontal: 20,
-        paddingVertical: 20,
+        paddingVertical: 25,
         borderTopLeftRadius: 32,
         borderTopRightRadius: 32,
     },
@@ -57,7 +58,7 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
         alignItems: 'center',
         gap: 10,
     },
-    attachementText: { color: COLOR.DARK[25], fontSize: 16 },
+    attachementText: { color: COLOR.DARK[25], fontSize: RFValue(14) },
     displayImg: {
         position: 'absolute',
         left: 90,
@@ -74,15 +75,13 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
         backgroundColor: COLOR.VIOLET[20],
     },
     sheetBtnText: {
-        fontSize: 16,
+        fontSize: RFValue(16),
         color: COLOR.PRIMARY.VIOLET,
         marginTop: 10,
     },
     closeIcon: {
         position: 'absolute',
-
         top: -5,
-        zIndex: 1,
         backgroundColor: 'rgba(0,0,0,0.5)',
         borderRadius: 20,
     },
@@ -91,10 +90,10 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
     },
-    flexRowText1: { fontWeight: '500', fontSize: 16, color: COLOR.DARK[100] },
+    flexRowText1: { fontWeight: '500', fontSize: RFValue(16), color: COLOR.DARK[100] },
     flexRowText2: {
         fontWeight: '500',
-        fontSize: 13,
+        fontSize: RFValue(13),
         color: COLOR.DARK[25],
     },
     editBtn: {
@@ -105,7 +104,7 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
     },
     editBtnText: {
         fontWeight: '500',
-        fontSize: 14,
+        fontSize: RFValue(14),
         color: COLOR.PRIMARY.VIOLET,
     },
     transferRow: {

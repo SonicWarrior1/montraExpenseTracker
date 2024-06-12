@@ -1,5 +1,6 @@
 import { StyleSheet } from 'react-native';
 import { COLORS } from '../../constants/commonStyles';
+import { RFValue } from 'react-native-responsive-fontsize';
 
 const styles = (COLOR: typeof COLORS) => StyleSheet.create({
     scrollView: { flex: 1, marginTop: 10, width: '100%' },
@@ -17,7 +18,7 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
         paddingHorizontal: 10,
     },
     month: {
-        fontSize: 24,
+        fontSize: RFValue(24),
         color: COLOR.LIGHT[100],
         fontWeight: '500',
     },
@@ -61,23 +62,23 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
         height: 14,
         width: 14,
         borderRadius: 10,
-        backgroundColor: COLOR.BLUE[100],
+        // backgroundColor: COLOR.BLUE[100],
     },
-    catText: { fontSize: 14, fontWeight: '500', color: COLOR.DARK[100] },
+    catText: { fontSize: RFValue(14), fontWeight: '500', color: COLOR.DARK[100] },
     text1: {
-        fontSize: 24,
+        fontSize: RFValue(24),
         fontWeight: '600',
         marginTop: 5,
         marginBottom: 5, color: COLOR.DARK[100]
     },
     text2: {
-        fontSize: 16,
+        fontSize: RFValue(16),
         fontWeight: '500',
         marginTop: 5,
         color: COLOR.DARK[25],
     },
     limitText: {
-        fontSize: 14,
+        fontSize: RFValue(14),
         fontWeight: '400',
         marginTop: 10,
         color: COLOR.PRIMARY.RED,

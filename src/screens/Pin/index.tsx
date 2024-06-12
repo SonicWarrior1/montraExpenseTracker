@@ -10,20 +10,67 @@ import {setLoading, userLoggedIn} from '../../redux/reducers/userSlice';
 import firestore from '@react-native-firebase/firestore';
 import {ICONS} from '../../constants/icons';
 import {encrypt} from '../../utils/encryption';
+// Third Party Libraries
+import Toast from 'react-native-toast-message';
 
 function Pin({route, navigation}: Readonly<PinSentScreenProps>) {
+  // constants
   const matrix = [
     [1, 2, 3],
     [4, 5, 6],
     [7, 8, 9],
     [-1, 0, 99],
   ];
-  const [pin, setPin] = useState<number[]>([]);
+  const dispatch = useAppDispatch();
   const user = useAppSelector(state => state.user.currentUser);
   const isSetup = user?.pin === '';
   const oldPin = route.params.pin ?? '';
-  const dispatch = useAppDispatch();
-  dispatch(setLoading(false));
+  // state
+  const [pin, setPin] = useState<number[]>([]);
+  // functions
+  const handlePin = (value: number) => {
+    return async () => {
+      if (value === -1) {
+        if (pin.length > 0) {
+          setPin(pin.slice(0, pin.length - 1));
+        }
+      } else if (value === 99) {
+        if (isSetup && oldPin === '') {
+          navigation.push(NAVIGATION.PIN, {
+            setup: true,
+            pin: pin.join(''),
+          });
+        } else if (isSetup && oldPin) {
+          if (oldPin === pin.join('')) {
+            console.log('Done');
+            await firestore()
+              .collection('users')
+              .doc(user?.uid)
+              .update({
+                pin: encrypt(pin.join(''), user.uid),
+              });
+            navigation.navigate(NAVIGATION.BottomTab);
+            dispatch(userLoggedIn({...user, pin: pin.join('')}));
+          } else {
+            console.log("Pin doesn't match");
+            Toast.show({
+              text1: "Pin doesn't match",
+              type: 'error',
+            });
+          }
+        } else if (pin.join('') === user?.pin) {
+          navigation.replace(NAVIGATION.BottomTab);
+          console.log('home');
+        } else {
+          console.log('Incorrect Pin');
+          Toast.show({text1: 'Incorrect Pin', type: 'error'});
+          setPin([]);
+        }
+      } else if (pin.length < 4) {
+        setPin([...pin, value]);
+      }
+    };
+  };
   return (
     <SafeAreaView style={styles.safeView}>
       <View style={styles.mainView}>
@@ -32,7 +79,7 @@ function Pin({route, navigation}: Readonly<PinSentScreenProps>) {
             ? STRINGS.SetupPin
             : isSetup && oldPin
             ? STRINGS.RetypePin
-            : STRINGS.EnterPin}{' '}
+            : STRINGS.EnterPin}
         </Text>
         <View style={styles.progressDotCtr}>
           {[0, 1, 2, 3].map(i => {
@@ -58,47 +105,17 @@ function Pin({route, navigation}: Readonly<PinSentScreenProps>) {
                 <TouchableOpacity
                   key={colIndex}
                   style={styles.btn}
-                  onPress={async () => {
-                    if (value === -1) {
-                      return;
-                    } else if (value === 99) {
-                      if (isSetup && oldPin === '') {
-                        navigation.push(NAVIGATION.PIN, {
-                          setup: true,
-                          pin: pin.join(''),
-                        });
-                      } else if (isSetup && oldPin) {
-                        if (oldPin === pin.join('')) {
-                          console.log('Done');
-                          await firestore()
-                            .collection('users')
-                            .doc(user?.uid)
-                            .update({
-                              pin: encrypt(pin.join(''), user.uid),
-                            });
-                          navigation.navigate(NAVIGATION.BottomTab);
-                          dispatch(userLoggedIn({...user, pin: pin.join('')}));
-                        } else {
-                          console.log("Pin doesn't match");
-                        }
-                      } else if (pin.join('') === user?.pin) {
-                        navigation.replace(NAVIGATION.BottomTab);
-                        console.log('home');
-                      } else {
-                        console.log('Incorrect Pin');
-                        setPin([]);
-                      }
-                    } else if (pin.length < 4) {
-                      setPin([...pin, value]);
-                    }
-                  }}>
+                  onPress={handlePin(value)}>
                   {value === 99 ? (
-                    ICONS.ArrowRight2({height: 30, width: 30,color:COLORS.LIGHT[100]})
+                    ICONS.ArrowRight2({
+                      height: 30,
+                      width: 30,
+                      color: COLORS.LIGHT[100],
+                    })
+                  ) : value === -1 ? (
+                    <Text style={styles.number}>DEL</Text>
                   ) : (
-                    <Text
-                      style={styles.number}>
-                      {value === -1 ? '' : value}
-                    </Text>
+                    <Text style={styles.number}>{value}</Text>
                   )}
                 </TouchableOpacity>
               ))}

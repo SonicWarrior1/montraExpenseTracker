@@ -1,5 +1,6 @@
 import { StyleSheet } from "react-native";
 import { COLORS } from "../../constants/commonStyles";
+import { RFValue } from "react-native-responsive-fontsize";
 
 const styles = (COLOR: typeof COLORS) => StyleSheet.create({
     row: {
@@ -9,7 +10,7 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
     },
-    text: { fontSize: 14, fontWeight: '500', color: COLOR.DARK[100] },
+    text: { fontSize: RFValue(14), fontWeight: '500', color: COLOR.DARK[100] },
     safeView: { flex: 1, backgroundColor: COLOR.LIGHT[100] }
 })
 

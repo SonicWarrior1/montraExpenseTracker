@@ -7,9 +7,15 @@ import {ICONS} from '../../constants/icons';
 import style from './styles';
 import {useAppSelector} from '../../redux/store';
 import {HomeScreenProps} from '../../defs/navigation';
-import { useAppTheme } from '../../hooks/themeHook';
+import {useAppTheme} from '../../hooks/themeHook';
 
-function HomeHeader({navigation}: Readonly<HomeScreenProps>) {
+function HomeHeader({
+  props,
+  setMonth,
+}: Readonly<{
+  props: Readonly<HomeScreenProps>;
+  setMonth: React.Dispatch<React.SetStateAction<number>>;
+}>) {
   const notifications = useAppSelector(
     state => state.user.currentUser?.notification,
   );
@@ -17,12 +23,17 @@ function HomeHeader({navigation}: Readonly<HomeScreenProps>) {
   const styles = style(COLOR);
   return (
     <View style={styles.ctr}>
-      <View style={styles.imgCtr}>
-        <Image
-          source={require('../../assets/Images/profileImg.jpeg')}
-          style={styles.img}
-        />
-      </View>
+      <Pressable
+        onPress={() => {
+          props.navigation.jumpTo(NAVIGATION.Profile);
+        }}>
+        <View style={styles.imgCtr}>
+          <Image
+            source={require('../../assets/Images/profileImg.jpeg')}
+            style={styles.img}
+          />
+        </View>
+      </Pressable>
       <Dropdown
         style={styles.dropdown}
         renderLeftIcon={() => (
@@ -31,28 +42,28 @@ function HomeHeader({navigation}: Readonly<HomeScreenProps>) {
         renderRightIcon={() => <></>}
         placeholder={STRINGS.Month}
         placeholderStyle={{marginLeft: 10}}
-        selectedTextStyle={{marginLeft: 10,color: COLOR.DARK[100]}}
+        selectedTextStyle={{marginLeft: 10, color: COLOR.DARK[100]}}
         value={monthData[new Date().getMonth()]}
         data={monthData}
         labelField={'label'}
         valueField={'value'}
-        onChange={() => {}}
+        onChange={({value}) => {
+          setMonth(value-1);
+        }}
         itemTextStyle={{color: COLOR.DARK[100]}}
         containerStyle={{backgroundColor: COLOR.LIGHT[100]}}
         activeColor={COLOR.LIGHT[100]}
       />
       <Pressable
         onPress={() => {
-          navigation.push(NAVIGATION.Notification);
+          props.navigation.push(NAVIGATION.Notification);
         }}>
         {ICONS.Notification({height: 25, width: 25})}
         {notifications && (
           <View style={styles.notifCount}>
             <Text style={{color: COLORS.VIOLET[100]}}>
-              {
-                Object.values(notifications ?? []).filter(item => !item.read)
-                  ?.length ??0
-              }
+              {Object.values(notifications ?? []).filter(item => !item.read)
+                ?.length ?? 0}
             </Text>
           </View>
         )}

@@ -2,6 +2,7 @@ import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {
   Pressable,
   SafeAreaView,
+  ScrollView,
   Text,
   useColorScheme,
   View,
@@ -18,17 +19,22 @@ import Piegraph from './atoms/piegraph';
 import TransactionList from './atoms/TransactionList';
 import CategoryList from './atoms/CategoryList';
 import {useAppTheme} from '../../hooks/themeHook';
+import {STRINGS} from '../../constants/strings';
 
 function FinancialReport() {
+  // functions
   const getMyColor = useCallback(() => {
     let n = (Math.random() * 0xfffff * 1000000).toString(16);
     return '#' + n.slice(0, 6);
   }, []);
+  // state
   const [month, setMonth] = useState(new Date().getMonth());
   const [graph, setGraph] = useState(0);
   const [transType, setTransType] = useState<'expense' | 'income'>('expense');
   const [type, setType] = useState<'transaction' | 'category'>('transaction');
   const [catColors, setCatColors] = useState<{[key: string]: string}>();
+  const [sort, setSort] = useState(false);
+  // redux
   const spends =
     useAppSelector(state => state.user.currentUser?.spend?.[month]) ?? [];
   const incomes =
@@ -37,6 +43,7 @@ function FinancialReport() {
   const {conversion, transactions: data} = useAppSelector(
     state => state.transaction,
   );
+  //
   const totalSpend = useMemo(
     () =>
       Object.values(spends)
@@ -70,7 +77,9 @@ function FinancialReport() {
   const scheme = useColorScheme();
   const theme = useAppSelector(state => state.user.currentUser?.theme);
   return (
-    <SafeAreaView style={styles.safeView}>
+    <ScrollView
+      contentContainerStyle={[styles.safeView]}
+      style={[styles.safeView, {paddingBottom: 20}]}>
       <FinancialReportHeader
         graph={graph}
         month={month}
@@ -164,7 +173,7 @@ function FinancialReport() {
                       : COLOR.DARK[100],
                 },
               ]}>
-              Income
+              {STRINGS.Income}
             </Text>
           </Pressable>
         </View>
@@ -180,7 +189,10 @@ function FinancialReport() {
           renderRightIcon={() => <></>}
           value={type}
           data={['transaction', 'category'].map(item => {
-            return {label: item[0].toUpperCase() + item.slice(1), value: item};
+            return {
+              label: item[0].toUpperCase() + item.slice(1),
+              value: item,
+            };
           })}
           labelField={'label'}
           valueField={'value'}
@@ -195,8 +207,24 @@ function FinancialReport() {
           activeColor={COLOR.LIGHT[100]}
           selectedTextStyle={{color: COLOR.DARK[100]}}
         />
-        <Pressable style={styles.filterBtn} onPress={() => {}}>
-          {ICONS.SortwithArrow({height: 25, width: 25, color: COLOR.DARK[100]})}
+        <Pressable
+          style={[
+            styles.filterBtn,
+            {
+              transform: [
+                {rotateZ: sort ? '-180deg' : '0deg'},
+                {rotateY: sort ? '180deg' : '0deg'},
+              ],
+            },
+          ]}
+          onPress={() => {
+            setSort(sort => !sort);
+          }}>
+          {ICONS.SortwithArrow({
+            height: 25,
+            width: 25,
+            color: COLOR.DARK[100],
+          })}
         </Pressable>
       </View>
       <Sapcer height={10} />
@@ -207,6 +235,7 @@ function FinancialReport() {
           data={data}
           month={month}
           transType={transType}
+          sort={sort}
         />
       ) : (
         <CategoryList
@@ -218,9 +247,10 @@ function FinancialReport() {
           totalIncome={totalIncome}
           totalSpend={totalSpend}
           transType={transType}
+          sort={sort}
         />
       )}
-    </SafeAreaView>
+    </ScrollView>
   );
 }
 

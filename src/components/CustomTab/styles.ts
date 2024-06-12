@@ -1,5 +1,6 @@
 import { StyleSheet } from 'react-native';
 import { COLORS } from '../../constants/commonStyles';
+import { RFValue } from 'react-native-responsive-fontsize';
 
 const styles = (COLOR: typeof COLORS) => StyleSheet.create({
     tabCtr: {
@@ -52,7 +53,7 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
         width: 70,
       },
       btnText:{
-        fontSize: 10,
+        fontSize: RFValue(9),
         fontWeight: '500',
       },
 });

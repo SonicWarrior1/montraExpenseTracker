@@ -8,16 +8,21 @@ import style from './styles';
 import {encrypt} from '../../utils/encryption';
 import {STRINGS} from '../../constants/strings';
 import {useAppTheme} from '../../hooks/themeHook';
+import {Swipeable} from 'react-native-gesture-handler';
 
 function NotificationScreen({navigation}: Readonly<NotificationScreenProps>) {
-  const COLOR = useAppTheme();
-  const styles = style(COLOR);
+  // redux
   const notifications = useAppSelector(
     state => state.user.currentUser?.notification,
   );
   const uid = useAppSelector(state => state.user.currentUser?.uid);
+  // constants
+  const COLOR = useAppTheme();
+  const styles = style(COLOR);
+  const userDoc = firestore().collection('users').doc(uid);
+  // state
   const [menu, setMenu] = useState(false);
-
+  // functions
   const handleMarkRead = useCallback(async () => {
     try {
       const readNotifications = Object.values(notifications!).reduce(
@@ -43,10 +48,7 @@ function NotificationScreen({navigation}: Readonly<NotificationScreenProps>) {
         },
         {},
       );
-      await firestore()
-        .collection('users')
-        .doc(uid)
-        .update({notification: readNotifications});
+      await userDoc.update({notification: readNotifications});
       setMenu(false);
     } catch (e) {
       console.log(e);
@@ -54,12 +56,56 @@ function NotificationScreen({navigation}: Readonly<NotificationScreenProps>) {
   }, [notifications, uid]);
   const handleDelete = useCallback(async () => {
     try {
-      await firestore().collection('users').doc(uid).update({notification: {}});
+      await userDoc.update({notification: {}});
       setMenu(false);
     } catch (e) {
       console.log(e);
     }
   }, [uid]);
+  const handleSingleDelete = useCallback(
+    (item: {
+        category: string;
+        type: string;
+        id: string;
+        time: Timestamp;
+        read: boolean;
+      }) =>
+      async () => {
+        try {
+          const deletedNotifications = Object.values(notifications!).reduce(
+            (
+              acc: {
+                [key: string]: {
+                  category: string;
+                  type: string;
+                  id: string;
+                  time: Timestamp;
+                  read: boolean;
+                };
+              },
+              val,
+            ) => {
+              if (val.id !== item.id) {
+                acc[val.id] = {
+                  ...val,
+                  category: encrypt(val.category, uid!),
+                  type: encrypt(val.type, uid!),
+                  read: true,
+                };
+              }
+              return acc;
+            },
+            {},
+          );
+          await userDoc.update({
+            notification: deletedNotifications,
+          });
+        } catch (e) {
+          console.log(e);
+        }
+      },
+    [notifications],
+  );
   useEffect(() => {
     if (
       Object.values(notifications!).filter(item => item.read === false)
@@ -104,25 +150,40 @@ function NotificationScreen({navigation}: Readonly<NotificationScreenProps>) {
           )}
           renderItem={({item}) => {
             return (
-              <View style={styles.ctr}>
-                <View>
-                  <Text style={styles.text1}>
-                    {item.category[0].toUpperCase() + item.category.slice(1)}{' '}
-                    {STRINGS.BudgetExceed}
-                  </Text>
+              <Swipeable
+                renderRightActions={() => {
+                  return (
+                    <Pressable
+                      style={styles.delete}
+                      onPress={handleSingleDelete(item)}>
+                      {ICONS.Trash({
+                        height: 30,
+                        width: 30,
+                        color: COLOR.LIGHT[100],
+                      })}
+                    </Pressable>
+                  );
+                }}>
+                <View style={styles.ctr}>
+                  <View style={{maxWidth: '85%'}}>
+                    <Text style={styles.text1} numberOfLines={1}>
+                      {item.category[0].toUpperCase() + item.category.slice(1)}{' '}
+                      {STRINGS.BudgetExceed}
+                    </Text>
+                    <Text style={styles.text2} numberOfLines={1}>
+                      Your{' '}
+                      {item.category[0].toUpperCase() + item.category.slice(1)}{' '}
+                      {STRINGS.BudgetExceed}
+                    </Text>
+                  </View>
                   <Text style={styles.text2}>
-                    Your{' '}
-                    {item.category[0].toUpperCase() + item.category.slice(1)}{' '}
-                    {STRINGS.BudgetExceed}
+                    {item.time.toDate().getHours()}.
+                    {item.time.toDate().getMinutes() < 10
+                      ? '0' + item.time.toDate().getMinutes()
+                      : item.time.toDate().getMinutes()}
                   </Text>
                 </View>
-                <Text style={styles.text2}>
-                  {item.time.toDate().getHours()}.
-                  {item.time.toDate().getMinutes() < 10
-                    ? '0' + item.time.toDate().getMinutes()
-                    : item.time.toDate().getMinutes()}
-                </Text>
-              </View>
+              </Swipeable>
             );
           }}
         />

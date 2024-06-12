@@ -1,8 +1,8 @@
 import React, {useState} from 'react';
 import {
+  Alert,
   Pressable,
   SafeAreaView,
-  ScrollView,
   Text,
   TouchableOpacity,
   View,
@@ -13,23 +13,31 @@ import {EmailEmptyError, PassEmptyError} from '../../constants/errors';
 import CustomPassInput from '../../components/CustomPassInput';
 import CustomButton from '../../components/CustomButton';
 import {NAVIGATION, STRINGS} from '../../constants/strings';
-import {COLORS} from '../../constants/commonStyles';
 import Sapcer from '../../components/Spacer';
 import {ICONS} from '../../constants/icons';
 import {LoginScreenProps} from '../../defs/navigation';
-import auth from '@react-native-firebase/auth';
-import firestore from '@react-native-firebase/firestore';
 import {setLoading, userLoggedIn} from '../../redux/reducers/userSlice';
-import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import {useAppDispatch} from '../../redux/store';
-import { UserFromJson, UserToJson } from '../../utils/userFuncs';
-import { useAppTheme } from '../../hooks/themeHook';
+import {UserFromJson, UserToJson} from '../../utils/userFuncs';
+import {useAppTheme} from '../../hooks/themeHook';
+// Third Party Libraries
+import {GoogleSignin} from '@react-native-google-signin/google-signin';
+import auth, {FirebaseAuthTypes} from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import Toast from 'react-native-toast-message';
 
 function Login({navigation}: Readonly<LoginScreenProps>) {
+  // constants
+  const dispatch = useAppDispatch();
+  const COLOR = useAppTheme();
+  const styles = style(COLOR);
+  const userCollection = firestore().collection('users');
+  // state
   const [email, setEmail] = useState('');
   const [pass, setPass] = useState('');
   const [form, setForm] = useState(false);
-  const dispatch = useAppDispatch();
+  // functions
   function onChangeEmail(str: string) {
     setEmail(str);
   }
@@ -43,15 +51,42 @@ function Login({navigation}: Readonly<LoginScreenProps>) {
         dispatch(setLoading(true));
         const creds = await auth().signInWithEmailAndPassword(email, pass);
         if (creds) {
-          const data = await firestore()
-            .collection('users')
-            .doc(creds.user.uid)
-            .get();
-          const user = UserFromJson(data.data()!);
-          dispatch(userLoggedIn(user));
+          if (creds.user.emailVerified) {
+            const data = await userCollection.doc(creds.user.uid).get();
+            const user = UserFromJson(data.data()!);
+            dispatch(userLoggedIn(user));
+          } else {
+            Alert.alert(
+              'Please verify your email',
+              'A verification email has already been sent to your registered email address, so verify your email before login',
+              [
+                {
+                  text: 'Resend',
+                  onPress: async () => {
+                    try {
+                      await creds.user.sendEmailVerification();
+                      await auth().signOut();
+                    } catch (e) {
+                      console.log(e);
+                      await auth().signOut();
+                    }
+                  },
+                },
+                {
+                  text: 'OK',
+                  onPress: async () => {
+                    console.log('OK Pressed');
+                    await auth().signOut();
+                  },
+                },
+              ],
+            );
+          }
         }
-      } catch (e) {
+      } catch (e: any) {
+        const error: FirebaseAuthTypes.NativeFirebaseAuthError = e;
         console.log(e);
+        Toast.show({text1: error.nativeErrorMessage, type: 'error'});
       }
       dispatch(setLoading(false));
     }
@@ -70,10 +105,7 @@ function Login({navigation}: Readonly<LoginScreenProps>) {
       // Sign-in the user with the credential
       const creds = await auth().signInWithCredential(googleCredential);
       if (creds) {
-        const res = await firestore()
-          .collection('users')
-          .doc(creds.user.uid)
-          .get();
+        const res = await userCollection.doc(creds.user.uid).get();
         if (!res.exists) {
           const user = UserToJson({
             name: creds.user.displayName!,
@@ -81,18 +113,17 @@ function Login({navigation}: Readonly<LoginScreenProps>) {
             uid: creds.user.uid,
             pin: '',
           });
-          await firestore().collection('users').doc(creds.user.uid).set(user);
-          dispatch(userLoggedIn({
-            name: creds.user.displayName!,
-            email: creds.user.email!,
-            uid: creds.user.uid,
-            pin: '',
-          }));
+          await userCollection.doc(creds.user.uid).set(user);
+          dispatch(
+            userLoggedIn({
+              name: creds.user.displayName!,
+              email: creds.user.email!,
+              uid: creds.user.uid,
+              pin: '',
+            }),
+          );
         } else {
-          const data = await firestore()
-            .collection('users')
-            .doc(creds.user.uid)
-            .get();
+          const data = await userCollection.doc(creds.user.uid).get();
           const user = UserFromJson(data.data()!);
           if (user) {
             dispatch(userLoggedIn(user));
@@ -104,13 +135,9 @@ function Login({navigation}: Readonly<LoginScreenProps>) {
     }
     dispatch(setLoading(false));
   }
-  const COLOR = useAppTheme();
-  const styles = style(COLOR);
   return (
     <SafeAreaView style={styles.safeView}>
-      <ScrollView
-        style={styles.flex}
-        contentContainerStyle={styles.flex}>
+      <KeyboardAwareScrollView enableOnAndroid={true}>
         <View style={styles.mainView}>
           <CustomInput
             placeholderText={STRINGS.Email}
@@ -127,7 +154,7 @@ function Login({navigation}: Readonly<LoginScreenProps>) {
             inputColor={COLOR.DARK[100]}
           />
           <PassEmptyError pass={pass} formKey={form} />
-          <Sapcer height={30} />
+          <Sapcer height={15} />
           <CustomButton title={STRINGS.LOGIN} onPress={handleLogin} />
           <Sapcer height={10} />
           <Text style={styles.orText}>{STRINGS.OrWith}</Text>
@@ -143,26 +170,20 @@ function Login({navigation}: Readonly<LoginScreenProps>) {
             onPress={() => {
               navigation.push(NAVIGATION.FORGOTPASSWORD);
             }}>
-            <Text
-              style={styles.forgotText}>
-              {STRINGS.ForgotPassword}
-            </Text>
+            <Text style={styles.forgotText}>{STRINGS.ForgotPassword}</Text>
           </Pressable>
           <Sapcer height={20} />
-          <Text style={{color: COLORS.DARK[25]}}>
-            {STRINGS.DontHaveAccount}{' '}
+          <View style={{flexDirection: 'row'}}>
+            <Text style={styles.dontHaveAcc}>{STRINGS.DontHaveAccount} </Text>
             <Pressable
               onPress={() => {
                 navigation.navigate(NAVIGATION.SIGNUP);
               }}>
-              <Text
-                style={styles.signupText}>
-                {STRINGS.SIGNUP}
-              </Text>
+              <Text style={styles.signupText}>{STRINGS.SIGNUP}</Text>
             </Pressable>
-          </Text>
+          </View>
         </View>
-      </ScrollView>
+      </KeyboardAwareScrollView>
     </SafeAreaView>
   );
 }

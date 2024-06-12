@@ -12,7 +12,8 @@ import CategorySelectionSheet from '../components/CategorySelectionSheet';
 import BudgetScreen from '../screens/Budgets';
 import {BottomParamList} from '../defs/navigation';
 import ProfileScreen from '../screens/Profile';
-import { useInitialSetup } from '../hooks/initialSetup';
+import {useInitialSetup} from '../hooks/initialSetup';
+import LogoutSheet from '../components/LogoutSheet';
 const Tab = createBottomTabNavigator<BottomParamList>();
 function CustomTabBar(props: Readonly<BottomTabBarProps>) {
   return <CustomTab {...props} />;
@@ -32,6 +33,7 @@ function BottomTabNavigator() {
       </Tab.Navigator>
       <FilterSheet />
       <CategorySelectionSheet />
+      <LogoutSheet/>
     </View>
   );
 }

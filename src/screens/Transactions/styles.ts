@@ -1,8 +1,9 @@
-import { StyleSheet } from 'react-native';
+import { Dimensions, StyleSheet } from 'react-native';
 import { COLORS } from '../../constants/commonStyles';
+import { RFValue } from 'react-native-responsive-fontsize';
 
 const styles = (COLOR: typeof COLORS) => StyleSheet.create({
-    safeView: { flex: 1, backgroundColor: COLOR.PRIMARY.LIGHT },
+    safeView: { flex: 1 },
     mainView: {
         flex: 1,
         alignItems: 'center',
@@ -10,37 +11,17 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
     },
     financialBtn: {
         width: '100%',
-        height: 50,
+        height: Dimensions.get('screen').height * 0.06,
         justifyContent: 'space-between',
         alignItems: 'center',
         borderRadius: 10,
         backgroundColor: COLOR.SECONDARY.VIOLET,
         flexDirection: 'row',
-        paddingHorizontal: 20,
+        paddingLeft: 20,
+        paddingRight: 15,
+        marginBottom: 10
     },
-    financialText: { fontSize: 18, color: COLOR.PRIMARY.VIOLET },
-    editBtn: {
-        paddingVertical: 8,
-        paddingHorizontal: 16,
-        backgroundColor: COLOR.VIOLET[20],
-        borderRadius: 40,
-    },
-    editBtnText: {
-        fontWeight: '500',
-        fontSize: 14,
-        color: COLOR.PRIMARY.VIOLET,
-    },
-    filterBtn: {
-        paddingVertical: 12,
-        paddingHorizontal: 26,
-        borderRadius: 40,
-        borderWidth: 1,
-        borderColor: COLOR.LIGHT[20],
-    },
-    filterBtnText: {
-        fontWeight: '500',
-        fontSize: 14,
-    },
+    financialText: { fontSize: RFValue(15), color: COLOR.PRIMARY.VIOLET },
     listItemCtr: {
         marginVertical: 5,
         flexDirection: 'row',
@@ -61,13 +42,18 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
         paddingHorizontal: 10,
         rowGap: 5,
     },
-    text1: { fontSize: 16, fontWeight: '500',color:COLOR.DARK[100] },
+    text1: { fontSize: RFValue(16), fontWeight: '500', color: COLOR.DARK[100] },
     text2: {
-        fontSize: 13,
+        fontSize: RFValue(13),
         fontWeight: '500',
         color: COLOR.DARK[25],
+    }, emptyText: {
+        fontSize: 16,
+        fontWeight: '500',
+        color: COLOR.DARK[25],
+        textAlign: 'center',
     },
-    sectionHeader: { fontSize: 18, fontWeight: '600', padding: 8,color:COLOR.DARK[100]  },
+    sectionHeader: { fontSize: RFValue(18), fontWeight: '600', padding: 8, color: COLOR.DARK[100] },
 });
 
 export default styles;

@@ -44,7 +44,7 @@ function Piegraph({
   const styles = style(COLOR);
   function labelComponent() {
     return (
-      <Text style={{fontSize: 32, fontWeight: '700', color: COLOR.DARK[100]}}>
+      <Text style={styles.pieCenterText}>
         {currencies[currency!].symbol}
         {(
           conversion.usd?.[currency!.toLowerCase()] *
@@ -92,7 +92,7 @@ function Piegraph({
         />
       ) : (
         <View style={styles.noDataCtr}>
-          <Text style={{color: COLOR.DARK[100]}}>{STRINGS.NoData}</Text>
+          <Text style={styles.emptyText}>{STRINGS.NoData}</Text>
         </View>
       )}
     </View>

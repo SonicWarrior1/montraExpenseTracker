@@ -9,9 +9,31 @@ export const toastConfig: ToastConfig = {
     return (
       <BaseToast
         {...props}
-        renderLeadingIcon={() => <View style={{width: '8%'}} />}
-        text1Props={{style: {color: COLORS.LIGHT[100]}}}
-        style={styles.success}
+        text1NumberOfLines={2}
+        text1Props={{
+          style: {
+            color: COLORS.LIGHT[100],
+            alignSelf: 'center',
+            fontSize:16
+          },
+        }}
+        style={[styles.success,{backgroundColor:COLORS.BLUE[100]}]}
+      />
+    );
+  },
+  error: props => {
+    return (
+      <BaseToast
+        {...props}
+        text1NumberOfLines={2}
+        text1Props={{
+          style: {
+            color: COLORS.LIGHT[100],
+            alignSelf: 'center',
+            fontSize:16
+          },
+        }}
+        style={[styles.success,{backgroundColor:COLORS.RED[100]}]}
       />
     );
   },

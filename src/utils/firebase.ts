@@ -6,7 +6,8 @@ import storage from '@react-native-firebase/storage';
 import notifee from '@notifee/react-native';
 import uuid from 'react-native-uuid';
 import { encrypt } from './encryption';
-import auth from '@react-native-firebase/auth';
+import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
+import Toast from 'react-native-toast-message';
 export function createTransaction({
     id,
     url,
@@ -328,10 +329,13 @@ export async function singupUser({ name, email, pass }: { name: string, email: s
                 .collection('users')
                 .doc(creds.user.uid)
                 .set(encrpytedUser);
+            await creds.user.sendEmailVerification();
             return true;
         }
-    } catch (e) {
+    } catch (e: any) {
+        const error: FirebaseAuthTypes.NativeFirebaseAuthError = e;
         console.log(e);
+        Toast.show({ text1: error.nativeErrorMessage, type: "error" })
         return false;
     }
     return false;

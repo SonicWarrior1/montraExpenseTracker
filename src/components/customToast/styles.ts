@@ -6,7 +6,7 @@ const styles = StyleSheet.create({
         borderRadius: 40,
         borderLeftWidth: 0,
         backgroundColor: COLORS.DARK[100],
-        height: 40,
+        height: 50,
         width: '90%',
     },
     customBack: {

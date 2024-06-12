@@ -1,20 +1,21 @@
 import { StyleSheet } from 'react-native';
 import { COLORS } from '../../constants/commonStyles';
+import { RFValue } from 'react-native-responsive-fontsize';
 
-const styles = (COLOR:typeof COLORS) => StyleSheet.create({
+const styles = (COLOR: typeof COLORS) => StyleSheet.create({
     dropdown: {
         borderWidth: 1,
         borderRadius: 20,
         height: 40,
-        fontSize: 14,
+        fontSize: RFValue(14),
         paddingHorizontal: 20,
         borderColor: COLOR.LIGHT[20],
-        width: 120,
+        width: 160,
     },
     listItemCtr: {
         marginVertical: 5,
         flexDirection: 'row',
-        backgroundColor: COLOR.LIGHT[60],
+        backgroundColor: COLOR.LIGHT[80],
         borderRadius: 16,
         flex: 1,
         paddingVertical: 10,
@@ -32,9 +33,9 @@ const styles = (COLOR:typeof COLORS) => StyleSheet.create({
         paddingHorizontal: 10,
         rowGap: 5,
     },
-    text1: { fontSize: 16, fontWeight: '500', color: COLOR.DARK[100] },
+    text1: { fontSize: RFValue(16), fontWeight: '500', color: COLOR.DARK[100] },
     text2: {
-        fontSize: 13,
+        fontSize: RFValue(13),
         fontWeight: '500',
         color: COLOR.DARK[25],
     }, filterBtn: {
@@ -58,20 +59,22 @@ const styles = (COLOR:typeof COLORS) => StyleSheet.create({
         borderRadius: 24,
         columnGap: 7,
     },
-    catText: { fontSize: 14, fontWeight: '500', color: COLOR.DARK[100] },
-    catAmt: { fontSize: 24, fontWeight: '500' },
-    safeView: { flex: 1, backgroundColor: COLOR.LIGHT[100] },
+    catText: { fontSize: RFValue(14), fontWeight: '500', color: COLOR.DARK[100] },
+    catAmt: { fontSize: RFValue(24), fontWeight: '500' },
+    safeView: { backgroundColor: COLOR.LIGHT[100] },
     monthRow: {
         flexDirection: 'row',
+        alignItems: "center",
         justifyContent: 'space-between',
         paddingHorizontal: 20,
+        paddingVertical: 10,
     },
-    graphBtnCtr: { flexDirection: 'row', borderWidth: 1, borderRadius: 8, borderColor: COLOR.DARK[100] },
+    graphBtnCtr: { flexDirection: 'row', borderWidth: 1, borderRadius: 8, borderColor: COLOR.LIGHT[40] },
     graphBtn: {
         paddingVertical: 10,
         paddingHorizontal: 10,
     },
-    amt: { fontSize: 32, fontWeight: '700', paddingLeft: 20, color: COLOR.DARK[100] },
+    amt: { fontSize: RFValue(32), fontWeight: '700', paddingLeft: 20, color: COLOR.DARK[100] },
     graphView: { transform: [{ translateX: -10 }] },
     pieView: {
         alignItems: 'center',
@@ -90,14 +93,14 @@ const styles = (COLOR:typeof COLORS) => StyleSheet.create({
         borderRadius: 32,
     },
     typeBtn: {
-        width: 160,
+        width: 165,
         height: 48,
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 32,
     },
     typeText: {
-        fontSize: 16,
+        fontSize: RFValue(14),
         fontWeight: '500',
     },
     flexRow: {
@@ -113,6 +116,8 @@ const styles = (COLOR:typeof COLORS) => StyleSheet.create({
         alignItems: 'center',
     },
     noDataCtr: { height: 230, justifyContent: 'center' },
+    pieCenterText: { fontSize: 32, fontWeight: '700', color: COLOR.DARK[100] },
+    emptyText:{fontSize: 16, fontWeight: '500', color: COLOR.DARK[25]}
 });
 
 export default styles;

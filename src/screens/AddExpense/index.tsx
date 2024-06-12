@@ -1,14 +1,17 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {
+  Dimensions,
   Image,
   Pressable,
   SafeAreaView,
+  ScrollView,
   Switch,
   Text,
   TextInput,
   View,
 } from 'react-native';
 import style from './styles';
+
 import CustomInput from '../../components/CustomInput';
 import {COLORS} from '../../constants/commonStyles';
 import Sapcer from '../../components/Spacer';
@@ -47,8 +50,10 @@ import {
   updateTransaction,
 } from '../../utils/firebase';
 import {useAppTheme} from '../../hooks/themeHook';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
 function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
+  // constants
   const COLOR = useAppTheme();
   const styles = style(COLOR);
   const pageType = route.params.type;
@@ -65,12 +70,13 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
       : pageType === 'transfer'
       ? COLORS.PRIMARY.BLUE
       : COLORS.PRIMARY.GREEN;
-
+  const dispatch = useAppDispatch();
   useEffect(() => {
     navigation.setOptions({
       title: pageType[0].toUpperCase() + pageType.slice(1),
     });
   }, [pageType]);
+  // redux use
   const conversion = useAppSelector(state => state.transaction.conversion);
   const expenseCat = useAppSelector(
     state => state.user.currentUser?.expenseCategory,
@@ -78,14 +84,9 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
   const incomeCat = useAppSelector(
     state => state.user.currentUser?.incomeCategory,
   );
-  const dispatch = useAppDispatch();
   const uid = useAppSelector(state => state.user.currentUser?.uid);
   const currency = useAppSelector(state => state.user.currentUser?.currency);
-
-  const filePickSheetRef = useRef<BottomSheetModal>(null);
-  const repeatSheetRef = useRef<BottomSheetModal>(null);
-  const addCategorySheetRef = useRef<BottomSheetModal>(null);
-
+  // state
   const [image, setImage] = useState(
     transaction && transaction.attachementType === 'image'
       ? transaction.attachement
@@ -117,6 +118,13 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
   const [wallet, setWallet] = useState(transaction ? transaction.wallet : '');
   const [from, setFrom] = useState(transaction ? transaction.from : '');
   const [to, setTo] = useState(transaction ? transaction.to : '');
+  const [formKey, setFormKey] = useState(false);
+  // refs
+  const filePickSheetRef = useRef<BottomSheetModal>(null);
+  const repeatSheetRef = useRef<BottomSheetModal>(null);
+  const addCategorySheetRef = useRef<BottomSheetModal>(null);
+
+  // functions
   const getAttachmentAndType = useCallback(() => {
     let attachement = '';
     let attachementType: transactionType['attachementType'] = 'none';
@@ -130,7 +138,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
     return {attachement, attachementType};
   }, [image, doc]);
 
-  async function handlePress() {
+  const handlePress = useCallback(async () => {
     setFormKey(true);
     if (pageType === 'transfer' && (from === '' || to === '')) {
       return;
@@ -145,6 +153,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
     const {attachement, attachementType} = getAttachmentAndType();
     try {
       const id = uuid.v4().toString();
+      const curr = await firestore().collection('users').doc(uid).get();
       const url = await getAttachmentUrl({
         attachement: attachement,
         id: id,
@@ -168,7 +177,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
         from: from,
         to: to,
       });
-      const curr = await firestore().collection('users').doc(uid).get();
+
       if (isEdit) {
         await updateTransaction({
           trans: trans,
@@ -251,13 +260,30 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
     } catch (e) {
       dispatch(setLoading(false));
     }
-  }
-  const [formKey, setFormKey] = useState(false);
+  }, [pageType, amount, category, wallet, from, to]);
+
   return (
-    <View style={[styles.safeView, {backgroundColor: backgroundColor}]}>
+    <KeyboardAwareScrollView
+      style={[{backgroundColor: backgroundColor}]}
+      contentContainerStyle={[{backgroundColor: backgroundColor, flexGrow: 1}]}
+      enableOnAndroid={true}>
       <SafeAreaView
-        style={[styles.safeView, {backgroundColor: backgroundColor}]}>
-        <View style={styles.mainView}>
+        style={[
+          styles.safeView,
+          {
+            backgroundColor: backgroundColor,
+          },
+        ]}>
+        <View
+          style={[
+            styles.mainView,
+            {
+              height:
+                pageType === 'transfer'
+                  ? Dimensions.get('screen').height / 2
+                  : Dimensions.get('screen').height / 3.2,
+            },
+          ]}>
           <Text style={styles.text1}>{STRINGS.HowMuch}</Text>
           <View style={styles.moneyCtr}>
             <Text style={styles.text2}>{currencies[currency!].symbol}</Text>
@@ -277,12 +303,12 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
               keyboardType="numeric"
             />
           </View>
-          <View style={{left: 20}}>
+          <View style={styles.amtError}>
             <EmptyError
               errorText={STRINGS.PleaseFillAnAmount}
               value={amount}
               formKey={formKey}
-              color={COLORS.RED[100]}
+              color={COLORS.LIGHT[100]}
               size={18}
             />
           </View>
@@ -366,7 +392,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
           value={desc}
           inputColor={COLOR.DARK[100]}
         />
-        <Sapcer height={10} />
+        <Sapcer height={24} />
         {pageType !== 'transfer' && (
           <CustomDropdown
             data={[
@@ -395,8 +421,8 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
               filePickSheetRef.current?.present();
             }}>
             {ICONS.Attachment({
-              height: 20,
-              width: 20,
+              height: 25,
+              width: 25,
               color: COLOR.DARK[100],
             })}
             <Text style={styles.attachementText}>{STRINGS.AddAttachement}</Text>
@@ -407,7 +433,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
               onPress={() => {
                 setImage('');
               }}
-              style={[styles.closeIcon, {left: 90}]}>
+              style={[styles.closeIcon, {left: 90, zIndex: zindex}]}>
               {ICONS.Close({height: 20, width: 20})}
             </Pressable>
             <Image
@@ -423,7 +449,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
               onPress={() => {
                 setDoc(undefined);
               }}
-              style={[styles.closeIcon, {left: 100}]}>
+              style={[styles.closeIcon, {left: 100, zIndex: zindex}]}>
               {ICONS.Close({height: 20, width: 20})}
             </Pressable>
             <Pressable
@@ -525,7 +551,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
           type={pageType}
         />
       </BottomSheetModalProvider>
-    </View>
+    </KeyboardAwareScrollView>
   );
 }
 

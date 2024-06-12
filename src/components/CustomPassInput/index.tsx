@@ -36,14 +36,14 @@ function CustomPassInput({
         }}>
         {showPass
           ? ICONS.Show({
-              height: 20,
-              width: 20,
+              height: 24,
+              width: 24,
               color: 'transparent',
               borderColor: COLOR.DARK[100],
             })
           : ICONS.Hide({
-              height: 18,
-              width: 18,
+              height: 22,
+              width: 22,
               color: COLOR.DARK[100],
             })}
       </Pressable>

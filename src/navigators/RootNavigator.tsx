@@ -189,6 +189,7 @@ function RootNavigator(): React.JSX.Element {
             component={Signup}
             options={{
               headerShown: true,
+              headerTitle:"Sign Up"
             }}
           />
           <Stack.Screen
@@ -203,6 +204,7 @@ function RootNavigator(): React.JSX.Element {
             component={ForgotPassword}
             options={{
               headerShown: true,
+              headerTitle:"Forgot Password"
             }}
           />
           <Stack.Screen

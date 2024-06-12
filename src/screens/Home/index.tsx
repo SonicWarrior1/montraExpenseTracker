@@ -1,6 +1,5 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
-  Dimensions,
   FlatList,
   Pressable,
   SafeAreaView,
@@ -9,40 +8,44 @@ import {
   useColorScheme,
   View,
 } from 'react-native';
-import {useAppSelector} from '../../redux/store';
-import LinearGradient from 'react-native-linear-gradient';
-import {catIcons, ICONS} from '../../constants/icons';
-import {currencies, NAVIGATION} from '../../constants/strings';
 import style from './styles';
+import {useAppSelector} from '../../redux/store';
+import {catIcons, ICONS} from '../../constants/icons';
+import {currencies, NAVIGATION, STRINGS} from '../../constants/strings';
 import {COLORS} from '../../constants/commonStyles';
 import {HomeScreenProps} from '../../defs/navigation';
-import {Timestamp} from '@react-native-firebase/firestore';
+import {useAppTheme} from '../../hooks/themeHook';
 import HomeHeader from '../../components/HomeHeader';
 import Graph from './atoms/graph';
-import {useAppTheme} from '../../hooks/themeHook';
+// Third Party Libraries
+import {Timestamp} from '@react-native-firebase/firestore';
+import LinearGradient from 'react-native-linear-gradient';
 
 function Home({navigation, route}: Readonly<HomeScreenProps>) {
+  const [month, setMonth] = useState(new Date().getMonth());
+  // redux
   const conversion = useAppSelector(state => state.transaction.conversion);
   const currency =
     useAppSelector(state => state.user.currentUser?.currency) ?? 'USD';
-  const month = new Date().getMonth();
   const spends = useAppSelector(
     state => state.user.currentUser?.spend?.[month],
   );
-  const totalSpend = Object.values(spends ?? [])
-    .reduce((a, b) => a + b, 0)
-    .toFixed(1);
   const incomes = useAppSelector(
     state => state.user.currentUser?.income?.[month],
   );
+  const data = useAppSelector(state => state.transaction.transactions);
+  const theme = useAppSelector(state => state.user.currentUser?.theme);
+  // constants
+  const totalSpend = Object.values(spends ?? [])
+    .reduce((a, b) => a + b, 0)
+    .toFixed(1);
   const totalIncome = Object.values(incomes ?? [])
     .reduce((a, b) => a + b, 0)
     .toFixed(1);
-  const data = useAppSelector(state => state.transaction.transactions);
   const COLOR = useAppTheme();
   const styles = style(COLOR);
   const scheme = useColorScheme();
-  const theme = useAppSelector(state => state.user.currentUser?.theme);
+
   return (
     <ScrollView
       style={{
@@ -67,13 +70,21 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
         }
         style={styles.gradient}>
         <SafeAreaView style={styles.safeView}>
-          <HomeHeader navigation={navigation} route={route} />
+          <HomeHeader props={{navigation, route}} setMonth={setMonth} />
           <Text style={styles.actText}>Account Balance</Text>
           <Text style={styles.amt}>
             {currencies[currency ?? 'USD'].symbol}
-            {(conversion.usd?.[(currency ?? 'USD').toLowerCase()] * 9400)
-              .toFixed(1)
-              .toString()}
+            {isNaN(
+              Number(
+                (
+                  conversion.usd?.[(currency ?? 'USD').toLowerCase()] * 9400
+                ).toFixed(1),
+              ),
+            )
+              ? 0
+              : (conversion.usd?.[(currency ?? 'USD').toLowerCase()] * 9400)
+                  .toFixed(1)
+                  .toString()}
           </Text>
           <View style={styles.transRow}>
             <View
@@ -89,12 +100,21 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
                 <Text style={styles.text1}>Income</Text>
                 <Text style={styles.text2} numberOfLines={1}>
                   {currencies[currency].symbol}
-                  {(
-                    conversion.usd?.[currency.toLowerCase()] *
-                    Number(totalIncome)
+                  {isNaN(
+                    Number(
+                      (
+                        conversion.usd?.[currency.toLowerCase()] *
+                        Number(totalIncome)
+                      ).toFixed(1),
+                    ),
                   )
-                    .toFixed(1)
-                    .toString()}
+                    ? 0
+                    : (
+                        conversion.usd?.[currency.toLowerCase()] *
+                        Number(totalIncome)
+                      )
+                        .toFixed(1)
+                        .toString()}
                 </Text>
               </View>
             </View>
@@ -110,34 +130,59 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
                 <Text style={styles.text1}>Expense</Text>
                 <Text style={styles.text2} numberOfLines={1}>
                   {currencies[currency].symbol}
-                  {(
-                    conversion.usd?.[currency.toLowerCase()] *
-                    Number(totalSpend)
+                  {isNaN(
+                    Number(
+                      (
+                        conversion.usd?.[currency.toLowerCase()] *
+                        Number(totalSpend)
+                      ).toFixed(1),
+                    ),
                   )
-                    .toFixed(1)
-                    .toString()}
+                    ? 0
+                    : (
+                        conversion.usd?.[currency.toLowerCase()] *
+                        Number(totalSpend)
+                      )
+                        .toFixed(1)
+                        .toString()}
                 </Text>
               </View>
             </View>
           </View>
         </SafeAreaView>
       </LinearGradient>
-      <View style={{}}>
-        <Text style={styles.graphTitle}>Spend Frequency</Text>
+      <View>
+        <Text style={styles.graphTitle}>{STRINGS.SpendFrequency}</Text>
         <Graph data={data} month={month} />
         <View style={styles.flexRow}>
-          <Text style={styles.text3}>Recent Transaction</Text>
-          <Pressable
-            style={styles.editBtn}
-            onPress={() => {
-              navigation.navigate(NAVIGATION.Transaction);
-            }}>
-            <Text style={styles.editBtnText}>See all</Text>
-          </Pressable>
+          <Text style={styles.text3}>{STRINGS.RecentTransaction}</Text>
+          {Object.values(data)
+            .filter(item => {
+              return (
+                Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+                  .toDate()
+                  ?.getMonth() === month
+              );
+            })
+            .sort((a, b) => b.timeStamp.seconds - a.timeStamp.seconds)
+            .slice(0, 3).length !== 0 && (
+            <Pressable
+              style={styles.editBtn}
+              onPress={() => {
+                navigation.navigate(NAVIGATION.Transaction);
+              }}>
+              <Text style={styles.editBtnText}>{STRINGS.SeeAll}</Text>
+            </Pressable>
+          )}
         </View>
 
         <FlatList
           style={{paddingHorizontal: 20}}
+          ListEmptyComponent={() => (
+            <View style={{justifyContent: 'center', alignItems: 'center'}}>
+              <Text style={styles.emptyText}> No Recent Transactions</Text>
+            </View>
+          )}
           data={Object.values(data)
             .filter(item => {
               return (
@@ -189,7 +234,9 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
                       : item.category[0].toLocaleUpperCase() +
                         item.category.slice(1)}
                   </Text>
-                  <Text style={styles.listtext2}>{item.desc}</Text>
+                  <Text style={styles.listtext2} numberOfLines={1}>
+                    {item.desc}
+                  </Text>
                 </View>
                 <View style={styles.column}>
                   <Text

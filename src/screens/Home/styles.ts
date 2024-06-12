@@ -1,5 +1,6 @@
 import { StyleSheet } from 'react-native';
 import { COLORS } from '../../constants/commonStyles';
+import { RFValue } from 'react-native-responsive-fontsize';
 const styles = (COLOR: typeof COLORS) => StyleSheet.create({
     moneyCtr: {
         height: 80,
@@ -17,12 +18,12 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
         borderRadius: 16,
     },
     text1: {
-        fontSize: 14,
+        fontSize: RFValue(14),
         fontWeight: '500',
         color: COLOR.LIGHT[100],
     },
     text2: {
-        fontSize: 22,
+        fontSize: RFValue(18),
         fontWeight: '600',
         color: COLOR.LIGHT[100],
         maxWidth:100,
@@ -34,12 +35,12 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
         borderRadius: 40,
     },
     filterBtnText: {
-        fontSize: 14,
+        fontSize: RFValue(14),
         color: COLOR.YELLOW[100],
     }, listItemCtr: {
         marginVertical: 5,
         flexDirection: 'row',
-        backgroundColor: COLOR.LIGHT[60],
+        backgroundColor: COLOR.LIGHT[80],
         borderRadius: 16,
         flex: 1,
         paddingVertical: 10,
@@ -57,9 +58,9 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
         paddingHorizontal: 10,
         rowGap: 5,
     },
-    listtext1: { fontSize: 16, fontWeight: '500', color: COLOR.DARK[100] },
+    listtext1: { fontSize: RFValue(16), fontWeight: '500', color: COLOR.DARK[100] },
     listtext2: {
-        fontSize: 13,
+        fontSize: RFValue(13),
         fontWeight: '500',
         color: COLOR.DARK[25],
     }, editBtn: {
@@ -70,7 +71,7 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
     },
     editBtnText: {
         fontWeight: '500',
-        fontSize: 14,
+        fontSize: RFValue(14),
         color: COLOR.PRIMARY.VIOLET,
     },
     mainView: { flex: 1 },
@@ -86,12 +87,12 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
         borderBottomRightRadius: 32,
         alignItems: 'center',
     }, actText: {
-        fontSize: 14,
+        fontSize: RFValue(14),
         fontWeight: '500',
         color: COLOR.DARK[25],
         marginTop: 18,
     },
-    amt: { fontSize: 40, fontWeight: '600', marginTop: 10, color: COLOR.DARK[100] },
+    amt: { fontSize: RFValue(40), fontWeight: '600', marginTop: 10, color: COLOR.DARK[100] },
     transRow: {
         flexDirection: 'row',
         justifyContent: 'center',
@@ -101,7 +102,7 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
         columnGap: 15,
         marginTop: 18,
     },
-    graphTitle: { fontSize: 18, fontWeight: '600', paddingHorizontal: 20, color: COLOR.DARK[100], paddingVertical: 12 },
+    graphTitle: { fontSize: RFValue(18), fontWeight: '600', paddingHorizontal: 20, color: COLOR.DARK[100], paddingVertical: 12 },
     dayRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',

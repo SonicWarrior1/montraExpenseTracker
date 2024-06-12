@@ -1,5 +1,6 @@
-import { StyleSheet } from 'react-native';
+import { Platform, StyleSheet } from 'react-native';
 import { COLORS } from '../../constants/commonStyles';
+import { RFValue } from 'react-native-responsive-fontsize';
 
 const styles = (COLOR: typeof COLORS) => StyleSheet.create({
     safeView: {
@@ -15,13 +16,14 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
         justifyContent: 'flex-start',
     },
     catCtr: {
+        marginTop: Platform.OS === 'ios' ? 0 : 40,
         flexDirection: 'row',
         alignItems: 'center',
         borderWidth: 1,
         borderColor: COLOR.LIGHT[20],
         backgroundColor: COLOR.LIGHT[80],
         paddingHorizontal: 15,
-        paddingVertical: 10,
+        paddingVertical: 15,
         borderRadius: 24,
         columnGap: 7,
         marginBottom: 20,
@@ -31,11 +33,11 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
         borderRadius: 10,
 
     },
-    catText: { fontSize: 18, fontWeight: '600', color: COLOR.DARK[100] },
+    catText: { fontSize: RFValue(18), fontWeight: '600', color: COLOR.DARK[100] },
     remainText: {
-        fontSize: 24, fontWeight: '600', marginBottom: 10, color: COLOR.DARK[100]
+        fontSize: RFValue(24), fontWeight: '600',  color: COLOR.DARK[100]
     },
-    amtText: { fontSize: 64, fontWeight: '600', marginBottom: 15, color: COLOR.DARK[100], maxWidth: "90%" },
+    amtText: { fontSize: RFValue(64), fontWeight: '600', marginBottom: 15, color: COLOR.DARK[100], maxWidth: "90%" },
     limitCtr: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -47,7 +49,7 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
         marginTop: 40,
     },
     limitText: {
-        fontSize: 14, fontWeight: '600', color: COLOR.LIGHT[100],
+        fontSize: RFValue(14), fontWeight: '600', color: COLOR.LIGHT[100],
     },
     progressbar: { width: '100%' },
     marginRight: { marginRight: 15 },

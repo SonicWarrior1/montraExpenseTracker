@@ -14,24 +14,27 @@ import {COLORS} from '../../constants/commonStyles';
 import {useAppTheme} from '../../hooks/themeHook';
 
 function DetailBudget({navigation, route}: Readonly<DetailBudgetScreenProps>) {
-  const COLOR = useAppTheme();
-  const styles = style(COLOR);
+  const month = route.params.month;
+  // redux
   const conversion = useAppSelector(state => state.transaction.conversion);
   const currency = useAppSelector(state => state.user.currentUser?.currency);
-  const month = route.params.month;
   const budgets = useAppSelector(
     state => state.user.currentUser?.budget[month],
   );
   const spends = useAppSelector(state => state.user.currentUser?.spend[month]);
-  const cat = route.params.category;
-  const budget = budgets![cat] ?? {
+  // constants
+  const COLOR = useAppTheme();
+  const styles = style(COLOR);
+  const selectedCategory = route.params.category;
+  const budget = budgets?.[selectedCategory] ?? {
     alert: false,
     limit: 0,
     percentage: 0,
   };
-  const spend = spends?.[cat] ?? 0;
+  const spend = spends?.[selectedCategory] ?? 0;
+  //ref
   const bottomSheetModalRef = useRef<BottomSheetModalMethods>(null);
-  console.log(spend ?? 0, budget.limit);
+  // functions
   const headerRight = () => {
     return (
       <Pressable
@@ -58,14 +61,14 @@ function DetailBudget({navigation, route}: Readonly<DetailBudgetScreenProps>) {
               style={[
                 styles.colorBox,
                 {
-                  backgroundColor: catIcons[cat]?.color ?? COLORS.LIGHT[20],
+                  backgroundColor: catIcons[selectedCategory]?.color ?? COLORS.LIGHT[20],
                 },
               ]}>
-              {catIcons[cat]?.icon({height: 20, width: 20}) ??
+              {catIcons[selectedCategory]?.icon({height: 20, width: 20}) ??
                 ICONS.Money({height: 20, width: 20})}
             </View>
             <Text style={styles.catText}>
-              {cat[0].toUpperCase() + cat.slice(1)}
+              {selectedCategory[0].toUpperCase() + selectedCategory.slice(1)}
             </Text>
           </View>
           <Text style={styles.remainText}>{STRINGS.Remaining}</Text>
@@ -82,7 +85,8 @@ function DetailBudget({navigation, route}: Readonly<DetailBudgetScreenProps>) {
           <View style={styles.progressbar}>
             <Bar
               progress={(spend ?? 0) / budget.limit}
-              height={8}
+              height={10}
+              borderRadius={10}
               width={null}
             />
           </View>
@@ -98,13 +102,13 @@ function DetailBudget({navigation, route}: Readonly<DetailBudgetScreenProps>) {
           onPress={() => {
             navigation.push(NAVIGATION.CreateBudget, {
               isEdit: true,
-              category: cat,
+              category: selectedCategory,
             });
           }}
         />
       </SafeAreaView>
       <DeleteBudgetSheet
-        category={cat}
+        category={selectedCategory}
         navigation={navigation}
         bottomSheetModalRef={bottomSheetModalRef}
       />
