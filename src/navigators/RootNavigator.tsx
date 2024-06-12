@@ -6,7 +6,7 @@ import {ICONS} from '../constants/icons';
 import {Pressable} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import Login from '../screens/Login';
-import {useAppSelector} from '../redux/store';
+import {useAppDispatch, useAppSelector} from '../redux/store';
 import ForgotPassword from '../screens/ForgotPassword';
 import ForgotEmailSent from '../screens/ForgotEmailSent';
 import Pin from '../screens/Pin';
@@ -25,6 +25,9 @@ import CurrencyScreen from '../screens/Currency';
 import ExportData from '../screens/ExportData';
 import ThemeScreen from '../screens/Theme';
 import {useAppTheme} from '../hooks/themeHook';
+import {useGetUsdConversionQuery} from '../redux/api/conversionApi';
+import {useEffect} from 'react';
+import {setConversionData} from '../redux/reducers/transactionSlice';
 export const Stack = createStackNavigator<RootStackParamList>();
 
 function RootNavigator(): React.JSX.Element {
@@ -46,7 +49,15 @@ function RootNavigator(): React.JSX.Element {
     ) : undefined;
   }
   const isLoggedIn = useAppSelector(state => state.user.currentUser);
+  const dispatch = useAppDispatch();
   const COLORS = useAppTheme();
+  const {data: conversion, isSuccess} = useGetUsdConversionQuery({});
+  useEffect(() => {
+    if (isSuccess) {
+      dispatch(setConversionData(conversion));
+      console.log('Ok')
+    }
+  }, [isSuccess]);
   return (
     <Stack.Navigator
       screenOptions={{
@@ -189,7 +200,7 @@ function RootNavigator(): React.JSX.Element {
             component={Signup}
             options={{
               headerShown: true,
-              headerTitle:"Sign Up"
+              headerTitle: 'Sign Up',
             }}
           />
           <Stack.Screen
@@ -204,7 +215,7 @@ function RootNavigator(): React.JSX.Element {
             component={ForgotPassword}
             options={{
               headerShown: true,
-              headerTitle:"Forgot Password"
+              headerTitle: 'Forgot Password',
             }}
           />
           <Stack.Screen

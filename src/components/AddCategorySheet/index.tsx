@@ -40,7 +40,7 @@ function AddCategorySheet({
   const dispatch = useAppDispatch();
   const snapPoints = useMemo(() => ['25%'], []);
   const [category, setCategory] = useState('');
-  const onPress = useCallback(async () => {
+  const onPress = async () => {
     const userDoc = firestore().collection('users').doc(uid);
     if (category !== '') {
       dispatch(setLoading(true));
@@ -67,7 +67,7 @@ function AddCategorySheet({
         bottomSheetModalRef.current?.dismiss();
       }
     }
-  }, [uid]);
+  };
   const COLOR = useAppTheme();
   const styles = style(COLOR);
   return (

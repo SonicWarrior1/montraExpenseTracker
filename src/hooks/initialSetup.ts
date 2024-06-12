@@ -46,11 +46,11 @@ export function useInitialSetup() {
         return () => unsubscribe();
 
     }, []);
-    const { data: conversion, isSuccess } = useGetUsdConversionQuery({});
-    useEffect(() => {
-        if (isSuccess) {
-            dispatch(setConversionData(conversion));
-        }
-    }, []);
+    // const { data: conversion, isSuccess } = useGetUsdConversionQuery({});
+    // useEffect(() => {
+    //     if (isSuccess) {
+    //         dispatch(setConversionData(conversion));
+    //     }
+    // }, []);
 
 }
