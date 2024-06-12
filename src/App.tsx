@@ -11,6 +11,7 @@ import Toast from 'react-native-toast-message';
 import {enableFreeze, enableScreens} from 'react-native-screens';
 import {toastConfig} from './components/customToast';
 import BootSplash from 'react-native-bootsplash';
+import InternetCheck from './components/InternetCheck';
 
 enableFreeze(true);
 enableScreens(false);
@@ -23,16 +24,19 @@ function App(): React.JSX.Element {
     <GestureHandlerRootView style={{flex: 1}}>
       <Provider store={store}>
         <PersistGate persistor={persistor}>
-          <Loader>
-            <NavigationContainer onReady={() => BootSplash.hide({fade: true})}>
-              <RootNavigator />
-              <Toast
-                position="bottom"
-                visibilityTime={2000}
-                config={toastConfig}
-              />
-            </NavigationContainer>
-          </Loader>
+          <InternetCheck>
+            <Loader>
+              <NavigationContainer
+                onReady={() => BootSplash.hide({fade: true})}>
+                <RootNavigator />
+                <Toast
+                  position="bottom"
+                  visibilityTime={2000}
+                  config={toastConfig}
+                />
+              </NavigationContainer>
+            </Loader>
+          </InternetCheck>
         </PersistGate>
       </Provider>
     </GestureHandlerRootView>

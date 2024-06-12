@@ -174,7 +174,9 @@ export const STRINGS = {
     From: 'From',
     To: 'To',
     WhatExport: 'What data do your want to export?',
-    SureLogout: 'Are you sure do you wanna logout?'
+    SureLogout: 'Are you sure do you wanna logout?',
+    NoInternetAccess: 'No Internet Access',
+    CheckInternet: 'Please check your internet connection'
 };
 export const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w]{1,}$/;
 export const nameRegex = /^[a-zA-Z ]*$/;
