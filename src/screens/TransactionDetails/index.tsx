@@ -1,4 +1,4 @@
-import React, {useEffect, useRef} from 'react';
+import React, {useEffect, useMemo, useRef} from 'react';
 import {
   Dimensions,
   Image,
@@ -62,7 +62,15 @@ function TransactionDetails({
       headerRight: headerRight,
     });
   }, []);
-
+  const getBackgroundColor = useMemo(() => {
+    if (trans.type === 'expense') {
+      return COLORS.PRIMARY.RED;
+    } else if (trans.type === 'transfer') {
+      return COLORS.PRIMARY.BLUE;
+    } else {
+      return COLORS.PRIMARY.GREEN;
+    }
+  }, [trans]);
   return (
     trans && (
       <View style={{flex: 1, backgroundColor: COLOR.LIGHT[100]}}>
@@ -70,12 +78,7 @@ function TransactionDetails({
           style={[
             styles.safeView,
             {
-              backgroundColor:
-                trans.type === 'expense'
-                  ? COLORS.PRIMARY.RED
-                  : trans.type === 'income'
-                  ? COLORS.PRIMARY.GREEN
-                  : COLORS.PRIMARY.BLUE,
+              backgroundColor: getBackgroundColor,
             },
           ]}>
           <Sapcer height={Dimensions.get('screen').height * 0.075} />

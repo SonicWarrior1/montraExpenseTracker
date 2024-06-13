@@ -6,12 +6,13 @@ import {COLORS} from '../../constants/commonStyles';
 import {PinSentScreenProps} from '../../defs/navigation';
 import {NAVIGATION, STRINGS} from '../../constants/strings';
 import {useAppDispatch, useAppSelector} from '../../redux/store';
-import {setLoading, userLoggedIn} from '../../redux/reducers/userSlice';
+import {userLoggedIn} from '../../redux/reducers/userSlice';
 import firestore from '@react-native-firebase/firestore';
 import {ICONS} from '../../constants/icons';
 import {encrypt} from '../../utils/encryption';
 // Third Party Libraries
 import Toast from 'react-native-toast-message';
+import uuid from 'react-native-uuid';
 
 function Pin({route, navigation}: Readonly<PinSentScreenProps>) {
   // constants
@@ -71,16 +72,19 @@ function Pin({route, navigation}: Readonly<PinSentScreenProps>) {
       }
     };
   };
+  const getTitleText = () => {
+    if (isSetup && oldPin === '') {
+      return STRINGS.SetupPin;
+    } else if (isSetup && oldPin) {
+      return STRINGS.RetypePin;
+    } else {
+      return STRINGS.EnterPin;
+    }
+  };
   return (
     <SafeAreaView style={styles.safeView}>
       <View style={styles.mainView}>
-        <Text style={styles.text}>
-          {isSetup && oldPin === ''
-            ? STRINGS.SetupPin
-            : isSetup && oldPin
-            ? STRINGS.RetypePin
-            : STRINGS.EnterPin}
-        </Text>
+        <Text style={styles.text}>{getTitleText()}</Text>
         <View style={styles.progressDotCtr}>
           {[0, 1, 2, 3].map(i => {
             return (
@@ -99,11 +103,11 @@ function Pin({route, navigation}: Readonly<PinSentScreenProps>) {
           })}
         </View>
         <View>
-          {matrix.map((row, rowIndex) => (
-            <View style={styles.flexRow} key={rowIndex}>
-              {row.map((value, colIndex) => (
+          {matrix.map(row => (
+            <View style={styles.flexRow} key={`row_${uuid.v4()}`}>
+              {row.map(value => (
                 <TouchableOpacity
-                  key={colIndex}
+                  key={`col_${uuid.v4()}`}
                   style={styles.btn}
                   onPress={handlePin(value)}>
                   {value === 99 ? (
@@ -112,10 +116,10 @@ function Pin({route, navigation}: Readonly<PinSentScreenProps>) {
                       width: 30,
                       color: COLORS.LIGHT[100],
                     })
-                  ) : value === -1 ? (
-                    <Text style={styles.number}>DEL</Text>
                   ) : (
-                    <Text style={styles.number}>{value}</Text>
+                    <Text style={styles.number}>
+                      {value === -1 ? 'DEL' : value}
+                    </Text>
                   )}
                 </TouchableOpacity>
               ))}

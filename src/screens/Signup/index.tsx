@@ -2,7 +2,6 @@ import React, {useState} from 'react';
 import {
   Pressable,
   SafeAreaView,
-  ScrollView,
   Text,
   TouchableOpacity,
   View,
@@ -51,7 +50,7 @@ function Signup({navigation}: Readonly<SignupScreenProps>) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [pass, setPass] = useState('');
-  const [confirmPass, setconfirmPass] = useState('');
+  const [confirmPass, setConfirmPass] = useState('');
   const [checked, setChecked] = useState(false);
   const [form, setForm] = useState(false);
   // functions
@@ -65,7 +64,7 @@ function Signup({navigation}: Readonly<SignupScreenProps>) {
     setPass(str);
   }
   function onChangeConfirmPass(str: string) {
-    setconfirmPass(str);
+    setConfirmPass(str);
   }
 
   async function handleSignup() {

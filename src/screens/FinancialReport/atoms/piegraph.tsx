@@ -55,26 +55,37 @@ function Piegraph({
       </Text>
     );
   }
+  const getFlexValue = () => {
+    if (transType === 'expense') {
+      if (spends.length !== 0) {
+        return 0;
+      } else {
+        return 1;
+      }
+    } else if (transType === 'income') {
+      if (incomes.length !== 0) {
+        return 0;
+      } else {
+        return 1;
+      }
+    }
+  };
+  const checkEmpty = () => {
+    if (transType === 'expense') {
+      return Number(totalSpend) !== 0;
+    } else {
+      return Number(totalIncome) !== 0;
+    }
+  };
   return (
     <View
       style={[
         styles.pieView,
         {
-          flex:
-            transType === 'expense'
-              ? spends.length !== 0
-                ? 0
-                : 1
-              : incomes.length !== 0
-              ? 0
-              : 1,
+          flex: getFlexValue(),
         },
       ]}>
-      {(
-        transType === 'expense'
-          ? Number(totalSpend) !== 0
-          : Number(totalIncome) !== 0
-      ) ? (
+      {checkEmpty() ? (
         <PieChart
           donut
           innerRadius={100}

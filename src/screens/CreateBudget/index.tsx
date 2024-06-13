@@ -1,8 +1,6 @@
 import React, {useRef, useState} from 'react';
 import {
-  KeyboardAvoidingView,
   SafeAreaView,
-  ScrollView,
   Switch,
   Text,
   TextInput,
@@ -33,11 +31,13 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
   const isEdit = route.params.isEdit;
   let selectedCategory;
   let oldBudget;
+  const x =
+    useAppSelector(state => state.user.currentUser?.budget[month]) ?? {};
   if (isEdit) {
     selectedCategory = route.params.category;
-    oldBudget = useAppSelector(
-      state => state.user.currentUser?.budget[month][selectedCategory!],
-    );
+    oldBudget = selectedCategory
+      ? x?.[selectedCategory] ?? undefined
+      : undefined;
   }
   const dispatch = useAppDispatch();
   // redux

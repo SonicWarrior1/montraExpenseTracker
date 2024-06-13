@@ -13,21 +13,26 @@ import {
 import SheetBackdrop from '../SheetBackDrop';
 import style from './styles';
 import CustomButton from '../CustomButton';
-import { useAppTheme } from '../../hooks/themeHook';
+import {useAppTheme} from '../../hooks/themeHook';
 
 function CategorySelectionSheet() {
+  // constants
   const dispatch = useAppDispatch();
   const snapPoints = useMemo(() => ['35%'], []);
+  const COLOR = useAppTheme();
+  const styles = style(COLOR);
+  // ref
   const ref = useRef<BottomSheetModal>(null);
+  // redux
   const isOpen = useAppSelector(state => state.transaction.isCatOpen);
   const selected = useAppSelector(state => state.transaction.filters.cat);
-  console.log(selected);
   const incomeCats = useAppSelector(
     state => state.user.currentUser?.incomeCategory,
   );
   const expenseCats = useAppSelector(
     state => state.user.currentUser?.expenseCategory,
   );
+
   useEffect(() => {
     if (isOpen === true) {
       ref.current?.present();
@@ -35,8 +40,7 @@ function CategorySelectionSheet() {
       ref.current?.close();
     }
   }, [isOpen]);
-  const COLOR=useAppTheme()
-  const styles=style(COLOR);
+
   return (
     <BottomSheetModalProvider>
       <BottomSheetModal
@@ -49,7 +53,7 @@ function CategorySelectionSheet() {
         }}
         backdropComponent={SheetBackdrop}
         backgroundStyle={styles.sheetBack}
-        handleIndicatorStyle={{backgroundColor:COLOR.DARK[100]}}>
+        handleIndicatorStyle={{backgroundColor: COLOR.DARK[100]}}>
         <BottomSheetView style={{paddingHorizontal: 20}}>
           <View style={styles.row}>
             {expenseCats

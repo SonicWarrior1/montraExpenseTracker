@@ -26,45 +26,58 @@ function CustomTab(props: Readonly<BottomTabBarProps>): React.JSX.Element {
 
   function handleAddBtnPress() {
     if (deg.value === '-45deg') {
-      translate1X.value = withTiming(-80);
-      translate1Y.value = withTiming(-80);
-      translate2X.value = withSequence(withTiming(-80), withTiming(0));
-      translate2Y.value = withSequence(withTiming(-80), withTiming(-120));
+      translate1X.value = withTiming(-80, {duration: 200});
+      translate1Y.value = withTiming(-80, {duration: 200});
+      translate2X.value = withSequence(
+        withTiming(-80, {duration: 200}),
+        withTiming(0, {duration: 200}),
+      );
+      translate2Y.value = withSequence(
+        withTiming(-80, {duration: 200}),
+        withTiming(-120, {duration: 200}),
+      );
       translate3X.value = withSequence(
-        withTiming(-80),
-        withTiming(0),
-        withTiming(80),
+        withTiming(-80, {duration: 200}),
+        withTiming(0, {duration: 200}),
+        withTiming(80, {duration: 200}),
       );
       translate3Y.value = withSequence(
-        withTiming(-80),
-        withTiming(-120),
-        withTiming(-80),
+        withTiming(-80, {duration: 200}),
+        withTiming(-120, {duration: 200}),
+        withTiming(-80, {duration: 200}),
       );
-      deg.value = withTiming('0deg');
+      deg.value = withTiming('0deg', {duration: 200});
       zIndex.value = 1;
     } else {
       zIndex.value = 0;
       translate3X.value = withSequence(
-        withTiming(0),
-        withTiming(-80),
-        withTiming(0),
+        withTiming(0, {duration: 200}),
+        withTiming(-80, {duration: 200}),
+        withTiming(0, {duration: 200}),
       );
       translate3Y.value = withSequence(
-        withTiming(-120),
-        withTiming(-80),
-        withTiming(0),
+        withTiming(-120, {duration: 200}),
+        withTiming(-80, {duration: 200}),
+        withTiming(0, {duration: 200}),
       );
-      translate2Y.value = withSequence(withTiming(-80), withTiming(0));
-      translate2X.value = withSequence(withTiming(-80), withTiming(0));
-      translate1Y.value = withTiming(0);
-      translate1X.value = withTiming(0);
-      deg.value = withTiming('-45deg');
+      translate2Y.value = withSequence(
+        withTiming(-80, {duration: 200}),
+        withTiming(0, {duration: 200}),
+      );
+      translate2X.value = withSequence(
+        withTiming(-80, {duration: 200}),
+        withTiming(0, {duration: 200}),
+      );
+      translate1Y.value = withTiming(0, {duration: 200});
+      translate1X.value = withTiming(0, {duration: 200});
+      deg.value = withTiming('-45deg', {duration: 200});
     }
   }
   const COLOR = useAppTheme();
   const styles = style(COLOR);
   const scheme = useColorScheme();
   const theme = useAppSelector(state => state.user.currentUser?.theme);
+  const finalTheme = theme === 'device' ? scheme : theme;
   return (
     <View style={styles.tabCtr}>
       <TabButton
@@ -131,9 +144,7 @@ function CustomTab(props: Readonly<BottomTabBarProps>): React.JSX.Element {
           {
             transform: [{translateY: -15}, {rotateZ: deg}],
             backgroundColor:
-              (theme === 'device' ? scheme : theme) === 'dark'
-                ? COLOR.LIGHT[40]
-                : COLOR.LIGHT[100],
+              finalTheme === 'dark' ? COLOR.LIGHT[40] : COLOR.LIGHT[100],
           },
         ]}>
         <Pressable style={styles.animatedBtn} onPress={handleAddBtnPress}>

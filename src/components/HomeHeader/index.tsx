@@ -1,10 +1,10 @@
 import React from 'react';
-import {COLORS} from '../../constants/commonStyles';
 import {Image, Pressable, Text, View} from 'react-native';
+import style from './styles';
+import {COLORS} from '../../constants/commonStyles';
 import {Dropdown} from 'react-native-element-dropdown';
 import {monthData, NAVIGATION, STRINGS} from '../../constants/strings';
 import {ICONS} from '../../constants/icons';
-import style from './styles';
 import {useAppSelector} from '../../redux/store';
 import {HomeScreenProps} from '../../defs/navigation';
 import {useAppTheme} from '../../hooks/themeHook';
@@ -16,9 +16,11 @@ function HomeHeader({
   props: Readonly<HomeScreenProps>;
   setMonth: React.Dispatch<React.SetStateAction<number>>;
 }>) {
+  // redux
   const notifications = useAppSelector(
     state => state.user.currentUser?.notification,
   );
+  // constants
   const COLOR = useAppTheme();
   const styles = style(COLOR);
   return (

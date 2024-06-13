@@ -43,21 +43,13 @@ function TransactionList({
   if (sort) {
     listData.reverse();
   }
+
   return (
     <FlatList
       style={{paddingHorizontal: 20}}
       data={listData}
       scrollEnabled={false}
-      ListEmptyComponent={() => {
-        return (
-          <View style={{justifyContent: 'center', alignItems: 'center'}}>
-            <Text
-              style={styles.emptyText}>
-              No Transactions for this Month
-            </Text>
-          </View>
-        );
-      }}
+      ListEmptyComponent={ListEmptyComponent}
       renderItem={({item}) => {
         return (
           <Pressable style={styles.listItemCtr}>
@@ -126,3 +118,13 @@ function TransactionList({
 }
 
 export default TransactionList;
+
+const ListEmptyComponent = () => {
+  const COLOR = useAppTheme();
+  const styles = style(COLOR);
+  return (
+    <View style={{justifyContent: 'center', alignItems: 'center'}}>
+      <Text style={styles.emptyText}>No Transactions for this Month</Text>
+    </View>
+  );
+};

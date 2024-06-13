@@ -1,10 +1,8 @@
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {
   Dimensions,
-  Image,
   Pressable,
   SafeAreaView,
-  ScrollView,
   Switch,
   Text,
   TextInput,
@@ -20,7 +18,10 @@ import {ICONS} from '../../constants/icons';
 import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import FilePickerSheet from '../../components/FilePickerSheet';
 import RepeatTransactionSheet from '../../components/RepeatTranscationSheet';
-import firestore, {Timestamp} from '@react-native-firebase/firestore';
+import firestore, {
+  FirebaseFirestoreTypes,
+  Timestamp,
+} from '@react-native-firebase/firestore';
 import {
   currencies,
   monthData,
@@ -51,6 +52,7 @@ import {
 } from '../../utils/firebase';
 import {useAppTheme} from '../../hooks/themeHook';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import AttachementContainer from './atoms/attachementContainer';
 
 function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
   // constants
@@ -64,12 +66,16 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
     console.log(transaction);
   }
   const month = new Date().getMonth();
-  const backgroundColor =
-    pageType === 'expense'
-      ? COLORS.PRIMARY.RED
-      : pageType === 'transfer'
-      ? COLORS.PRIMARY.BLUE
-      : COLORS.PRIMARY.GREEN;
+  const getBackgroundColor = useMemo(() => {
+    if (pageType === 'expense') {
+      return COLORS.PRIMARY.RED;
+    } else if (pageType === 'transfer') {
+      return COLORS.PRIMARY.BLUE;
+    } else {
+      return COLORS.PRIMARY.GREEN;
+    }
+  }, [pageType]);
+  const backgroundColor = getBackgroundColor;
   const dispatch = useAppDispatch();
   useEffect(() => {
     navigation.setOptions({
@@ -129,6 +135,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
     let attachement = '';
     let attachementType: transactionType['attachementType'] = 'none';
     if (image !== '') {
+      console.log('IMAGE', image);
       attachement = image!;
       attachementType = 'image';
     } else if (doc) {
@@ -138,6 +145,128 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
     return {attachement, attachementType};
   }, [image, doc]);
 
+  const handleEditTransaction = async ({
+    trans,
+    transaction,
+    uid,
+    curr,
+    amount,
+    category,
+    conversion,
+    currency,
+    month,
+  }: {
+    trans: transactionType;
+    transaction: transactionType | undefined;
+    uid: string;
+    curr: FirebaseFirestoreTypes.DocumentSnapshot<FirebaseFirestoreTypes.DocumentData>;
+    amount: string;
+    category: string;
+    conversion: {
+      [key: string]: {
+        [key: string]: number;
+      };
+    };
+    currency: string | undefined;
+    month: number;
+  }) => {
+    await updateTransaction({
+      trans: trans,
+      transId: transaction?.id!,
+      uid: uid,
+    });
+    if (pageType === 'expense') {
+      await handleExpenseUpdate({
+        curr: curr,
+        amount: Number(amount),
+        category: category,
+        conversion: conversion,
+        currency: currency!,
+        month: month,
+        transaction: transaction!,
+        uid: uid,
+      });
+      const totalSpent =
+        UserFromJson(curr.data() as UserType)?.spend?.[month]?.[category] ??
+        0 - transaction!.amount + Number(amount);
+      await handleNotify({
+        curr: curr,
+        totalSpent: totalSpent,
+        category: category,
+        month: month,
+        uid: uid,
+      });
+    } else if (pageType === 'income') {
+      await handleIncomeUpdate({
+        curr: curr,
+        amount: Number(amount),
+        category: category,
+        conversion: conversion,
+        currency: currency!,
+        month: month,
+        transaction: transaction!,
+        uid: uid,
+      });
+    }
+  };
+  const handleNewTransaction = async ({
+    trans,
+    uid,
+    curr,
+    amount,
+    category,
+    conversion,
+    currency,
+    month,
+    id,
+  }: {
+    trans: transactionType;
+    uid: string;
+    curr: FirebaseFirestoreTypes.DocumentSnapshot<FirebaseFirestoreTypes.DocumentData>;
+    amount: string;
+    category: string;
+    conversion: {
+      [key: string]: {
+        [key: string]: number;
+      };
+    };
+    currency: string | undefined;
+    month: number;
+    id: string;
+  }) => {
+    await addNewTransaction({id: id, trans: trans, uid: uid});
+    if (pageType === 'expense') {
+      await handleNewExpense({
+        curr: curr,
+        amount: Number(amount),
+        category: category,
+        conversion: conversion,
+        currency: currency!,
+        month: month,
+        uid: uid,
+      });
+      const totalSpent =
+        (UserFromJson(curr.data() as UserType)?.spend[month]?.[category] ?? 0) +
+        Number(amount);
+      await handleNotify({
+        curr: curr,
+        totalSpent: totalSpent,
+        category: category,
+        month: month,
+        uid: uid,
+      });
+    } else if (pageType === 'income') {
+      await handleNewIncome({
+        curr: curr,
+        amount: Number(amount),
+        category: category,
+        conversion: conversion,
+        currency: currency!,
+        month: month,
+        uid: uid,
+      });
+    }
+  };
   const handlePress = useCallback(async () => {
     setFormKey(true);
     if (pageType === 'transfer' && (from === '' || to === '')) {
@@ -159,6 +288,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
         id: id,
         uid: uid!,
       });
+      console.log(repeatData, 'sdjufndsjhfbdshjfbsdjfbnsdjkfnb');
       const trans = createTransaction({
         id: id,
         url: url,
@@ -177,79 +307,30 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
         from: from,
         to: to,
       });
-
       if (isEdit) {
-        await updateTransaction({
+        handleEditTransaction({
           trans: trans,
-          transId: transaction?.id!,
+          transaction: transaction,
           uid: uid!,
+          amount: amount,
+          category: category,
+          conversion: conversion,
+          curr: curr,
+          currency: currency,
+          month: month,
         });
-        if (pageType === 'expense') {
-          await handleExpenseUpdate({
-            curr: curr,
-            amount: Number(amount),
-            category: category,
-            conversion: conversion,
-            currency: currency!,
-            month: month,
-            transaction: transaction!,
-            uid: uid!,
-          });
-          const totalSpent =
-            UserFromJson(curr.data() as UserType)?.spend?.[month]?.[category] ??
-            0 - transaction!.amount + Number(amount);
-          await handleNotify({
-            curr: curr,
-            totalSpent: totalSpent,
-            category: category,
-            month: month,
-            uid: uid!,
-          });
-        } else if (pageType === 'income') {
-          await handleIncomeUpdate({
-            curr: curr,
-            amount: Number(amount),
-            category: category,
-            conversion: conversion,
-            currency: currency!,
-            month: month,
-            transaction: transaction!,
-            uid: uid!,
-          });
-        }
       } else {
-        await addNewTransaction({id: id, trans: trans, uid: uid!});
-        if (pageType === 'expense') {
-          await handleNewExpense({
-            curr: curr,
-            amount: Number(amount),
-            category: category,
-            conversion: conversion,
-            currency: currency!,
-            month: month,
-            uid: uid!,
-          });
-          const totalSpent =
-            (UserFromJson(curr.data() as UserType)?.spend[month]?.[category] ??
-              0) + Number(amount);
-          await handleNotify({
-            curr: curr,
-            totalSpent: totalSpent,
-            category: category,
-            month: month,
-            uid: uid!,
-          });
-        } else if (pageType === 'income') {
-          await handleNewIncome({
-            curr: curr,
-            amount: Number(amount),
-            category: category,
-            conversion: conversion,
-            currency: currency!,
-            month: month,
-            uid: uid!,
-          });
-        }
+        handleNewTransaction({
+          trans: trans,
+          uid: uid!,
+          amount: amount,
+          category: category,
+          conversion: conversion,
+          curr: curr,
+          currency: currency,
+          month: month,
+          id: id,
+        });
       }
       Toast.show({
         text1: 'Transaction has been Added Succesfully',
@@ -260,8 +341,37 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
     } catch (e) {
       dispatch(setLoading(false));
     }
-  }, [pageType, amount, category, wallet, from, to]);
-
+  }, [
+    pageType,
+    amount,
+    category,
+    wallet,
+    from,
+    to,
+    repeatData,
+    image,
+    doc,
+    desc,
+    conversion,
+    currency,
+    isEdit,
+    pageType,
+    transaction,
+    uid,
+  ]);
+  const getDate = useCallback(() => {
+    if (repeatData) {
+      if (isEdit) {
+        if ((repeatData.date as Timestamp)?.seconds !== undefined) {
+          return (repeatData.date as Timestamp).toDate().toLocaleDateString();
+        } else {
+          return (repeatData.date as Date)?.toLocaleDateString();
+        }
+      } else {
+        return (repeatData.date as Date)?.toLocaleDateString();
+      }
+    }
+  }, [isEdit, repeatData]);
   return (
     <>
       <KeyboardAwareScrollView
@@ -416,55 +526,15 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
               formKey={formKey}
             />
           )}
-          {image === '' && doc === undefined ? (
-            <Pressable
-              style={styles.attachementCtr}
-              onPress={() => {
-                setZindex(0);
-                filePickSheetRef.current?.present();
-              }}>
-              {ICONS.Attachment({
-                height: 25,
-                width: 25,
-                color: COLOR.DARK[100],
-              })}
-              <Text style={styles.attachementText}>
-                {STRINGS.AddAttachement}
-              </Text>
-            </Pressable>
-          ) : doc === undefined ? (
-            <View>
-              <Pressable
-                onPress={() => {
-                  setImage('');
-                }}
-                style={[styles.closeIcon, {left: 90, zIndex: zindex}]}>
-                {ICONS.Close({height: 20, width: 20})}
-              </Pressable>
-              <Image
-                source={{uri: image}}
-                height={110}
-                width={110}
-                style={{borderRadius: 10}}
-              />
-            </View>
-          ) : (
-            <View>
-              <Pressable
-                onPress={() => {
-                  setDoc(undefined);
-                }}
-                style={[styles.closeIcon, {left: 100, zIndex: zindex}]}>
-                {ICONS.Close({height: 20, width: 20})}
-              </Pressable>
-              <Pressable
-                style={[styles.sheetBtn, {paddingHorizontal: 10}]}
-                onPress={() => {}}>
-                {ICONS.Document({height: 30, width: 30})}
-                <Text style={styles.sheetBtnText}>{doc.name}</Text>
-              </Pressable>
-            </View>
-          )}
+          <AttachementContainer
+            doc={doc}
+            filePickSheetRef={filePickSheetRef}
+            image={image!}
+            setDoc={setDoc}
+            setImage={setImage}
+            setZindex={setZindex}
+            zindex={zindex}
+          />
           <Sapcer height={20} />
           {pageType !== 'transfer' && (
             <View style={styles.flexRow}>
@@ -514,15 +584,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
               {repeatData.end === 'date' && (
                 <View>
                   <Text style={styles.flexRowText1}>{STRINGS.EndAfter}</Text>
-                  <Text style={styles.flexRowText2}>
-                    {isEdit
-                      ? (repeatData.date as Timestamp)?.seconds !== undefined
-                        ? (repeatData.date as Timestamp)
-                            .toDate()
-                            .toLocaleDateString()
-                        : (repeatData.date as Date)?.toLocaleDateString()
-                      : (repeatData.date as Date)?.toLocaleDateString()}
-                  </Text>
+                  <Text style={styles.flexRowText2}>{getDate()}</Text>
                 </View>
               )}
               <Pressable

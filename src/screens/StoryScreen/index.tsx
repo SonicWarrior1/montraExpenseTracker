@@ -1,4 +1,10 @@
-import {Dimensions, SafeAreaView, Text, TouchableOpacity, View} from 'react-native';
+import {
+  Dimensions,
+  SafeAreaView,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import React, {useState} from 'react';
 import {COLORS} from '../../constants/commonStyles';
 import style from './styles';
@@ -41,17 +47,36 @@ export default function StoryScreen({navigation}: Readonly<StoryScreenProps>) {
   // state
   const [index, setIndex] = useState(0);
 
+  const getBackgroundColor = () => {
+    if (index === 0) {
+      return COLORS.RED[100];
+    } else if (index === 1) {
+      return COLORS.GREEN[100];
+    } else {
+      return COLORS.VIOLET[100];
+    }
+  };
+
+  const getText = () => {
+    if (index === 0) {
+      return STRINGS.YouSpend;
+    } else if (index === 1) {
+      return STRINGS.YouEarned;
+    } else if (index === 2) {
+      return (
+        (budgetExceed === undefined ? 0 : budgetExceed.length) +
+        STRINGS.BudgetLimitExceed
+      );
+    } else {
+      return STRINGS.Quote;
+    }
+  };
   return (
     <SafeAreaView
       style={[
         styles.safeView,
         {
-          backgroundColor:
-            index === 0
-              ? COLORS.RED[100]
-              : index === 1
-              ? COLORS.GREEN[100]
-              : COLORS.VIOLET[100],
+          backgroundColor: getBackgroundColor(),
         },
       ]}>
       <View style={styles.progressRow}>
@@ -99,14 +124,7 @@ export default function StoryScreen({navigation}: Readonly<StoryScreenProps>) {
                 marginTop: index === 3 ? 150 : 0,
               },
             ]}>
-            {index === 0
-              ? STRINGS.YouSpend
-              : index === 1
-              ? STRINGS.YouEarned
-              : index === 2
-              ? (budgetExceed === undefined ? 0 : budgetExceed.length) +
-                STRINGS.BudgetLimitExceed
-              : STRINGS.Quote}
+            {getText()}
           </Text>
           {index === 3 && (
             <Text style={styles.text2}>{STRINGS.QuoteAuthor}</Text>

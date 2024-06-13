@@ -6,6 +6,7 @@
         "encryption",
         "Theme",
         "Transfer",
-        "Internet"
+        "Internet",
+        "SonarQube"
     ]
 }

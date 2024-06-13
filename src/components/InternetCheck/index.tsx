@@ -1,11 +1,13 @@
 import React from 'react';
 import {Text, View} from 'react-native';
 import styles from './styles';
-import {useNetInfo} from '@react-native-community/netinfo';
 import {useAppTheme} from '../../hooks/themeHook';
 import { STRINGS } from '../../constants/strings';
+// Third Party Libraries
+import {useNetInfo} from '@react-native-community/netinfo';
 
 function InternetCheck({children}: Readonly<{children: React.JSX.Element}>) {
+  // constants
   const {isConnected} = useNetInfo();
   const COLOR = useAppTheme();
   return !isConnected ? (

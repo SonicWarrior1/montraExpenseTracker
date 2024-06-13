@@ -1,10 +1,11 @@
 import React from 'react';
 import {ActivityIndicator, View} from 'react-native';
-import {useAppSelector} from '../../redux/store';
 import styles from './styles';
+import {useAppSelector} from '../../redux/store';
 import { COLORS } from '../../constants/commonStyles';
 
 function Loader({children}: Readonly<{children: React.JSX.Element}>) {
+  // redux
   const isLoading = useAppSelector(state => state.user.loading);
   return isLoading ? (
     <>
