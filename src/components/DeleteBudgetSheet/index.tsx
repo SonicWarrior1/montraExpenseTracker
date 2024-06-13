@@ -3,7 +3,7 @@ import {
   BottomSheetModalProvider,
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
-import React, {useCallback, useMemo} from 'react';
+import React, {useMemo} from 'react';
 import {Text, View} from 'react-native';
 import CustomButton from '../CustomButton';
 import {useAppDispatch, useAppSelector} from '../../redux/store';

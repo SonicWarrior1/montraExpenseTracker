@@ -1,16 +1,17 @@
-import {BottomSheetModal, BottomSheetView} from '@gorhom/bottom-sheet';
 import React, {useMemo, useState} from 'react';
 import {Pressable, View} from 'react-native';
+import style from './styles';
 import CustomDropdown from '../CustomDropDown';
-import DatePicker from 'react-native-date-picker';
 import CustomButton from '../CustomButton';
-import {BottomSheetModalMethods} from '@gorhom/bottom-sheet/lib/typescript/types';
 import CustomInput from '../CustomInput';
 import {monthData, STRINGS, weekData} from '../../constants/strings';
 import {repeatDataType} from '../../defs/transaction';
-import style from './styles';
 import SheetBackdrop from '../SheetBackDrop';
-import { useAppTheme } from '../../hooks/themeHook';
+import {useAppTheme} from '../../hooks/themeHook';
+// Third party Libraries
+import {BottomSheetModalMethods} from '@gorhom/bottom-sheet/lib/typescript/types';
+import DatePicker from 'react-native-date-picker';
+import {BottomSheetModal, BottomSheetView} from '@gorhom/bottom-sheet';
 
 function RepeatTransactionSheet({
   bottomSheetModalRef,
@@ -21,6 +22,7 @@ function RepeatTransactionSheet({
     React.SetStateAction<repeatDataType | undefined>
   >;
 }>) {
+  // state
   const [freq, setFreq] = useState<'yearly' | 'monthly' | 'weekly' | 'daily'>();
   const [month, setMonth] = useState(1);
   const [day, setDay] = useState(1);
@@ -28,10 +30,12 @@ function RepeatTransactionSheet({
   const [end, setEnd] = useState<'date' | 'never'>();
   const [date, setDate] = useState<Date>(new Date());
   const [isDateOpen, setIsDateOpen] = useState(false);
-
+  // constants
   const snapPoints = useMemo(() => ['40%'], []);
-
   const year = new Date().getFullYear();
+  const COLOR = useAppTheme();
+  const styles = style(COLOR);
+  // functions
   const generateDaysInYear = useMemo(() => {
     const daysInYear = [];
     for (let month = 1; month <= 12; month++) {
@@ -57,8 +61,6 @@ function RepeatTransactionSheet({
     return daysInYear;
   }, [year]);
   const daysInYear = generateDaysInYear;
-  const COLOR = useAppTheme();
-  const styles = style(COLOR);
   return (
     <BottomSheetModal
       enablePanDownToClose
@@ -67,7 +69,7 @@ function RepeatTransactionSheet({
       snapPoints={snapPoints}
       backdropComponent={SheetBackdrop}
       backgroundStyle={styles.sheetBack}
-      handleIndicatorStyle={{backgroundColor:COLOR.DARK[100]}}>
+      handleIndicatorStyle={{backgroundColor: COLOR.DARK[100]}}>
       <BottomSheetView style={styles.sheetView}>
         <View style={styles.flexRow}>
           <View style={styles.flex}>

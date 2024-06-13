@@ -30,11 +30,30 @@ function BudgetScreen({navigation}: Readonly<BudgetScreenProps>) {
   const conversion = useAppSelector(state => state.transaction.conversion);
   const spend =
     useAppSelector(state => state.user.currentUser?.spend[month]) ?? {};
-  // functions 
+  // functions
   const getMyColor = useCallback(() => {
     let n = (Math.random() * 0xfffff * 1000000).toString(16);
     return '#' + n.slice(0, 6);
   }, []);
+  const getValue = (
+    val: {
+      alert: boolean;
+      limit: number;
+      percentage: number;
+    },
+    key: string,
+  ) => {
+    if (val.limit - spend[key] < 0) {
+      return '0';
+    } else if (spend[key] === undefined) {
+      return (conversion.usd[currency!.toLowerCase()] * val.limit).toFixed(1);
+    } else {
+      return (
+        conversion.usd[currency!.toLowerCase()] * val.limit -
+        (spend[key] ?? 0)
+      ).toFixed(1);
+    }
+  };
   return (
     <View style={styles.safeView}>
       <Sapcer height={30} />
@@ -123,16 +142,7 @@ function BudgetScreen({navigation}: Readonly<BudgetScreenProps>) {
                   </View>
                   <Text style={styles.text1}>
                     Remaining {currencies[currency!].symbol}
-                    {val.limit - spend[key] < 0
-                      ? '0'
-                      : spend[key] === undefined
-                      ? (
-                          conversion.usd[currency!.toLowerCase()] * val.limit
-                        ).toFixed(1)
-                      : (
-                          conversion.usd[currency!.toLowerCase()] * val.limit -
-                          (spend[key] ?? 0)
-                        ).toFixed(1)}
+                    {getValue(val, key)}
                   </Text>
                   <Bar
                     progress={(spend[key] ?? 0) / val.limit}

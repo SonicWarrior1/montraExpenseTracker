@@ -176,9 +176,19 @@ export const STRINGS = {
     WhatExport: 'What data do your want to export?',
     SureLogout: 'Are you sure do you wanna logout?',
     NoInternetAccess: 'No Internet Access',
-    CheckInternet: 'Please check your internet connection'
+    CheckInternet: 'Please check your internet connection',
+    PasswordDoNotMatch: 'Password do not match',
+    ConfirmPasswordCannotBeEmpty: 'Confirm Password cannot be Empty',
+    PasswordNotValid: "Password must contain atleast 1 Uppercase, 1 Lowercase, 1 Numeric and 1 Symbol Character",
+    PasswordCannotBeEmpty: "Password cannot be Empty",
+    EmailIsNotValid: "Email is not Valid",
+    EmailCannotBeEmpty: "Email cannot be Empty",
+    NameIsNotValid: "Name is not Valid",
+    NameCannotBeEmpty: "Name cannot be Empty",
+    NoRecentTransactions: "No Recent Transactions"
 };
-export const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w]{1,}$/;
+
+export const emailRegex = /^[a-zA-Z0-9_-]+@([a-zA-Z0-9-]+\.)+[a-zA-Z0-9]+$/;;
 export const nameRegex = /^[a-zA-Z ]*$/;
 export const passRegex =
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;

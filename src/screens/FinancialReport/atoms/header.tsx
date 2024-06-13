@@ -4,7 +4,6 @@ import {ICONS} from '../../../constants/icons';
 import {Dropdown} from 'react-native-element-dropdown';
 import style from '../styles';
 import {monthData, STRINGS} from '../../../constants/strings';
-import {COLORS} from '../../../constants/commonStyles';
 import {useAppTheme} from '../../../hooks/themeHook';
 
 function FinancialReportHeader({

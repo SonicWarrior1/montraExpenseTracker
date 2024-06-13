@@ -2,11 +2,6 @@ import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {Pressable, Text, View} from 'react-native';
 import {ICONS} from '../../constants/icons';
 import CustomButton from '../CustomButton';
-import {
-  BottomSheetModal,
-  BottomSheetModalProvider,
-  BottomSheetView,
-} from '@gorhom/bottom-sheet';
 import style from './styles';
 import {useAppDispatch, useAppSelector} from '../../redux/store';
 import {
@@ -19,12 +14,27 @@ import {
 import SheetBackdrop from '../SheetBackDrop';
 import {STRINGS} from '../../constants/strings';
 import {useAppTheme} from '../../hooks/themeHook';
+// Third Party Libraries
+import {
+  BottomSheetModal,
+  BottomSheetModalProvider,
+  BottomSheetView,
+} from '@gorhom/bottom-sheet';
 
 function FilterSheet() {
+  // constants
   const snapPoints = useMemo(() => ['64%'], []);
+  const dispatch = useAppDispatch();
+  const COLOR = useAppTheme();
+  const styles = style(COLOR);
+  // ref
   const ref = useRef<BottomSheetModal>(null);
+  // redux
   const isOpen = useAppSelector(state => state.transaction.isFilterOpen);
   const selectedCats = useAppSelector(state => state.transaction.filters.cat);
+  // state
+  const [filter, setFilter] = useState(-1);
+  const [sort, setSort] = useState(-1);
   useEffect(() => {
     if (isOpen === true) {
       ref.current?.present();
@@ -32,11 +42,7 @@ function FilterSheet() {
       ref.current?.close();
     }
   }, [isOpen]);
-  const [filter, setFilter] = useState(-1);
-  const [sort, setSort] = useState(-1);
-  const dispatch = useAppDispatch();
-  const COLOR = useAppTheme();
-  const styles = style(COLOR);
+
   return (
     <BottomSheetModalProvider>
       <BottomSheetModal
@@ -131,7 +137,7 @@ function FilterSheet() {
             style={[
               styles.text1,
               {
-                marginVertical: 15
+                marginVertical: 15,
               },
             ]}>
             {STRINGS.SortBy}
@@ -240,7 +246,7 @@ function FilterSheet() {
                 height: 25,
                 width: 25,
                 color: COLOR.VIOLET[100],
-                borderColor:COLOR.VIOLET[100]
+                borderColor: COLOR.VIOLET[100],
               })}
             </Pressable>
           </View>

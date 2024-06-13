@@ -1,13 +1,14 @@
 import React from 'react';
 import {Pressable, Text, View} from 'react-native';
-import {ICONS} from '../../constants/icons';
-import {Dropdown} from 'react-native-element-dropdown';
 import style from './styles';
+import {ICONS} from '../../constants/icons';
 import {useAppDispatch, useAppSelector} from '../../redux/store';
 import {openFilterSheet} from '../../redux/reducers/transactionSlice';
 import {monthData, STRINGS} from '../../constants/strings';
 import {useAppTheme} from '../../hooks/themeHook';
 import {COLORS} from '../../constants/commonStyles';
+// Third party Libraries
+import {Dropdown} from 'react-native-element-dropdown';
 
 function TransactionHeader({
   month,
@@ -16,12 +17,12 @@ function TransactionHeader({
   month: number;
   setMonth: React.Dispatch<React.SetStateAction<number>>;
 }>) {
+  // constants
   const dispatch = useAppDispatch();
   const COLOR = useAppTheme();
   const styles = style(COLOR);
   // redux
   const filters = useAppSelector(state => state.transaction.filters);
-
   return (
     <View style={styles.header}>
       <Dropdown

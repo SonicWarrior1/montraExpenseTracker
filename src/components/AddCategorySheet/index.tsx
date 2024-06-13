@@ -1,4 +1,4 @@
-import React, {useCallback, useMemo, useState} from 'react';
+import React, {useMemo, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux/store';
 import {
   BottomSheetModal,
@@ -6,7 +6,6 @@ import {
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import {BottomSheetModalMethods} from '@gorhom/bottom-sheet/lib/typescript/types';
-import CustomInput from '../CustomInput';
 import CustomButton from '../CustomButton';
 import Sapcer from '../Spacer';
 import firestore from '@react-native-firebase/firestore';
@@ -30,6 +29,7 @@ function AddCategorySheet({
   bottomSheetModalRef: React.RefObject<BottomSheetModalMethods>;
   type: transactionType['type'];
 }>) {
+  // redux
   const uid = useAppSelector(state => state.user.currentUser?.uid);
   const expenseCats = useAppSelector(
     state => state.user.currentUser?.expenseCategory,
@@ -37,23 +37,28 @@ function AddCategorySheet({
   const incomeCats = useAppSelector(
     state => state.user.currentUser?.incomeCategory,
   );
+  // constants
   const dispatch = useAppDispatch();
   const snapPoints = useMemo(() => ['25%'], []);
+  const COLOR = useAppTheme();
+  const styles = style(COLOR);
+  // state
   const [category, setCategory] = useState('');
+  // functions
   const onPress = async () => {
     const userDoc = firestore().collection('users').doc(uid);
     if (category !== '') {
       dispatch(setLoading(true));
       try {
         if (type === 'expense') {
-          await dispatch(addExpenseCategory(category));
+          dispatch(addExpenseCategory(category));
           await userDoc.update({
             expenseCategory: [...expenseCats!, category].map(item =>
               encrypt(item, uid!),
             ),
           });
         } else if (type === 'income') {
-          await dispatch(addIncomeCategory(category));
+          dispatch(addIncomeCategory(category));
           await userDoc.update({
             incomeCategory: [...incomeCats!, category].map(item =>
               encrypt(item, uid!),
@@ -68,8 +73,7 @@ function AddCategorySheet({
       }
     }
   };
-  const COLOR = useAppTheme();
-  const styles = style(COLOR);
+
   return (
     <BottomSheetModal
       enablePanDownToClose

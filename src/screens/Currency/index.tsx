@@ -1,5 +1,5 @@
 import React from 'react';
-import {FlatList, Pressable, SafeAreaView, Text, View} from 'react-native';
+import {FlatList, Pressable, SafeAreaView, Text} from 'react-native';
 import {currencies} from '../../constants/strings';
 import BouncyCheckbox from 'react-native-bouncy-checkbox/build/dist/BouncyCheckbox';
 import {useAppSelector} from '../../redux/store';

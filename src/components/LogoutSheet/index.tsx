@@ -3,7 +3,7 @@ import {
   BottomSheetModalProvider,
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
-import React, {useEffect, useMemo, useRef} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef} from 'react';
 import {Text, View} from 'react-native';
 import CustomButton from '../CustomButton';
 import {useAppDispatch, useAppSelector} from '../../redux/store';
@@ -26,6 +26,16 @@ function LogoutSheet() {
   const ref = useRef<BottomSheetModalMethods>(null);
   // redux
   const isOpen = useAppSelector(state => state.transaction.isLogoutOpen);
+  // functions
+  const onLogout = useCallback(async () => {
+    try {
+      await auth().signOut();
+      dispatch(userLoggedIn(undefined));
+      dispatch(openLogoutSheet(false));
+    } catch (e) {
+      console.log(e);
+    }
+  }, []);
   useEffect(() => {
     if (isOpen === true) {
       ref.current?.present();
@@ -61,18 +71,7 @@ function LogoutSheet() {
               />
             </View>
             <View style={styles.flex}>
-              <CustomButton
-                title={STRINGS.Yes}
-                onPress={async () => {
-                  try {
-                    await auth().signOut();
-                    dispatch(userLoggedIn(undefined));
-                    dispatch(openLogoutSheet(false));
-                  } catch (e) {
-                    console.log(e);
-                  }
-                }}
-              />
+              <CustomButton title={STRINGS.Yes} onPress={onLogout} />
             </View>
           </View>
         </BottomSheetView>

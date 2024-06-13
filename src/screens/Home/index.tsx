@@ -20,6 +20,7 @@ import Graph from './atoms/graph';
 // Third Party Libraries
 import {Timestamp} from '@react-native-firebase/firestore';
 import LinearGradient from 'react-native-linear-gradient';
+import {transactionType} from '../../defs/transaction';
 
 function Home({navigation, route}: Readonly<HomeScreenProps>) {
   const [month, setMonth] = useState(new Date().getMonth());
@@ -45,26 +46,40 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
   const COLOR = useAppTheme();
   const styles = style(COLOR);
   const scheme = useColorScheme();
-
+  const finalTheme = theme === 'device' ? scheme : theme;
+  const getAmtColor = (item: transactionType) => {
+    if (item.type === 'expense') {
+      return COLORS.PRIMARY.RED;
+    } else if (item.type === 'income') {
+      return COLORS.PRIMARY.GREEN;
+    } else {
+      return COLORS.PRIMARY.BLUE;
+    }
+  };
+  const getAmtSymbol = (item: transactionType) => {
+    if (item.type === 'expense') {
+      return '-';
+    } else if (item.type === 'income') {
+      return '+';
+    } else {
+      return '';
+    }
+  };
   return (
     <ScrollView
       style={{
         backgroundColor:
-          (theme === 'device' ? scheme : theme) === 'light'
-            ? COLORS.LIGHT[100]
-            : COLORS.DARK[75],
+          finalTheme === 'light' ? COLORS.LIGHT[100] : COLORS.DARK[75],
       }}
       contentContainerStyle={[
         {
           backgroundColor:
-            (theme === 'device' ? scheme : theme) === 'light'
-              ? COLORS.LIGHT[100]
-              : COLORS.DARK[75],
+            finalTheme === 'light' ? COLORS.LIGHT[100] : COLORS.DARK[75],
         },
       ]}>
       <LinearGradient
         colors={
-          (theme === 'device' ? scheme : theme) === 'light'
+          finalTheme === 'light'
             ? ['#FFF6E5', '#F8EDD830']
             : ['#F8EDD860', '#23222030']
         }
@@ -178,11 +193,7 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
 
         <FlatList
           style={{paddingHorizontal: 20}}
-          ListEmptyComponent={() => (
-            <View style={{justifyContent: 'center', alignItems: 'center'}}>
-              <Text style={styles.emptyText}> No Recent Transactions</Text>
-            </View>
-          )}
+          ListEmptyComponent={ListEmptyComponent}
           data={Object.values(data)
             .filter(item => {
               return (
@@ -244,20 +255,11 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
                       styles.listtext1,
                       {
                         fontWeight: '600',
-                        color:
-                          item.type === 'expense'
-                            ? COLORS.PRIMARY.RED
-                            : item.type === 'income'
-                            ? COLORS.PRIMARY.GREEN
-                            : COLORS.PRIMARY.BLUE,
+                        color: getAmtColor(item),
                       },
                     ]}>
-                    {item.type === 'expense'
-                      ? '-'
-                      : item.type === 'income'
-                      ? '+'
-                      : ''}{' '}
-                    {currencies[currency].symbol}{' '}
+                    {getAmtSymbol(item)}{' '}
+                    {currencies[currency].symbol}
                     {(
                       (conversion?.usd?.[currency.toLowerCase()] ?? 1) *
                       item.amount
@@ -290,3 +292,13 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
 }
 
 export default Home;
+
+function ListEmptyComponent() {
+  const COLOR = useAppTheme();
+  const styles = style(COLOR);
+  return (
+    <View style={{justifyContent: 'center', alignItems: 'center'}}>
+      <Text style={styles.emptyText}>{STRINGS.NoRecentTransactions}</Text>
+    </View>
+  );
+}

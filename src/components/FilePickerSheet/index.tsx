@@ -1,7 +1,6 @@
 import {BottomSheetModal, BottomSheetView} from '@gorhom/bottom-sheet';
 import React, {useCallback, useMemo} from 'react';
-import {iconProps, ICONS} from '../../constants/icons';
-import {Pressable, Text} from 'react-native';
+import {ICONS} from '../../constants/icons';
 import {pickSingle} from 'react-native-document-picker';
 import {
   ImageLibraryOptions,
@@ -35,7 +34,11 @@ function FilePickerSheet({
   >;
   onDismiss?: () => void;
 }>) {
+  // constants
   const snapPoints = useMemo(() => ['25%'], []);
+  const COLOR = useAppTheme();
+  const styles = style(COLOR);
+  // functions
   const openImagePicker = useCallback(async () => {
     const options: ImageLibraryOptions = {
       mediaType: 'photo',
@@ -77,8 +80,7 @@ function FilePickerSheet({
       console.log(e);
     }
   }, []);
-  const COLOR = useAppTheme();
-  const styles = style(COLOR);
+  
   return (
     <BottomSheetModal
       enablePanDownToClose

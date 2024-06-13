@@ -1,7 +1,7 @@
 import React, {useCallback, useState} from 'react';
 import {Platform, SafeAreaView, Text, View} from 'react-native';
 import style from './styles';
-import {useAppSelector} from '../../redux/store';
+import {useAppDispatch, useAppSelector} from '../../redux/store';
 import {monthData, STRINGS, weekData} from '../../constants/strings';
 import CustomDropdown from '../../components/CustomDropDown';
 import CustomButton from '../../components/CustomButton';
@@ -13,15 +13,18 @@ import {jsonToCSV} from 'react-native-csv';
 import ReactNativeBlobUtil from 'react-native-blob-util';
 import uuid from 'react-native-uuid';
 import Toast from 'react-native-toast-message';
+import {setLoading} from '../../redux/reducers/userSlice';
 function ExportData() {
   // redux
   const data = useAppSelector(state => state.transaction.transactions);
+  const dispatch = useAppDispatch();
   // state
   const [dataType, setDataType] = useState<'all' | 'expense' | 'income'>('all');
   const [dataRange, setDataRange] = useState<7 | 15 | 30>(7);
   const [dataFormat, setDataFormat] = useState<'csv' | 'pdf'>('csv');
   // functions
   const handleExport = useCallback(async () => {
+    dispatch(setLoading(true));
     const daysAgo = new Date();
     daysAgo.setDate(daysAgo.getDate() - dataRange);
     const x = jsonToCSV(
@@ -32,19 +35,21 @@ function ExportData() {
             (dataType === 'all' ? true : dataType === item.type),
         )
         .map(val => {
+          let frequency = '';
+          if (val.freq?.freq === 'yearly') {
+            frequency = val.freq.day! + monthData[val.freq.month!].label;
+          } else if (val.freq?.freq === 'monthly') {
+            frequency = String(val.freq.day);
+          } else if (val.freq?.freq === 'weekly') {
+            frequency = weekData[val.freq.weekDay].label;
+          }
           return {
             ...val,
             timeStamp: val.timeStamp.toDate(),
             freq:
               (val.freq?.freq ?? 'never') +
               ' ' +
-              (val.freq?.freq === 'yearly'
-                ? val.freq.day! + monthData[val.freq.month!].label
-                : val.freq?.freq === 'monthly'
-                ? val.freq.day
-                : val.freq?.freq === 'weekly'
-                ? weekData[val.freq.weekDay].label
-                : '') +
+              frequency +
               ' ' +
               (val.freq?.end !== undefined && val.freq.end === 'date'
                 ? ',end - ' + (val.freq.date as Timestamp).toDate()
@@ -64,8 +69,10 @@ function ExportData() {
       } else {
         Toast.show({text1: 'File Downloaded'});
       }
+      dispatch(setLoading(false));
     } catch (e) {
       console.log(e);
+      dispatch(setLoading(false));
     }
   }, [data, dataRange, dataType]);
   // constants

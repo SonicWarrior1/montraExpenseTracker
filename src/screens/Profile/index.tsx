@@ -11,12 +11,10 @@ import style from './styles';
 import {ProfileScreenProps} from '../../defs/navigation';
 import {NAVIGATION, STRINGS} from '../../constants/strings';
 import {useAppDispatch, useAppSelector} from '../../redux/store';
-import {userLoggedIn} from '../../redux/reducers/userSlice';
 import {COLORS} from '../../constants/commonStyles';
 import {ICONS} from '../../constants/icons';
 import {useAppTheme} from '../../hooks/themeHook';
 // Third Party Libraries
-import auth from '@react-native-firebase/auth';
 import {openLogoutSheet} from '../../redux/reducers/transactionSlice';
 
 function ProfileScreen({navigation}: Readonly<ProfileScreenProps>) {
@@ -41,20 +39,8 @@ function ProfileScreen({navigation}: Readonly<ProfileScreenProps>) {
                 <Text style={styles.text2}>{username}</Text>
               </View>
             </View>
-            {/* {ICONS.Edit({
-              height: 32,
-              width: 32,
-              color: 'transparent',
-              borderColor: COLOR.DARK[25],
-            })} */}
           </View>
           <View style={styles.card}>
-            {/* <Pressable style={styles.btn}>
-              <View style={styles.colorBox}>
-                {ICONS.Wallet({height: 24, width: 24})}
-              </View>
-              <Text style={styles.btnText}>{STRINGS.Account}</Text>
-            </Pressable> */}
             <Pressable
               style={styles.btn}
               onPress={() => {

@@ -62,21 +62,25 @@ function Login({navigation}: Readonly<LoginScreenProps>) {
               [
                 {
                   text: 'Resend',
-                  onPress: async () => {
-                    try {
-                      await creds.user.sendEmailVerification();
-                      await auth().signOut();
-                    } catch (e) {
-                      console.log(e);
-                      await auth().signOut();
-                    }
+                  onPress: () => {
+                    (async () => {
+                      try {
+                        await creds.user.sendEmailVerification();
+                        await auth().signOut();
+                      } catch (e) {
+                        console.log(e);
+                        await auth().signOut();
+                      }
+                    })();
                   },
                 },
                 {
                   text: 'OK',
-                  onPress: async () => {
-                    console.log('OK Pressed');
-                    await auth().signOut();
+                  onPress: () => {
+                    (async () => {
+                      console.log('OK Pressed');
+                      await auth().signOut();
+                    })();
                   },
                 },
               ],

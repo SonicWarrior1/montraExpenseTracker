@@ -2,8 +2,7 @@ import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../redux/store";
 import firestore from '@react-native-firebase/firestore';
 import { transactionType } from "../defs/transaction";
-import { setConversionData, setTransaction } from "../redux/reducers/transactionSlice";
-import { useGetUsdConversionQuery } from "../redux/api/conversionApi";
+import { setTransaction } from "../redux/reducers/transactionSlice";
 import { userLoggedIn } from "../redux/reducers/userSlice";
 import { UserType } from "../defs/user";
 import { UserFromJson } from "../utils/userFuncs";
@@ -46,11 +45,5 @@ export function useInitialSetup() {
         return () => unsubscribe();
 
     }, []);
-    // const { data: conversion, isSuccess } = useGetUsdConversionQuery({});
-    // useEffect(() => {
-    //     if (isSuccess) {
-    //         dispatch(setConversionData(conversion));
-    //     }
-    // }, []);
 
 }

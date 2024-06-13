@@ -29,18 +29,36 @@ const TransactionItem = ({
   // constants
   const COLOR = useAppTheme();
   const styles = style(COLOR);
+  const finaltheme = theme === 'device' ? scheme : theme;
   // redux
   const user = useAppSelector(state => state.user.currentUser);
   const conversion = useAppSelector(state => state.transaction.conversion);
+  // functions
+  const getAmtSymbol = (item: transactionType) => {
+    if (item.type === 'expense') {
+      return '-';
+    } else if (item.type === 'income') {
+      return '+';
+    } else {
+      return '';
+    }
+  };
+  const getAmtColor = (item: transactionType) => {
+    if (item.type === 'expense') {
+      return COLORS.PRIMARY.RED;
+    } else if (item.type === 'income') {
+      return COLORS.PRIMARY.GREEN;
+    } else {
+      return COLORS.PRIMARY.BLUE;
+    }
+  };
   return (
     <Pressable
       style={[
         styles.listItemCtr,
         {
           backgroundColor:
-            (theme === 'device' ? scheme : theme) === 'light'
-              ? COLORS.LIGHT[80]
-              : COLORS.DARK[100],
+            finaltheme === 'light' ? COLORS.LIGHT[80] : COLORS.DARK[100],
         },
       ]}
       onPress={() => {
@@ -81,16 +99,10 @@ const TransactionItem = ({
             styles.text1,
             {
               fontWeight: '600',
-              color:
-                item.type === 'expense'
-                  ? COLORS.PRIMARY.RED
-                  : item.type === 'income'
-                  ? COLORS.PRIMARY.GREEN
-                  : COLORS.PRIMARY.BLUE,
+              color: getAmtColor(item),
             },
           ]}>
-          {item.type === 'expense' ? '-' : item.type === 'income' ? '+' : ''}{' '}
-          {currencies[user?.currency ?? 'USD'].symbol}
+          {getAmtSymbol(item)} {currencies[user?.currency ?? 'USD'].symbol}
           {(
             conversion.usd[(user?.currency ?? 'USD').toLowerCase()] *
             item.amount

@@ -1,7 +1,7 @@
 import {Pressable, Text} from 'react-native';
+import style from '../FilePickerSheet/styles';
 import {iconProps} from '../../constants/icons';
 import {useAppTheme} from '../../hooks/themeHook';
-import style from '../FilePickerSheet/styles';
 
 function SheetButtons({
   icon,

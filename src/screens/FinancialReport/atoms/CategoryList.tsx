@@ -57,13 +57,7 @@ function CategoryList({
       style={{paddingHorizontal: 20}}
       data={listData}
       scrollEnabled={false}
-      ListEmptyComponent={() => {
-        return (
-          <View style={{justifyContent: 'center', alignItems: 'center'}}>
-            <Text style={styles.emptyText}>No Data for this Month</Text>
-          </View>
-        );
-      }}
+      ListEmptyComponent={ListEmptyComponent}
       renderItem={({item}) =>
         Number(item[1]) ? (
           <View>
@@ -122,3 +116,13 @@ function CategoryList({
 }
 
 export default CategoryList;
+
+const ListEmptyComponent = () => {
+  const COLOR = useAppTheme();
+  const styles = style(COLOR);
+  return (
+    <View style={{justifyContent: 'center', alignItems: 'center'}}>
+      <Text style={styles.emptyText}>No Data for this Month</Text>
+    </View>
+  );
+};

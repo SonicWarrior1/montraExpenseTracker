@@ -1,12 +1,5 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
-import {
-  Pressable,
-  SafeAreaView,
-  ScrollView,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
+import {Pressable, ScrollView, Text, useColorScheme, View} from 'react-native';
 import {COLORS} from '../../constants/commonStyles';
 import {ICONS} from '../../constants/icons';
 import style from './styles';
@@ -76,6 +69,16 @@ function FinancialReport() {
   const styles = style(COLOR);
   const scheme = useColorScheme();
   const theme = useAppSelector(state => state.user.currentUser?.theme);
+  const finalTheme = theme === 'device' ? scheme : theme;
+  const typeBtnColor = (type: 'income' | 'expense') => {
+    if (transType === type) {
+      return COLORS.VIOLET[100];
+    } else if (finalTheme === 'light') {
+      return COLORS.LIGHT[60];
+    } else {
+      return COLOR.DARK[75];
+    }
+  };
   return (
     <ScrollView
       contentContainerStyle={[styles.safeView]}
@@ -115,21 +118,14 @@ function FinancialReport() {
             styles.innerTypeRow,
             {
               backgroundColor:
-                (theme === 'device' ? scheme : theme) === 'dark'
-                  ? COLORS.DARK[75]
-                  : COLOR.LIGHT[60],
+                finalTheme === 'dark' ? COLORS.DARK[75] : COLOR.LIGHT[60],
             },
           ]}>
           <Pressable
             style={[
               styles.typeBtn,
               {
-                backgroundColor:
-                  transType === 'expense'
-                    ? COLORS.VIOLET[100]
-                    : (theme === 'device' ? scheme : theme) === 'light'
-                    ? COLORS.LIGHT[60]
-                    : COLOR.DARK[75],
+                backgroundColor: typeBtnColor('expense'),
               },
             ]}
             onPress={() => {
@@ -145,19 +141,14 @@ function FinancialReport() {
                       : COLOR.DARK[100],
                 },
               ]}>
-              Expense
+              {STRINGS.Expense}
             </Text>
           </Pressable>
           <Pressable
             style={[
               styles.typeBtn,
               {
-                backgroundColor:
-                  transType === 'income'
-                    ? COLORS.VIOLET[100]
-                    : (theme === 'device' ? scheme : theme) === 'light'
-                    ? COLORS.LIGHT[60]
-                    : COLOR.DARK[75],
+                backgroundColor: typeBtnColor('income'),
               },
             ]}
             onPress={() => {

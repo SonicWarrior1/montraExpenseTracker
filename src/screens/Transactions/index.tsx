@@ -146,15 +146,14 @@ function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
   }
   console.log(applyFilters());
   const theme = useAppSelector(state => state.user.currentUser?.theme);
+  const finaltheme = theme === 'device' ? scheme : theme;
   return (
     <SafeAreaView
       style={[
         styles.safeView,
         {
           backgroundColor:
-            (theme === 'device' ? scheme : theme) === 'dark'
-              ? COLORS.DARK[75]
-              : COLOR.LIGHT[100],
+            finaltheme === 'dark' ? COLORS.DARK[75] : COLOR.LIGHT[100],
         },
       ]}>
       <TransactionHeader month={month} setMonth={setMonth} />

@@ -1,12 +1,8 @@
-import {
-  BottomTabBarProps,
-  createBottomTabNavigator,
-} from '@react-navigation/bottom-tabs';
+import {View} from 'react-native';
 import Home from '../screens/Home';
 import {NAVIGATION} from '../constants/strings';
 import CustomTab from '../components/CustomTab';
 import TransactionScreen from '../screens/Transactions';
-import {View} from 'react-native';
 import FilterSheet from '../components/FilterSheet';
 import CategorySelectionSheet from '../components/CategorySelectionSheet';
 import BudgetScreen from '../screens/Budgets';
@@ -14,6 +10,12 @@ import {BottomParamList} from '../defs/navigation';
 import ProfileScreen from '../screens/Profile';
 import {useInitialSetup} from '../hooks/initialSetup';
 import LogoutSheet from '../components/LogoutSheet';
+// Third Party Libraries
+import {
+  BottomTabBarProps,
+  createBottomTabNavigator,
+} from '@react-navigation/bottom-tabs';
+
 const Tab = createBottomTabNavigator<BottomParamList>();
 function CustomTabBar(props: Readonly<BottomTabBarProps>) {
   return <CustomTab {...props} />;
