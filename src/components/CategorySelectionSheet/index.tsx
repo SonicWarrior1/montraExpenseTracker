@@ -53,7 +53,7 @@ function CategorySelectionSheet() {
         }}
         backdropComponent={SheetBackdrop}
         backgroundStyle={styles.sheetBack}
-        handleIndicatorStyle={{backgroundColor: COLOR.DARK[100]}}>
+        handleIndicatorStyle={{backgroundColor: COLOR.VIOLET[40]}}>
         <BottomSheetView style={{paddingHorizontal: 20}}>
           <View style={styles.row}>
             {expenseCats

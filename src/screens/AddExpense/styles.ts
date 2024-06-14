@@ -117,7 +117,7 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
         borderRadius: 30,
         position: 'absolute',
         left: '44%',
-        borderColor: COLOR.LIGHT[20],
+        borderColor: "#F1F1FA",
     },
     flex: { flex: 1 },
 });

@@ -49,7 +49,7 @@ function AttachementContainer({
         {ICONS.Attachment({
           height: 25,
           width: 25,
-          color: COLOR.DARK[100],
+          color: COLOR.DARK[25],
         })}
         <Text style={styles.attachementText}>{STRINGS.AddAttachement}</Text>
       </Pressable>

@@ -174,7 +174,7 @@ function FinancialReport() {
           style={[styles.dropdown, {width: 160}]}
           renderLeftIcon={() => (
             <View style={{marginRight: 10}}>
-              {ICONS.ArrowDown({width: 15, height: 15})}
+              {ICONS.ArrowDown({width: 15, height: 15,borderColor: COLOR.VIOLET[100],})}
             </View>
           )}
           renderRightIcon={() => <></>}

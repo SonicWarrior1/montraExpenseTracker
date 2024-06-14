@@ -175,6 +175,31 @@ export function EmptyError({
     </>
   );
 }
+export function EmptyZeroError({
+  value,
+  formKey,
+  errorText,
+  color = 'rgb(255,51,51)',
+  size = 12,
+}: Readonly<{
+  value: string;
+  formKey: boolean;
+  errorText: string;
+  color?: string;
+  size?: number;
+}>) {
+  return (
+    <>
+      {(value === '' || Number(value)<=0 ) && formKey ? (
+        <Text style={[style.error, {color: color, fontSize: size, height: 24}]}>
+          {errorText}
+        </Text>
+      ) : (
+        <Sapcer height={24} />
+      )}
+    </>
+  );
+}
 
 const style = StyleSheet.create({
   error: {

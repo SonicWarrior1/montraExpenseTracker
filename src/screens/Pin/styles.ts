@@ -32,12 +32,13 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         width: screenWidth / 3,
-        height: 125,
+        height: 100,
     },
     number: {
         fontSize: 48,
         fontWeight: '500',
         color: 'white',
+        fontFamily:'Inter-Regular'
     },
 });
 export default styles;

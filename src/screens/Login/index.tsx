@@ -54,11 +54,18 @@ function Login({navigation}: Readonly<LoginScreenProps>) {
           if (creds.user.emailVerified) {
             const data = await userCollection.doc(creds.user.uid).get();
             const user = UserFromJson(data.data()!);
-            dispatch(userLoggedIn(user));
+            if (user.pin === '') {
+              navigation.navigate(NAVIGATION.PIN, {
+                pin: user.pin === '' ? undefined : user.pin,
+                uid: creds.user.uid,
+              });
+            } else {
+              dispatch(userLoggedIn(user));
+            }
           } else {
             Alert.alert(
               'Please verify your email',
-              'A verification email has already been sent to your registered email address, so verify your email before login',
+              'A verification email has already been sent to your registered email address, so verify your email before login.',
               [
                 {
                   text: 'Resend',
@@ -161,7 +168,7 @@ function Login({navigation}: Readonly<LoginScreenProps>) {
           <Sapcer height={15} />
           <CustomButton title={STRINGS.LOGIN} onPress={handleLogin} />
           <Sapcer height={10} />
-          <Text style={styles.orText}>{STRINGS.OrWith}</Text>
+          <Text style={styles.orText}>{STRINGS.Or}</Text>
           <Sapcer height={10} />
           <TouchableOpacity onPress={onGoogleButtonPress} style={[styles.btn]}>
             <View style={styles.googleRow}>

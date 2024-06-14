@@ -27,7 +27,7 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
     progressRow: {
         flexDirection: 'row',
         width: '100%',
-        columnGap: 10,
+        columnGap: 4,
         paddingHorizontal: 15,
         marginTop: 20,
     },

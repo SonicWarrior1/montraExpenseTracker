@@ -90,7 +90,9 @@ function TransactionDetails({
               ).toFixed(1),
             )}
           </Text>
-          <Text style={styles.desc}>{trans.desc ?? ''}</Text>
+          <Text style={styles.desc} numberOfLines={1}>
+            {trans.desc ?? ''}
+          </Text>
           <Text style={styles.time}>
             {
               weekData[
@@ -166,9 +168,14 @@ function TransactionDetails({
               </>
             )}
           </View>
+
           <View style={styles.descCtr}>
-            <Text style={styles.descTitle}>{STRINGS.Description}</Text>
-            <Text style={styles.descText}>{STRINGS.SampleDesc}</Text>
+            {(trans.desc ?? '') !== '' && (
+              <Text style={styles.descTitle}>{STRINGS.Description}</Text>
+            )}
+            {(trans.desc ?? '') !== '' && (
+              <Text style={styles.descText}>{trans.desc}</Text>
+            )}
             {trans.attachementType !== 'none' && (
               <View>
                 <Text style={styles.descTitle}>{STRINGS.Attachement}</Text>
@@ -189,6 +196,7 @@ function TransactionDetails({
               </View>
             )}
           </View>
+
           <View style={styles.btnView}>
             <CustomButton
               title={STRINGS.Edit}

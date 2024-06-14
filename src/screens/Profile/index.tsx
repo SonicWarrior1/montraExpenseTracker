@@ -47,7 +47,7 @@ function ProfileScreen({navigation}: Readonly<ProfileScreenProps>) {
                 navigation.navigate(NAVIGATION.Settings);
               }}>
               <View style={styles.colorBox}>
-                {ICONS.Setting({height: 24, width: 24})}
+                {ICONS.Setting({height: 22, width: 22})}
               </View>
               <Text style={styles.btnText}>{STRINGS.Settings}</Text>
             </Pressable>
@@ -57,7 +57,7 @@ function ProfileScreen({navigation}: Readonly<ProfileScreenProps>) {
                 navigation.navigate(NAVIGATION.ExportData);
               }}>
               <View style={styles.colorBox}>
-                {ICONS.Upload({height: 24, width: 24, color: 'transparent'})}
+                {ICONS.Upload({height: 22, width: 22, color: 'transparent'})}
               </View>
               <Text style={styles.btnText}>{STRINGS.ExportData}</Text>
             </Pressable>
@@ -68,7 +68,7 @@ function ProfileScreen({navigation}: Readonly<ProfileScreenProps>) {
               }}>
               <View
                 style={[styles.colorBox, {backgroundColor: COLORS.RED[20]}]}>
-                {ICONS.Logout({height: 24, width: 24, color: 'transparent'})}
+                {ICONS.Logout({height: 22, width: 22, color: 'transparent'})}
               </View>
               <Text style={styles.btnText}>{STRINGS.Logout}</Text>
             </Pressable>

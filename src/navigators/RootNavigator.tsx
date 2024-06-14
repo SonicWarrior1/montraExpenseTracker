@@ -3,7 +3,7 @@ import Onboarding from '../screens/Onboarding';
 import {NAVIGATION} from '../constants/strings';
 import Signup from '../screens/Signup';
 import {ICONS} from '../constants/icons';
-import {Pressable} from 'react-native';
+import {Dimensions, Platform, Pressable} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import Login from '../screens/Login';
 import {useAppDispatch, useAppSelector} from '../redux/store';
@@ -55,7 +55,7 @@ function RootNavigator(): React.JSX.Element {
   useEffect(() => {
     if (isSuccess) {
       dispatch(setConversionData(conversion));
-      console.log('Ok')
+      console.log('Ok');
     }
   }, [isSuccess]);
   return (
@@ -153,7 +153,14 @@ function RootNavigator(): React.JSX.Element {
               headerShown: true,
               headerTitleStyle: {color: COLORS.DARK[100]},
               title: 'Settings',
-              headerStyle: {backgroundColor: COLORS.LIGHT[100]},
+              headerStyle: {
+                backgroundColor: COLORS.LIGHT[100],
+                height:
+                  Platform.OS === 'ios'
+                    ? Dimensions.get('screen').height * 0.141
+                    : Dimensions.get('screen').height * 0.075,
+              },
+              headerShadowVisible: true,
               headerLeft: props => headerLeft(props, COLORS.DARK[100]),
             }}
           />
@@ -163,7 +170,14 @@ function RootNavigator(): React.JSX.Element {
             options={{
               headerShown: true,
               headerTitleStyle: {color: COLORS.DARK[100]},
-              headerStyle: {backgroundColor: COLORS.LIGHT[100]},
+              headerStyle: {
+                backgroundColor: COLORS.LIGHT[100],
+                height:
+                  Platform.OS === 'ios'
+                    ? Dimensions.get('screen').height * 0.141
+                    : Dimensions.get('screen').height * 0.075,
+              },
+              headerShadowVisible: true,
               title: 'Currency',
               headerLeft: props => headerLeft(props, COLORS.DARK[100]),
             }}
@@ -175,7 +189,14 @@ function RootNavigator(): React.JSX.Element {
               headerShown: true,
               headerTitleStyle: {color: COLORS.DARK[100]},
               title: 'Theme',
-              headerStyle: {backgroundColor: COLORS.LIGHT[100]},
+              headerStyle: {
+                backgroundColor: COLORS.LIGHT[100],
+                height:
+                  Platform.OS === 'ios'
+                    ? Dimensions.get('screen').height * 0.141
+                    : Dimensions.get('screen').height * 0.075,
+              },
+              headerShadowVisible: true,
               headerLeft: props => headerLeft(props, COLORS.DARK[100]),
             }}
           />
@@ -185,7 +206,14 @@ function RootNavigator(): React.JSX.Element {
             options={{
               headerShown: true,
               headerTitleStyle: {color: COLORS.DARK[100]},
-              headerStyle: {backgroundColor: COLORS.LIGHT[100]},
+              headerStyle: {
+                backgroundColor: COLORS.LIGHT[100],
+                height:
+                  Platform.OS === 'ios'
+                    ? Dimensions.get('screen').height * 0.141
+                    : Dimensions.get('screen').height * 0.075,
+              },
+              headerShadowVisible: true,
               title: 'Export Data',
               headerLeft: props => headerLeft(props, COLORS.DARK[100]),
             }}
@@ -221,6 +249,11 @@ function RootNavigator(): React.JSX.Element {
           <Stack.Screen
             name={NAVIGATION.FORGOTEMAILSENT}
             component={ForgotEmailSent}
+          />
+          <Stack.Screen
+            name={NAVIGATION.PIN}
+            component={Pin}
+            initialParams={{pin: undefined}}
           />
         </Stack.Group>
       )}

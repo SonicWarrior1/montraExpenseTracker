@@ -20,7 +20,7 @@ function CustomInput({
 }: Readonly<{
   value: string;
   onChangeText: (str: string) => void;
-  type: 'email' | 'name';
+  type: 'email' | 'name' | 'sentence';
   placeholderText: string;
   maxLength?: number;
   inputColor?: string;
@@ -37,7 +37,9 @@ function CustomInput({
       value={value}
       onChangeText={onChangeText}
       placeholderTextColor={COLORS.DARK[25]}
-      autoCapitalize={type === 'name' ? 'words' : 'none'}
+      autoCapitalize={
+        type === 'name' ? 'words' : type === 'sentence' ? 'sentences' : 'none'
+      }
       autoCorrect={false}
       maxLength={maxLength}
       onBlur={onBlur}

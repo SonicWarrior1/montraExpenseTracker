@@ -26,7 +26,7 @@ function SettingsScreen({navigation}: Readonly<SettingsScreenProps>) {
           navigation.navigate(NAVIGATION.Theme);
         }}
         text={STRINGS.Theme}
-        subText={theme?.toLocaleUpperCase()!}
+        subText={theme?.[0]?.toLocaleUpperCase() + theme?.slice(1)!}
       />
     </SafeAreaView>
   );

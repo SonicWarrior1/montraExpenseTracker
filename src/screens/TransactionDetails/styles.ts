@@ -16,7 +16,7 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
         paddingHorizontal: 20,
     },
     amt: { fontSize: RFValue(48), fontWeight: '700', color: COLOR.LIGHT[100] },
-    desc: { fontSize: (16), fontWeight: '500', color: COLOR.LIGHT[80], marginTop: 10 },
+    desc: { fontSize: (16), fontWeight: '500', color: COLOR.LIGHT[80], marginTop: 10 ,maxWidth:250},
     time: { fontSize: (13), fontWeight: '500', color: COLOR.LIGHT[80], marginTop: 10 },
     text1: { color: COLOR.DARK[25], fontSize: RFValue(13), fontWeight: '500' },
     text2: { fontSize: RFValue(15), fontWeight: '600', color: COLOR.DARK[100] },

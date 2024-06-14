@@ -131,7 +131,7 @@ function ExportData() {
         <CustomButton
           title={STRINGS.Export}
           onPress={handleExport}
-          icon={ICONS.Download({height: 20, width: 20})}
+          icon={ICONS.Download({height: 24, width: 24})}
         />
       </View>
     </SafeAreaView>

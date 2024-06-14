@@ -53,7 +53,7 @@ export const STRINGS = {
     SIGNUP: 'Sign Up',
     EmailOnWay: 'Your email is on the way',
     CheckYourEmail: 'Check your email',
-    InstructionResetPass: 'and follow the instructions to reset your password',
+    InstructionResetPass: 'and follow the instructions to reset your password. Please note that the reset link will only be valid for 1 hour.',
     BackToLogin: 'Back to Login',
     DontWorry: "Don't worry.",
     EnterEmailForReset: "Enter your email and we'll send you a link to reset your password.",
@@ -64,7 +64,8 @@ export const STRINGS = {
     ConfrimPassword: 'Confirm Password',
     BySigningUp: 'By signing up, you agree to the',
     Terms: 'Terms of Service and Privacy Policy',
-    OrWith: 'Or With',
+    OrWith: 'Or with',
+    Or: 'Or',
     SignupWithGoogle: 'Sign Up with Google',
     AlreadyHaveAccount: 'Already have an Account?',
     SignupSuccesful: 'A verification email has been sent to your account.',
@@ -84,6 +85,7 @@ export const STRINGS = {
     TransactionDeletedSuccesfully: 'Transaction Deleted Succesfully',
     Camera: 'Camera',
     Gallery: 'Gallery',
+    Image:'Image',
     Document: 'Document',
     FilterTransaction: 'Filter Transaction',
     Reset: 'Reset',
@@ -108,7 +110,7 @@ export const STRINGS = {
     Description: 'Description',
     Wallet: 'Wallet',
     PleaseSelectAWallet: 'Please select a wallet',
-    AddAttachement: 'Add Attachement',
+    AddAttachement: 'Add Attachment',
     Repeat: 'Repeat',
     RepeatTransaction: 'Repeat Transaction',
     Frequency: 'Frequency',
@@ -142,7 +144,7 @@ export const STRINGS = {
     MarkAllRead: 'Mark all Read',
     RemoveAll: 'Remove all',
     SetupPin: "Let's setup your PIN",
-    RetypePin: 'Ok. Re type your PIN again.',
+    RetypePin: 'Retype your PIN',
     EnterPin: 'Enter Your Pin',
     Username: 'Username',
     Account: 'Account',
@@ -154,7 +156,7 @@ export const STRINGS = {
     ThisMonth: 'This Month',
     YouSpend: 'You Spend 💸',
     YouEarned: 'You Earned 💰',
-    BudgetLimitExceed: ' of 12 Budget is exceeds the limit',
+    BudgetLimitExceed: ' of 12 Budget exceeds the limit',
     Quote: '“Financial freedom is freedom from fear.”',
     QuoteAuthor: '-Robert Kiyosaki',
     BiggestSpending: 'and your biggest spending is from',
@@ -164,7 +166,7 @@ export const STRINGS = {
     Dark: 'Dark',
     UseDeviceTheme: 'Use Device Theme',
     Type: 'Type',
-    Attachement: 'Attachement',
+    Attachement: 'Attachment',
     SampleDesc: ' Amet minim mollit non deserunt ullamco est sit aliqua dolor do amet sint. Velit officia consequat duis enim velit mollit. Exercitation veniam consequat sunt nostrud amet.',
     ViewDocument: 'View Document',
     SeeFinancialReport: 'See your financial report',
@@ -179,7 +181,7 @@ export const STRINGS = {
     CheckInternet: 'Please check your internet connection',
     PasswordDoNotMatch: 'Password do not match',
     ConfirmPasswordCannotBeEmpty: 'Confirm Password cannot be Empty',
-    PasswordNotValid: "Password must contain atleast 1 Uppercase, 1 Lowercase, 1 Numeric and 1 Symbol Character",
+    PasswordNotValid: "Password must contain at least 8 characters with 1 Uppercase, 1 Lowercase, 1 Numeric, and 1 Special character",
     PasswordCannotBeEmpty: "Password cannot be Empty",
     EmailIsNotValid: "Email is not Valid",
     EmailCannotBeEmpty: "Email cannot be Empty",
@@ -190,8 +192,7 @@ export const STRINGS = {
 
 export const emailRegex = /^[a-zA-Z0-9_-]+@([a-zA-Z0-9-]+\.)+[a-zA-Z0-9]+$/;;
 export const nameRegex = /^[a-zA-Z ]*$/;
-export const passRegex =
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+export const passRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&\s])[A-Za-z\d@$!%*?&\s]{8,}$/;
 
 export const monthData = [
     { label: 'January', value: 1 },

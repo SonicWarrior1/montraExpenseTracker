@@ -1,11 +1,5 @@
 import React, {useRef, useState} from 'react';
-import {
-  SafeAreaView,
-  Switch,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
+import {SafeAreaView, Switch, Text, TextInput, View} from 'react-native';
 import Sapcer from '../../components/Spacer';
 import CustomButton from '../../components/CustomButton';
 import style from './styles';
@@ -21,7 +15,7 @@ import {CreateBudgetScreenProps} from '../../defs/navigation';
 import {currencies, STRINGS} from '../../constants/strings';
 import {encrypt} from '../../utils/encryption';
 import {useAppTheme} from '../../hooks/themeHook';
-import {EmptyError} from '../../constants/errors';
+import {EmptyError, EmptyZeroError} from '../../constants/errors';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
   // constants
@@ -49,7 +43,7 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
       ? (conversion.usd[currency!.toLowerCase()] * oldBudget?.limit!)
           .toFixed(1)
           .toString()
-      : '',
+      : '0',
   );
   const [category, setCategory] = useState(isEdit ? selectedCategory : '');
   const [alert, setAlert] = useState(isEdit ? oldBudget?.alert : false);
@@ -91,7 +85,7 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
               />
             </View>
             <View style={{left: 20}}>
-              <EmptyError
+              <EmptyZeroError
                 errorText={STRINGS.PleaseFillAnAmount}
                 value={amount}
                 formKey={form}
@@ -108,7 +102,7 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
               return {
                 label:
                   item === 'add'
-                    ? 'Add new Category'
+                    ? 'ADD NEW CATEGORY'
                     : item[0].toUpperCase() + item.slice(1),
                 value: item,
               };
@@ -175,9 +169,9 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
           <CustomButton
             title={STRINGS.Continue}
             onPress={async () => {
-              console.log(conversion.usd);
+              console.log(amount);
               setForm(true);
-              if (amount !== '' || category !== '') {
+              if (amount !== '' && Number(amount) > 0 && category !== '') {
                 try {
                   dispatch(setLoading(true));
                   await firestore()
@@ -213,6 +207,7 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
           <AddCategorySheet
             bottomSheetModalRef={addCategorySheetRef}
             type={'expense'}
+            setMyCategory={setCategory}
           />
         </BottomSheetModalProvider>
       </View>

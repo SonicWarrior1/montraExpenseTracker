@@ -17,7 +17,7 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
     },
     text2: {
         fontWeight: '500',
-        fontSize: RFValue(16),
+        fontSize: RFValue(14),
         color: COLOR.DARK[100],
         textAlign: 'center',
     },

@@ -11,7 +11,7 @@ export type RootStackParamList = {
     BottomTab: undefined,
     ForgotPassword: undefined,
     ForgotEmailSent: { email: string },
-    Pin: { setup?: boolean, pin?: string }
+    Pin: { setup?: boolean, pin?: string ,uid?:string}
     AddExpense: { type: 'expense' | 'income' | 'transfer', isEdit: boolean, transaction?: transactionType }
     TransactionDetail: { transaction: transactionType },
     DocView: { uri: string },

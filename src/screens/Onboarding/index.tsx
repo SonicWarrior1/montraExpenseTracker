@@ -1,5 +1,12 @@
 import React, {useState} from 'react';
-import {Dimensions, Platform, SafeAreaView, Text, View} from 'react-native';
+import {
+  Dimensions,
+  Image,
+  Platform,
+  SafeAreaView,
+  Text,
+  View,
+} from 'react-native';
 import style from './styles';
 import {NAVIGATION, STRINGS} from '../../constants/strings';
 import {OnboardingScreenProps} from '../../defs/navigation';
@@ -15,18 +22,18 @@ const screenWidth = Dimensions.get('screen').width;
 const screenHeight = Dimensions.get('window').height;
 const data = [
   {
-    icon: ICONS.Onboard1,
+    icon: '../../assets/Images/onboarding1.png',
     text1: 'Gain total control of your money',
     text2: 'Become your own money manager and make every cent count',
   },
   {
-    icon: ICONS.Onboard2,
+    icon: '../../assets/Images/onboarding2.png',
     text1: 'Know where your money goes',
     text2:
       'Track your transaction easily,with categories and financial report ',
   },
   {
-    icon: ICONS.Onboard3,
+    icon: '../../assets/Images/onboarding3.png',
     text1: 'Planning ahead',
     text2: 'Setup your budget for each category so you in control',
   },
@@ -47,22 +54,36 @@ function Onboarding({navigation}: Readonly<OnboardingScreenProps>) {
     <SafeAreaView style={styles.safeView}>
       <View style={styles.mainView}>
         <View>
-          {Platform.OS !== 'ios' && <Sapcer height={screenHeight * 0.035} />}
-          <View style={{height: screenHeight * 0.66}}>
+          {Platform.OS !== 'ios' ? (
+            <Sapcer height={screenHeight * 0.055} />
+          ) : (
+            <Sapcer height={screenHeight * 0.025} />
+          )}
+          <View style={{height: screenHeight * 0.64}}>
             <Carousel
               loop={false}
               width={screenWidth - 40}
               data={data}
               scrollAnimationDuration={300}
               onSnapToItem={index => {
-                setIndex(index);
+                setIndex(index)
               }}
-              renderItem={({item}) => (
+              renderItem={({item, index}) => (
                 <View style={styles.carouselCtr}>
-                  {item.icon({
-                    height: screenWidth * 0.8,
-                    width: screenWidth * 0.7,
-                  })}
+                  <Image
+                    source={
+                      index === 0
+                        ? require('../../assets/Images/onboarding1.png')
+                        : index == 1
+                        ? require('../../assets/Images/onboarding2.png')
+                        : require('../../assets/Images/onboarding3.png')
+                    }
+                    style={{
+                      height: screenHeight * 0.4,
+                      width: screenWidth * 0.9,
+                      transform:[{scale:0.9}]
+                    }}
+                  />
                   <View>
                     <Text style={styles.text1}>{item.text1}</Text>
                     <View style={{height: screenHeight * 0.025}} />

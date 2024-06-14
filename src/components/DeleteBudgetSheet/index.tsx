@@ -68,7 +68,7 @@ function DeleteBudgetSheet({
         snapPoints={snapPoints}
         backdropComponent={SheetBackdrop}
         backgroundStyle={styles.sheetBack}
-        handleIndicatorStyle={{backgroundColor: COLOR.DARK[100]}}>
+        handleIndicatorStyle={{backgroundColor: COLOR.VIOLET[40]}}>
         <BottomSheetView style={styles.sheetView}>
           <Text style={styles.text1}>{STRINGS.Removebudget}</Text>
           <Text style={styles.text2}>{STRINGS.SureRemoveBudgetNo}</Text>

@@ -3,15 +3,21 @@ import {SafeAreaView, ScrollView, Text, View} from 'react-native';
 import style from './styles';
 import Sapcer from '../../components/Spacer';
 import CustomInput from '../../components/CustomInput';
-import {EmailEmptyError} from '../../constants/errors';
+import {
+  EmailEmptyError,
+  EmailValError,
+  testInput,
+} from '../../constants/errors';
 import CustomButton from '../../components/CustomButton';
 import {ForgotScreenProps} from '../../defs/navigation';
-import {NAVIGATION, STRINGS} from '../../constants/strings';
+import {emailRegex, NAVIGATION, STRINGS} from '../../constants/strings';
 import {useAppTheme} from '../../hooks/themeHook';
 // Third Party Libraries
-import auth from '@react-native-firebase/auth';
+import auth, {FirebaseAuthTypes} from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
 import {useAppDispatch} from '../../redux/store';
 import {setLoading} from '../../redux/reducers/userSlice';
+import Toast from 'react-native-toast-message';
 
 function ForgotPassword({navigation}: Readonly<ForgotScreenProps>) {
   // constants
@@ -27,7 +33,7 @@ function ForgotPassword({navigation}: Readonly<ForgotScreenProps>) {
   }
   async function handleForgot() {
     setForm(true);
-    if (email !== '') {
+    if (email !== '' && testInput(emailRegex, email)) {
       try {
         dispatch(setLoading(true));
         await auth().sendPasswordResetEmail(email);
@@ -40,8 +46,10 @@ function ForgotPassword({navigation}: Readonly<ForgotScreenProps>) {
           ],
         });
         dispatch(setLoading(false));
-      } catch (e) {
+      } catch (e: any) {
         console.log(e);
+        const error: FirebaseAuthTypes.NativeFirebaseAuthError = e;
+        Toast.show({text1: error.nativeErrorMessage, type: 'error'});
         dispatch(setLoading(false));
       }
     }
@@ -61,7 +69,7 @@ function ForgotPassword({navigation}: Readonly<ForgotScreenProps>) {
             value={email}
             inputColor={COLOR.DARK[100]}
           />
-          <EmailEmptyError email={email} formKey={form} />
+          <EmailValError email={email} formKey={form} />
           <Sapcer height={20} />
           <CustomButton onPress={handleForgot} title={STRINGS.Continue} />
         </View>

@@ -25,7 +25,7 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
         color: 'grey',
         lineHeight: RFValue(19)
     },
-    carouselCtr: { paddingHorizontal: 10, justifyContent: "space-between", flex: 1 },
+    carouselCtr: { paddingHorizontal: 10, justifyContent: "space-between", flex: 1, alignItems: "center" },
     progressDotCtr: {
         flexDirection: 'row',
         gap: 20,

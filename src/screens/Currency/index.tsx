@@ -31,17 +31,19 @@ function CurrencyScreen() {
             <Text style={styles.text}>
               {item.name} {'(' + item.code + ')'}{' '}
             </Text>
-            <BouncyCheckbox
+            {code === item.code&&<BouncyCheckbox
               style={styles.checkbox}
               disableText={false}
-              fillColor={COLORS.BLUE[100]}
+              fillColor={'#5233FF'}
               isChecked={code === item.code}
               onPress={async () => {
                 if (code !== item.code) {
                   await userDoc.update({currency: encrypt(item.code, uid!)});
                 }
               }}
-            />
+              iconStyle={{height: 24, width: 24}}
+              iconImageStyle={{height: 12.5, width: 12.5}}
+            />}
           </Pressable>
         )}
       />

@@ -1,9 +1,9 @@
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {
   Dimensions,
+  Image,
   Pressable,
   SafeAreaView,
-  Switch,
   Text,
   TextInput,
   View,
@@ -37,7 +37,11 @@ import Toast from 'react-native-toast-message';
 import {ExpenseScreenProps} from '../../defs/navigation';
 import AddCategorySheet from '../../components/AddCategorySheet';
 import {UserType} from '../../defs/user';
-import {CompundEmptyError, EmptyError} from '../../constants/errors';
+import {
+  CompundEmptyError,
+  EmptyError,
+  EmptyZeroError,
+} from '../../constants/errors';
 import {UserFromJson} from '../../utils/userFuncs';
 import {
   addNewTransaction,
@@ -53,6 +57,7 @@ import {
 import {useAppTheme} from '../../hooks/themeHook';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import AttachementContainer from './atoms/attachementContainer';
+import {Switch} from 'react-native-switch';
 
 function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
   // constants
@@ -116,9 +121,9 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
             transaction.amount
           ).toFixed(1),
         ).toString()
-      : '',
+      : '0',
   );
-  const [category, setCategory] = useState(
+  const [category, setCategory] = useState<string | undefined>(
     transaction ? transaction.category : '',
   );
   const [wallet, setWallet] = useState(transaction ? transaction.wallet : '');
@@ -267,14 +272,17 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
       });
     }
   };
-  const handlePress = useCallback(async () => {
+  const handlePress = async () => {
     setFormKey(true);
-    if (pageType === 'transfer' && (from === '' || to === '')) {
+    if (
+      pageType === 'transfer' &&
+      (amount === '' || Number(amount) <= 0 || from === '' || to === '')
+    ) {
       return;
     }
     if (
       pageType !== 'transfer' &&
-      (amount === '' || category === '' || wallet === '')
+      (amount === '' || Number(amount) <= 0 || category === '' || wallet === '')
     ) {
       return;
     }
@@ -288,13 +296,12 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
         id: id,
         uid: uid!,
       });
-      console.log(repeatData, 'sdjufndsjhfbdshjfbsdjfbnsdjkfnb');
       const trans = createTransaction({
         id: id,
         url: url,
         attachementType: attachementType,
         amount: amount,
-        category: category,
+        category: category!,
         conversion: conversion,
         currency: currency!,
         desc: desc,
@@ -313,7 +320,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
           transaction: transaction,
           uid: uid!,
           amount: amount,
-          category: category,
+          category: category!,
           conversion: conversion,
           curr: curr,
           currency: currency,
@@ -324,7 +331,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
           trans: trans,
           uid: uid!,
           amount: amount,
-          category: category,
+          category: category!,
           conversion: conversion,
           curr: curr,
           currency: currency,
@@ -333,7 +340,9 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
         });
       }
       Toast.show({
-        text1: 'Transaction has been Added Succesfully',
+        text1: `Transaction has been ${
+          isEdit ? 'Updated' : 'Added'
+        } Succesfully`,
         type: 'custom',
       });
       navigation.pop();
@@ -341,24 +350,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
     } catch (e) {
       dispatch(setLoading(false));
     }
-  }, [
-    pageType,
-    amount,
-    category,
-    wallet,
-    from,
-    to,
-    repeatData,
-    image,
-    doc,
-    desc,
-    conversion,
-    currency,
-    isEdit,
-    pageType,
-    transaction,
-    uid,
-  ]);
+  };
   const getDate = useCallback(() => {
     if (repeatData) {
       if (isEdit) {
@@ -417,7 +409,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
               />
             </View>
             <View style={styles.amtError}>
-              <EmptyError
+              <EmptyZeroError
                 errorText={STRINGS.PleaseFillAnAmount}
                 value={amount}
                 formKey={formKey}
@@ -435,7 +427,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
                   return {
                     label:
                       item === 'add'
-                        ? 'Add new Category'
+                        ? 'ADD NEW CATEGORY'
                         : item[0].toUpperCase() + item.slice(1),
                     value: item,
                   };
@@ -492,7 +484,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
           {pageType !== 'transfer' && (
             <EmptyError
               errorText={STRINGS.PleaseSelectACategory}
-              value={category}
+              value={category!}
               formKey={formKey}
             />
           )}
@@ -501,7 +493,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
             onChangeText={(str: string) => {
               setDesc(str);
             }}
-            type="name"
+            type="sentence"
             value={desc}
             inputColor={COLOR.DARK[100]}
           />
@@ -545,11 +537,17 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
                 </Text>
               </View>
               <Switch
-                trackColor={{
-                  false: COLORS.VIOLET[20],
-                  true: COLORS.VIOLET[100],
-                }}
-                ios_backgroundColor={COLORS.VIOLET[20]}
+                backgroundActive={COLORS.VIOLET[100]}
+                backgroundInactive={COLORS.VIOLET[20]}
+                activeText=""
+                inActiveText=""
+                barHeight={30}
+                circleSize={24}
+                switchBorderRadius={16}
+                innerCircleStyle={{width: 24, height: 24}}
+                switchLeftPx={5}
+                switchRightPx={5}
+                circleBorderWidth={0}
                 onValueChange={val => {
                   if (val) {
                     repeatSheetRef.current?.present({
@@ -620,6 +618,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
         <AddCategorySheet
           bottomSheetModalRef={addCategorySheetRef}
           type={pageType}
+          setMyCategory={setCategory}
         />
       </BottomSheetModalProvider>
     </>

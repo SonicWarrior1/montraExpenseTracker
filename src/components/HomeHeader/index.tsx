@@ -39,7 +39,7 @@ function HomeHeader({
       <Dropdown
         style={styles.dropdown}
         renderLeftIcon={() => (
-          <View>{ICONS.ArrowDown({width: 15, height: 15})}</View>
+          <View>{ICONS.ArrowDown({width: 15, height: 15,borderColor: COLOR.VIOLET[100],})}</View>
         )}
         renderRightIcon={() => <></>}
         placeholder={STRINGS.Month}

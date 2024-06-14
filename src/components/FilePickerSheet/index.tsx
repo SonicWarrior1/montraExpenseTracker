@@ -90,7 +90,7 @@ function FilePickerSheet({
       backdropComponent={SheetBackdrop}
       backgroundStyle={styles.sheetBack}
       onDismiss={onDismiss}
-      handleIndicatorStyle={{backgroundColor: COLOR.DARK[100]}}>
+      handleIndicatorStyle={{backgroundColor: COLOR.VIOLET[40]}}>
       <BottomSheetView style={styles.sheetView}>
         <SheetButtons
           title={STRINGS.Camera}
@@ -98,7 +98,7 @@ function FilePickerSheet({
           onPress={openCamera}
         />
         <SheetButtons
-          title={STRINGS.Gallery}
+          title={STRINGS.Image}
           icon={ICONS.Gallery}
           onPress={openImagePicker}
         />

@@ -52,7 +52,7 @@ function LogoutSheet() {
         snapPoints={snapPoints}
         backdropComponent={SheetBackdrop}
         backgroundStyle={styles.sheetBack}
-        handleIndicatorStyle={{backgroundColor: COLOR.DARK[100]}}
+        handleIndicatorStyle={{backgroundColor: COLOR.VIOLET[40]}}
         onDismiss={() => {
           dispatch(openLogoutSheet(false));
         }}>

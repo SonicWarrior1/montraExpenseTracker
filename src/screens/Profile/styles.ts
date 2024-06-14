@@ -4,7 +4,7 @@ import { RFValue } from "react-native-responsive-fontsize";
 
 const styles = (COLOR: typeof COLORS) => StyleSheet.create({
     colorBox: {
-        borderRadius: 10,
+        borderRadius: 16,
         justifyContent: "center",
         alignItems: "center",
         width: 52,

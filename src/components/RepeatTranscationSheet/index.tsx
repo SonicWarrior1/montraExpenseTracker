@@ -69,7 +69,7 @@ function RepeatTransactionSheet({
       snapPoints={snapPoints}
       backdropComponent={SheetBackdrop}
       backgroundStyle={styles.sheetBack}
-      handleIndicatorStyle={{backgroundColor: COLOR.DARK[100]}}>
+      handleIndicatorStyle={{backgroundColor: COLOR.VIOLET[40]}}>
       <BottomSheetView style={styles.sheetView}>
         <View style={styles.flexRow}>
           <View style={styles.flex}>

@@ -21,13 +21,16 @@ import {encrypt} from '../../utils/encryption';
 import {STRINGS} from '../../constants/strings';
 import {useAppTheme} from '../../hooks/themeHook';
 import {COLORS} from '../../constants/commonStyles';
+import Toast from 'react-native-toast-message';
 
 function AddCategorySheet({
   bottomSheetModalRef,
   type,
+  setMyCategory,
 }: Readonly<{
   bottomSheetModalRef: React.RefObject<BottomSheetModalMethods>;
   type: transactionType['type'];
+  setMyCategory: React.Dispatch<React.SetStateAction<string|undefined>>;
 }>) {
   // redux
   const uid = useAppSelector(state => state.user.currentUser?.uid);
@@ -49,22 +52,29 @@ function AddCategorySheet({
     const userDoc = firestore().collection('users').doc(uid);
     if (category !== '') {
       dispatch(setLoading(true));
+      console.log(expenseCats);
+      if (expenseCats?.includes(category.toLowerCase())) {
+        Toast.show({text1: `${category} is already added`, type: 'error'});
+        dispatch(setLoading(false));
+        return;
+      }
       try {
         if (type === 'expense') {
-          dispatch(addExpenseCategory(category));
+          dispatch(addExpenseCategory(category.toLowerCase()));
           await userDoc.update({
-            expenseCategory: [...expenseCats!, category].map(item =>
-              encrypt(item, uid!),
+            expenseCategory: [...expenseCats!, category.toLowerCase()].map(
+              item => encrypt(item, uid!),
             ),
           });
         } else if (type === 'income') {
-          dispatch(addIncomeCategory(category));
+          dispatch(addIncomeCategory(category.toLowerCase()));
           await userDoc.update({
-            incomeCategory: [...incomeCats!, category].map(item =>
+            incomeCategory: [...incomeCats!, category.toLowerCase()].map(item =>
               encrypt(item, uid!),
             ),
           });
         }
+        setMyCategory(category.toLocaleLowerCase().trim())
       } catch (e) {
         console.log(e);
       } finally {
@@ -82,15 +92,16 @@ function AddCategorySheet({
       snapPoints={snapPoints}
       backdropComponent={SheetBackdrop}
       backgroundStyle={styles.sheetBack}
-      handleIndicatorStyle={{backgroundColor: COLOR.DARK[100]}}>
+      handleIndicatorStyle={{backgroundColor: COLOR.VIOLET[40]}}>
       <BottomSheetView style={styles.sheetView}>
         <BottomSheetTextInput
           style={styles.input}
           placeholder={STRINGS.CategoryName}
           keyboardType={'default'}
-          value={category}
+          // value={category}
           onChangeText={(str: string) => {
-            setCategory(str);
+            console.log(str);
+            setCategory(str.trim());
           }}
           placeholderTextColor={COLORS.DARK[25]}
           autoCapitalize={'words'}
