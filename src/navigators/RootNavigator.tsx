@@ -3,7 +3,7 @@ import Onboarding from '../screens/Onboarding';
 import {NAVIGATION} from '../constants/strings';
 import Signup from '../screens/Signup';
 import {ICONS} from '../constants/icons';
-import {Dimensions, Platform, Pressable} from 'react-native';
+import {Dimensions, Platform, Pressable, View} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import Login from '../screens/Login';
 import {useAppDispatch, useAppSelector} from '../redux/store';
@@ -58,6 +58,14 @@ function RootNavigator(): React.JSX.Element {
       console.log('Ok');
     }
   }, [isSuccess]);
+  const headerBackground = (color: string) => (
+    <View
+      style={{
+        backgroundColor: color,
+        width: '100%',
+        height: '100%',
+      }}></View>
+  );
   return (
     <Stack.Navigator
       screenOptions={{
@@ -85,7 +93,8 @@ function RootNavigator(): React.JSX.Element {
             component={AddExpense}
             options={{
               headerShown: true,
-              headerTransparent: true,
+              // headerTransparent: true,
+              // headerBackground:()=>headerBackground(COLO)
               headerTitleStyle: {color: COLORS.LIGHT[100]},
               headerLeft: props => headerLeft(props, COLORS.LIGHT[100]),
             }}
@@ -116,7 +125,7 @@ function RootNavigator(): React.JSX.Element {
             component={CreateBudget}
             options={{
               headerShown: true,
-              headerTransparent: true,
+              headerBackground: () => headerBackground(COLORS.VIOLET[100]),
               headerTitleStyle: {color: COLORS.LIGHT[100]},
               title: 'Create Budget',
               headerLeft: props => headerLeft(props, COLORS.LIGHT[100]),

@@ -3,8 +3,8 @@ import { COLORS } from "../../constants/commonStyles";
 
 const styles = (COLOR: typeof COLORS) => StyleSheet.create({
   filterBtn: {
-    paddingVertical: 12,
-    paddingHorizontal: 26,
+    paddingVertical: 8,
+    paddingHorizontal: 18,
     borderRadius: 40,
     borderWidth: 1,
     borderColor: COLOR.LIGHT[20],
@@ -19,6 +19,8 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
     flexWrap: 'wrap',
     columnGap: 10,
     rowGap: 10,
+    alignItems:"center",
+    justifyContent:"center"
   },
   sheetBack: { borderTopLeftRadius: 32, borderTopRightRadius: 32, backgroundColor: COLOR.LIGHT[100] }
 })

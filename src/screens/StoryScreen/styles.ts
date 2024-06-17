@@ -39,7 +39,7 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
     },
     mainView: {
         flex: 1,
-        paddingTop: 35,
+        paddingTop: 40,
         alignItems: 'center',
         justifyContent: 'space-between',
         paddingHorizontal: 16,
@@ -54,6 +54,7 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
         fontSize: RFValue(32),
         fontWeight: '600',
         color: COLOR.LIGHT[100],
+        textAlign:"center"
     },
     text2: {
         fontSize: RFValue(24),
@@ -61,16 +62,16 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
         color: COLOR.LIGHT[100],
         alignSelf: 'flex-start',
     },
-    catRow: { flexDirection: 'row', columnGap: 15, marginTop: 30 },
+    catRow: { flexDirection: 'row', columnGap: 15, marginTop: 30, flexWrap: "wrap", justifyContent: "center" },
     amt: {
         fontSize: RFValue(64),
         fontWeight: '700',
         color: COLOR.LIGHT[100],
-        
+
     },
     card: {
         backgroundColor: COLOR.LIGHT[100],
-        marginBottom: 60,
+        marginBottom: 10,
         paddingVertical: 15,
         paddingHorizontal: 10,
         width: '100%',

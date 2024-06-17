@@ -1,5 +1,6 @@
 import {
   Dimensions,
+  Image,
   SafeAreaView,
   Text,
   TouchableOpacity,
@@ -116,16 +117,26 @@ export default function StoryScreen({navigation}: Readonly<StoryScreenProps>) {
       <View style={styles.mainView}>
         {index !== 3 && <Text style={styles.title}>{STRINGS.ThisMonth}</Text>}
         <View style={{alignItems: 'center'}}>
-          <Text
-            style={[
-              styles.text1,
-              {
-                paddingHorizontal: index === 3 ? 0 : 40,
-                marginTop: index === 3 ? 150 : 0,
-              },
-            ]}>
-            {getText()}
-          </Text>
+          <View
+            style={{flexDirection: 'row', alignItems: 'center', columnGap: 5}}>
+            <Text
+              style={[
+                styles.text1,
+                {
+                  paddingHorizontal: 0,
+                  marginTop: index === 3 ? 150 : 0,
+                },
+              ]}>
+              {getText()}
+            </Text>
+            {index==0?<Image
+              source={require('../../assets/Images/YouSpend.png')}
+              style={{transform:[{scale:1.1}]}}
+            />:<Image
+            source={require('../../assets/Images/YouEarned.png')}
+            style={{transform:[{scale:1.1}]}}
+          />}
+          </View>
           {index === 3 && (
             <Text style={styles.text2}>{STRINGS.QuoteAuthor}</Text>
           )}
@@ -152,7 +163,7 @@ export default function StoryScreen({navigation}: Readonly<StoryScreenProps>) {
             </View>
           )}
           {(index === 0 || index === 1) && (
-            <Text style={styles.amt} numberOfLines={1}>
+            <Text style={[styles.amt,{marginTop:15}]} numberOfLines={1}>
               {currencies[currency!].symbol}
               {index === 0
                 ? (
@@ -174,6 +185,7 @@ export default function StoryScreen({navigation}: Readonly<StoryScreenProps>) {
             </Text>
           )}
         </View>
+        
         {((index === 0 && biggestSpend[0][0] !== '') ||
           (index === 1 && biggestIncome[0][0] !== '')) && (
           <View style={styles.card}>

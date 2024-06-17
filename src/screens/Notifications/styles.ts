@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { Dimensions, Platform, StyleSheet } from "react-native";
 import { COLORS } from "../../constants/commonStyles";
 import { RFValue } from "react-native-responsive-fontsize";
 
@@ -22,7 +22,7 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
         paddingHorizontal: 20,
         borderBottomWidth: 1,
         borderColor: COLOR.LIGHT[20],
-        backgroundColor:COLOR.LIGHT[100],
+        backgroundColor: COLOR.LIGHT[100],
         paddingVertical: 10,
         // columnGap:10,
         justifyContent: 'space-between',
@@ -45,20 +45,21 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
         backgroundColor: COLOR.LIGHT[100],
         shadowColor: 'grey',
         shadowOpacity: 0.3,
-        right: 15,
-        top: 95,
+        right: Dimensions.get('screen').width / 20,
+        top: Platform.OS === 'ios' ? Dimensions.get('screen').height / 9 : Dimensions.get('screen').height / 22,
         shadowRadius: 5,
         shadowOffset: {
             height: 2,
             width: 1,
         },
+        elevation:20
     },
     menuText: { color: COLOR.DARK[100] },
-    delete:{
+    delete: {
         backgroundColor: 'red',
         paddingHorizontal: 20,
         justifyContent: 'center',
         alignItems: 'center',
-      }
+    }
 })
 export default styles

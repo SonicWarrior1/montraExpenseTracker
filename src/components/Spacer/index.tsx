@@ -5,4 +5,4 @@ function Sapcer({height, width}: Readonly<{height?: number; width?: number}>) {
   return <View style={{height, width}}></View>;
 }
 
-export default Sapcer;
+export default React.memo(Sapcer);

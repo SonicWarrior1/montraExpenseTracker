@@ -36,7 +36,7 @@ function CustomInput({
       keyboardType={type === 'name' ? 'default' : 'email-address'}
       value={value}
       onChangeText={onChangeText}
-      placeholderTextColor={COLORS.DARK[25]}
+      placeholderTextColor={ "#91919F"}
       autoCapitalize={
         type === 'name' ? 'words' : type === 'sentence' ? 'sentences' : 'none'
       }

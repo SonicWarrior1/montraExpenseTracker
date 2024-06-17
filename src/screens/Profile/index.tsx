@@ -16,6 +16,7 @@ import {ICONS} from '../../constants/icons';
 import {useAppTheme} from '../../hooks/themeHook';
 // Third Party Libraries
 import {openLogoutSheet} from '../../redux/reducers/transactionSlice';
+import TabBackdrop from '../../components/TabBackdrop';
 
 function ProfileScreen({navigation}: Readonly<ProfileScreenProps>) {
   const dispatch = useAppDispatch();
@@ -23,6 +24,7 @@ function ProfileScreen({navigation}: Readonly<ProfileScreenProps>) {
   const COLOR = useAppTheme();
   const styles = style(COLOR);
   return (
+    <>
     <SafeAreaView style={styles.safeView}>
       <ScrollView>
         <View style={styles.mainView}>
@@ -76,6 +78,8 @@ function ProfileScreen({navigation}: Readonly<ProfileScreenProps>) {
         </View>
       </ScrollView>
     </SafeAreaView>
+    <TabBackdrop/>
+    </>
   );
 }
 

@@ -27,7 +27,7 @@ function CustomPassInput({
         secureTextEntry={showPass}
         value={value}
         onChangeText={onChangeText}
-        placeholderTextColor={COLORS.DARK[25]}
+        placeholderTextColor={'#91919F'}
         textContentType="oneTimeCode"
       />
       <Pressable

@@ -15,6 +15,7 @@ import {
   BottomTabBarProps,
   createBottomTabNavigator,
 } from '@react-navigation/bottom-tabs';
+import TabBackdrop from '../components/TabBackdrop';
 
 const Tab = createBottomTabNavigator<BottomParamList>();
 function CustomTabBar(props: Readonly<BottomTabBarProps>) {

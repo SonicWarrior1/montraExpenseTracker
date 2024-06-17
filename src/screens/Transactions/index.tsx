@@ -19,6 +19,7 @@ import {NAVIGATION, STRINGS} from '../../constants/strings';
 import {useAppTheme} from '../../hooks/themeHook';
 import {Timestamp} from '@react-native-firebase/firestore';
 import TransactionItem from './atoms/TransactionItem';
+import TabBackdrop from '../../components/TabBackdrop';
 function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
   // constants
   const COLOR = useAppTheme();
@@ -127,19 +128,23 @@ function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
     if (filters.sort === 'oldest') {
       return x.slice().reverse();
     } else if (filters.sort === 'lowest') {
-      return x.map(data => {
-        return {
-          title: data.title,
-          data: data.data.slice().sort((a, b) => a.amount - b.amount),
-        };
-      });
+      return [
+        {
+          title: '',
+          data: Object.values(transaction)
+            .slice()
+            .sort((a, b) => a.amount - b.amount),
+        },
+      ];
     } else if (filters.sort === 'highest') {
-      return x.map(data => {
-        return {
-          title: data.title,
-          data: data.data.slice().sort((a, b) => b.amount - a.amount),
-        };
-      });
+      return [
+        {
+          title: '',
+          data: Object.values(transaction)
+            .slice()
+            .sort((a, b) => b.amount - a.amount),
+        },
+      ];
     } else {
       return x;
     }
@@ -148,85 +153,91 @@ function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
   const theme = useAppSelector(state => state.user.currentUser?.theme);
   const finaltheme = theme === 'device' ? scheme : theme;
   return (
-    <SafeAreaView
-      style={[
-        styles.safeView,
-        {
-          backgroundColor:
-            finaltheme === 'dark' ? COLORS.DARK[75] : COLOR.LIGHT[100],
-        },
-      ]}>
-      <TransactionHeader month={month} setMonth={setMonth} />
-      <ScrollView>
-        <View style={styles.mainView}>
-          <TouchableOpacity
-            style={styles.financialBtn}
-            onPress={() => {
-              navigation.navigate(NAVIGATION.Story);
-            }}>
-            <Text style={styles.financialText}>
-              {STRINGS.SeeFinancialReport}
-            </Text>
-            {ICONS.ArrowRight({
-              height: 30,
-              width: 25,
-              color: COLOR.VIOLET[100],
-              borderColor: COLOR.VIOLET[100],
-            })}
-          </TouchableOpacity>
-          {applyFilters().length === 2 &&
-          applyFilters()[0].data.length === 0 &&
-          applyFilters()[1].data.length === 0 ? (
-            <View
-              style={{
-                justifyContent: 'center',
-                alignItems: 'center',
+    <>
+      <SafeAreaView
+        style={[
+          styles.safeView,
+          {
+            backgroundColor:
+              finaltheme === 'dark' ? COLORS.DARK[75] : COLOR.LIGHT[100],
+          },
+        ]}>
+        <TransactionHeader month={month} setMonth={setMonth} />
+        <ScrollView>
+          <View style={styles.mainView}>
+            <TouchableOpacity
+              style={styles.financialBtn}
+              onPress={() => {
+                navigation.navigate(NAVIGATION.Story);
               }}>
-              <Text style={styles.emptyText}> No Transactions</Text>
-            </View>
-          ) : (
-            <SectionList
-              scrollEnabled={false}
-              style={{width: '100%'}}
-              sections={applyFilters()}
-              renderItem={({item}) => (
-                <TransactionItem
-                  item={item}
-                  navigation={navigation}
-                  scheme={scheme}
-                  theme={theme}
-                />
-              )}
-              renderSectionHeader={({section: {title, data}}) =>
-                data.length === 0 ? (
-                  <View />
-                ) : (
-                  <Text style={styles.sectionHeader}>
-                    {title !== 'today' && title !== 'yesterday'
-                      ? Timestamp.fromMillis(Number(title) * 1000)
-                          .toDate()
-                          .getDate()
-                          .toString() +
-                        '/' +
-                        (
+              <Text style={styles.financialText}>
+                {STRINGS.SeeFinancialReport}
+              </Text>
+              {ICONS.ArrowRight({
+                height: 30,
+                width: 25,
+                color: COLOR.VIOLET[100],
+                borderColor: COLOR.VIOLET[100],
+              })}
+            </TouchableOpacity>
+            {applyFilters().length === 2 &&
+            applyFilters()[0].data.length === 0 &&
+            applyFilters()[1].data.length === 0 ? (
+              <View
+                style={{
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                <Text style={styles.emptyText}> No Transactions</Text>
+              </View>
+            ) : (
+              <SectionList
+                scrollEnabled={false}
+                style={{width: '100%'}}
+                sections={applyFilters()}
+                renderItem={({item}) => (
+                  <TransactionItem
+                    item={item}
+                    navigation={navigation}
+                    scheme={scheme}
+                    theme={theme}
+                    dateShow={
+                      filters.sort === 'highest' || filters.sort === 'lowest'
+                    }
+                  />
+                )}
+                renderSectionHeader={({section: {title, data}}) =>
+                  data.length === 0 || title === '' ? (
+                    <View />
+                  ) : (
+                    <Text style={styles.sectionHeader}>
+                      {title !== 'today' && title !== 'yesterday'
+                        ? Timestamp.fromMillis(Number(title) * 1000)
+                            .toDate()
+                            .getDate()
+                            .toString() +
+                          '/' +
+                          (
+                            Timestamp.fromMillis(Number(title) * 1000)
+                              .toDate()
+                              .getMonth() + 1
+                          ).toString() +
+                          '/' +
                           Timestamp.fromMillis(Number(title) * 1000)
                             .toDate()
-                            .getMonth() + 1
-                        ).toString() +
-                        '/' +
-                        Timestamp.fromMillis(Number(title) * 1000)
-                          .toDate()
-                          .getFullYear()
-                          .toString()
-                      : title[0].toUpperCase() + title.slice(1)}
-                  </Text>
-                )
-              }
-            />
-          )}
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+                            .getFullYear()
+                            .toString()
+                        : title[0].toUpperCase() + title.slice(1)}
+                    </Text>
+                  )
+                }
+              />
+            )}
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+      <TabBackdrop />
+    </>
   );
 }
 

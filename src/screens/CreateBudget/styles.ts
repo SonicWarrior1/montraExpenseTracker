@@ -4,7 +4,7 @@ import { RFValue } from 'react-native-responsive-fontsize';
 const styles = (COLOR: typeof COLORS) => StyleSheet.create({
     safeView: { flex: 1, backgroundColor: COLOR.PRIMARY.VIOLET },
     mainView: {
-        height: Dimensions.get('screen').height / 1.85,
+        height: Dimensions.get('screen').height / 2.1,
         justifyContent: 'flex-end',
     },
     text1: {

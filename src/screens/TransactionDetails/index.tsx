@@ -1,7 +1,9 @@
-import React, {useEffect, useMemo, useRef} from 'react';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {
+  ActivityIndicator,
   Dimensions,
   Image,
+  Modal,
   Pressable,
   SafeAreaView,
   Text,
@@ -26,6 +28,7 @@ import {useAppTheme} from '../../hooks/themeHook';
 // Third Party Libraries
 import {Timestamp} from '@react-native-firebase/firestore';
 import {BottomSheetModalMethods} from '@gorhom/bottom-sheet/lib/typescript/types';
+import ImageModal from './atoms/imageModal';
 
 function TransactionDetails({
   route,
@@ -45,6 +48,9 @@ function TransactionDetails({
   );
   // ref
   const bottomSheetModalRef = useRef<BottomSheetModalMethods>(null);
+  // state
+  const [showImage, setShowImage] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   // functions
   const headerRight = () => {
     return (
@@ -74,6 +80,13 @@ function TransactionDetails({
   return (
     trans && (
       <View style={{flex: 1, backgroundColor: COLOR.LIGHT[100]}}>
+        {trans.attachementType === 'image' && trans.attachement && (
+          <ImageModal
+            setShowImage={setShowImage}
+            showImage={showImage}
+            url={trans.attachement}
+          />
+        )}
         <SafeAreaView
           style={[
             styles.safeView,
@@ -180,7 +193,25 @@ function TransactionDetails({
               <View>
                 <Text style={styles.descTitle}>{STRINGS.Attachement}</Text>
                 {trans.attachementType === 'image' ? (
-                  <Image source={{uri: trans.attachement}} style={styles.img} />
+                  <>
+                    {isLoading &&
+                    <ActivityIndicator  color={COLORS.VIOLET[40]}/>}
+                    <Pressable
+                      onPress={() => {
+                        setShowImage(true);
+                      }}>
+                      <Image
+                        source={{uri: trans.attachement}}
+                        style={styles.img}
+                        onLoadStart={() => {
+                          setIsLoading(true);
+                        }}
+                        onLoadEnd={() => {
+                          setIsLoading(false);
+                        }}
+                      />
+                    </Pressable>
+                  </>
                 ) : (
                   <CustomButton
                     title={STRINGS.ViewDocument}

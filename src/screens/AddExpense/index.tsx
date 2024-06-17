@@ -85,6 +85,14 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
   useEffect(() => {
     navigation.setOptions({
       title: pageType[0].toUpperCase() + pageType.slice(1),
+      headerBackground: () => (
+        <View
+          style={{
+            backgroundColor: getBackgroundColor,
+            width: '100%',
+            height: '100%',
+          }}></View>
+      ),
     });
   }, [pageType]);
   // redux use
@@ -130,6 +138,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
   const [from, setFrom] = useState(transaction ? transaction.from : '');
   const [to, setTo] = useState(transaction ? transaction.to : '');
   const [formKey, setFormKey] = useState(false);
+  const [catColors, setCatColors] = useState<{[key: string]: string}>();
   // refs
   const filePickSheetRef = useRef<BottomSheetModal>(null);
   const repeatSheetRef = useRef<BottomSheetModal>(null);
@@ -342,7 +351,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
       Toast.show({
         text1: `Transaction has been ${
           isEdit ? 'Updated' : 'Added'
-        } Succesfully`,
+        } Successfully`,
         type: 'custom',
       });
       navigation.pop();
@@ -355,15 +364,53 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
     if (repeatData) {
       if (isEdit) {
         if ((repeatData.date as Timestamp)?.seconds !== undefined) {
-          return (repeatData.date as Timestamp).toDate().toLocaleDateString();
+          return (
+            (repeatData.date as Timestamp)?.toDate()?.getDate() +
+            ' ' +
+            monthData[(repeatData.date as Timestamp)?.toDate()?.getMonth()]
+              .label +
+            ' ' +
+            (repeatData.date as Timestamp)?.toDate()?.getFullYear()
+          );
         } else {
-          return (repeatData.date as Date)?.toLocaleDateString();
+          return (
+            (repeatData.date as Date)?.getDate() +
+            ' ' +
+            monthData[(repeatData.date as Date)?.getMonth()].label +
+            ' ' +
+            (repeatData.date as Date)?.getFullYear()
+          );
         }
       } else {
-        return (repeatData.date as Date)?.toLocaleDateString();
+        return (
+          (repeatData.date as Date)?.getDate() +
+          ' ' +
+          monthData[(repeatData.date as Date)?.getMonth()].label +
+          ' ' +
+          (repeatData.date as Date)?.getFullYear()
+        );
       }
     }
   }, [isEdit, repeatData]);
+  const getMyColor = useCallback(() => {
+    let n = (Math.random() * 0xfffff * 1000000).toString(16);
+    return '#' + n.slice(0, 6);
+  }, []);
+  useEffect(() => {
+    setCatColors(
+      Object.values(pageType === 'expense' ? expenseCat! : incomeCat!).reduce(
+        (acc: {[key: string]: string}, item) => {
+          acc[item] = getMyColor();
+          return acc;
+        },
+        {},
+      ),
+    );
+    return () => {
+      setCatColors(undefined);
+    };
+  }, [pageType, expenseCat, incomeCat]);
+  console.log(catColors);
   return (
     <>
       <KeyboardAwareScrollView
@@ -385,8 +432,8 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
               {
                 height:
                   pageType === 'transfer'
-                    ? Dimensions.get('screen').height / 2
-                    : Dimensions.get('screen').height / 3.2,
+                    ? Dimensions.get('screen').height / 2.4
+                    : Dimensions.get('screen').height / 4,
               },
             ]}>
             <Text style={styles.text1}>{STRINGS.HowMuch}</Text>
@@ -395,6 +442,11 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
               <TextInput
                 style={styles.input}
                 maxLength={6}
+                onPress={() => {
+                  if (amount === '0') {
+                    setAmount('');
+                  }
+                }}
                 onChangeText={(str: string) => {
                   let numericValue = str.replace(/[^0-9.]+/g, '');
                   const decimalCount = numericValue.split('.').length - 1;
@@ -442,6 +494,21 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
               }}
               value={category}
               placeholder={STRINGS.Category}
+              leftIcon={visible => {
+                console.log(category);
+                return !visible && category !== '' ? (
+                  <View
+                    style={{
+                      height: 15,
+                      width: 15,
+                      backgroundColor: catColors?.[category ?? ''] ?? 'green',
+                      borderRadius: 20,
+                      marginRight: 8,
+                    }}
+                  />
+                ) : undefined;
+              }}
+              catColors={catColors}
             />
           )}
           {pageType === 'transfer' && (
@@ -533,7 +600,9 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
               <View>
                 <Text style={styles.flexRowText1}>{STRINGS.Repeat}</Text>
                 <Text style={styles.flexRowText2}>
-                  {STRINGS.RepeatTransaction}
+                  {repeatData
+                    ? 'Repeat transaction, set your own time'
+                    : STRINGS.RepeatTransaction}
                 </Text>
               </View>
               <Switch

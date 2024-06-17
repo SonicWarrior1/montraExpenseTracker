@@ -6,6 +6,7 @@ import style from '../styles';
 import {currencies} from '../../../constants/strings';
 import {transactionType} from '../../../defs/transaction';
 import {useAppTheme} from '../../../hooks/themeHook';
+import { Timestamp } from '@react-native-firebase/firestore';
 
 function Linegraph({
   totalSpend,
@@ -47,7 +48,7 @@ function Linegraph({
         {Object.values(data)
           .filter(
             item =>
-              item.timeStamp.toDate().getMonth() === month &&
+              Timestamp.fromMillis(item.timeStamp.seconds * 1000).toDate().getMonth() === month &&
               item.type === transType,
           )
           .sort((a, b) => a.timeStamp.seconds - b.timeStamp.seconds)
@@ -67,7 +68,7 @@ function Linegraph({
             data={Object.values(data)
               .filter(
                 item =>
-                  item.timeStamp.toDate().getMonth() === month &&
+                  Timestamp.fromMillis(item.timeStamp.seconds * 1000).toDate().getMonth() === month &&
                   item.type === transType,
               )
               .sort((a, b) => a.timeStamp.seconds - b.timeStamp.seconds)

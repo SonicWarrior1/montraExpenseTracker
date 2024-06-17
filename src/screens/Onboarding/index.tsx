@@ -1,22 +1,20 @@
 import React, {useState} from 'react';
 import {
   Dimensions,
-  Image,
   Platform,
   SafeAreaView,
-  Text,
   View,
 } from 'react-native';
 import style from './styles';
 import {NAVIGATION, STRINGS} from '../../constants/strings';
 import {OnboardingScreenProps} from '../../defs/navigation';
 import {COLORS} from '../../constants/commonStyles';
-import {ICONS} from '../../constants/icons';
 import {useAppTheme} from '../../hooks/themeHook';
 import Sapcer from '../../components/Spacer';
 import CustomButton from '../../components/CustomButton';
 // Third party libraries
 import Carousel from 'react-native-reanimated-carousel';
+import CarasoulCtr from './atoms/CarasoulCtr';
 
 const screenWidth = Dimensions.get('screen').width;
 const screenHeight = Dimensions.get('window').height;
@@ -66,31 +64,9 @@ function Onboarding({navigation}: Readonly<OnboardingScreenProps>) {
               data={data}
               scrollAnimationDuration={300}
               onSnapToItem={index => {
-                setIndex(index)
+                setIndex(index);
               }}
-              renderItem={({item, index}) => (
-                <View style={styles.carouselCtr}>
-                  <Image
-                    source={
-                      index === 0
-                        ? require('../../assets/Images/onboarding1.png')
-                        : index == 1
-                        ? require('../../assets/Images/onboarding2.png')
-                        : require('../../assets/Images/onboarding3.png')
-                    }
-                    style={{
-                      height: screenHeight * 0.4,
-                      width: screenWidth * 0.9,
-                      transform:[{scale:0.9}]
-                    }}
-                  />
-                  <View>
-                    <Text style={styles.text1}>{item.text1}</Text>
-                    <View style={{height: screenHeight * 0.025}} />
-                    <Text style={styles.text2}>{item.text2}</Text>
-                  </View>
-                </View>
-              )}
+              renderItem={CarasoulCtr}
             />
           </View>
           <Sapcer

@@ -12,6 +12,8 @@ import {useAppTheme} from '../../hooks/themeHook';
 import {BottomSheetModalMethods} from '@gorhom/bottom-sheet/lib/typescript/types';
 import DatePicker from 'react-native-date-picker';
 import {BottomSheetModal, BottomSheetView} from '@gorhom/bottom-sheet';
+import {AnimatedEmptyError, EmptyError} from '../../constants/errors';
+import Sapcer from '../Spacer';
 
 function RepeatTransactionSheet({
   bottomSheetModalRef,
@@ -30,6 +32,7 @@ function RepeatTransactionSheet({
   const [end, setEnd] = useState<'date' | 'never'>();
   const [date, setDate] = useState<Date>(new Date());
   const [isDateOpen, setIsDateOpen] = useState(false);
+  const [formkey, setFormkey] = useState(false);
   // constants
   const snapPoints = useMemo(() => ['40%'], []);
   const year = new Date().getFullYear();
@@ -69,10 +72,13 @@ function RepeatTransactionSheet({
       snapPoints={snapPoints}
       backdropComponent={SheetBackdrop}
       backgroundStyle={styles.sheetBack}
-      handleIndicatorStyle={{backgroundColor: COLOR.VIOLET[40]}}>
+      handleIndicatorStyle={{backgroundColor: COLOR.VIOLET[40]}}
+      onDismiss={() => {
+        setFormkey(false);
+      }}>
       <BottomSheetView style={styles.sheetView}>
         <View style={styles.flexRow}>
-          <View style={styles.flex}>
+          <View style={[styles.flex, {minWidth: 35}]}>
             <CustomDropdown
               data={[
                 {label: 'Yearly', value: 'yearly'},
@@ -88,7 +94,7 @@ function RepeatTransactionSheet({
             />
           </View>
           {freq === 'yearly' && (
-            <View style={styles.flex}>
+            <View style={[styles.flex, {minWidth: 70}]}>
               <CustomDropdown
                 data={monthData}
                 onChange={val => {
@@ -106,13 +112,13 @@ function RepeatTransactionSheet({
                   freq === 'monthly'
                     ? daysInYear[new Date().getMonth()].days.map(day => {
                         return {
-                          label: day,
+                          label: String(day),
                           value: day,
                         };
                       })
                     : daysInYear[month - 1].days.map(day => {
                         return {
-                          label: day,
+                          label: String(day),
                           value: day,
                         };
                       })
@@ -138,6 +144,11 @@ function RepeatTransactionSheet({
             </View>
           )}
         </View>
+        <AnimatedEmptyError
+          errorText="Please select an option"
+          value={freq ?? ''}
+          formKey={formkey}
+        />
         <View style={styles.flexRow}>
           <View style={styles.flex}>
             <CustomDropdown
@@ -150,6 +161,7 @@ function RepeatTransactionSheet({
               }}
               placeholder="End After"
               value={end}
+              disable={freq===undefined}
             />
           </View>
           {end === 'date' && (
@@ -187,18 +199,22 @@ function RepeatTransactionSheet({
             </Pressable>
           )}
         </View>
+        <Sapcer height={10} />
         <CustomButton
           title={STRINGS.Next}
           onPress={() => {
-            setRepeatData({
-              freq: freq ?? 'daily',
-              month: month,
-              day: day,
-              weekDay: weekDay,
-              end: end ?? 'never',
-              date: date,
-            });
-            bottomSheetModalRef.current?.close();
+            setFormkey(true);
+            if (freq) {
+              setRepeatData({
+                freq: freq ?? 'daily',
+                month: month,
+                day: day,
+                weekDay: weekDay,
+                end: end ?? 'never',
+                date: date,
+              });
+              bottomSheetModalRef.current?.close();
+            }
           }}
         />
       </BottomSheetView>

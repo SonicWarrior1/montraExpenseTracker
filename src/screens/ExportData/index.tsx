@@ -31,8 +31,8 @@ function ExportData() {
       Object.values(data)
         .filter(
           item =>
-            item.timeStamp.toDate() > daysAgo &&
-            (dataType === 'all' ? true : dataType === item.type),
+            Timestamp.fromMillis(item.timeStamp.seconds * 1000).toDate() >
+              daysAgo && (dataType === 'all' ? true : dataType === item.type),
         )
         .map(val => {
           let frequency = '';
@@ -106,9 +106,10 @@ function ExportData() {
             })}
             onChange={data => {
               setDataRange(data.value);
+              console.log(data);
             }}
             placeholder=""
-            value={dataRange}
+            value={String(dataRange)}
           />
           <Text style={styles.text}>{STRINGS.WhatFormat}</Text>
           <CustomDropdown

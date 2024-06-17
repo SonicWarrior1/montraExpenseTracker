@@ -1,5 +1,5 @@
 import React, {useEffect, useMemo, useRef, useState} from 'react';
-import {Pressable, Text, View} from 'react-native';
+import {BackHandler, Pressable, Text, View} from 'react-native';
 import {ICONS} from '../../constants/icons';
 import CustomButton from '../CustomButton';
 import style from './styles';
@@ -42,7 +42,17 @@ function FilterSheet() {
       ref.current?.close();
     }
   }, [isOpen]);
-
+  const backAction = () => {
+    dispatch(openFilterSheet(false));
+    return true;
+  };
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      backAction,
+    );
+    return () => backHandler.remove();
+  }, []);
   return (
     <BottomSheetModalProvider>
       <BottomSheetModal
@@ -65,7 +75,7 @@ function FilterSheet() {
                 setFilter(-1);
                 setSort(-1);
                 dispatch(setFilters(-1));
-                dispatch(setSortFilter(2));
+                dispatch(setSortFilter(-1));
                 dispatch(clearCatFilter());
               }}>
               <Text style={styles.editBtnText}>{STRINGS.Reset}</Text>

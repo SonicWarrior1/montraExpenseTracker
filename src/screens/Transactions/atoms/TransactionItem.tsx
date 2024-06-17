@@ -1,7 +1,7 @@
 import {Timestamp} from '@react-native-firebase/firestore';
 import {ColorSchemeName, Pressable, Text, View} from 'react-native';
 import style from '../styles';
-import {currencies, NAVIGATION} from '../../../constants/strings';
+import {currencies, monthData, NAVIGATION} from '../../../constants/strings';
 import {COLORS} from '../../../constants/commonStyles';
 import {catIcons, ICONS} from '../../../constants/icons';
 import {useAppTheme} from '../../../hooks/themeHook';
@@ -17,6 +17,7 @@ const TransactionItem = ({
   theme,
   scheme,
   navigation,
+  dateShow,
 }: {
   item: transactionType;
   theme: 'light' | 'device' | 'dark' | undefined;
@@ -25,6 +26,7 @@ const TransactionItem = ({
     BottomTabNavigationProp<BottomParamList, 'Transaction', undefined>,
     StackNavigationProp<RootStackParamList, keyof RootStackParamList, undefined>
   >;
+  dateShow?: boolean;
 }) => {
   // constants
   const COLOR = useAppTheme();
@@ -109,6 +111,20 @@ const TransactionItem = ({
           ).toFixed(1)}
         </Text>
         <Text style={styles.text2}>
+          {dateShow &&
+            Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+              ?.toDate()
+              ?.getDate() +
+              ' ' +
+              monthData[
+                Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+                  ?.toDate()
+                  ?.getMonth()
+              ].label +
+              ' ' +
+              Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+                ?.toDate()
+                ?.getFullYear()}{' '}
           {Timestamp.fromMillis(item.timeStamp.seconds * 1000)
             .toDate()
             .getHours()}

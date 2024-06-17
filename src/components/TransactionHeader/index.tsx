@@ -23,12 +23,19 @@ function TransactionHeader({
   const styles = style(COLOR);
   // redux
   const filters = useAppSelector(state => state.transaction.filters);
+  console.log(filters.sort !== 'none' ? 1 : 0);
   return (
     <View style={styles.header}>
       <Dropdown
         style={styles.dropdown}
         renderLeftIcon={() => (
-          <View>{ICONS.ArrowDown({width: 15, height: 15,borderColor: COLOR.VIOLET[100],})}</View>
+          <View>
+            {ICONS.ArrowDown({
+              width: 15,
+              height: 15,
+              borderColor: COLOR.VIOLET[100],
+            })}
+          </View>
         )}
         renderRightIcon={() => <></>}
         placeholder={STRINGS.Month}
@@ -56,11 +63,13 @@ function TransactionHeader({
           borderColor: COLOR.DARK[100],
         })}
         {(filters.filter !== 'none' ? 1 : 0) +
+          (filters.sort !== 'none' ? 1 : 0) +
           (filters.cat.length > 0 ? filters.cat.length : 0) !==
           0 && (
           <View style={styles.notifCount}>
             <Text style={{color: COLORS.LIGHT[100]}}>
               {(filters.filter !== 'none' ? 1 : 0) +
+                (filters.sort !== 'none' ? 1 : 0) +
                 (filters.cat.length > 0 ? filters.cat.length : 0)}
             </Text>
           </View>

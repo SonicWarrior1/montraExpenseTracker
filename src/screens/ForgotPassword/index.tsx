@@ -18,6 +18,7 @@ import firestore from '@react-native-firebase/firestore';
 import {useAppDispatch} from '../../redux/store';
 import {setLoading} from '../../redux/reducers/userSlice';
 import Toast from 'react-native-toast-message';
+import {decrypt} from '../../utils/encryption';
 
 function ForgotPassword({navigation}: Readonly<ForgotScreenProps>) {
   // constants
@@ -31,20 +32,43 @@ function ForgotPassword({navigation}: Readonly<ForgotScreenProps>) {
   function onChangeEmail(str: string) {
     setEmail(str);
   }
+  async function isUserExist(email: string) {
+    try {
+      const snapshot = await firestore().collection('users').get();
+      const res = snapshot.docs.filter(doc => {
+        console.log(
+          doc.data()['email'],
+          doc.data()['uid'],
+          decrypt(doc.data()['email'], doc.data()['uid']),
+        );
+        console.log((decrypt(doc.data()['email'], doc.data()['uid']) ?? '') === email)
+        return (decrypt(doc.data()['email'], doc.data()['uid']) ?? '') === email;
+      });
+      console.log(res[0]);
+      return res.length !== 0;
+    } catch (e) {
+      console.log(e);
+      return false;
+    }
+  }
   async function handleForgot() {
     setForm(true);
     if (email !== '' && testInput(emailRegex, email)) {
       try {
         dispatch(setLoading(true));
-        await auth().sendPasswordResetEmail(email);
-        navigation.reset({
-          index: 2,
-          routes: [
-            {name: NAVIGATION.ONBOARDING},
-            {name: NAVIGATION.LOGIN},
-            {name: NAVIGATION.FORGOTEMAILSENT, params: {email: email}},
-          ],
-        });
+        if (await isUserExist(email)) {
+          await auth().sendPasswordResetEmail(email);
+          navigation.reset({
+            index: 2,
+            routes: [
+              {name: NAVIGATION.ONBOARDING},
+              {name: NAVIGATION.LOGIN},
+              {name: NAVIGATION.FORGOTEMAILSENT, params: {email: email}},
+            ],
+          });
+        } else {
+          Toast.show({text1: 'This email is not registered', type: 'error'});
+        }
         dispatch(setLoading(false));
       } catch (e: any) {
         console.log(e);

@@ -15,6 +15,7 @@ import {useAppSelector} from '../../redux/store';
 import {Bar} from 'react-native-progress';
 import {COLORS} from '../../constants/commonStyles';
 import {useAppTheme} from '../../hooks/themeHook';
+import TabBackdrop from '../../components/TabBackdrop';
 
 function BudgetScreen({navigation}: Readonly<BudgetScreenProps>) {
   // constants
@@ -55,6 +56,7 @@ function BudgetScreen({navigation}: Readonly<BudgetScreenProps>) {
     }
   };
   return (
+    <>
     <View style={styles.safeView}>
       <Sapcer height={30} />
       <SafeAreaView style={styles.safeView}>
@@ -182,6 +184,8 @@ function BudgetScreen({navigation}: Readonly<BudgetScreenProps>) {
         <Sapcer height={20} />
       </View>
     </View>
+    <TabBackdrop/>
+    </>
   );
 }
 export default BudgetScreen;

@@ -1,4 +1,4 @@
-import React, {useRef, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {SafeAreaView, Switch, Text, TextInput, View} from 'react-native';
 import Sapcer from '../../components/Spacer';
 import CustomButton from '../../components/CustomButton';
@@ -37,6 +37,13 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
   // redux
   const conversion = useAppSelector(state => state.transaction.conversion);
   const currency = useAppSelector(state => state.user.currentUser?.currency);
+  const budgets = useAppSelector(
+    state => state.user.currentUser?.budget[month],
+  );
+  const expenseCat = useAppSelector(
+    state => state.user.currentUser?.expenseCategory,
+  );
+  const uid = useAppSelector(state => state.user.currentUser?.uid);
   // state
   const [amount, setAmount] = useState(
     isEdit
@@ -50,13 +57,30 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
   const [sliderVal, setSliderVal] = useState(
     isEdit ? oldBudget?.percentage : 0,
   );
-  const expenseCat = useAppSelector(
-    state => state.user.currentUser?.expenseCategory,
-  );
-  const uid = useAppSelector(state => state.user.currentUser?.uid);
+  const [catColors, setCatColors] = useState<{[key: string]: string}>();
   const [form, setForm] = useState(false);
+
   // ref
   const addCategorySheetRef = useRef<BottomSheetModal>(null);
+  //functions
+  const getMyColor = useCallback(() => {
+    let n = (Math.random() * 0xfffff * 1000000).toString(16);
+    return '#' + n.slice(0, 6);
+  }, []);
+  useEffect(() => {
+    setCatColors(
+      Object.values(expenseCat!).reduce(
+        (acc: {[key: string]: string}, item) => {
+          acc[item] = getMyColor();
+          return acc;
+        },
+        {},
+      ),
+    );
+    return () => {
+      setCatColors(undefined);
+    };
+  }, [expenseCat]);
   return (
     <KeyboardAwareScrollView
       style={{backgroundColor: COLOR.PRIMARY.VIOLET}}
@@ -71,6 +95,11 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
               <TextInput
                 style={styles.input}
                 maxLength={6}
+                onPress={() => {
+                  if (amount === '0') {
+                    setAmount('');
+                  }
+                }}
                 onChangeText={(str: string) => {
                   let numericValue = str.replace(/[^0-9.]+/g, '');
                   const decimalCount = numericValue.split('.').length - 1;
@@ -93,20 +122,21 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
                 size={18}
               />
             </View>
-            <Sapcer height={20} />
           </View>
         </SafeAreaView>
         <View style={styles.detailsCtr}>
           <CustomDropdown
-            data={expenseCat!.map(item => {
-              return {
-                label:
-                  item === 'add'
-                    ? 'ADD NEW CATEGORY'
-                    : item[0].toUpperCase() + item.slice(1),
-                value: item,
-              };
-            })}
+            data={expenseCat!
+              .filter(cat => !Object.keys(budgets!).includes(cat))
+              .map(item => {
+                return {
+                  label:
+                    item === 'add'
+                      ? 'ADD NEW CATEGORY'
+                      : item[0].toUpperCase() + item.slice(1),
+                  value: item,
+                };
+              })}
             onChange={val => {
               if (val.value === 'add') {
                 addCategorySheetRef.current?.present();
@@ -116,6 +146,21 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
             }}
             value={category}
             placeholder={STRINGS.Category}
+            leftIcon={visible => {
+              console.log(category);
+              return !visible && category !== '' ? (
+                <View
+                  style={{
+                    height: 15,
+                    width: 15,
+                    backgroundColor: catColors?.[category ?? ''] ?? 'green',
+                    borderRadius: 20,
+                    marginRight: 8,
+                  }}
+                />
+              ) : undefined;
+            }}
+            catColors={catColors}
           />
           <EmptyError
             errorText={STRINGS.PleaseSelectACategory}

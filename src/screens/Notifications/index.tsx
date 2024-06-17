@@ -1,5 +1,13 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import {FlatList, Pressable, SafeAreaView, Text, View} from 'react-native';
+import {
+  Alert,
+  FlatList,
+  Pressable,
+  SafeAreaView,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import {useAppSelector} from '../../redux/store';
 import {NotificationScreenProps} from '../../defs/navigation';
 import {ICONS} from '../../constants/icons';
@@ -9,6 +17,7 @@ import {encrypt} from '../../utils/encryption';
 import {STRINGS} from '../../constants/strings';
 import {useAppTheme} from '../../hooks/themeHook';
 import {Swipeable} from 'react-native-gesture-handler';
+import Sapcer from '../../components/Spacer';
 
 function NotificationScreen({navigation}: Readonly<NotificationScreenProps>) {
   // redux
@@ -54,13 +63,34 @@ function NotificationScreen({navigation}: Readonly<NotificationScreenProps>) {
       console.log(e);
     }
   }, [notifications, uid]);
-  const handleDelete = useCallback(async () => {
-    try {
-      await userDoc.update({notification: {}});
-      setMenu(false);
-    } catch (e) {
-      console.log(e);
-    }
+  const handleDelete = useCallback(() => {
+    Alert.alert(
+      'Are you sure ?',
+      'Are you sure you want to delete all the notifications.',
+      [
+        {
+          text: 'No',
+          onPress: () => {
+            (async () => {
+              console.log('OK Pressed');
+            })();
+          },
+        },
+        {
+          text: 'Yes',
+          onPress: () => {
+            (async () => {
+              try {
+                setMenu(false);
+                await userDoc.update({notification: {}});
+              } catch (e) {
+                console.log(e);
+              }
+            })();
+          },
+        },
+      ],
+    );
   }, [uid]);
   const handleSingleDelete = useCallback(
     (item: {
@@ -130,13 +160,17 @@ function NotificationScreen({navigation}: Readonly<NotificationScreenProps>) {
           })}
         </Pressable>
         <Text style={styles.headerTitle}>{STRINGS.Notifications}</Text>
-        <Pressable
-          style={{marginRight: 15}}
-          onPress={() => {
-            setMenu(menu => !menu);
-          }}>
-          {ICONS.More({height: 20, width: 20, color: COLOR.DARK[100]})}
-        </Pressable>
+        {Object.values(notifications!).length === 0 ? (
+          <Sapcer width={25}></Sapcer>
+        ) : (
+          <Pressable
+            style={{marginRight: 15}}
+            onPress={() => {
+              setMenu(menu => !menu);
+            }}>
+            {ICONS.More({height: 20, width: 20, color: COLOR.DARK[100]})}
+          </Pressable>
+        )}
       </View>
       {notifications === undefined ||
       Object.values(notifications).length === 0 ? (
@@ -144,58 +178,68 @@ function NotificationScreen({navigation}: Readonly<NotificationScreenProps>) {
           <Text style={styles.NoNotifText}>{STRINGS.NoNotification}</Text>
         </View>
       ) : (
-        <FlatList
-          data={Object.values(notifications).sort(
-            (a, b) => b.time.seconds - a.time.seconds,
-          )}
-          renderItem={({item}) => {
-            return (
-              <Swipeable
-                renderRightActions={() => {
-                  return (
-                    <Pressable
-                      style={styles.delete}
-                      onPress={handleSingleDelete(item)}>
-                      {ICONS.Trash({
-                        height: 30,
-                        width: 30,
-                        color: COLOR.LIGHT[100],
-                      })}
-                    </Pressable>
-                  );
-                }}>
-                <View style={styles.ctr}>
-                  <View style={{maxWidth: '85%'}}>
-                    <Text style={styles.text1} numberOfLines={1}>
-                      {item.category[0].toUpperCase() + item.category.slice(1)}{' '}
-                      {STRINGS.BudgetExceed}
-                    </Text>
-                    <Text style={styles.text2} numberOfLines={1}>
-                      Your{' '}
-                      {item.category[0].toUpperCase() + item.category.slice(1)}{' '}
-                      {STRINGS.BudgetExceed}
+        <Pressable
+          onPress={() => {
+            if (menu) {
+              setMenu(false);
+            }
+          }}
+          style={{flex: 1}}>
+          <FlatList
+            data={Object.values(notifications).sort(
+              (a, b) => b.time.seconds - a.time.seconds,
+            )}
+            renderItem={({item}) => {
+              return (
+                <Swipeable
+                  renderRightActions={() => {
+                    return (
+                      <Pressable
+                        style={styles.delete}
+                        onPress={handleSingleDelete(item)}>
+                        {ICONS.Trash({
+                          height: 30,
+                          width: 30,
+                          color: COLOR.LIGHT[100],
+                        })}
+                      </Pressable>
+                    );
+                  }}>
+                  <View style={styles.ctr}>
+                    <View style={{maxWidth: '85%'}}>
+                      <Text style={styles.text1} numberOfLines={1}>
+                        {item.category[0].toUpperCase() +
+                          item.category.slice(1)}{' '}
+                        {STRINGS.BudgetExceed}
+                      </Text>
+                      <Text style={styles.text2} numberOfLines={1}>
+                        Your{' '}
+                        {item.category[0].toUpperCase() +
+                          item.category.slice(1)}{' '}
+                        {STRINGS.BudgetExceed}
+                      </Text>
+                    </View>
+                    <Text style={styles.text2}>
+                      {item.time.toDate().getHours()}.
+                      {item.time.toDate().getMinutes() < 10
+                        ? '0' + item.time.toDate().getMinutes()
+                        : item.time.toDate().getMinutes()}
                     </Text>
                   </View>
-                  <Text style={styles.text2}>
-                    {item.time.toDate().getHours()}.
-                    {item.time.toDate().getMinutes() < 10
-                      ? '0' + item.time.toDate().getMinutes()
-                      : item.time.toDate().getMinutes()}
-                  </Text>
-                </View>
-              </Swipeable>
-            );
-          }}
-        />
+                </Swipeable>
+              );
+            }}
+          />
+        </Pressable>
       )}
       {menu && (
         <View style={styles.menu}>
-          <Pressable onPress={handleMarkRead}>
+          {/* <Pressable onPress={handleMarkRead}>
             <Text style={styles.menuText}>{STRINGS.MarkAllRead}</Text>
-          </Pressable>
-          <Pressable onPress={handleDelete}>
+          </Pressable> */}
+          <TouchableOpacity onPress={handleDelete}>
             <Text style={styles.menuText}>{STRINGS.RemoveAll}</Text>
-          </Pressable>
+          </TouchableOpacity>
         </View>
       )}
     </SafeAreaView>

@@ -9,7 +9,7 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
         paddingHorizontal: 15,
         columnGap: 10,
         alignItems: 'center',
-        width:180,
+        width: 180,
     },
     iconCtr: {
         backgroundColor: COLOR.LIGHT[100],
@@ -26,12 +26,13 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
         fontSize: RFValue(18),
         fontWeight: '600',
         color: COLOR.LIGHT[100],
-        maxWidth:100,
-        
+        maxWidth: 100,
+
     },
     filterBtn: {
         paddingVertical: 10,
-        paddingHorizontal: 22,
+        // paddingHorizontal: 22,
+        alignItems: "center",
         borderRadius: 40,
     },
     filterBtnText: {
@@ -106,7 +107,7 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
     dayRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        paddingHorizontal: 20,
+        paddingHorizontal: 12,
     },
     flexRow: {
         flexDirection: 'row',
