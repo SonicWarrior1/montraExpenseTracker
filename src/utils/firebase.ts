@@ -273,41 +273,71 @@ export async function handleNotify({
     ]?.[category];
     if (
         totalBudget &&
-        totalSpent >= totalBudget.limit * (totalBudget.percentage / 100)
+        (totalSpent >= totalBudget.limit || totalSpent >= totalBudget.limit * (totalBudget.percentage / 100))
     ) {
         try {
             const notificationId = uuid.v4();
-            await firestore()
-                .collection('users')
-                .doc(uid)
-                .update({
-                    [`notification.${notificationId}`]: {
-                        type: encrypt('budget', uid),
-                        category: encrypt(category, uid),
-                        id: notificationId,
-                        time: Timestamp.now(),
-                        read: false,
-                    },
-                });
             await notifee.requestPermission();
             const channelId = await notifee.createChannel({
                 id: 'default',
                 name: 'Default Channel',
             });
-            await notifee.displayNotification({
-                title:
-                    category[0].toUpperCase() +
-                    category.slice(1) +
-                    ' budget has exceeded the limit',
-                body:
-                    'Your ' +
-                    category[0].toUpperCase() +
-                    category.slice(1) +
-                    ' budget has exceeded the limit',
-                android: {
-                    channelId,
-                },
-            });
+            if (totalSpent >= totalBudget.limit) {
+                await firestore()
+                    .collection('users')
+                    .doc(uid)
+                    .update({
+                        [`notification.${notificationId}`]: {
+                            type: encrypt('budget-limit', uid),
+                            category: encrypt(category, uid),
+                            id: notificationId,
+                            time: Timestamp.now(),
+                            read: false,
+                            percentage: totalBudget.percentage
+                        },
+                    });
+                await notifee.displayNotification({
+                    title:
+                        category[0].toUpperCase() +
+                        category.slice(1) +
+                        ' Budget Limit Exceeded',
+                    body:
+                        'Your ' +
+                        category[0].toUpperCase() +
+                        category.slice(1) +
+                        ' budget has exceeded the limit',
+                    android: {
+                        channelId,
+                    },
+                });
+            } else if (totalSpent >= totalBudget.limit * (totalBudget.percentage / 100)) {
+                await firestore()
+                    .collection('users')
+                    .doc(uid)
+                    .update({
+                        [`notification.${notificationId}`]: {
+                            type: encrypt('budget-percent', uid),
+                            category: encrypt(category, uid),
+                            id: notificationId,
+                            time: Timestamp.now(),
+                            read: false,
+                            percentage: totalBudget.percentage
+                        },
+                    });
+                await notifee.displayNotification({
+                    title:
+                        `Exceeded ${totalBudget.percentage}% of ${category[0].toUpperCase() +
+                        category.slice(1)
+                        } budget`,
+                    body:
+                        `You've exceeded ${totalBudget.percentage}% of your ${category[0].toUpperCase() +
+                        category.slice(1)} budget. Take action to stay on track.`,
+                    android: {
+                        channelId,
+                    },
+                });
+            }
+
         } catch (e) {
             console.log(e);
         }

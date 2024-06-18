@@ -187,9 +187,27 @@ export const STRINGS = {
     EmailCannotBeEmpty: "Email cannot be Empty",
     NameIsNotValid: "Name is not Valid",
     NameCannotBeEmpty: "Name cannot be Empty",
-    NoRecentTransactions: "No Recent Transactions"
+    NoRecentTransactions: "No Recent Transactions",
+    NoTransactions:"No Transactions"
 };
-
+export const OnboardData = [
+    {
+      icon: '../../assets/Images/onboarding1.png',
+      text1: 'Gain total control of your money',
+      text2: 'Become your own money manager and make every cent count',
+    },
+    {
+      icon: '../../assets/Images/onboarding2.png',
+      text1: 'Know where your money goes',
+      text2:
+        'Track your transaction easily,with categories and financial report ',
+    },
+    {
+      icon: '../../assets/Images/onboarding3.png',
+      text1: 'Planning ahead',
+      text2: 'Setup your budget for each category so you in control',
+    },
+  ];
 export const emailRegex = /^[a-zA-Z0-9_-]+@([a-zA-Z0-9-]+\.)+[a-zA-Z0-9]+$/;;
 export const nameRegex = /^[a-zA-Z ]*$/;
 export const passRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&\s])[A-Za-z\d@$!%*?&\s]{8,}$/;

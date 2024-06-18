@@ -8,6 +8,7 @@ import {STRINGS} from '../../../constants/strings';
 import {useAppTheme} from '../../../hooks/themeHook';
 import {useAppSelector} from '../../../redux/store';
 import {Timestamp} from '@react-native-firebase/firestore';
+import LinegraphLabel from '../../../components/LinegraphLabel';
 
 function Graph({
   data,
@@ -51,7 +52,36 @@ function Graph({
     })
     .sort((a, b) => a.timeStamp.seconds - b.timeStamp.seconds)
     .map(item => {
-      return {value: item.amount};
+      return {
+        value: item.amount,
+        date:
+          graphDay === 0
+            ? Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+                .toDate()
+                .getHours() +
+              ':' +
+              (Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+                .toDate()
+                .getMinutes() < 10
+                ? '0' +
+                  Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+                    .toDate()
+                    .getMinutes()
+                : Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+                    .toDate()
+                    .getMinutes())
+            : Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+                .toDate()
+                .getDay() +
+              '/' +
+              Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+                .toDate()
+                .getMonth() +
+              '/' +
+              Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+                .toDate()
+                .getFullYear(),
+      };
     });
   useEffect(() => {
     if (month !== new Date().getMonth()) {
@@ -86,6 +116,20 @@ function Graph({
             curved={true}
             overflowBottom={-1}
             onlyPositive
+            disableScroll
+            yAxisExtraHeight={30}
+            pointerConfig={{
+              pointerStripHeight: 220,
+              pointerStripColor: 'lightgray',
+              pointerStripWidth: 2,
+              pointerColor: 'lightgray',
+              pointerLabelWidth: 100,
+              activatePointersOnLongPress: true,
+              autoAdjustPointerLabelPosition: true,
+              pointerLabelComponent: (
+                items: {date: string; value: number}[],
+              ) => <LinegraphLabel items={items} />,
+            }}
           />
         </View>
       )}

@@ -1,7 +1,12 @@
-import {View, TextInput, Pressable} from 'react-native';
+import {
+  View,
+  TextInput,
+  Pressable,
+  NativeSyntheticEvent,
+  TextInputFocusEventData,
+} from 'react-native';
 import styles from './styles';
 import {useState} from 'react';
-import {COLORS} from '../../constants/commonStyles';
 import {ICONS} from '../../constants/icons';
 import {useAppTheme} from '../../hooks/themeHook';
 
@@ -10,9 +15,11 @@ function CustomPassInput({
   onChangeText,
   placeholderText,
   inputColor = 'black',
+  onBlur,
 }: Readonly<{
   value: string | undefined;
   onChangeText: (str: string) => void;
+  onBlur?: (props: NativeSyntheticEvent<TextInputFocusEventData>) => void;
   placeholderText: string;
   eyeColor?: string;
   inputColor?: string;
@@ -29,6 +36,7 @@ function CustomPassInput({
         onChangeText={onChangeText}
         placeholderTextColor={'#91919F'}
         textContentType="oneTimeCode"
+        onBlur={onBlur}
       />
       <Pressable
         onPress={() => {

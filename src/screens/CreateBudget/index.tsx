@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {SafeAreaView, Switch, Text, TextInput, View} from 'react-native';
-import Sapcer from '../../components/Spacer';
+import Spacer from '../../components/Spacer';
 import CustomButton from '../../components/CustomButton';
 import style from './styles';
 import CustomDropdown from '../../components/CustomDropDown';
@@ -53,6 +53,7 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
       : '0',
   );
   const [category, setCategory] = useState(isEdit ? selectedCategory : '');
+  console.log(category)
   const [alert, setAlert] = useState(isEdit ? oldBudget?.alert : false);
   const [sliderVal, setSliderVal] = useState(
     isEdit ? oldBudget?.percentage : 0,
@@ -167,7 +168,7 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
             value={category!}
             formKey={form}
           />
-          <Sapcer height={20} />
+          <Spacer height={20} />
           <View style={styles.flexRow}>
             <View>
               <Text style={styles.flexRowText1}>{STRINGS.RecieveAlert}</Text>
@@ -189,7 +190,7 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
               value={alert}
             />
           </View>
-          <Sapcer height={10} />
+          <Spacer height={10} />
           {alert === true ? (
             <Slider
               maximumValue={100}
@@ -210,7 +211,7 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
           ) : (
             <></>
           )}
-          <Sapcer height={30} />
+          <Spacer height={30} />
           <CustomButton
             title={STRINGS.Continue}
             onPress={async () => {
@@ -246,7 +247,7 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
               }
             }}
           />
-          <Sapcer height={20} />
+          <Spacer height={20} />
         </View>
         <BottomSheetModalProvider>
           <AddCategorySheet

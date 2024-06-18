@@ -12,7 +12,7 @@ import style from './styles';
 
 import CustomInput from '../../components/CustomInput';
 import {COLORS} from '../../constants/commonStyles';
-import Sapcer from '../../components/Spacer';
+import Spacer from '../../components/Spacer';
 import CustomDropdown from '../../components/CustomDropDown';
 import {ICONS} from '../../constants/icons';
 import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
@@ -43,6 +43,7 @@ import {
   EmptyZeroError,
 } from '../../constants/errors';
 import {UserFromJson} from '../../utils/userFuncs';
+import AttachementContainer from './atoms/attachementContainer';
 import {
   addNewTransaction,
   createTransaction,
@@ -56,7 +57,6 @@ import {
 } from '../../utils/firebase';
 import {useAppTheme} from '../../hooks/themeHook';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-import AttachementContainer from './atoms/attachementContainer';
 import {Switch} from 'react-native-switch';
 
 function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
@@ -189,7 +189,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
       transId: transaction?.id!,
       uid: uid,
     });
-    if (pageType === 'expense') {
+    if (pageType === 'expense' || pageType === 'transfer') {
       await handleExpenseUpdate({
         curr: curr,
         amount: Number(amount),
@@ -249,7 +249,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
     id: string;
   }) => {
     await addNewTransaction({id: id, trans: trans, uid: uid});
-    if (pageType === 'expense') {
+    if (pageType === 'expense' || pageType === 'transfer') {
       await handleNewExpense({
         curr: curr,
         amount: Number(amount),
@@ -310,7 +310,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
         url: url,
         attachementType: attachementType,
         amount: amount,
-        category: category!,
+        category: pageType === 'transfer' ? 'transfer' : category!,
         conversion: conversion,
         currency: currency!,
         desc: desc,
@@ -329,7 +329,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
           transaction: transaction,
           uid: uid!,
           amount: amount,
-          category: category!,
+          category: pageType === 'transfer' ? 'transfer' : category!,
           conversion: conversion,
           curr: curr,
           currency: currency,
@@ -340,7 +340,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
           trans: trans,
           uid: uid!,
           amount: amount,
-          category: category!,
+          category: pageType === 'transfer' ? 'transfer' : category!,
           conversion: conversion,
           curr: curr,
           currency: currency,
@@ -564,7 +564,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
             value={desc}
             inputColor={COLOR.DARK[100]}
           />
-          <Sapcer height={24} />
+          <Spacer height={24} />
           {pageType !== 'transfer' && (
             <CustomDropdown
               data={[
@@ -594,7 +594,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
             setZindex={setZindex}
             zindex={zindex}
           />
-          <Sapcer height={20} />
+          <Spacer height={20} />
           {pageType !== 'transfer' && (
             <View style={styles.flexRow}>
               <View>
@@ -631,7 +631,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
               />
             </View>
           )}
-          {pageType !== 'transfer' && <Sapcer height={20} />}
+          {pageType !== 'transfer' && <Spacer height={20} />}
           {repeatData && (
             <View style={styles.flexRow}>
               <View>
@@ -666,9 +666,9 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
               </Pressable>
             </View>
           )}
-          <Sapcer height={20} />
+          <Spacer height={20} />
           <CustomButton title={STRINGS.Continue} onPress={handlePress} />
-          <Sapcer height={20} />
+          <Spacer height={20} />
         </View>
       </KeyboardAwareScrollView>
       <BottomSheetModalProvider>

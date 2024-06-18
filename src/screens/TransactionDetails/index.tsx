@@ -20,7 +20,7 @@ import {
   STRINGS,
   weekData,
 } from '../../constants/strings';
-import Sapcer from '../../components/Spacer';
+import Spacer from '../../components/Spacer';
 import CustomButton from '../../components/CustomButton';
 import DeleteTransactionSheet from '../../components/DeleteTransSheet';
 import {useAppSelector} from '../../redux/store';
@@ -94,7 +94,7 @@ function TransactionDetails({
               backgroundColor: getBackgroundColor,
             },
           ]}>
-          <Sapcer height={Dimensions.get('screen').height * 0.075} />
+          <Spacer height={Dimensions.get('screen').height * 0.075} />
           <Text style={styles.amt}>
             {currencies[currency!].symbol ?? '$'}{' '}
             {Number(

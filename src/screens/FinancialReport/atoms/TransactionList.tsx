@@ -15,6 +15,9 @@ function TransactionList({
   conversion,
   currency,
   sort,
+  expenseOffset,
+  incomeOffset,
+  limit,
 }: Readonly<{
   data: {
     [key: string]: transactionType;
@@ -28,6 +31,9 @@ function TransactionList({
   };
   currency: string | undefined;
   sort: boolean;
+  expenseOffset: number;
+  incomeOffset: number;
+  limit: number;
 }>) {
   const COLOR = useAppTheme();
   const styles = style(COLOR);
@@ -38,8 +44,11 @@ function TransactionList({
           .toDate()
           .getMonth() === month && item.type === transType,
     )
-    .sort((a, b) => b.timeStamp.seconds - a.timeStamp.seconds)
-    .slice(0, 4);
+    .sort((a, b) => b.amount - a.amount)
+    .slice(
+      0,
+      transType === 'income' ? incomeOffset + limit : expenseOffset + limit,
+    );
   if (sort) {
     listData.reverse();
   }

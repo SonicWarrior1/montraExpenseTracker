@@ -53,7 +53,7 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
         color: COLOR.DARK[25],
         textAlign: 'center',
     },
-    sectionHeader: { fontSize: RFValue(18), fontWeight: '600', padding: 8, color: COLOR.DARK[100] },
+    sectionHeader: { fontSize: RFValue(18), fontWeight: '600', padding: 8, color: COLOR.DARK[100], backgroundColor: COLOR.LIGHT[100] },
 });
 
 export default styles;

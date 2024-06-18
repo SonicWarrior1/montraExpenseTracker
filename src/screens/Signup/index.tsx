@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import style from './styles';
 import CustomInput from '../../components/CustomInput';
-import Sapcer from '../../components/Spacer';
+import Spacer from '../../components/Spacer';
 import {
   ConfirmPassError,
   EmailValError,
@@ -51,7 +51,13 @@ function Signup({navigation}: Readonly<SignupScreenProps>) {
   const [pass, setPass] = useState('');
   const [confirmPass, setConfirmPass] = useState('');
   const [checked, setChecked] = useState(false);
-  const [form, setForm] = useState(false);
+  const [form, setForm] = useState({
+    name: false,
+    email: false,
+    pass: false,
+    confirmPass: false,
+    terms: false,
+  });
   // functions
   function onChangeName(str: string) {
     setName(str);
@@ -67,7 +73,13 @@ function Signup({navigation}: Readonly<SignupScreenProps>) {
   }
 
   async function handleSignup() {
-    setForm(true);
+    setForm({
+      name: true,
+      email: true,
+      pass: true,
+      confirmPass: true,
+      terms: true,
+    });
     if (
       name !== '' &&
       testInput(nameRegex, name) &&
@@ -110,14 +122,10 @@ function Signup({navigation}: Readonly<SignupScreenProps>) {
             pin: '',
           });
           await userCollection.doc(creds.user.uid).set(user);
-          dispatch(
-            userLoggedIn({
-              name: creds.user.displayName!,
-              email: creds.user.email!,
-              uid: creds.user.uid,
-              pin: '',
-            }),
-          );
+          navigation.navigate(NAVIGATION.PIN, {
+            pin: user.pin === '' ? undefined : user.pin,
+            uid: creds.user.uid,
+          });
         } else {
           const data = await userCollection.doc(creds.user.uid).get();
           const user = UserFromJson(data.data()!);
@@ -141,44 +149,65 @@ function Signup({navigation}: Readonly<SignupScreenProps>) {
             type="name"
             value={name}
             inputColor={COLOR.DARK[100]}
+            onBlur={e => {
+              if (name === '') {
+                setForm(formkey => ({...formkey, name: true}));
+              }
+            }}
           />
-          <NameValError name={name} formKey={form} />
+          <NameValError name={name} formKey={form.name} />
           <CustomInput
             placeholderText={STRINGS.Email}
             onChangeText={onChangeEmail}
             type="email"
             value={email}
             inputColor={COLOR.DARK[100]}
+            onBlur={e => {
+              if (email === '') {
+                setForm(formkey => ({...formkey, email: true}));
+              }
+            }}
           />
-          <EmailValError email={email} formKey={form} />
+          <EmailValError email={email} formKey={form.email} />
           <CustomPassInput
             onChangeText={onChangePass}
             placeholderText={STRINGS.Password}
             value={pass}
             inputColor={COLOR.DARK[100]}
+            onBlur={e => {
+              if (pass === '') {
+                setForm(formkey => ({...formkey, pass: true}));
+              }
+            }}
           />
-          <PassValidationError pass={pass} formKey={form} />
+          <PassValidationError pass={pass} formKey={form.pass} />
           <CustomPassInput
             onChangeText={onChangeConfirmPass}
             placeholderText={STRINGS.ConfrimPassword}
             value={confirmPass}
             inputColor={COLOR.DARK[100]}
+            onBlur={e => {
+              if (confirmPass === '') {
+                setForm(formkey => ({...formkey, confirmPass: true}));
+              }
+            }}
           />
           <ConfirmPassError
             pass={pass}
             confirmPass={confirmPass}
-            formKey={form}
+            formKey={form.confirmPass}
           />
           <BouncyCheckbox
             size={25}
             fillColor={
-              !checked && form ? COLORS.RED[100] : COLORS.PRIMARY.VIOLET
+              !checked && form.terms ? COLORS.RED[100] : COLORS.PRIMARY.VIOLET
             }
             unFillColor={COLOR.LIGHT[100]}
             iconStyle={{borderRadius: 5}}
             innerIconStyle={{borderWidth: 2, borderRadius: 5}}
             onPress={(isChecked: boolean) => {
               setChecked(isChecked);
+              setForm(form => ({...form, terms: true}));
             }}
             isChecked={checked}
             textComponent={
@@ -193,18 +222,18 @@ function Signup({navigation}: Readonly<SignupScreenProps>) {
             }
             disableText={false}
           />
-          <Sapcer height={20} />
+          <Spacer height={20} />
           <CustomButton title={STRINGS.SIGNUP} onPress={handleSignup} />
-          <Sapcer height={10} />
+          <Spacer height={10} />
           <Text style={styles.orText}>{STRINGS.OrWith}</Text>
-          <Sapcer height={10} />
+          <Spacer height={10} />
           <TouchableOpacity onPress={onGoogleButtonPress} style={[styles.btn]}>
             <View style={styles.googleBtn}>
               {ICONS.Google({height: 25, width: 25})}
               <Text style={styles.text}>{STRINGS.SignupWithGoogle}</Text>
             </View>
           </TouchableOpacity>
-          <Sapcer height={10} />
+          <Spacer height={10} />
           <View style={{flexDirection: 'row'}}>
             <Text style={styles.text2}>{STRINGS.AlreadyHaveAccount} </Text>
             <Pressable
@@ -220,4 +249,4 @@ function Signup({navigation}: Readonly<SignupScreenProps>) {
   );
 }
 
-export default Signup;
+export default React.memo(Signup);

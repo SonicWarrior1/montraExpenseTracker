@@ -1,7 +1,7 @@
 import React, {useEffect} from 'react';
 import {StyleSheet, Text} from 'react-native';
 import {emailRegex, nameRegex, passRegex, STRINGS} from './strings';
-import Sapcer from '../components/Spacer';
+import Spacer from '../components/Spacer';
 import Animated, {useSharedValue, withTiming} from 'react-native-reanimated';
 
 export function ConfirmPassError({
@@ -20,7 +20,7 @@ export function ConfirmPassError({
       <Text style={style.error}>{STRINGS.ConfirmPasswordCannotBeEmpty}</Text>
     );
   } else {
-    return <Sapcer height={25} />;
+    return <Spacer height={25} />;
   }
 }
 export function testInput(re: RegExp, str: string): boolean {
@@ -44,7 +44,7 @@ export function PassValidationError({
       </Text>
     );
   } else {
-    return <Sapcer height={25} />;
+    return <Spacer height={25} />;
   }
 }
 
@@ -60,7 +60,7 @@ export function PassEmptyError({
       {pass === '' && formKey ? (
         <Text style={style.error}>{STRINGS.PasswordCannotBeEmpty}</Text>
       ) : (
-        <Sapcer height={25} />
+        <Spacer height={25} />
       )}
     </>
   );
@@ -78,7 +78,7 @@ export function EmailValError({
   } else if (email === '' && formKey) {
     return <Text style={style.error}>{STRINGS.EmailCannotBeEmpty}</Text>;
   } else {
-    return <Sapcer height={25} />;
+    return <Spacer height={25} />;
   }
 }
 export function EmailEmptyError({
@@ -93,7 +93,7 @@ export function EmailEmptyError({
       {email === '' && formKey ? (
         <Text style={style.error}>{STRINGS.EmailCannotBeEmpty}</Text>
       ) : (
-        <Sapcer height={25} />
+        <Spacer height={25} />
       )}
     </>
   );
@@ -111,7 +111,7 @@ export function NameValError({
   } else if (name === '' && formKey) {
     return <Text style={style.error}>{STRINGS.NameCannotBeEmpty}</Text>;
   } else {
-    return <Sapcer height={25} />;
+    return <Spacer height={25} />;
   }
 }
 export function CompundEmptyError({
@@ -136,7 +136,7 @@ export function CompundEmptyError({
           {errorText}
         </Text>
       ) : (
-        <Sapcer height={24} />
+        <Spacer height={24} />
       )}
     </>
   );
@@ -161,7 +161,7 @@ export function EmptyError({
           {errorText}
         </Text>
       ) : (
-        <Sapcer height={24} />
+        <Spacer height={24} />
       )}
     </>
   );

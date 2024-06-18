@@ -6,7 +6,8 @@ import style from '../styles';
 import {currencies} from '../../../constants/strings';
 import {transactionType} from '../../../defs/transaction';
 import {useAppTheme} from '../../../hooks/themeHook';
-import { Timestamp } from '@react-native-firebase/firestore';
+import {Timestamp} from '@react-native-firebase/firestore';
+import LinegraphLabel from '../../../components/LinegraphLabel';
 
 function Linegraph({
   totalSpend,
@@ -48,8 +49,9 @@ function Linegraph({
         {Object.values(data)
           .filter(
             item =>
-              Timestamp.fromMillis(item.timeStamp.seconds * 1000).toDate().getMonth() === month &&
-              item.type === transType,
+              Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+                .toDate()
+                .getMonth() === month && item.type === transType,
           )
           .sort((a, b) => a.timeStamp.seconds - b.timeStamp.seconds)
           .map(item => {
@@ -68,12 +70,27 @@ function Linegraph({
             data={Object.values(data)
               .filter(
                 item =>
-                  Timestamp.fromMillis(item.timeStamp.seconds * 1000).toDate().getMonth() === month &&
-                  item.type === transType,
+                  Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+                    .toDate()
+                    .getMonth() === month && item.type === transType,
               )
               .sort((a, b) => a.timeStamp.seconds - b.timeStamp.seconds)
               .map(item => {
-                return {value: item.amount};
+                return {
+                  value: item.amount,
+                  date:
+                    Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+                      .toDate()
+                      .getDay() +
+                    '/' +
+                    Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+                      .toDate()
+                      .getMonth() +
+                    '/' +
+                    Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+                      .toDate()
+                      .getFullYear(),
+                };
               })}
             areaChart
             adjustToWidth
@@ -92,6 +109,20 @@ function Linegraph({
             curved={true}
             overflowBottom={-1}
             onlyPositive
+            disableScroll
+            yAxisExtraHeight={40}
+            pointerConfig={{
+              pointerStripHeight: 250,
+              pointerStripColor: 'lightgray',
+              pointerStripWidth: 2,
+              pointerColor: 'lightgray',
+              pointerLabelWidth: 100,
+              activatePointersOnLongPress: true,
+              autoAdjustPointerLabelPosition: true,
+              pointerLabelComponent: (
+                items: {date: string; value: number}[]
+              ) => <LinegraphLabel items={items} />,
+            }}
           />
         )}
       </View>

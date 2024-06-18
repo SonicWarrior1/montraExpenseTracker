@@ -1,11 +1,18 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
-import {Pressable, ScrollView, Text, useColorScheme, View} from 'react-native';
+import {
+  NativeScrollEvent,
+  Pressable,
+  ScrollView,
+  Text,
+  useColorScheme,
+  View,
+} from 'react-native';
 import {COLORS} from '../../constants/commonStyles';
 import {ICONS} from '../../constants/icons';
 import style from './styles';
 import {Dropdown} from 'react-native-element-dropdown';
 import {useAppSelector} from '../../redux/store';
-import Sapcer from '../../components/Spacer';
+import Spacer from '../../components/Spacer';
 import FinancialReportHeader from './atoms/header';
 import Linegraph from './atoms/linegraph';
 import Piegraph from './atoms/piegraph';
@@ -27,6 +34,8 @@ function FinancialReport() {
   const [type, setType] = useState<'transaction' | 'category'>('transaction');
   const [catColors, setCatColors] = useState<{[key: string]: string}>();
   const [sort, setSort] = useState(false);
+  const [incomeOffset, setIncomeOffset] = useState(0);
+  const [expenseOffest, setExpenseOffset] = useState(0);
   // redux
   const spends =
     useAppSelector(state => state.user.currentUser?.spend?.[month]) ?? [];
@@ -65,6 +74,19 @@ function FinancialReport() {
       setCatColors(undefined);
     };
   }, [transType]);
+  const isCloseToBottom = ({
+    layoutMeasurement,
+    contentOffset,
+    contentSize,
+  }: NativeScrollEvent) => {
+    const paddingToBottom = 5;
+    return (
+      layoutMeasurement.height + contentOffset.y >=
+      contentSize.height - paddingToBottom
+    );
+  };
+  // constants
+  const limit = 5;
   const COLOR = useAppTheme();
   const styles = style(COLOR);
   const scheme = useColorScheme();
@@ -82,7 +104,19 @@ function FinancialReport() {
   return (
     <ScrollView
       contentContainerStyle={[styles.safeView]}
-      style={[styles.safeView, {paddingBottom: 20}]}>
+      style={[styles.safeView, {paddingBottom: 20}]}
+      onScroll={({nativeEvent}) => {
+        if (isCloseToBottom(nativeEvent)) {
+          console.log(incomeOffset);
+          if (incomeOffset + limit < Object.values(data).length)
+            if (transType === 'expense') {
+              setExpenseOffset(offset => offset + 5);
+            } else {
+              setIncomeOffset(offset => offset + 5);
+            }
+        }
+      }}
+      scrollEventThrottle={400}>
       <FinancialReportHeader
         graph={graph}
         month={month}
@@ -174,7 +208,11 @@ function FinancialReport() {
           style={[styles.dropdown, {width: 160}]}
           renderLeftIcon={() => (
             <View style={{marginRight: 10}}>
-              {ICONS.ArrowDown({width: 15, height: 15,borderColor: COLOR.VIOLET[100],})}
+              {ICONS.ArrowDown({
+                width: 15,
+                height: 15,
+                borderColor: COLOR.VIOLET[100],
+              })}
             </View>
           )}
           renderRightIcon={() => <></>}
@@ -218,7 +256,7 @@ function FinancialReport() {
           })}
         </Pressable>
       </View>
-      <Sapcer height={10} />
+      <Spacer height={10} />
       {type === 'transaction' ? (
         <TransactionList
           conversion={conversion}
@@ -227,6 +265,9 @@ function FinancialReport() {
           month={month}
           transType={transType}
           sort={sort}
+          limit={limit}
+          incomeOffset={incomeOffset}
+          expenseOffset={expenseOffest}
         />
       ) : (
         <CategoryList

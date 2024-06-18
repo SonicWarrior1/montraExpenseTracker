@@ -12,7 +12,6 @@ import {ICONS} from '../../constants/icons';
 import {useAppSelector} from '../../redux/store';
 import {transactionType} from '../../defs/transaction';
 import {COLORS} from '../../constants/commonStyles';
-import {ScrollView} from 'react-native-gesture-handler';
 import TransactionHeader from '../../components/TransactionHeader';
 import {TransactionScreenProps} from '../../defs/navigation';
 import {NAVIGATION, STRINGS} from '../../constants/strings';
@@ -27,14 +26,21 @@ function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
   const scheme = useColorScheme();
   // redux
   const transaction = useAppSelector(state => state.transaction.transactions);
+  const [offset, setOffset] = useState<number>(0);
+  const limit = 10;
   const filters = useAppSelector(state => state.transaction.filters);
   // state
   const [month, setMonth] = useState(new Date().getMonth());
   // functions
-  function filterDataByDate(data: {[key: string]: transactionType}) {
+  function filterDataByDate(
+    data: {[key: string]: transactionType},
+    offset: number,
+  ) {
     const startOfToday = new Date().setHours(0, 0, 0, 0) / 1000;
     const startOfYesterday = startOfToday - 24 * 60 * 60;
     const res = Object.values(data)
+      .sort((a, b) => b.timeStamp.seconds - a.timeStamp.seconds)
+      .slice(0, offset + limit)
       .filter(
         item =>
           Timestamp.fromMillis(item.timeStamp.seconds * 1000)
@@ -55,13 +61,28 @@ function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
           } else {
             acc.yesterday = [item];
           }
-        } else if (acc[item.timeStamp.seconds]) {
-          acc[item.timeStamp.seconds].push(item);
+        } else if (
+          acc[
+            Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+              .toDate()
+              .toLocaleDateString()
+          ]
+        ) {
+          acc[
+            Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+              .toDate()
+              .toLocaleDateString()
+          ].push(item);
         } else {
-          acc[item.timeStamp.seconds] = [item];
+          acc[
+            Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+              .toDate()
+              .toLocaleDateString()
+          ] = [item];
         }
         return acc;
       }, {});
+
     const result = [
       {
         title: 'today',
@@ -96,13 +117,12 @@ function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
       },
       [],
     );
-    x.reverse();
+    // x.reverse();
     return [...result, ...x];
   }
 
-  const data = filterDataByDate(transaction);
-
-  function applyFilters() {
+  function applyFilters(offset: number) {
+    const data = filterDataByDate(transaction, offset);
     const catFiltered =
       filters.cat.length === 0
         ? data
@@ -149,7 +169,6 @@ function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
       return x;
     }
   }
-  console.log(applyFilters());
   const theme = useAppSelector(state => state.user.currentUser?.theme);
   const finaltheme = theme === 'device' ? scheme : theme;
   return (
@@ -163,78 +182,70 @@ function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
           },
         ]}>
         <TransactionHeader month={month} setMonth={setMonth} />
-        <ScrollView>
-          <View style={styles.mainView}>
-            <TouchableOpacity
-              style={styles.financialBtn}
-              onPress={() => {
-                navigation.navigate(NAVIGATION.Story);
+        <View style={styles.mainView}>
+          {applyFilters(offset).length === 2 &&
+          applyFilters(offset)[0].data.length === 0 &&
+          applyFilters(offset)[1].data.length === 0 ? (
+            <View
+              style={{
+                justifyContent: 'center',
+                alignItems: 'center',
               }}>
-              <Text style={styles.financialText}>
-                {STRINGS.SeeFinancialReport}
-              </Text>
-              {ICONS.ArrowRight({
-                height: 30,
-                width: 25,
-                color: COLOR.VIOLET[100],
-                borderColor: COLOR.VIOLET[100],
-              })}
-            </TouchableOpacity>
-            {applyFilters().length === 2 &&
-            applyFilters()[0].data.length === 0 &&
-            applyFilters()[1].data.length === 0 ? (
-              <View
-                style={{
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}>
-                <Text style={styles.emptyText}> No Transactions</Text>
-              </View>
-            ) : (
-              <SectionList
-                scrollEnabled={false}
-                style={{width: '100%'}}
-                sections={applyFilters()}
-                renderItem={({item}) => (
-                  <TransactionItem
-                    item={item}
-                    navigation={navigation}
-                    scheme={scheme}
-                    theme={theme}
-                    dateShow={
-                      filters.sort === 'highest' || filters.sort === 'lowest'
-                    }
-                  />
-                )}
-                renderSectionHeader={({section: {title, data}}) =>
-                  data.length === 0 || title === '' ? (
-                    <View />
-                  ) : (
-                    <Text style={styles.sectionHeader}>
-                      {title !== 'today' && title !== 'yesterday'
-                        ? Timestamp.fromMillis(Number(title) * 1000)
-                            .toDate()
-                            .getDate()
-                            .toString() +
-                          '/' +
-                          (
-                            Timestamp.fromMillis(Number(title) * 1000)
-                              .toDate()
-                              .getMonth() + 1
-                          ).toString() +
-                          '/' +
-                          Timestamp.fromMillis(Number(title) * 1000)
-                            .toDate()
-                            .getFullYear()
-                            .toString()
-                        : title[0].toUpperCase() + title.slice(1)}
-                    </Text>
-                  )
+              <Text style={styles.emptyText}>{STRINGS.NoTransactions}</Text>
+            </View>
+          ) : (
+            <SectionList
+              ListHeaderComponent={
+                <TouchableOpacity
+                  style={styles.financialBtn}
+                  onPress={() => {
+                    navigation.navigate(NAVIGATION.Story);
+                  }}>
+                  <Text style={styles.financialText}>
+                    {STRINGS.SeeFinancialReport}
+                  </Text>
+                  {ICONS.ArrowRight({
+                    height: 30,
+                    width: 25,
+                    color: COLOR.VIOLET[100],
+                    borderColor: COLOR.VIOLET[100],
+                  })}
+                </TouchableOpacity>
+              }
+              onEndReached={() => {
+                console.log('OFFset', offset);
+                if (offset + limit < Object.values(transaction).length) {
+                  setOffset(offset => offset + 10);
                 }
-              />
-            )}
-          </View>
-        </ScrollView>
+              }}
+              style={{width: '100%'}}
+              sections={applyFilters(offset)}
+              showsVerticalScrollIndicator={false}
+              renderItem={({item}) => (
+                <TransactionItem
+                  item={item}
+                  navigation={navigation}
+                  scheme={scheme}
+                  theme={theme}
+                  dateShow={
+                    filters.sort === 'highest' || filters.sort === 'lowest'
+                  }
+                />
+              )}
+              renderSectionHeader={({section: {title, data}}) =>
+                data.length === 0 || title === '' ? (
+                  <View />
+                ) : (
+                  <Text style={styles.sectionHeader}>
+                    {title !== 'today' && title !== 'yesterday'
+                      ? title
+                      : title[0].toUpperCase() + title.slice(1)}
+                  </Text>
+                )
+              }
+            />
+          )}
+        </View>
       </SafeAreaView>
       <TabBackdrop />
     </>

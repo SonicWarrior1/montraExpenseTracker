@@ -13,7 +13,7 @@ import {BottomSheetModalMethods} from '@gorhom/bottom-sheet/lib/typescript/types
 import DatePicker from 'react-native-date-picker';
 import {BottomSheetModal, BottomSheetView} from '@gorhom/bottom-sheet';
 import {AnimatedEmptyError, EmptyError} from '../../constants/errors';
-import Sapcer from '../Spacer';
+import Spacer from '../Spacer';
 
 function RepeatTransactionSheet({
   bottomSheetModalRef,
@@ -199,7 +199,7 @@ function RepeatTransactionSheet({
             </Pressable>
           )}
         </View>
-        <Sapcer height={10} />
+        <Spacer height={10} />
         <CustomButton
           title={STRINGS.Next}
           onPress={() => {

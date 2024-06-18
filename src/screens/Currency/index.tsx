@@ -33,6 +33,7 @@ function CurrencyScreen() {
             </Text>
             {code === item.code&&<BouncyCheckbox
               style={styles.checkbox}
+              disabled
               disableText={false}
               fillColor={'#5233FF'}
               isChecked={code === item.code}

@@ -17,7 +17,7 @@ import {encrypt} from '../../utils/encryption';
 import {STRINGS} from '../../constants/strings';
 import {useAppTheme} from '../../hooks/themeHook';
 import {Swipeable} from 'react-native-gesture-handler';
-import Sapcer from '../../components/Spacer';
+import Spacer from '../../components/Spacer';
 
 function NotificationScreen({navigation}: Readonly<NotificationScreenProps>) {
   // redux
@@ -161,7 +161,7 @@ function NotificationScreen({navigation}: Readonly<NotificationScreenProps>) {
         </Pressable>
         <Text style={styles.headerTitle}>{STRINGS.Notifications}</Text>
         {Object.values(notifications!).length === 0 ? (
-          <Sapcer width={25}></Sapcer>
+          <Spacer width={25}></Spacer>
         ) : (
           <Pressable
             style={{marginRight: 15}}
@@ -208,15 +208,26 @@ function NotificationScreen({navigation}: Readonly<NotificationScreenProps>) {
                   <View style={styles.ctr}>
                     <View style={{maxWidth: '85%'}}>
                       <Text style={styles.text1} numberOfLines={1}>
-                        {item.category[0].toUpperCase() +
-                          item.category.slice(1)}{' '}
-                        {STRINGS.BudgetExceed}
+                        {item.type === 'budget-percent'
+                          ? `Exceeded ${item.percentage}% of ${
+                              item.category[0].toUpperCase() +
+                              item.category.slice(1)
+                            } budget`
+                          : item.category[0].toUpperCase() +
+                            item.category.slice(1) +
+                            ' Budget Limit Exceeded'}
                       </Text>
-                      <Text style={styles.text2} numberOfLines={1}>
-                        Your{' '}
-                        {item.category[0].toUpperCase() +
-                          item.category.slice(1)}{' '}
-                        {STRINGS.BudgetExceed}
+                      <Text style={styles.text2}>
+                        {item.type === 'budget-percent'
+                          ? `You've exceeded ${item.percentage}% of your ${
+                              item.category[0].toUpperCase() +
+                              item.category.slice(1)
+                            } budget. Take action to stay on track.`
+                          : 'Your ' +
+                            item.category[0].toUpperCase() +
+                            item.category.slice(1) +
+                            ' ' +
+                            STRINGS.BudgetExceed}
                       </Text>
                     </View>
                     <Text style={styles.text2}>

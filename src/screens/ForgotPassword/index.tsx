@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {SafeAreaView, ScrollView, Text, View} from 'react-native';
 import style from './styles';
-import Sapcer from '../../components/Spacer';
+import Spacer from '../../components/Spacer';
 import CustomInput from '../../components/CustomInput';
 import {
   EmailEmptyError,
@@ -85,7 +85,7 @@ function ForgotPassword({navigation}: Readonly<ForgotScreenProps>) {
         <View style={styles.mainView}>
           <Text style={styles.text}>{STRINGS.DontWorry}</Text>
           <Text style={styles.text}>{STRINGS.EnterEmailForReset}</Text>
-          <Sapcer height={30} />
+          <Spacer height={30} />
           <CustomInput
             placeholderText={STRINGS.Email}
             onChangeText={onChangeEmail}
@@ -94,7 +94,7 @@ function ForgotPassword({navigation}: Readonly<ForgotScreenProps>) {
             inputColor={COLOR.DARK[100]}
           />
           <EmailValError email={email} formKey={form} />
-          <Sapcer height={20} />
+          <Spacer height={20} />
           <CustomButton onPress={handleForgot} title={STRINGS.Continue} />
         </View>
       </ScrollView>

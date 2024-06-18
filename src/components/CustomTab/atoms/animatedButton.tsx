@@ -4,6 +4,7 @@ import style from '../styles';
 import { Pressable } from 'react-native';
 import { COLORS } from '../../../constants/commonStyles';
 import { useAppTheme } from '../../../hooks/themeHook';
+import React from 'react';
 
 function AnimatedBtn({
     translateX,
@@ -42,4 +43,4 @@ function AnimatedBtn({
     );
   }
 
-  export default AnimatedBtn;
+  export default React.memo(AnimatedBtn);

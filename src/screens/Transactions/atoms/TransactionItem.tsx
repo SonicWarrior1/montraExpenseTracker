@@ -11,6 +11,7 @@ import {CompositeNavigationProp} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {transactionType} from '../../../defs/transaction';
 import {useAppSelector} from '../../../redux/store';
+import React from 'react';
 
 const TransactionItem = ({
   item,
@@ -145,4 +146,4 @@ const TransactionItem = ({
   );
 };
 
-export default TransactionItem;
+export default React.memo(TransactionItem);

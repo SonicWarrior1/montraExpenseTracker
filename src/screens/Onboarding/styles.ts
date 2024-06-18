@@ -1,7 +1,8 @@
-import { StyleSheet } from 'react-native';
+import { Dimensions, Platform, StyleSheet } from 'react-native';
 import { COLORS } from '../../constants/commonStyles';
 import { RFValue } from 'react-native-responsive-fontsize';
-
+const screenWidth = Dimensions.get('screen').width;
+const screenHeight = Dimensions.get('window').height;
 const styles = (COLOR: typeof COLORS) => StyleSheet.create({
     safeView: {
         flex: 1,
@@ -33,8 +34,23 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
         alignItems: 'center',
     },
     progressDot: {
-
         borderRadius: 10,
     },
+    btnView: {
+        paddingBottom: screenHeight * 0.03,
+        paddingTop: screenHeight * 0.03,
+        rowGap: screenHeight * 0.015,
+    },
+    carasoul: {
+        height: screenHeight * 0.64,
+        marginTop:
+            Platform.OS !== 'ios'
+                ? screenHeight * 0.055
+                : screenHeight * 0.025,
+        marginBottom:
+            Platform.OS !== 'ios'
+                ? screenHeight * 0.05
+                : screenHeight * 0.03,
+    }
 });
 export default styles;

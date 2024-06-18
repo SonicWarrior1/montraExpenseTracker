@@ -1,6 +1,6 @@
 import React from 'react';
 import {FlatList, Text, View} from 'react-native';
-import Sapcer from '../../../components/Spacer';
+import Spacer from '../../../components/Spacer';
 import {Bar} from 'react-native-progress';
 import {COLORS} from '../../../constants/commonStyles';
 import {currencies} from '../../../constants/strings';
@@ -89,7 +89,7 @@ function CategoryList({
                   .toString()}
               </Text>
             </View>
-            <Sapcer height={5} />
+            <Spacer height={5} />
             <Bar
               progress={
                 item[1] /
@@ -105,7 +105,7 @@ function CategoryList({
               unfilledColor={COLOR.LIGHT[40]}
               color={catColors![item[0]]}
             />
-            <Sapcer height={20} />
+            <Spacer height={20} />
           </View>
         ) : (
           <View />

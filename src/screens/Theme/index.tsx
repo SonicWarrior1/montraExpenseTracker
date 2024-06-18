@@ -21,11 +21,14 @@ function ThemeScreen() {
       <Pressable
         style={styles.row}
         onPress={async () => {
-          await userDoc.update({theme: encrypt('light', uid!)});
+          if (theme !== 'light') {
+            await userDoc.update({theme: encrypt('light', uid!)});
+          }
         }}>
         <Text style={styles.text}>{STRINGS.Light}</Text>
         {theme === 'light' && (
           <BouncyCheckbox
+            disabled
             style={{width: 28}}
             disableText={false}
             fillColor={'#5233FF'}
@@ -38,11 +41,14 @@ function ThemeScreen() {
       <Pressable
         style={styles.row}
         onPress={async () => {
-          await userDoc.update({theme: encrypt('dark', uid!)});
+          if (theme !== 'dark') {
+            await userDoc.update({theme: encrypt('dark', uid!)});
+          }
         }}>
         <Text style={styles.text}>{STRINGS.Dark}</Text>
         {theme === 'dark' && (
           <BouncyCheckbox
+            disabled
             style={{width: 28}}
             disableText={false}
             fillColor={'#5233FF'}
@@ -55,11 +61,14 @@ function ThemeScreen() {
       <Pressable
         style={styles.row}
         onPress={async () => {
-          await userDoc.update({theme: encrypt('device', uid!)});
+          if (theme !== 'device') {
+            await userDoc.update({theme: encrypt('device', uid!)});
+          }
         }}>
         <Text style={styles.text}>{STRINGS.UseDeviceTheme}</Text>
         {theme === 'device' && (
           <BouncyCheckbox
+            disabled
             style={{width: 28}}
             disableText={false}
             fillColor={'#5233FF'}

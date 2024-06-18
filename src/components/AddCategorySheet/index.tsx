@@ -7,7 +7,7 @@ import {
 } from '@gorhom/bottom-sheet';
 import {BottomSheetModalMethods} from '@gorhom/bottom-sheet/lib/typescript/types';
 import CustomButton from '../CustomButton';
-import Sapcer from '../Spacer';
+import Spacer from '../Spacer';
 import firestore from '@react-native-firebase/firestore';
 import {
   addExpenseCategory,
@@ -107,7 +107,7 @@ function AddCategorySheet({
           autoCapitalize={'words'}
           autoCorrect={false}
         />
-        <Sapcer height={20} />
+        <Spacer height={20} />
         <CustomButton title={STRINGS.Add} onPress={onPress} />
       </BottomSheetView>
     </BottomSheetModal>

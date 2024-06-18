@@ -1,8 +1,9 @@
 import React from 'react';
 import {View} from 'react-native';
 
-function Sapcer({height, width}: Readonly<{height?: number; width?: number}>) {
+function Spacer({height, width}: Readonly<{height?: number; width?: number}>) {
+  console.log("djfbk")
   return <View style={{height, width}}></View>;
 }
 
-export default React.memo(Sapcer);
+export default React.memo(Spacer);

@@ -24,6 +24,7 @@ import {transactionType} from '../../defs/transaction';
 import TabBackdrop from '../../components/TabBackdrop';
 
 function Home({navigation, route}: Readonly<HomeScreenProps>) {
+  // state
   const [month, setMonth] = useState(new Date().getMonth());
   // redux
   const conversion = useAppSelector(state => state.transaction.conversion);

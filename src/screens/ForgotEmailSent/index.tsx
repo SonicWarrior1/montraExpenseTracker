@@ -8,7 +8,7 @@ import {
   View,
 } from 'react-native';
 import style from './styles';
-import Sapcer from '../../components/Spacer';
+import Spacer from '../../components/Spacer';
 import CustomButton from '../../components/CustomButton';
 import {ForgotSentScreenProps} from '../../defs/navigation';
 import {STRINGS} from '../../constants/strings';
@@ -31,13 +31,13 @@ function ForgotEmailSent({navigation, route}: Readonly<ForgotSentScreenProps>) {
             source={require('../../assets/Images/EmailSent.png')}
             style={{height: screenWidth * 0.8, width: screenWidth * 0.8}}
           />
-          <Sapcer height={15} />
+          <Spacer height={15} />
           <Text style={styles.text1}>{STRINGS.EmailOnWay}</Text>
-          <Sapcer height={20} />
+          <Spacer height={20} />
           <Text style={styles.text2}>
             {STRINGS.CheckYourEmail} {email} {STRINGS.InstructionResetPass}
           </Text>
-          <Sapcer height={screenHeight * 0.2} />
+          <Spacer height={screenHeight * 0.2} />
           <CustomButton title={STRINGS.BackToLogin} onPress={handlePress} />
         </View>
       </ScrollView>

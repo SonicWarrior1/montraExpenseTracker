@@ -94,7 +94,11 @@ function FilterSheet() {
                 },
               ]}
               onPress={() => {
-                setFilter(0);
+                if (filter === 0) {
+                  setFilter(-1);
+                } else {
+                  setFilter(0);
+                }
               }}>
               <Text
                 style={[
@@ -113,7 +117,11 @@ function FilterSheet() {
                 },
               ]}
               onPress={() => {
-                setFilter(1);
+                if (filter === 1) {
+                  setFilter(-1);
+                } else {
+                  setFilter(1);
+                }
               }}>
               <Text
                 style={[
@@ -132,7 +140,11 @@ function FilterSheet() {
                 },
               ]}
               onPress={() => {
-                setFilter(2);
+                if (filter === 2) {
+                  setFilter(-1);
+                } else {
+                  setFilter(2);
+                }
               }}>
               <Text
                 style={[
@@ -162,7 +174,11 @@ function FilterSheet() {
                 },
               ]}
               onPress={() => {
-                setSort(0);
+                if (sort === 0) {
+                  setSort(-1);
+                } else {
+                  setSort(0);
+                }
               }}>
               <Text
                 style={[
@@ -181,7 +197,11 @@ function FilterSheet() {
                 },
               ]}
               onPress={() => {
-                setSort(1);
+                if (sort === 1) {
+                  setSort(-1);
+                } else {
+                  setSort(1);
+                }
               }}>
               <Text
                 style={[
@@ -200,7 +220,11 @@ function FilterSheet() {
                 },
               ]}
               onPress={() => {
-                setSort(2);
+                if (sort === 2) {
+                  setSort(-1);
+                } else {
+                  setSort(2);
+                }
               }}>
               <Text
                 style={[
@@ -219,7 +243,11 @@ function FilterSheet() {
                 },
               ]}
               onPress={() => {
-                setSort(3);
+                if (sort === 3) {
+                  setSort(-1);
+                } else {
+                  setSort(3);
+                }
               }}>
               <Text
                 style={[

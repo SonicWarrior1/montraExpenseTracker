@@ -13,7 +13,7 @@ import {EmailEmptyError, PassEmptyError} from '../../constants/errors';
 import CustomPassInput from '../../components/CustomPassInput';
 import CustomButton from '../../components/CustomButton';
 import {NAVIGATION, STRINGS} from '../../constants/strings';
-import Sapcer from '../../components/Spacer';
+import Spacer from '../../components/Spacer';
 import {ICONS} from '../../constants/icons';
 import {LoginScreenProps} from '../../defs/navigation';
 import {setLoading, userLoggedIn} from '../../redux/reducers/userSlice';
@@ -36,7 +36,10 @@ function Login({navigation}: Readonly<LoginScreenProps>) {
   // state
   const [email, setEmail] = useState('');
   const [pass, setPass] = useState('');
-  const [form, setForm] = useState(false);
+  const [form, setForm] = useState({
+    email: false,
+    pass: false,
+  });
   // functions
   function onChangeEmail(str: string) {
     setEmail(str);
@@ -45,7 +48,7 @@ function Login({navigation}: Readonly<LoginScreenProps>) {
     setPass(str);
   }
   async function handleLogin() {
-    setForm(true);
+    setForm({email: true, pass: true});
     if (email !== '' && pass !== '') {
       try {
         dispatch(setLoading(true));
@@ -125,14 +128,10 @@ function Login({navigation}: Readonly<LoginScreenProps>) {
             pin: '',
           });
           await userCollection.doc(creds.user.uid).set(user);
-          dispatch(
-            userLoggedIn({
-              name: creds.user.displayName!,
-              email: creds.user.email!,
-              uid: creds.user.uid,
-              pin: '',
-            }),
-          );
+          navigation.navigate(NAVIGATION.PIN, {
+            pin: user.pin === '' ? undefined : user.pin,
+            uid: creds.user.uid,
+          });
         } else {
           const data = await userCollection.doc(creds.user.uid).get();
           const user = UserFromJson(data.data()!);
@@ -156,34 +155,44 @@ function Login({navigation}: Readonly<LoginScreenProps>) {
             type="email"
             value={email}
             inputColor={COLOR.DARK[100]}
+            onBlur={e => {
+              if (email === '') {
+                setForm(formkey => ({...formkey, email: true}));
+              }
+            }}
           />
-          <EmailEmptyError email={email} formKey={form} />
+          <EmailEmptyError email={email} formKey={form.email} />
           <CustomPassInput
             onChangeText={onChangePass}
             placeholderText={STRINGS.Password}
             value={pass}
             inputColor={COLOR.DARK[100]}
+            onBlur={e => {
+              if (pass === '') {
+                setForm(formkey => ({...formkey, pass: true}));
+              }
+            }}
           />
-          <PassEmptyError pass={pass} formKey={form} />
-          <Sapcer height={15} />
+          <PassEmptyError pass={pass} formKey={form.pass} />
+          <Spacer height={15} />
           <CustomButton title={STRINGS.LOGIN} onPress={handleLogin} />
-          <Sapcer height={10} />
+          <Spacer height={10} />
           <Text style={styles.orText}>{STRINGS.Or}</Text>
-          <Sapcer height={10} />
+          <Spacer height={10} />
           <TouchableOpacity onPress={onGoogleButtonPress} style={[styles.btn]}>
             <View style={styles.googleRow}>
               {ICONS.Google({height: 25, width: 25})}
               <Text style={styles.text}>{STRINGS.LoginGoogle}</Text>
             </View>
           </TouchableOpacity>
-          <Sapcer height={20} />
+          <Spacer height={20} />
           <Pressable
             onPress={() => {
               navigation.push(NAVIGATION.FORGOTPASSWORD);
             }}>
             <Text style={styles.forgotText}>{STRINGS.ForgotPassword}</Text>
           </Pressable>
-          <Sapcer height={20} />
+          <Spacer height={20} />
           <View style={{flexDirection: 'row'}}>
             <Text style={styles.dontHaveAcc}>{STRINGS.DontHaveAccount} </Text>
             <Pressable
@@ -199,4 +208,4 @@ function Login({navigation}: Readonly<LoginScreenProps>) {
   );
 }
 
-export default Login;
+export default React.memo(Login);

@@ -62,13 +62,14 @@ export function UserFromJson(json: FirebaseFirestoreTypes.DocumentData): UserTyp
                 }
             }))];
         })) ?? {},
-        notification: Object.fromEntries(Object.entries<{ category: string, type: string, id: string, time: Timestamp, read: boolean }>(json.notification).map(([key, val]) => {
+        notification: Object.fromEntries(Object.entries<{ category: string, type: string, id: string, time: Timestamp, read: boolean, percentage: number }>(json.notification).map(([key, val]) => {
             return [key, {
                 category: decrypt(val['category'], json.uid) ?? val['category'],
                 type: decrypt(val['type'], json.uid) ?? val['type'],
                 id: val['id'],
                 time: val['time'],
                 read: val['read'],
+                percentage: val['percentage'] ?? 0
             }]
         })) ?? {},
         currency: decrypt(json.currency, json.uid) ?? 'USD',

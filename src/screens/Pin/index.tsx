@@ -157,7 +157,11 @@ function Pin({route, navigation}: Readonly<PinSentScreenProps>) {
   return (
     <SafeAreaView style={styles.safeView}>
       <View style={styles.mainView}>
-        <View style={{paddingTop:Dimensions.get('screen').height*0.03,rowGap:100}}>
+        <View
+          style={{
+            paddingTop: Dimensions.get('screen').height * 0.03,
+            rowGap: 100,
+          }}>
           <View
             style={{
               flexDirection: 'row',
