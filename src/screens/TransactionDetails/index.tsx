@@ -29,6 +29,8 @@ import {useAppTheme} from '../../hooks/themeHook';
 import {Timestamp} from '@react-native-firebase/firestore';
 import {BottomSheetModalMethods} from '@gorhom/bottom-sheet/lib/typescript/types';
 import ImageModal from './atoms/imageModal';
+import {OnlineTransactionModel} from '../../DbModels/OnlineTransactionModel';
+import {useObject, useQuery} from '@realm/react';
 
 function TransactionDetails({
   route,
@@ -40,12 +42,14 @@ function TransactionDetails({
   // redux
   const currency = useAppSelector(state => state.user.currentUser?.currency);
   const conversion = useAppSelector(state => state.transaction.conversion);
-  const trans = useAppSelector(
-    state =>
-      state.transaction.transactions[
-        route.params.transaction.timeStamp.seconds
-      ],
+  console.log(route.params.transaction.timeStamp.seconds)
+  const trans = useObject(
+    OnlineTransactionModel,
+    String(route.params.transaction.timeStamp.seconds),
   );
+  console.log(trans)
+  // const data = Array(...dbData);
+  // const trans = data[route.params.transaction.timeStamp.seconds];
   // ref
   const bottomSheetModalRef = useRef<BottomSheetModalMethods>(null);
   // state
@@ -69,9 +73,9 @@ function TransactionDetails({
     });
   }, []);
   const getBackgroundColor = useMemo(() => {
-    if (trans.type === 'expense') {
+    if (trans!.type === 'expense') {
       return COLORS.PRIMARY.RED;
-    } else if (trans.type === 'transfer') {
+    } else if (trans!.type === 'transfer') {
       return COLORS.PRIMARY.BLUE;
     } else {
       return COLORS.PRIMARY.GREEN;
@@ -194,8 +198,9 @@ function TransactionDetails({
                 <Text style={styles.descTitle}>{STRINGS.Attachement}</Text>
                 {trans.attachementType === 'image' ? (
                   <>
-                    {isLoading &&
-                    <ActivityIndicator  color={COLORS.VIOLET[40]}/>}
+                    {isLoading && (
+                      <ActivityIndicator color={COLORS.VIOLET[40]} />
+                    )}
                     <Pressable
                       onPress={() => {
                         setShowImage(true);

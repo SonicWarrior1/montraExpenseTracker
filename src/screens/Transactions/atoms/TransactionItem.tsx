@@ -12,6 +12,7 @@ import {StackNavigationProp} from '@react-navigation/stack';
 import {transactionType} from '../../../defs/transaction';
 import {useAppSelector} from '../../../redux/store';
 import React from 'react';
+import { OnlineTransactionModel } from '../../../DbModels/OnlineTransactionModel';
 
 const TransactionItem = ({
   item,
@@ -20,7 +21,7 @@ const TransactionItem = ({
   navigation,
   dateShow,
 }: {
-  item: transactionType;
+  item: OnlineTransactionModel;
   theme: 'light' | 'device' | 'dark' | undefined;
   scheme: ColorSchemeName;
   navigation: CompositeNavigationProp<
@@ -37,7 +38,7 @@ const TransactionItem = ({
   const user = useAppSelector(state => state.user.currentUser);
   const conversion = useAppSelector(state => state.transaction.conversion);
   // functions
-  const getAmtSymbol = (item: transactionType) => {
+  const getAmtSymbol = (item: OnlineTransactionModel) => {
     if (item.type === 'expense') {
       return '-';
     } else if (item.type === 'income') {
@@ -46,7 +47,7 @@ const TransactionItem = ({
       return '';
     }
   };
-  const getAmtColor = (item: transactionType) => {
+  const getAmtColor = (item: OnlineTransactionModel) => {
     if (item.type === 'expense') {
       return COLORS.PRIMARY.RED;
     } else if (item.type === 'income') {
@@ -65,6 +66,7 @@ const TransactionItem = ({
         },
       ]}
       onPress={() => {
+        console.log(item)
         navigation.push(NAVIGATION.TransactionDetail, {
           transaction: item,
         });

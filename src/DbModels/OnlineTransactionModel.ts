@@ -33,6 +33,7 @@ export class OnlineTransactionModel extends Realm.Object {
             attachementType: 'string',
             from: 'string',
             to: 'string',
-        }
+        },
+        primaryKey:'id'
     }
 }

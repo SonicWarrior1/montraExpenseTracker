@@ -20,6 +20,8 @@ import TransactionList from './atoms/TransactionList';
 import CategoryList from './atoms/CategoryList';
 import {useAppTheme} from '../../hooks/themeHook';
 import {STRINGS} from '../../constants/strings';
+import { useQuery } from '@realm/react';
+import { OnlineTransactionModel } from '../../DbModels/OnlineTransactionModel';
 
 function FinancialReport() {
   // functions
@@ -42,9 +44,11 @@ function FinancialReport() {
   const incomes =
     useAppSelector(state => state.user.currentUser?.income?.[month]) ?? [];
   const currency = useAppSelector(state => state.user.currentUser?.currency);
-  const {conversion, transactions: data} = useAppSelector(
+  const {conversion} = useAppSelector(
     state => state.transaction,
   );
+  const dbData = useQuery(OnlineTransactionModel);
+  const data = Array(...dbData);
   //
   const totalSpend = useMemo(
     () =>

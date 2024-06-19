@@ -17,20 +17,12 @@ import {useAppTheme} from '../../hooks/themeHook';
 // Third Party Libraries
 import {openLogoutSheet} from '../../redux/reducers/transactionSlice';
 import TabBackdrop from '../../components/TabBackdrop';
-import CustomButton from '../../components/CustomButton';
-import {useQuery, useRealm} from '@realm/react';
-import {OnlineTransactionModel} from '../../DbModels/OnlineTransactionModel';
-import {OfflineTransactionModel} from '../../DbModels/OfflineTransactionModel';
 
 function ProfileScreen({navigation}: Readonly<ProfileScreenProps>) {
   const dispatch = useAppDispatch();
   const username = useAppSelector(state => state.user.currentUser?.name);
   const COLOR = useAppTheme();
   const styles = style(COLOR);
-  const realm = useRealm();
-  const trans = useAppSelector(state => state.transaction.transactions);
-  const online = useQuery(OnlineTransactionModel);
-  const offline = useQuery(OfflineTransactionModel);
   return (
     <>
       <SafeAreaView style={styles.safeView}>
@@ -84,21 +76,6 @@ function ProfileScreen({navigation}: Readonly<ProfileScreenProps>) {
               </Pressable>
             </View>
           </View>
-          <CustomButton
-            title="RealmCheck"
-            onPress={() => {
-              realm.write(() => {
-                realm.create('OnlineTransaction', Object.values(trans)[0]);
-              });
-              realm.write(() => {
-                realm.create('OfflineTransaction', Object.values(trans)[1]);
-              });
-              // console.log(realm.objects('transaction'))
-              console.log('Online', online);
-              console.log('Offline', offline);
-              // console.log(realm.isEmpty)
-            }}
-          />
         </ScrollView>
       </SafeAreaView>
       <TabBackdrop />

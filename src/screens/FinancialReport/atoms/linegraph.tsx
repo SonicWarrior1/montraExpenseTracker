@@ -8,6 +8,7 @@ import {transactionType} from '../../../defs/transaction';
 import {useAppTheme} from '../../../hooks/themeHook';
 import {Timestamp} from '@react-native-firebase/firestore';
 import LinegraphLabel from '../../../components/LinegraphLabel';
+import { OnlineTransactionModel } from '../../../DbModels/OnlineTransactionModel';
 
 function Linegraph({
   totalSpend,
@@ -20,9 +21,7 @@ function Linegraph({
 }: Readonly<{
   totalSpend: string;
   totalIncome: string;
-  data: {
-    [key: string]: transactionType;
-  };
+  data: OnlineTransactionModel[];
   currency: string | undefined;
   transType: 'income' | 'expense';
   conversion: {
@@ -46,7 +45,7 @@ function Linegraph({
           .toString()}
       </Text>
       <View style={styles.graphView}>
-        {Object.values(data)
+        {data
           .filter(
             item =>
               Timestamp.fromMillis(item.timeStamp.seconds * 1000)
@@ -67,7 +66,7 @@ function Linegraph({
           </View>
         ) : (
           <LineChart
-            data={Object.values(data)
+            data={data
               .filter(
                 item =>
                   Timestamp.fromMillis(item.timeStamp.seconds * 1000)

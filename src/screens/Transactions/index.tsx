@@ -19,13 +19,17 @@ import {useAppTheme} from '../../hooks/themeHook';
 import {Timestamp} from '@react-native-firebase/firestore';
 import TransactionItem from './atoms/TransactionItem';
 import TabBackdrop from '../../components/TabBackdrop';
+import {useQuery} from '@realm/react';
+import { OnlineTransactionModel } from '../../DbModels/OnlineTransactionModel';
 function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
   // constants
   const COLOR = useAppTheme();
   const styles = style(COLOR);
   const scheme = useColorScheme();
   // redux
-  const transaction = useAppSelector(state => state.transaction.transactions);
+  // const transaction = useAppSelector(state => state.transaction.transactions);
+  const dbData = useQuery(OnlineTransactionModel);
+  const transaction=Array(...dbData);
   const [offset, setOffset] = useState<number>(0);
   const limit = 10;
   const filters = useAppSelector(state => state.transaction.filters);
@@ -33,12 +37,12 @@ function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
   const [month, setMonth] = useState(new Date().getMonth());
   // functions
   function filterDataByDate(
-    data: {[key: string]: transactionType},
+    data: OnlineTransactionModel[],
     offset: number,
   ) {
     const startOfToday = new Date().setHours(0, 0, 0, 0) / 1000;
     const startOfYesterday = startOfToday - 24 * 60 * 60;
-    const res = Object.values(data)
+    const res = data
       .sort((a, b) => b.timeStamp.seconds - a.timeStamp.seconds)
       .slice(0, offset + limit)
       .filter(
@@ -47,7 +51,7 @@ function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
             .toDate()
             .getMonth() === month,
       )
-      .reduce((acc: {[key: string]: Array<transactionType>}, item) => {
+      .reduce((acc: {[key: string]: Array<OnlineTransactionModel>}, item) => {
         const itemTime = item.timeStamp.seconds;
         if (itemTime >= startOfToday) {
           if (acc.today) {
@@ -106,7 +110,7 @@ function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
     delete res.today;
     delete res.yesterday;
     const x = Object.entries(res).reduce(
-      (acc: Array<{title: string; data: Array<transactionType>}>, curr) => {
+      (acc: Array<{title: string; data: Array<OnlineTransactionModel>}>, curr) => {
         acc.push({
           title: curr[0],
           data: [...curr[1]].sort(

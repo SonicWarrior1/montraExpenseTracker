@@ -4,19 +4,19 @@ import { TimestampModel } from "./TimestampModel";
 
 export class OfflineTransactionModel extends Realm.Object {
     name!: string;
-    id!: string ;
-    amount!: number ;
+    id!: string;
+    amount!: number;
     category!: string;
-    desc!: string ;
+    desc!: string;
     wallet!: string;
     attachement?: string;
     repeat!: boolean;
     freq?: RepeatDataModel;
     timeStamp!: TimestampModel;
-    type!: string ;
-    attachementType!: string ;
-    from!: string ;
-    to!: string ;
+    type!: string;
+    attachementType!: string;
+    from!: string;
+    to!: string;
     static readonly schema: ObjectSchema = {
         name: 'OfflineTransaction',
         properties: {
@@ -27,12 +27,13 @@ export class OfflineTransactionModel extends Realm.Object {
             wallet: 'string',
             attachement: 'string?',
             repeat: 'bool',
-            freq:'repeat?',
+            freq: 'repeat?',
             timeStamp: 'timestamp',
             type: 'string',
             attachementType: 'string',
             from: 'string',
             to: 'string',
-        }
+        },
+        primaryKey: 'id'
     }
 }

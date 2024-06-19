@@ -9,14 +9,13 @@ import {useAppTheme} from '../../../hooks/themeHook';
 import {useAppSelector} from '../../../redux/store';
 import {Timestamp} from '@react-native-firebase/firestore';
 import LinegraphLabel from '../../../components/LinegraphLabel';
+import { OnlineTransactionModel } from '../../../DbModels/OnlineTransactionModel';
 
 function Graph({
   data,
   month,
 }: Readonly<{
-  data: {
-    [key: string]: transactionType;
-  };
+  data:OnlineTransactionModel[];
   month: number;
 }>) {
   const theme = useAppSelector(state => state.user.currentUser?.theme);
@@ -32,7 +31,7 @@ function Graph({
   const startOfYear = Math.floor(
     new Date(new Date().setMonth(0, 1)).setHours(0, 0, 0, 0) / 1000,
   );
-  const graphData = Object.values(data)
+  const graphData = data
     .filter(item => {
       if (graphDay === 0) {
         return (
