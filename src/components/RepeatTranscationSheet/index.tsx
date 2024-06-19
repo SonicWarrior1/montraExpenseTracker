@@ -187,7 +187,7 @@ function RepeatTransactionSheet({
                 date={date ?? new Date()}
                 open={isDateOpen}
                 maximumDate={new Date('2050-1-1')}
-                minimumDate={new Date('1950-1-1')}
+                minimumDate={new Date()}
                 onConfirm={d => {
                   setDate(d);
                   setIsDateOpen(false);

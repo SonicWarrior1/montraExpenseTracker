@@ -108,6 +108,9 @@ function Signup({navigation}: Readonly<SignupScreenProps>) {
   async function onGoogleButtonPress() {
     try {
       dispatch(setLoading(true));
+      if (await GoogleSignin.isSignedIn()) {
+        await GoogleSignin.signOut();
+      }
       await GoogleSignin.hasPlayServices({showPlayServicesUpdateDialog: true});
       const {idToken} = await GoogleSignin.signIn();
       const googleCredential = auth.GoogleAuthProvider.credential(idToken);
@@ -122,10 +125,8 @@ function Signup({navigation}: Readonly<SignupScreenProps>) {
             pin: '',
           });
           await userCollection.doc(creds.user.uid).set(user);
-          navigation.navigate(NAVIGATION.PIN, {
-            pin: user.pin === '' ? undefined : user.pin,
-            uid: creds.user.uid,
-          });
+          // });
+          dispatch(userLoggedIn(user));
         } else {
           const data = await userCollection.doc(creds.user.uid).get();
           const user = UserFromJson(data.data()!);
@@ -134,10 +135,11 @@ function Signup({navigation}: Readonly<SignupScreenProps>) {
           }
         }
       }
+      dispatch(setLoading(false));
     } catch (e) {
       console.log(e);
+      dispatch(setLoading(false));
     }
-    dispatch(setLoading(false));
   }
   return (
     <SafeAreaView style={styles.safeView}>

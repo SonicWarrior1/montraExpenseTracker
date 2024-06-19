@@ -128,7 +128,7 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
         <View style={styles.detailsCtr}>
           <CustomDropdown
             data={expenseCat!
-              .filter(cat => !Object.keys(budgets!).includes(cat))
+              .filter(cat => !Object.keys(budgets??[]).includes(cat))
               .map(item => {
                 return {
                   label:

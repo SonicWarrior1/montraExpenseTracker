@@ -18,13 +18,14 @@ import {setLoading, userLoggedIn} from '../../redux/reducers/userSlice';
 import firestore from '@react-native-firebase/firestore';
 import {ICONS} from '../../constants/icons';
 import {encrypt} from '../../utils/encryption';
-import Sapcer from '../../components/Spacer';
+import Spacer from '../../components/Spacer';
 // Third Party Libraries
 import Toast from 'react-native-toast-message';
 import uuid from 'react-native-uuid';
 import auth from '@react-native-firebase/auth';
 import {UserFromJson} from '../../utils/userFuncs';
-import {useNavigation} from '@react-navigation/native';
+import {GoogleSignin} from '@react-native-google-signin/google-signin';
+import VerifyPassModal from './atoms/VerifyPassModal';
 
 function Pin({route, navigation}: Readonly<PinSentScreenProps>) {
   // constants
@@ -35,24 +36,14 @@ function Pin({route, navigation}: Readonly<PinSentScreenProps>) {
     [-1, 0, 99],
   ];
   const dispatch = useAppDispatch();
-  const user = useAppSelector(state => state.user.currentUser);
-  const isSetup = user === undefined ? true : user.pin === '';
+  const currentUser = useAppSelector(state => state.user.currentUser);
+  const isSetup = currentUser?.pin === '';
   const oldPin = route.params.pin ?? '';
-  console.log(route.params.uid, isSetup, oldPin);
-  // console.log(nav.,isSetup);
   // state
   const [pin, setPin] = useState<number[]>([]);
-  // functions
-  const nav = useNavigation();
-  useEffect(() => {
-    console.log('sdjfiksuj');
-    if (!isSetup && pin.length === 4) {
-      console.log('chal ja bhai');
-      nav.replace(NAVIGATION.BottomTab);
-      setPin([]);
-    }
-    dispatch(setLoading(false));
-  }, [isSetup, nav, user]);
+  const [menu, setMenu] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  //functions
   const handlePin = (value: number) => {
     return async () => {
       if (value === -1) {
@@ -68,14 +59,15 @@ function Pin({route, navigation}: Readonly<PinSentScreenProps>) {
           navigation.push(NAVIGATION.PIN, {
             setup: true,
             pin: pin.join(''),
-            uid: route.params.uid,
           });
         } else if (isSetup && oldPin) {
           if (oldPin === pin.join('')) {
             console.log('Done');
             dispatch(setLoading(true));
-            const uid = route.params.uid;
-            const data = await firestore().collection('users').doc(uid).get();
+            const data = await firestore()
+              .collection('users')
+              .doc(currentUser?.uid)
+              .get();
             const user = UserFromJson(data.data()!);
             await firestore()
               .collection('users')
@@ -83,7 +75,9 @@ function Pin({route, navigation}: Readonly<PinSentScreenProps>) {
               .update({
                 pin: encrypt(pin.join(''), user.uid),
               });
-            dispatch(userLoggedIn({...user, pin: pin.join('')}));
+            await dispatch(userLoggedIn({...user, pin: pin.join('')}));
+            navigation.replace(NAVIGATION.BottomTab);
+            dispatch(setLoading(false));
           } else {
             console.log("Pin doesn't match");
             Toast.show({
@@ -91,13 +85,13 @@ function Pin({route, navigation}: Readonly<PinSentScreenProps>) {
               type: 'error',
             });
           }
-        } else if (pin.join('') === user?.pin) {
+        } else if (pin.join('') === currentUser?.pin) {
           // dispatch(setLoading(true))
           navigation.reset({index: 0, routes: [{name: NAVIGATION.BottomTab}]});
           setPin([]);
           console.log('home');
         } else {
-          console.log(user?.pin);
+          console.log(currentUser?.pin);
           console.log('Incorrect Pin');
           Toast.show({text1: 'Incorrect Pin', type: 'error'});
           setPin([]);
@@ -133,10 +127,23 @@ function Pin({route, navigation}: Readonly<PinSentScreenProps>) {
             text: 'YES',
             onPress: () => {
               (async () => {
-                await auth().signOut();
-                navigation.goBack();
-                // dispatch(userLoggedIn(undefined));
-                // navigation.navigate(NAVIGATION.LOGIN);
+                dispatch(setLoading(true));
+                if (await GoogleSignin.isSignedIn()) {
+                  GoogleSignin.signOut();
+                } else {
+                  await auth().signOut();
+                }
+                dispatch(userLoggedIn(undefined));
+                setTimeout(() => {
+                  navigation.reset({
+                    index: 1,
+                    routes: [
+                      {name: NAVIGATION.ONBOARDING},
+                      {name: NAVIGATION.LOGIN},
+                    ],
+                  });
+                  dispatch(setLoading(false));
+                }, 100);
               })();
             },
           },
@@ -156,7 +163,18 @@ function Pin({route, navigation}: Readonly<PinSentScreenProps>) {
   }, []);
   return (
     <SafeAreaView style={styles.safeView}>
-      <View style={styles.mainView}>
+      <VerifyPassModal
+        setShowModal={setShowModal}
+        showModal={showModal}
+        setMenu={setMenu}
+      />
+      <Pressable
+        style={styles.mainView}
+        onPress={() => {
+          if (menu) {
+            setMenu(false);
+          }
+        }}>
         <View
           style={{
             paddingTop: Dimensions.get('screen').height * 0.03,
@@ -179,10 +197,20 @@ function Pin({route, navigation}: Readonly<PinSentScreenProps>) {
                 })}
               </Pressable>
             ) : (
-              <Sapcer width={25} />
+              <Spacer width={25} />
             )}
             <Text style={styles.text}>{getTitleText()}</Text>
-            <Sapcer width={25} />
+            {isSetup ? (
+              <Spacer width={25} />
+            ) : (
+              <Pressable
+                style={{transform: [{rotateZ: '90deg'}]}}
+                onPress={() => {
+                  setMenu(menu => !menu);
+                }}>
+                {ICONS.More({height: 20, width: 20, color: 'white'})}
+              </Pressable>
+            )}
           </View>
           <View style={styles.progressDotCtr}>
             {[0, 1, 2, 3].map(i => {
@@ -227,7 +255,40 @@ function Pin({route, navigation}: Readonly<PinSentScreenProps>) {
             </View>
           ))}
         </View>
-      </View>
+
+        {menu && (
+          <View style={styles.menu}>
+            <TouchableOpacity
+              onPress={() => {
+                setShowModal(true);
+              }}>
+              <Text style={styles.menuText}>Reset Pin</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={async () => {
+                dispatch(setLoading(true));
+                if (await GoogleSignin.isSignedIn()) {
+                  GoogleSignin.signOut();
+                } else {
+                  await auth().signOut();
+                }
+                dispatch(userLoggedIn(undefined));
+                setTimeout(() => {
+                  navigation.reset({
+                    index: 1,
+                    routes: [
+                      {name: NAVIGATION.ONBOARDING},
+                      {name: NAVIGATION.LOGIN},
+                    ],
+                  });
+                  dispatch(setLoading(false));
+                }, 50);
+              }}>
+              <Text style={styles.menuText}>Logout</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      </Pressable>
     </SafeAreaView>
   );
 }

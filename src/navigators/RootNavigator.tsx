@@ -259,11 +259,11 @@ function RootNavigator(): React.JSX.Element {
             name={NAVIGATION.FORGOTEMAILSENT}
             component={ForgotEmailSent}
           />
-          <Stack.Screen
+          {/* <Stack.Screen
             name={NAVIGATION.PIN}
             component={Pin}
             initialParams={{pin: undefined}}
-          />
+          /> */}
         </Stack.Group>
       )}
     </Stack.Navigator>

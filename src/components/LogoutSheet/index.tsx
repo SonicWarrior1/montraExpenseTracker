@@ -17,6 +17,7 @@ import {useAppTheme} from '../../hooks/themeHook';
 import {BottomSheetModalMethods} from '@gorhom/bottom-sheet/lib/typescript/types';
 import auth from '@react-native-firebase/auth';
 import {openLogoutSheet} from '../../redux/reducers/transactionSlice';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
 function LogoutSheet() {
   // constants
   const COLOR = useAppTheme();

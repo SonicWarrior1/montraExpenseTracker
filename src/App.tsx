@@ -24,7 +24,7 @@ function App(): React.JSX.Element {
     <GestureHandlerRootView style={{flex: 1}}>
       <Provider store={store}>
         <PersistGate persistor={persistor}>
-          <InternetCheck>
+          {/* <InternetCheck> */}
             <Loader>
               <NavigationContainer
                 onReady={() => BootSplash.hide({fade: true})}>
@@ -36,7 +36,7 @@ function App(): React.JSX.Element {
                 />
               </NavigationContainer>
             </Loader>
-          </InternetCheck>
+          {/* </InternetCheck> */}
         </PersistGate>
       </Provider>
     </GestureHandlerRootView>

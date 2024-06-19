@@ -19,7 +19,9 @@ function ExportData() {
   const data = useAppSelector(state => state.transaction.transactions);
   const dispatch = useAppDispatch();
   // state
-  const [dataType, setDataType] = useState<'all' | 'expense' | 'income'>('all');
+  const [dataType, setDataType] = useState<
+    'all' | 'expense' | 'income' | 'transfer'
+  >('all');
   const [dataRange, setDataRange] = useState<7 | 15 | 30>(7);
   const [dataFormat, setDataFormat] = useState<'csv' | 'pdf'>('csv');
   // functions
@@ -27,7 +29,7 @@ function ExportData() {
     dispatch(setLoading(true));
     const daysAgo = new Date();
     daysAgo.setDate(daysAgo.getDate() - dataRange);
-    const x = jsonToCSV(
+    const csvData = jsonToCSV(
       Object.values(data)
         .filter(
           item =>
@@ -35,6 +37,12 @@ function ExportData() {
               daysAgo && (dataType === 'all' ? true : dataType === item.type),
         )
         .map(val => {
+          if (val.type === 'transfer') {
+            return {
+              ...val,
+              timeStamp: val.timeStamp.toDate(),
+            };
+          }
           let frequency = '';
           if (val.freq?.freq === 'yearly') {
             frequency = val.freq.day! + monthData[val.freq.month!].label;
@@ -57,13 +65,18 @@ function ExportData() {
           };
         }),
     );
+    if(csvData===''){
+      Toast.show({text1:"There is no data to be exported",type:"error"})
+      dispatch(setLoading(false))
+      return;
+    }
     try {
       const id = uuid.v4();
       const dirPath =
         Platform.OS === 'ios'
           ? ReactNativeBlobUtil.fs.dirs.DocumentDir
           : ReactNativeBlobUtil.fs.dirs.LegacyDownloadDir;
-      await ReactNativeBlobUtil.fs.writeFile(`${dirPath}/${id}.csv`, x);
+      await ReactNativeBlobUtil.fs.writeFile(`${dirPath}/${id}.csv`, csvData);
       if (Platform.OS === 'ios') {
         ReactNativeBlobUtil.ios.openDocument(`${dirPath}/${id}.csv`);
       } else {
@@ -84,7 +97,7 @@ function ExportData() {
         <View>
           <Text style={styles.text}>{STRINGS.WhatExport}</Text>
           <CustomDropdown
-            data={['all', 'expense', 'income'].map(item => {
+            data={['all', 'expense', 'income', 'transfer'].map(item => {
               return {
                 label: item[0].toUpperCase() + item.slice(1),
                 value: item,

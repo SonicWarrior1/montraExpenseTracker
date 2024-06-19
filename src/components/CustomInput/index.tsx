@@ -5,6 +5,7 @@ import {
 } from 'react-native';
 import styles from './styles';
 import {COLORS} from '../../constants/commonStyles';
+import React from 'react';
 
 function CustomInput({
   value,
@@ -29,6 +30,7 @@ function CustomInput({
   editable?: boolean;
   onPress?: () => void;
 }>) {
+  console.log("jdsnfksj")
   return (
     <TextInput
       style={[styles.input, {color: inputColor, flex: flex}]}
@@ -48,4 +50,4 @@ function CustomInput({
     />
   );
 }
-export default CustomInput;
+export default React.memo(CustomInput);

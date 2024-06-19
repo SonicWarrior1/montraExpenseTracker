@@ -57,14 +57,14 @@ function Login({navigation}: Readonly<LoginScreenProps>) {
           if (creds.user.emailVerified) {
             const data = await userCollection.doc(creds.user.uid).get();
             const user = UserFromJson(data.data()!);
-            if (user.pin === '') {
-              navigation.navigate(NAVIGATION.PIN, {
-                pin: user.pin === '' ? undefined : user.pin,
-                uid: creds.user.uid,
-              });
-            } else {
-              dispatch(userLoggedIn(user));
-            }
+            // if (user.pin === '') {
+            //   navigation.navigate(NAVIGATION.PIN, {
+            //     pin: user.pin === '' ? undefined : user.pin,
+            //     uid: creds.user.uid,
+            //   });
+            // } else {
+            dispatch(userLoggedIn(user));
+            // }
           } else {
             Alert.alert(
               'Please verify your email',
@@ -108,8 +108,12 @@ function Login({navigation}: Readonly<LoginScreenProps>) {
   async function onGoogleButtonPress() {
     try {
       dispatch(setLoading(true));
+      if (await GoogleSignin.isSignedIn()) {
+        await GoogleSignin.signOut();
+      }
       // Check if your device supports Google Play
       await GoogleSignin.hasPlayServices({showPlayServicesUpdateDialog: true});
+
       // Get the users ID token
       const {idToken} = await GoogleSignin.signIn();
 
@@ -128,10 +132,7 @@ function Login({navigation}: Readonly<LoginScreenProps>) {
             pin: '',
           });
           await userCollection.doc(creds.user.uid).set(user);
-          navigation.navigate(NAVIGATION.PIN, {
-            pin: user.pin === '' ? undefined : user.pin,
-            uid: creds.user.uid,
-          });
+          dispatch(userLoggedIn(user));
         } else {
           const data = await userCollection.doc(creds.user.uid).get();
           const user = UserFromJson(data.data()!);
