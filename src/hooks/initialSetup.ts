@@ -7,7 +7,9 @@ import { userLoggedIn } from "../redux/reducers/userSlice";
 import { UserType } from "../defs/user";
 import { UserFromJson } from "../utils/userFuncs";
 import { TransFromJson } from "../utils/transFuncs";
+import { useRealm } from "@realm/react";
 export function useInitialSetup() {
+    const realm = useRealm();
     const dispatch = useAppDispatch();
     const user = useAppSelector(state => state.user.currentUser);
     useEffect(() => {
@@ -33,14 +35,20 @@ export function useInitialSetup() {
                     doc => (TransFromJson(doc.data(), user!.uid)),
                 );
                 console.log(data)
-                const formatData = data.reduce(
-                    (acc: { [key: string]: transactionType }, item) => {
-                        acc[item.timeStamp.seconds] = item;
-                        return acc;
-                    },
-                    {},
-                );
-                dispatch(setTransaction(formatData));
+                data.forEach((item) => {
+                    realm.write(() => {
+                        realm.create('OnlineTransaction', item);
+                    });
+                })
+                
+                // const formatData = data.reduce(
+                //     (acc: { [key: string]: transactionType }, item) => {
+                //         acc[item.timeStamp.seconds] = item;
+                //         return acc;
+                //     },
+                //     {},
+                // );
+                // dispatch(setTransaction(formatData));
             });
         return () => unsubscribe();
 

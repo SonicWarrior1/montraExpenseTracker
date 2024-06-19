@@ -12,6 +12,11 @@ import {enableFreeze, enableScreens} from 'react-native-screens';
 import {toastConfig} from './components/customToast';
 import BootSplash from 'react-native-bootsplash';
 import InternetCheck from './components/InternetCheck';
+import {RealmProvider} from '@realm/react';
+import {TimestampModel} from './DbModels/TimestampModel';
+import {RepeatDataModel} from './DbModels/RepeatDataModel';
+import {OnlineTransactionModel} from './DbModels/OnlineTransactionModel';
+import { OfflineTransactionModel } from './DbModels/OfflineTransactionModel';
 
 enableFreeze(true);
 enableScreens(false);
@@ -22,9 +27,16 @@ GoogleSignin.configure({
 function App(): React.JSX.Element {
   return (
     <GestureHandlerRootView style={{flex: 1}}>
-      <Provider store={store}>
-        <PersistGate persistor={persistor}>
-          {/* <InternetCheck> */}
+      <RealmProvider
+        schema={[
+          TimestampModel,
+          RepeatDataModel,
+          OnlineTransactionModel,
+          OfflineTransactionModel
+        ]}>
+        <Provider store={store}>
+          <PersistGate persistor={persistor}>
+            {/* <InternetCheck> */}
             <Loader>
               <NavigationContainer
                 onReady={() => BootSplash.hide({fade: true})}>
@@ -36,9 +48,10 @@ function App(): React.JSX.Element {
                 />
               </NavigationContainer>
             </Loader>
-          {/* </InternetCheck> */}
-        </PersistGate>
-      </Provider>
+            {/* </InternetCheck> */}
+          </PersistGate>
+        </Provider>
+      </RealmProvider>
     </GestureHandlerRootView>
   );
 }
