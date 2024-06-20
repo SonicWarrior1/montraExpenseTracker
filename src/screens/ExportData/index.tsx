@@ -16,11 +16,13 @@ import Toast from 'react-native-toast-message';
 import {setLoading} from '../../redux/reducers/userSlice';
 import {useQuery} from '@realm/react';
 import {OnlineTransactionModel} from '../../DbModels/OnlineTransactionModel';
+import {OfflineTransactionModel} from '../../DbModels/OfflineTransactionModel';
 function ExportData() {
   // redux
   // const data = useAppSelector(state => state.transaction.transactions);
-  const dbData = useQuery(OnlineTransactionModel);
-  const data = Array(...dbData);
+  const onlineData = useQuery(OnlineTransactionModel);
+  const offlineData = useQuery(OfflineTransactionModel);
+  const data = Array(...onlineData, ...offlineData);
   const dispatch = useAppDispatch();
   // state
   const [dataType, setDataType] = useState<
@@ -128,7 +130,6 @@ function ExportData() {
             })}
             onChange={data => {
               setDataRange(data.value);
-              console.log(data);
             }}
             placeholder=""
             value={String(dataRange)}

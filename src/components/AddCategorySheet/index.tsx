@@ -52,7 +52,6 @@ function AddCategorySheet({
     const userDoc = firestore().collection('users').doc(uid);
     if (category !== '') {
       dispatch(setLoading(true));
-      console.log(expenseCats);
       if (expenseCats?.includes(category.toLowerCase())) {
         Toast.show({text1: `${category} is already added`, type: 'error'});
         dispatch(setLoading(false));
@@ -100,7 +99,6 @@ function AddCategorySheet({
           keyboardType={'default'}
           // value={category}
           onChangeText={(str: string) => {
-            console.log(str);
             setCategory(str.trim());
           }}
           placeholderTextColor={COLORS.DARK[25]}

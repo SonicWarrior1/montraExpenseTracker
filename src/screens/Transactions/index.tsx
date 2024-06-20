@@ -10,7 +10,6 @@ import {
 import style from './styles';
 import {ICONS} from '../../constants/icons';
 import {useAppSelector} from '../../redux/store';
-import {transactionType} from '../../defs/transaction';
 import {COLORS} from '../../constants/commonStyles';
 import TransactionHeader from '../../components/TransactionHeader';
 import {TransactionScreenProps} from '../../defs/navigation';
@@ -21,15 +20,18 @@ import TransactionItem from './atoms/TransactionItem';
 import TabBackdrop from '../../components/TabBackdrop';
 import {useQuery} from '@realm/react';
 import { OnlineTransactionModel } from '../../DbModels/OnlineTransactionModel';
+import { OfflineTransactionModel } from '../../DbModels/OfflineTransactionModel';
 function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
   // constants
   const COLOR = useAppTheme();
   const styles = style(COLOR);
   const scheme = useColorScheme();
   // redux
-  // const transaction = useAppSelector(state => state.transaction.transactions);
-  const dbData = useQuery(OnlineTransactionModel);
-  const transaction=Array(...dbData);
+  const onlineData = useQuery(OnlineTransactionModel);
+  const offlineData = useQuery(OfflineTransactionModel);
+
+  const transaction=Array(...onlineData,...offlineData);
+  console.log(offlineData)
   const [offset, setOffset] = useState<number>(0);
   const limit = 10;
   const filters = useAppSelector(state => state.transaction.filters);
@@ -42,7 +44,7 @@ function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
   ) {
     const startOfToday = new Date().setHours(0, 0, 0, 0) / 1000;
     const startOfYesterday = startOfToday - 24 * 60 * 60;
-    const res = data
+    const res = data.slice()
       .sort((a, b) => b.timeStamp.seconds - a.timeStamp.seconds)
       .slice(0, offset + limit)
       .filter(
@@ -217,7 +219,6 @@ function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
                 </TouchableOpacity>
               }
               onEndReached={() => {
-                console.log('OFFset', offset);
                 if (offset + limit < Object.values(transaction).length) {
                   setOffset(offset => offset + 10);
                 }

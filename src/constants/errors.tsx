@@ -186,7 +186,6 @@ export function EmptyZeroError({
     } else {
       height.value = withTiming(0);
     }
-    console.log(height);
   }, [value, formKey]);
   return (
     <>
@@ -230,7 +229,6 @@ export function AnimatedEmptyError({
     } else {
       height.value = withTiming(10);
     }
-    console.log(height.value);
   }, [value, formKey]);
   return (
     <>

@@ -1,19 +1,23 @@
 import {BottomSheetModal, BottomSheetView} from '@gorhom/bottom-sheet';
 import React, {useCallback, useMemo} from 'react';
 import {ICONS} from '../../constants/icons';
-import {pickSingle} from 'react-native-document-picker';
 import {
   ImageLibraryOptions,
   launchImageLibrary,
   CameraOptions,
   launchCamera,
 } from 'react-native-image-picker';
-import {BottomSheetModalMethods} from '@gorhom/bottom-sheet/lib/typescript/types';
 import style from './styles';
 import SheetBackdrop from '../SheetBackDrop';
 import {STRINGS} from '../../constants/strings';
 import {useAppTheme} from '../../hooks/themeHook';
 import SheetButtons from '../SheetButton';
+// Third Party Libraries
+import RNBlobUtil from 'react-native-blob-util';
+import {BottomSheetModalMethods} from '@gorhom/bottom-sheet/lib/typescript/types';
+import {pickSingle} from 'react-native-document-picker';
+import {useNetInfo} from '@react-native-community/netinfo';
+import {Platform} from 'react-native';
 
 function FilePickerSheet({
   bottomSheetModalRef,
@@ -38,23 +42,29 @@ function FilePickerSheet({
   const snapPoints = useMemo(() => ['25%'], []);
   const COLOR = useAppTheme();
   const styles = style(COLOR);
+  const {isConnected} = useNetInfo();
   // functions
   const openImagePicker = useCallback(async () => {
     const options: ImageLibraryOptions = {
       mediaType: 'photo',
+      includeBase64: !isConnected,
     };
     let response = await launchImageLibrary(options);
     if (response.didCancel) {
       console.log('User cancelled image picker');
     } else {
       let imageUri = response.assets![0].uri;
+      if (!isConnected) {
+        imageUri = response.assets![0].base64;
+      }
       setImage(imageUri);
       bottomSheetModalRef.current?.close();
     }
-  }, []);
+  }, [isConnected]);
   const openCamera = useCallback(async () => {
     const options: CameraOptions = {
       mediaType: 'photo',
+      includeBase64: !isConnected,
     };
     let response = await launchCamera(options);
     console.log(response);
@@ -62,16 +72,24 @@ function FilePickerSheet({
       console.log('User cancelled image picker');
     } else {
       let imageUri = response.assets![0].uri;
+      if (!isConnected) {
+        imageUri = response.assets![0].base64;
+      }
       setImage(imageUri);
       bottomSheetModalRef.current?.close();
     }
-  }, []);
-  const docPicker = useCallback(async () => {
+  }, [isConnected]);
+  const docPicker = async () => {
     try {
       let res = await pickSingle();
-      console.log(res);
+      let uri = res.uri;
+      if (!isConnected) {
+        const filePath = Platform.OS === 'ios' ? res.uri.slice(7) : res.uri;
+        uri = await RNBlobUtil.fs.readFile(filePath, 'base64');
+        console.log('Base64:', uri);
+      }
       if (res) {
-        setDoc({uri: res.uri, name: res.name!});
+        setDoc({uri: uri, name: res.name!});
         bottomSheetModalRef.current?.close();
       } else {
         console.log('User cancelled doc picker');
@@ -79,8 +97,8 @@ function FilePickerSheet({
     } catch (e) {
       console.log(e);
     }
-  }, []);
-  
+  };
+
   return (
     <BottomSheetModal
       enablePanDownToClose
@@ -112,5 +130,4 @@ function FilePickerSheet({
   );
 }
 
-export default FilePickerSheet;
-
+export default React.memo(FilePickerSheet);

@@ -2,7 +2,6 @@ import React from 'react';
 import {View} from 'react-native';
 
 function Spacer({height, width}: Readonly<{height?: number; width?: number}>) {
-  console.log("djfbk")
   return <View style={{height, width}}></View>;
 }
 

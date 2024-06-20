@@ -30,7 +30,6 @@ function CustomInput({
   editable?: boolean;
   onPress?: () => void;
 }>) {
-  console.log("jdsnfksj")
   return (
     <TextInput
       style={[styles.input, {color: inputColor, flex: flex}]}

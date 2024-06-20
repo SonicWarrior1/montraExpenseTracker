@@ -66,7 +66,6 @@ const TransactionItem = ({
         },
       ]}
       onPress={() => {
-        console.log(item)
         navigation.push(NAVIGATION.TransactionDetail, {
           transaction: item,
         });

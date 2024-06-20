@@ -17,6 +17,7 @@ export class OfflineTransactionModel extends Realm.Object {
     attachementType!: string;
     from!: string;
     to!: string;
+    operation!:string;
     static readonly schema: ObjectSchema = {
         name: 'OfflineTransaction',
         properties: {
@@ -33,6 +34,7 @@ export class OfflineTransactionModel extends Realm.Object {
             attachementType: 'string',
             from: 'string',
             to: 'string',
+            operation:'string'
         },
         primaryKey: 'id'
     }

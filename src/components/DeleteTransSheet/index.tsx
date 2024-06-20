@@ -22,6 +22,10 @@ import {encrypt} from '../../utils/encryption';
 import {STRINGS} from '../../constants/strings';
 import {useAppTheme} from '../../hooks/themeHook';
 import {StackNavigationProp} from '@react-navigation/stack';
+import {useNetInfo} from '@react-native-community/netinfo';
+import {useObject, useRealm} from '@realm/react';
+import {OnlineTransactionModel} from '../../DbModels/OnlineTransactionModel';
+import {UpdateMode} from 'realm';
 function DeleteTransactionSheet({
   bottomSheetModalRef,
   id,
@@ -51,46 +55,55 @@ function DeleteTransactionSheet({
   const month = new Date().getMonth();
   const COLOR = useAppTheme();
   const styles = style(COLOR);
+  const {isConnected} = useNetInfo();
+  const realm = useRealm();
+  const trans = useObject(OnlineTransactionModel, id);
   // functions
   const handleDelete = useCallback(async () => {
-    const userDoc = firestore().collection('users').doc(uid);
     try {
       dispatch(setLoading(true));
-      const curr = await userDoc.get();
-      if (type === 'expense') {
-        await userDoc.update({
-          [`spend.${month}.${category}`]: encrypt(
-            String(
-              (
-                Number(
-                  UserFromJson(curr.data() as UserType).spend[month][
-                    category
-                  ] ?? 0,
-                ) -
-                amt / conversion.usd[currency!.toLowerCase()]
-              ).toFixed(1),
-            ),
-            uid!,
-          ),
+      if (!isConnected) {
+        realm.write(() => {
+          realm.create('OfflineTransaction', {...trans,operation:"delete"}!, UpdateMode.Modified);
         });
-      } else if (type === 'income') {
-        await userDoc.update({
-          [`income.${month}.${category}`]: encrypt(
-            String(
-              (
-                Number(
-                  UserFromJson(curr.data() as UserType).income[month][
-                    category
-                  ] ?? 0,
-                ) -
-                amt / conversion.usd[currency!.toLowerCase()]
-              ).toFixed(1),
+      } else {
+        const userDoc = firestore().collection('users').doc(uid);
+        const curr = await userDoc.get();
+        if (type === 'expense') {
+          await userDoc.update({
+            [`spend.${month}.${category}`]: encrypt(
+              String(
+                (
+                  Number(
+                    UserFromJson(curr.data() as UserType).spend[month][
+                      category
+                    ] ?? 0,
+                  ) -
+                  amt / conversion.usd[currency!.toLowerCase()]
+                ).toFixed(1),
+              ),
+              uid!,
             ),
-            uid!,
-          ),
-        });
+          });
+        } else if (type === 'income') {
+          await userDoc.update({
+            [`income.${month}.${category}`]: encrypt(
+              String(
+                (
+                  Number(
+                    UserFromJson(curr.data() as UserType).income[month][
+                      category
+                    ] ?? 0,
+                  ) -
+                  amt / conversion.usd[currency!.toLowerCase()]
+                ).toFixed(1),
+              ),
+              uid!,
+            ),
+          });
+        }
+        await userDoc.collection('transactions').doc(id).delete();
       }
-      await userDoc.collection('transactions').doc(id).delete();
       Toast.show({
         text1: STRINGS.TransactionDeletedSuccesfully,
         type: 'custom',

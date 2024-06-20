@@ -3,7 +3,6 @@ import {
   ActivityIndicator,
   Dimensions,
   Image,
-  Modal,
   Pressable,
   SafeAreaView,
   Text,
@@ -30,7 +29,8 @@ import {Timestamp} from '@react-native-firebase/firestore';
 import {BottomSheetModalMethods} from '@gorhom/bottom-sheet/lib/typescript/types';
 import ImageModal from './atoms/imageModal';
 import {OnlineTransactionModel} from '../../DbModels/OnlineTransactionModel';
-import {useObject, useQuery} from '@realm/react';
+import {useObject} from '@realm/react';
+import {OfflineTransactionModel} from '../../DbModels/OfflineTransactionModel';
 
 function TransactionDetails({
   route,
@@ -42,14 +42,14 @@ function TransactionDetails({
   // redux
   const currency = useAppSelector(state => state.user.currentUser?.currency);
   const conversion = useAppSelector(state => state.transaction.conversion);
-  console.log(route.params.transaction.timeStamp.seconds)
-  const trans = useObject(
-    OnlineTransactionModel,
-    String(route.params.transaction.timeStamp.seconds),
+  const online = useObject(OnlineTransactionModel, route.params.transaction.id);
+  const offline = useObject(
+    OfflineTransactionModel,
+    route.params.transaction.id,
   );
-  console.log(trans)
-  // const data = Array(...dbData);
-  // const trans = data[route.params.transaction.timeStamp.seconds];
+  console.log('djsfskdfnl', online, offline);
+  const trans = offline ?? online;
+  console.log(trans, route.params.transaction.id, online, offline);
   // ref
   const bottomSheetModalRef = useRef<BottomSheetModalMethods>(null);
   // state
@@ -88,7 +88,13 @@ function TransactionDetails({
           <ImageModal
             setShowImage={setShowImage}
             showImage={showImage}
-            url={trans.attachement}
+            url={
+              trans.attachement?.startsWith(
+                'https://firebasestorage.googleapis.com',
+              )
+                ? trans.attachement
+                : 'data:image/png;base64,' + trans.attachement
+            }
           />
         )}
         <SafeAreaView
@@ -168,7 +174,9 @@ function TransactionDetails({
               <>
                 <View style={styles.ctrColumn}>
                   <Text style={styles.text1}>{STRINGS.Category}</Text>
-                  <Text style={styles.text2}>
+                  <Text
+                    style={[styles.text2, {maxWidth: 140}]}
+                    numberOfLines={1}>
                     {(trans.category ?? '')[0].toLocaleUpperCase() +
                       (trans.category ?? '').slice(1)}
                   </Text>
@@ -205,16 +213,33 @@ function TransactionDetails({
                       onPress={() => {
                         setShowImage(true);
                       }}>
-                      <Image
-                        source={{uri: trans.attachement}}
-                        style={styles.img}
-                        onLoadStart={() => {
-                          setIsLoading(true);
-                        }}
-                        onLoadEnd={() => {
-                          setIsLoading(false);
-                        }}
-                      />
+                      {trans.attachement?.startsWith(
+                        'https://firebasestorage.googleapis.com',
+                      ) ? (
+                        <Image
+                          source={{uri: trans.attachement}}
+                          style={styles.img}
+                          onLoadStart={() => {
+                            setIsLoading(true);
+                          }}
+                          onLoadEnd={() => {
+                            setIsLoading(false);
+                          }}
+                        />
+                      ) : (
+                        <Image
+                          source={{
+                            uri: 'data:image/png;base64,' + trans.attachement,
+                          }}
+                          style={styles.img}
+                          onLoadStart={() => {
+                            setIsLoading(true);
+                          }}
+                          onLoadEnd={() => {
+                            setIsLoading(false);
+                          }}
+                        />
+                      )}
                     </Pressable>
                   </>
                 ) : (

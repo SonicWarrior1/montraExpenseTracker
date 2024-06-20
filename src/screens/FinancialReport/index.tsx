@@ -22,6 +22,7 @@ import {useAppTheme} from '../../hooks/themeHook';
 import {STRINGS} from '../../constants/strings';
 import { useQuery } from '@realm/react';
 import { OnlineTransactionModel } from '../../DbModels/OnlineTransactionModel';
+import { OfflineTransactionModel } from '../../DbModels/OfflineTransactionModel';
 
 function FinancialReport() {
   // functions
@@ -47,8 +48,9 @@ function FinancialReport() {
   const {conversion} = useAppSelector(
     state => state.transaction,
   );
-  const dbData = useQuery(OnlineTransactionModel);
-  const data = Array(...dbData);
+  const onlineData = useQuery(OnlineTransactionModel);
+  const offlineData = useQuery(OfflineTransactionModel);
+  const data=Array(...onlineData,...offlineData);
   //
   const totalSpend = useMemo(
     () =>
@@ -111,7 +113,6 @@ function FinancialReport() {
       style={[styles.safeView, {paddingBottom: 20}]}
       onScroll={({nativeEvent}) => {
         if (isCloseToBottom(nativeEvent)) {
-          console.log(incomeOffset);
           if (incomeOffset + limit < Object.values(data).length)
             if (transType === 'expense') {
               setExpenseOffset(offset => offset + 5);

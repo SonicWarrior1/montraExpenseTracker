@@ -88,7 +88,6 @@ function Login({navigation}: Readonly<LoginScreenProps>) {
                   text: 'OK',
                   onPress: () => {
                     (async () => {
-                      console.log('OK Pressed');
                       await auth().signOut();
                     })();
                   },

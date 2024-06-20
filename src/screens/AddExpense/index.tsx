@@ -58,9 +58,16 @@ import {
 import {useAppTheme} from '../../hooks/themeHook';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {Switch} from 'react-native-switch';
+import {useNetInfo} from '@react-native-community/netinfo';
+import {useObject, useRealm} from '@realm/react';
+import {TransFromJson} from '../../utils/transFuncs';
+import {OnlineTransactionModel} from '../../DbModels/OnlineTransactionModel';
+import { UpdateMode } from 'realm';
 
 function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
   // constants
+  const {isConnected} = useNetInfo();
+  const realm = useRealm();
   const COLOR = useAppTheme();
   const styles = style(COLOR);
   const pageType = route.params.type;
@@ -68,7 +75,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
   let transaction: transactionType | undefined;
   if (isEdit) {
     transaction = route.params.transaction;
-    console.log(transaction);
+    // console.log(transaction);
   }
   const month = new Date().getMonth();
   const getBackgroundColor = useMemo(() => {
@@ -144,6 +151,8 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
   const repeatSheetRef = useRef<BottomSheetModal>(null);
   const addCategorySheetRef = useRef<BottomSheetModal>(null);
 
+  //
+  // const oldTrans = useObject(OnlineTransactionModel, transaction?.id ?? '');
   // functions
   const getAttachmentAndType = useCallback(() => {
     let attachement = '';
@@ -299,54 +308,89 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
     const {attachement, attachementType} = getAttachmentAndType();
     try {
       const id = uuid.v4().toString();
-      const curr = await firestore().collection('users').doc(uid).get();
-      const url = await getAttachmentUrl({
-        attachement: attachement,
-        id: id,
-        uid: uid!,
-      });
-      const trans = createTransaction({
-        id: id,
-        url: url,
-        attachementType: attachementType,
-        amount: amount,
-        category: pageType === 'transfer' ? 'transfer' : category!,
-        conversion: conversion,
-        currency: currency!,
-        desc: desc,
-        isEdit: isEdit,
-        pageType: pageType,
-        repeatData: repeatData!,
-        transaction: transaction!,
-        wallet: wallet,
-        uid: uid!,
-        from: from,
-        to: to,
-      });
-      if (isEdit) {
-        handleEditTransaction({
-          trans: trans,
-          transaction: transaction,
-          uid: uid!,
-          amount: amount,
-          category: pageType === 'transfer' ? 'transfer' : category!,
-          conversion: conversion,
-          curr: curr,
-          currency: currency,
-          month: month,
+      if (!isConnected) {
+        console.log('offline');
+        let trans = TransFromJson(
+          createTransaction({
+            id: id,
+            url: attachement,
+            attachementType: attachementType,
+            amount: amount,
+            category: pageType === 'transfer' ? 'transfer' : category!,
+            conversion: conversion,
+            currency: currency!,
+            desc: desc,
+            isEdit: isEdit,
+            pageType: pageType,
+            repeatData: repeatData!,
+            transaction: transaction!,
+            wallet: wallet,
+            uid: uid!,
+            from: from,
+            to: to,
+          }),
+          uid!,
+        );
+        // console.log(trans);
+        if (trans.freq) {
+          trans.freq.date = Timestamp.fromDate(trans.freq?.date as Date);
+        }
+        trans['operation'] = isEdit ? 'update' : 'add';
+        console.log('old', trans);
+        realm.write(() => {
+          const x = realm.create('OfflineTransaction', trans, UpdateMode.Modified);
+          console.log('new', x);
         });
       } else {
-        handleNewTransaction({
-          trans: trans,
+        const curr = await firestore().collection('users').doc(uid).get();
+        const url = await getAttachmentUrl({
+          attachement: attachement,
+          id: id,
           uid: uid!,
+        });
+        const trans = createTransaction({
+          id: id,
+          url: url,
+          attachementType: attachementType,
           amount: amount,
           category: pageType === 'transfer' ? 'transfer' : category!,
           conversion: conversion,
-          curr: curr,
-          currency: currency,
-          month: month,
-          id: id,
+          currency: currency!,
+          desc: desc,
+          isEdit: isEdit,
+          pageType: pageType,
+          repeatData: repeatData!,
+          transaction: transaction!,
+          wallet: wallet,
+          uid: uid!,
+          from: from,
+          to: to,
         });
+        if (isEdit) {
+          handleEditTransaction({
+            trans: trans,
+            transaction: transaction,
+            uid: uid!,
+            amount: amount,
+            category: pageType === 'transfer' ? 'transfer' : category!,
+            conversion: conversion,
+            curr: curr,
+            currency: currency,
+            month: month,
+          });
+        } else {
+          handleNewTransaction({
+            trans: trans,
+            uid: uid!,
+            amount: amount,
+            category: pageType === 'transfer' ? 'transfer' : category!,
+            conversion: conversion,
+            curr: curr,
+            currency: currency,
+            month: month,
+            id: id,
+          });
+        }
       }
       Toast.show({
         text1: `Transaction has been ${
@@ -410,7 +454,6 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
       setCatColors(undefined);
     };
   }, [pageType, expenseCat, incomeCat]);
-  console.log(catColors);
   return (
     <>
       <KeyboardAwareScrollView
@@ -495,7 +538,6 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
               value={category}
               placeholder={STRINGS.Category}
               leftIcon={visible => {
-                console.log(category);
                 return !visible && category !== '' ? (
                   <View
                     style={{

@@ -5,6 +5,7 @@ import style from '../styles';
 import {STRINGS} from '../../../constants/strings';
 import {useAppTheme} from '../../../hooks/themeHook';
 import {BottomSheetModalMethods} from '@gorhom/bottom-sheet/lib/typescript/types';
+import {useNetInfo} from '@react-native-community/netinfo';
 
 function AttachementContainer({
   image,
@@ -38,6 +39,8 @@ function AttachementContainer({
 }>) {
   const COLOR = useAppTheme();
   const styles = style(COLOR);
+  const {isConnected} = useNetInfo();
+  console.log(isConnected)
   if (image === '' && doc === undefined) {
     return (
       <Pressable
@@ -64,12 +67,21 @@ function AttachementContainer({
           style={[styles.closeIcon, {left: 90, zIndex: zindex}]}>
           {ICONS.Close({height: 20, width: 20})}
         </Pressable>
-        <Image
-          source={{uri: image}}
-          height={110}
-          width={110}
-          style={{borderRadius: 10}}
-        />
+        {isConnected ? (
+          <Image
+            source={{uri: image}}
+            height={110}
+            width={110}
+            style={{borderRadius: 10}}
+          />
+        ) : (
+          <Image
+            source={{uri: 'data:image/png;base64,' + image}}
+            height={110}
+            width={110}
+            style={{borderRadius: 10}}
+          />
+        )}
       </View>
     );
   } else {

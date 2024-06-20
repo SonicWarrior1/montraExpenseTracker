@@ -53,7 +53,6 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
       : '0',
   );
   const [category, setCategory] = useState(isEdit ? selectedCategory : '');
-  console.log(category)
   const [alert, setAlert] = useState(isEdit ? oldBudget?.alert : false);
   const [sliderVal, setSliderVal] = useState(
     isEdit ? oldBudget?.percentage : 0,
@@ -148,7 +147,6 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
             value={category}
             placeholder={STRINGS.Category}
             leftIcon={visible => {
-              console.log(category);
               return !visible && category !== '' ? (
                 <View
                   style={{
@@ -215,7 +213,6 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
           <CustomButton
             title={STRINGS.Continue}
             onPress={async () => {
-              console.log(amount);
               setForm(true);
               if (amount !== '' && Number(amount) > 0 && category !== '') {
                 try {

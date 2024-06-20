@@ -16,7 +16,8 @@ import {RealmProvider} from '@realm/react';
 import {TimestampModel} from './DbModels/TimestampModel';
 import {RepeatDataModel} from './DbModels/RepeatDataModel';
 import {OnlineTransactionModel} from './DbModels/OnlineTransactionModel';
-import { OfflineTransactionModel } from './DbModels/OfflineTransactionModel';
+import {OfflineTransactionModel} from './DbModels/OfflineTransactionModel';
+import firestore from '@react-native-firebase/firestore';
 
 enableFreeze(true);
 enableScreens(false);
@@ -24,6 +25,7 @@ GoogleSignin.configure({
   webClientId:
     '426728684733-08hbgavcdljaclium152ea992drr4ev3.apps.googleusercontent.com',
 });
+firestore().settings({persistence: false});
 function App(): React.JSX.Element {
   return (
     <GestureHandlerRootView style={{flex: 1}}>
@@ -32,7 +34,7 @@ function App(): React.JSX.Element {
           TimestampModel,
           RepeatDataModel,
           OnlineTransactionModel,
-          OfflineTransactionModel
+          OfflineTransactionModel,
         ]}>
         <Provider store={store}>
           <PersistGate persistor={persistor}>

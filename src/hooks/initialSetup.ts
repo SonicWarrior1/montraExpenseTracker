@@ -8,8 +8,18 @@ import { UserFromJson } from "../utils/userFuncs";
 import { TransFromJson } from "../utils/transFuncs";
 import { useQuery, useRealm } from "@realm/react";
 import { OnlineTransactionModel } from "../DbModels/OnlineTransactionModel";
+import { useNetInfo } from "@react-native-community/netinfo";
+import { syncDb } from "./syncDb";
+import { OfflineTransactionModel } from "../DbModels/OfflineTransactionModel";
 export function useInitialSetup() {
     const realm = useRealm();
+    const { isConnected } = useNetInfo();
+    const data = useQuery(OfflineTransactionModel)
+    const { uid, currency } = useAppSelector(state => state.user.currentUser)!
+    const conversion = useAppSelector(state => state.transaction.conversion)
+    useEffect(() => {
+        syncDb({ uid: uid, conversion: conversion, currency: currency, data: data, isConnected: isConnected!, realm: realm });
+    }, [isConnected])
     const dispatch = useAppDispatch();
     const user = useAppSelector(state => state.user.currentUser);
     useEffect(() => {
@@ -35,7 +45,7 @@ export function useInitialSetup() {
                 const data: transactionType[] = snapshot.docs.map(
                     doc => (TransFromJson(doc.data(), user!.uid)),
                 );
-                console.log(data)
+                // console.log(data)
                 realm.write(() => {
                     realm.delete(transactions)
                 });
