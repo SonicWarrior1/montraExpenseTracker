@@ -18,6 +18,7 @@ import {RepeatDataModel} from './DbModels/RepeatDataModel';
 import {OnlineTransactionModel} from './DbModels/OnlineTransactionModel';
 import {OfflineTransactionModel} from './DbModels/OfflineTransactionModel';
 import firestore from '@react-native-firebase/firestore';
+import { BudgetModel } from './DbModels/BudgetModel';
 
 enableFreeze(true);
 enableScreens(false);
@@ -35,6 +36,7 @@ function App(): React.JSX.Element {
           RepeatDataModel,
           OnlineTransactionModel,
           OfflineTransactionModel,
+          BudgetModel
         ]}>
         <Provider store={store}>
           <PersistGate persistor={persistor}>
@@ -47,6 +49,7 @@ function App(): React.JSX.Element {
                   position="bottom"
                   visibilityTime={2000}
                   config={toastConfig}
+                  autoHide
                 />
               </NavigationContainer>
             </Loader>

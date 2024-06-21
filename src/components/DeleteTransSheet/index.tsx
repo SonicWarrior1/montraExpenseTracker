@@ -26,9 +26,11 @@ import {useNetInfo} from '@react-native-community/netinfo';
 import {useObject, useRealm} from '@realm/react';
 import {OnlineTransactionModel} from '../../DbModels/OnlineTransactionModel';
 import {UpdateMode} from 'realm';
+import storage from '@react-native-firebase/storage';
 function DeleteTransactionSheet({
   bottomSheetModalRef,
   id,
+  url,
   navigation,
   type,
   amt,
@@ -41,6 +43,7 @@ function DeleteTransactionSheet({
     'TransactionDetail',
     undefined
   >;
+  url: string;
   type: transactionType['type'];
   amt: number;
   category: string;
@@ -64,58 +67,38 @@ function DeleteTransactionSheet({
       dispatch(setLoading(true));
       if (!isConnected) {
         realm.write(() => {
-          realm.create('OfflineTransaction', {...trans,operation:"delete"}!, UpdateMode.Modified);
+          realm.create(
+            'OfflineTransaction',
+            {...trans, operation: 'delete'},
+            UpdateMode.Modified,
+          );
         });
+        bottomSheetModalRef.current?.dismiss();
+        navigation.pop();
       } else {
         const userDoc = firestore().collection('users').doc(uid);
-        const curr = await userDoc.get();
-        if (type === 'expense') {
-          await userDoc.update({
-            [`spend.${month}.${category}`]: encrypt(
-              String(
-                (
-                  Number(
-                    UserFromJson(curr.data() as UserType).spend[month][
-                      category
-                    ] ?? 0,
-                  ) -
-                  amt / conversion.usd[currency!.toLowerCase()]
-                ).toFixed(1),
-              ),
-              uid!,
-            ),
-          });
-        } else if (type === 'income') {
-          await userDoc.update({
-            [`income.${month}.${category}`]: encrypt(
-              String(
-                (
-                  Number(
-                    UserFromJson(curr.data() as UserType).income[month][
-                      category
-                    ] ?? 0,
-                  ) -
-                  amt / conversion.usd[currency!.toLowerCase()]
-                ).toFixed(1),
-              ),
-              uid!,
-            ),
-          });
-        }
+        bottomSheetModalRef.current?.dismiss();
+        navigation.pop();
         await userDoc.collection('transactions').doc(id).delete();
+        if (url !== '') {
+          await storage().refFromURL(url).delete();
+        }
+        // setTimeout(() => {
+        //   realm.write(() => {
+        //     realm.delete(trans);
+        //   });
+        // }, 500);
       }
       Toast.show({
         text1: STRINGS.TransactionDeletedSuccesfully,
         type: 'custom',
       });
-      bottomSheetModalRef.current?.dismiss();
-      navigation.pop();
       dispatch(setLoading(false));
     } catch (e) {
       console.log(e);
       dispatch(setLoading(false));
     }
-  }, [uid, id]);
+  }, [uid, id, isConnected]);
   return (
     <BottomSheetModalProvider>
       <BottomSheetModal

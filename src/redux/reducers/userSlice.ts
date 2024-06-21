@@ -14,6 +14,12 @@ const UserSlice = createSlice({
         userLoggedIn(state, action) {
             state.currentUser = action.payload
         },
+        addBudget(state, action) {
+            state.currentUser!.budget[action.payload.month][action.payload.cat] = action.payload.budget
+        },
+        deleteBudget(state, action) {
+            delete state.currentUser!.budget[action.payload.month][action.payload.cat];
+        },
         setLoading(state, action) {
             state.loading = action.payload;
         },
@@ -29,5 +35,5 @@ const UserSlice = createSlice({
     }
 })
 
-export const { userLoggedIn, setLoading, addExpenseCategory, addIncomeCategory,setCurrencyCode } = UserSlice.actions
+export const { userLoggedIn, setLoading, addExpenseCategory, addIncomeCategory, setCurrencyCode, addBudget,deleteBudget } = UserSlice.actions
 export default UserSlice.reducer

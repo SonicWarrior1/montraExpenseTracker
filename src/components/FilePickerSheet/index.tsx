@@ -81,8 +81,12 @@ function FilePickerSheet({
   }, [isConnected]);
   const docPicker = async () => {
     try {
-      let res = await pickSingle();
-      let uri = res.uri;
+      let res = await pickSingle({
+        copyTo: 'cachesDirectory',
+        allowMultiSelection: false,
+        type: 'pdf',
+      });
+      let uri = res.fileCopyUri ?? res.uri;
       if (!isConnected) {
         const filePath = Platform.OS === 'ios' ? res.uri.slice(7) : res.uri;
         uri = await RNBlobUtil.fs.readFile(filePath, 'base64');

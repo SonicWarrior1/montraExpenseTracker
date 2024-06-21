@@ -22,7 +22,7 @@ import {
 import Spacer from '../../components/Spacer';
 import CustomButton from '../../components/CustomButton';
 import DeleteTransactionSheet from '../../components/DeleteTransSheet';
-import {useAppSelector} from '../../redux/store';
+import {useAppDispatch, useAppSelector} from '../../redux/store';
 import {useAppTheme} from '../../hooks/themeHook';
 // Third Party Libraries
 import {Timestamp} from '@react-native-firebase/firestore';
@@ -31,6 +31,9 @@ import ImageModal from './atoms/imageModal';
 import {OnlineTransactionModel} from '../../DbModels/OnlineTransactionModel';
 import {useObject} from '@realm/react';
 import {OfflineTransactionModel} from '../../DbModels/OfflineTransactionModel';
+import ReactNativeBlobUtil from 'react-native-blob-util';
+import FileViewer from 'react-native-file-viewer';
+import {setLoading} from '../../redux/reducers/userSlice';
 
 function TransactionDetails({
   route,
@@ -40,6 +43,7 @@ function TransactionDetails({
   const COLOR = useAppTheme();
   const styles = style(COLOR);
   // redux
+  const dispatch = useAppDispatch();
   const currency = useAppSelector(state => state.user.currentUser?.currency);
   const conversion = useAppSelector(state => state.transaction.conversion);
   const online = useObject(OnlineTransactionModel, route.params.transaction.id);
@@ -73,16 +77,18 @@ function TransactionDetails({
     });
   }, []);
   const getBackgroundColor = useMemo(() => {
-    if (trans!.type === 'expense') {
-      return COLORS.PRIMARY.RED;
-    } else if (trans!.type === 'transfer') {
-      return COLORS.PRIMARY.BLUE;
-    } else {
-      return COLORS.PRIMARY.GREEN;
+    if (trans) {
+      if (trans.type === 'expense') {
+        return COLORS.PRIMARY.RED;
+      } else if (trans.type === 'transfer') {
+        return COLORS.PRIMARY.BLUE;
+      } else {
+        return COLORS.PRIMARY.GREEN;
+      }
     }
   }, [trans]);
   return (
-    trans && (
+    trans !== null && (
       <View style={{flex: 1, backgroundColor: COLOR.LIGHT[100]}}>
         {trans.attachementType === 'image' && trans.attachement && (
           <ImageModal
@@ -245,10 +251,20 @@ function TransactionDetails({
                 ) : (
                   <CustomButton
                     title={STRINGS.ViewDocument}
-                    onPress={() => {
-                      navigation.navigate(NAVIGATION.DocView, {
-                        uri: trans.attachement!,
-                      });
+                    onPress={async () => {
+                      try {
+                        dispatch(setLoading(true));
+                        const res = await ReactNativeBlobUtil.config({
+                          fileCache: true,
+                          appendExt: 'pdf',
+                        }).fetch('GET', trans.attachement ?? '');
+                        console.log(res.path());
+                        dispatch(setLoading(false));
+                        FileViewer.open(res.path(), {showOpenWithDialog: true});
+                      } catch (e) {
+                        console.log(e);
+                        dispatch(setLoading(false));
+                      }
                     }}
                     backgroundColor={COLORS.VIOLET[20]}
                     textColor={COLORS.VIOLET[100]}
@@ -278,6 +294,7 @@ function TransactionDetails({
           type={trans.type}
           category={trans.category}
           amt={trans.amount}
+          url={trans.attachement ?? ''}
         />
       </View>
     )

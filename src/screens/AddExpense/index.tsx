@@ -59,10 +59,10 @@ import {useAppTheme} from '../../hooks/themeHook';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {Switch} from 'react-native-switch';
 import {useNetInfo} from '@react-native-community/netinfo';
-import {useObject, useRealm} from '@realm/react';
+import {useObject, useQuery, useRealm} from '@realm/react';
 import {TransFromJson} from '../../utils/transFuncs';
 import {OnlineTransactionModel} from '../../DbModels/OnlineTransactionModel';
-import { UpdateMode } from 'realm';
+import {UpdateMode} from 'realm';
 
 function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
   // constants
@@ -77,6 +77,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
     transaction = route.params.transaction;
     // console.log(transaction);
   }
+  const TransOnline = useObject(OnlineTransactionModel, transaction?.id ?? '');
   const month = new Date().getMonth();
   const getBackgroundColor = useMemo(() => {
     if (pageType === 'expense') {
@@ -151,8 +152,6 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
   const repeatSheetRef = useRef<BottomSheetModal>(null);
   const addCategorySheetRef = useRef<BottomSheetModal>(null);
 
-  //
-  // const oldTrans = useObject(OnlineTransactionModel, transaction?.id ?? '');
   // functions
   const getAttachmentAndType = useCallback(() => {
     let attachement = '';
@@ -198,39 +197,39 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
       transId: transaction?.id!,
       uid: uid,
     });
-    if (pageType === 'expense' || pageType === 'transfer') {
-      await handleExpenseUpdate({
-        curr: curr,
-        amount: Number(amount),
-        category: category,
-        conversion: conversion,
-        currency: currency!,
-        month: month,
-        transaction: transaction!,
-        uid: uid,
-      });
-      const totalSpent =
-        UserFromJson(curr.data() as UserType)?.spend?.[month]?.[category] ??
-        0 - transaction!.amount + Number(amount);
-      await handleNotify({
-        curr: curr,
-        totalSpent: totalSpent,
-        category: category,
-        month: month,
-        uid: uid,
-      });
-    } else if (pageType === 'income') {
-      await handleIncomeUpdate({
-        curr: curr,
-        amount: Number(amount),
-        category: category,
-        conversion: conversion,
-        currency: currency!,
-        month: month,
-        transaction: transaction!,
-        uid: uid,
-      });
-    }
+    // if (pageType === 'expense' || pageType === 'transfer') {
+    //   await handleExpenseUpdate({
+    //     curr: curr,
+    //     amount: Number(amount),
+    //     category: category,
+    //     conversion: conversion,
+    //     currency: currency!,
+    //     month: month,
+    //     transaction: transaction!,
+    //     uid: uid,
+    //   });
+    //   const totalSpent =
+    //     UserFromJson(curr.data() as UserType)?.spend?.[month]?.[category] ??
+    //     0 - transaction!.amount + Number(amount);
+    //   await handleNotify({
+    //     curr: curr,
+    //     totalSpent: totalSpent,
+    //     category: category,
+    //     month: month,
+    //     uid: uid,
+    //   });
+    // } else if (pageType === 'income') {
+    //   await handleIncomeUpdate({
+    //     curr: curr,
+    //     amount: Number(amount),
+    //     category: category,
+    //     conversion: conversion,
+    //     currency: currency!,
+    //     month: month,
+    //     transaction: transaction!,
+    //     uid: uid,
+    //   });
+    // }
   };
   const handleNewTransaction = async ({
     trans,
@@ -258,37 +257,37 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
     id: string;
   }) => {
     await addNewTransaction({id: id, trans: trans, uid: uid});
-    if (pageType === 'expense' || pageType === 'transfer') {
-      await handleNewExpense({
-        curr: curr,
-        amount: Number(amount),
-        category: category,
-        conversion: conversion,
-        currency: currency!,
-        month: month,
-        uid: uid,
-      });
-      const totalSpent =
-        (UserFromJson(curr.data() as UserType)?.spend[month]?.[category] ?? 0) +
-        Number(amount);
-      await handleNotify({
-        curr: curr,
-        totalSpent: totalSpent,
-        category: category,
-        month: month,
-        uid: uid,
-      });
-    } else if (pageType === 'income') {
-      await handleNewIncome({
-        curr: curr,
-        amount: Number(amount),
-        category: category,
-        conversion: conversion,
-        currency: currency!,
-        month: month,
-        uid: uid,
-      });
-    }
+    // if (pageType === 'expense' || pageType === 'transfer') {
+    //   await handleNewExpense({
+    //     curr: curr,
+    //     amount: Number(amount),
+    //     category: category,
+    //     conversion: conversion,
+    //     currency: currency!,
+    //     month: month,
+    //     uid: uid,
+    //   });
+    //   const totalSpent =
+    //     (UserFromJson(curr.data() as UserType)?.spend[month]?.[category] ?? 0) +
+    //     Number(amount);
+    //   await handleNotify({
+    //     curr: curr,
+    //     totalSpent: totalSpent,
+    //     category: category,
+    //     month: month,
+    //     uid: uid,
+    //   });
+    // } else if (pageType === 'income') {
+    //   await handleNewIncome({
+    //     curr: curr,
+    //     amount: Number(amount),
+    //     category: category,
+    //     conversion: conversion,
+    //     currency: currency!,
+    //     month: month,
+    //     uid: uid,
+    //   });
+    // }
   };
   const handlePress = async () => {
     setFormKey(true);
@@ -331,15 +330,22 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
           }),
           uid!,
         );
-        // console.log(trans);
         if (trans.freq) {
           trans.freq.date = Timestamp.fromDate(trans.freq?.date as Date);
         }
-        trans['operation'] = isEdit ? 'update' : 'add';
-        console.log('old', trans);
         realm.write(() => {
-          const x = realm.create('OfflineTransaction', trans, UpdateMode.Modified);
-          console.log('new', x);
+          if (isEdit && TransOnline) {
+            realm.create(
+              'OnlineTransaction',
+              {...trans, changed: true},
+              UpdateMode.Modified,
+            );
+          }
+         realm.create(
+            'OfflineTransaction',
+            {...trans, operation: isEdit ? 'update' : 'add'},
+            UpdateMode.Modified,
+          );
         });
       } else {
         const curr = await firestore().collection('users').doc(uid).get();

@@ -2352,6 +2352,8 @@ PODS:
     - Firebase/Storage (= 10.25.0)
     - React-Core
     - RNFBApp
+  - RNFileViewer (2.1.5):
+    - React-Core
   - RNGestureHandler (2.16.2):
     - DoubleConversion
     - glog
@@ -2500,6 +2502,7 @@ DEPENDENCIES:
   - "RNFBAuth (from `../node_modules/@react-native-firebase/auth`)"
   - "RNFBFirestore (from `../node_modules/@react-native-firebase/firestore`)"
   - "RNFBStorage (from `../node_modules/@react-native-firebase/storage`)"
+  - RNFileViewer (from `../node_modules/react-native-file-viewer`)
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
   - "RNGoogleSignin (from `../node_modules/@react-native-google-signin/google-signin`)"
   - "RNNotifee (from `../node_modules/@notifee/react-native`)"
@@ -2674,6 +2677,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-firebase/firestore"
   RNFBStorage:
     :path: "../node_modules/@react-native-firebase/storage"
+  RNFileViewer:
+    :path: "../node_modules/react-native-file-viewer"
   RNGestureHandler:
     :path: "../node_modules/react-native-gesture-handler"
   RNGoogleSignin:
@@ -2782,6 +2787,7 @@ SPEC CHECKSUMS:
   RNFBAuth: ed61486ebcb31caa7c92d6e3064773511f5f60ff
   RNFBFirestore: 974889969da6539c48d17b1e8f66e4125e3d0211
   RNFBStorage: d2da22d7168baf5109050f0f79dcb00ca0f49881
+  RNFileViewer: ce7ca3ac370e18554d35d6355cffd7c30437c592
   RNGestureHandler: 20a4307fd21cbff339abfcfa68192f3f0a6a518b
   RNGoogleSignin: 24d3b3261f78b0fae0aa013f8ab6f8d25e369b0c
   RNNotifee: 8e2d3df3f0e9ce8f5d1fe4c967431138190b6175

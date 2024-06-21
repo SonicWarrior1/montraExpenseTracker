@@ -22,7 +22,10 @@ function ExportData() {
   // const data = useAppSelector(state => state.transaction.transactions);
   const onlineData = useQuery(OnlineTransactionModel);
   const offlineData = useQuery(OfflineTransactionModel);
-  const data = Array(...onlineData, ...offlineData);
+  const data = [
+    ...onlineData.filter(item => item.changed !== true),
+    ...offlineData.filter(item => item.operation !== 'delete'),
+  ];
   const dispatch = useAppDispatch();
   // state
   const [dataType, setDataType] = useState<

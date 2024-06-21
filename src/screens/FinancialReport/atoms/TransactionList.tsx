@@ -8,6 +8,7 @@ import {catIcons, ICONS} from '../../../constants/icons';
 import {transactionType} from '../../../defs/transaction';
 import {useAppTheme} from '../../../hooks/themeHook';
 import { OnlineTransactionModel } from '../../../DbModels/OnlineTransactionModel';
+import { OfflineTransactionModel } from '../../../DbModels/OfflineTransactionModel';
 
 function TransactionList({
   data,
@@ -20,7 +21,7 @@ function TransactionList({
   incomeOffset,
   limit,
 }: Readonly<{
-  data: OnlineTransactionModel[];
+  data: (OnlineTransactionModel|OfflineTransactionModel)[];
   transType: 'income' | 'expense';
   month: number;
   conversion: {

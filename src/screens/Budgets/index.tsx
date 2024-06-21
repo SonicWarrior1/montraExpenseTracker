@@ -1,11 +1,5 @@
 import React, {useCallback, useState} from 'react';
-import {
-  FlatList,
-  Pressable,
-  SafeAreaView,
-  Text,
-  View,
-} from 'react-native';
+import {FlatList, Pressable, SafeAreaView, Text, View} from 'react-native';
 import style from './styles';
 import {ICONS} from '../../constants/icons';
 import CustomButton from '../../components/CustomButton';
@@ -22,6 +16,8 @@ import {Bar} from 'react-native-progress';
 import {COLORS} from '../../constants/commonStyles';
 import {useAppTheme} from '../../hooks/themeHook';
 import TabBackdrop from '../../components/TabBackdrop';
+import {useQuery} from '@realm/react';
+import {BudgetModel} from '../../DbModels/BudgetModel';
 
 function BudgetScreen({navigation}: Readonly<BudgetScreenProps>) {
   // constants
@@ -61,6 +57,10 @@ function BudgetScreen({navigation}: Readonly<BudgetScreenProps>) {
       ).toFixed(1);
     }
   };
+  const dbBudgets = useQuery(BudgetModel);
+  console.log('====================================');
+  console.log(dbBudgets);
+  console.log('====================================');
   return (
     <>
       <View style={styles.safeView}>
@@ -121,7 +121,7 @@ function BudgetScreen({navigation}: Readonly<BudgetScreenProps>) {
           ) : (
             <FlatList
               data={Object.entries(budgets)}
-              style={{marginTop:15}}
+              style={{marginTop: 15,width:"100%"}}
               showsVerticalScrollIndicator={false}
               renderItem={({item}) => {
                 const key = item[0];

@@ -17,7 +17,7 @@ import {useAppTheme} from '../../hooks/themeHook';
 import {BottomSheetModalMethods} from '@gorhom/bottom-sheet/lib/typescript/types';
 import auth from '@react-native-firebase/auth';
 import {openLogoutSheet} from '../../redux/reducers/transactionSlice';
-import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import {useRealm} from '@realm/react';
 function LogoutSheet() {
   // constants
   const COLOR = useAppTheme();
@@ -25,6 +25,7 @@ function LogoutSheet() {
   const dispatch = useAppDispatch();
   const snapPoints = useMemo(() => ['25%'], []);
   const ref = useRef<BottomSheetModalMethods>(null);
+  const realm = useRealm();
   // redux
   const isOpen = useAppSelector(state => state.transaction.isLogoutOpen);
   // functions
@@ -33,6 +34,9 @@ function LogoutSheet() {
       await auth().signOut();
       dispatch(userLoggedIn(undefined));
       dispatch(openLogoutSheet(false));
+      realm.write(() => {
+        realm.deleteAll();
+      });
     } catch (e) {
       console.log(e);
     }

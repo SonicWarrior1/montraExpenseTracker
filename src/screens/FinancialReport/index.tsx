@@ -50,7 +50,10 @@ function FinancialReport() {
   );
   const onlineData = useQuery(OnlineTransactionModel);
   const offlineData = useQuery(OfflineTransactionModel);
-  const data=Array(...onlineData,...offlineData);
+  const data = [
+    ...onlineData.filter(item => item.changed !== true),
+    ...offlineData.filter(item=>item.operation!=='delete'),
+  ];
   //
   const totalSpend = useMemo(
     () =>

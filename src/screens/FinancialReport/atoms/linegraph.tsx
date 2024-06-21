@@ -8,7 +8,8 @@ import {transactionType} from '../../../defs/transaction';
 import {useAppTheme} from '../../../hooks/themeHook';
 import {Timestamp} from '@react-native-firebase/firestore';
 import LinegraphLabel from '../../../components/LinegraphLabel';
-import { OnlineTransactionModel } from '../../../DbModels/OnlineTransactionModel';
+import {OnlineTransactionModel} from '../../../DbModels/OnlineTransactionModel';
+import {OfflineTransactionModel} from '../../../DbModels/OfflineTransactionModel';
 
 function Linegraph({
   totalSpend,
@@ -21,7 +22,7 @@ function Linegraph({
 }: Readonly<{
   totalSpend: string;
   totalIncome: string;
-  data: OnlineTransactionModel[];
+  data: (OnlineTransactionModel | OfflineTransactionModel)[];
   currency: string | undefined;
   transType: 'income' | 'expense';
   conversion: {
@@ -119,7 +120,7 @@ function Linegraph({
               activatePointersOnLongPress: true,
               autoAdjustPointerLabelPosition: true,
               pointerLabelComponent: (
-                items: {date: string; value: number}[]
+                items: {date: string; value: number}[],
               ) => <LinegraphLabel items={items} />,
             }}
           />

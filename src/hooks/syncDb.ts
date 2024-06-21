@@ -1,9 +1,11 @@
 import { OfflineTransactionModel } from "../DbModels/OfflineTransactionModel"
-import firestore, { Timestamp } from '@react-native-firebase/firestore'
+import firestore, { deleteField, Timestamp } from '@react-native-firebase/firestore'
+import storage, { firebase } from '@react-native-firebase/storage'
 import { encrypt } from "../utils/encryption"
-import { Results } from "realm"
+import Realm, { Results } from "realm"
+import { BudgetModel } from "../DbModels/BudgetModel"
 export const syncDb = async ({
-    uid, data, isConnected, conversion, currency, realm
+    uid, data, isConnected, conversion, currency, realm, budget
 }: {
     uid: string,
     data: Results<OfflineTransactionModel>,
@@ -15,47 +17,91 @@ export const syncDb = async ({
     },
     currency: string,
     realm: Realm
+    budget: Results<BudgetModel>
 }) => {
     console.log(uid)
     console.log("sync")
-    if (data.length > 0 && isConnected) {
+    if ((data.length > 0 || budget.length > 0) && isConnected) {
         try {
             const batch = firestore().batch();
-            data.forEach((item) => {
-                if (item.operation === 'add' || item.operation === 'update') {
-                    batch.set(firestore().collection('users').doc(uid).collection('transactions').doc(item.id), {
-                        amount: encrypt(String((Number(item.amount) / conversion.usd[currency.toLowerCase()]).toFixed(1)), uid),
-                        category: encrypt(item.category, uid),
-                        desc: encrypt(item.desc, uid),
-                        wallet: encrypt(item.wallet, uid),
-                        attachement: encrypt(item.attachement!, uid),
-                        repeat: item.freq !== undefined,
-                        freq: item.freq ? {
-                            freq: encrypt(item.freq.freq, uid),
-                            month: encrypt(String(item.freq.month), uid),
-                            day: encrypt(String(item.freq.day), uid),
-                            weekDay: encrypt(String(item.freq.weekDay), uid),
-                            end: encrypt(item.freq.end, uid),
-                            date: item.freq.date,
-                        } : null,
-                        id: item.id,
-                        timeStamp: Timestamp.now(),
-                        type: encrypt(item.type, uid),
-                        attachementType: encrypt(item.attachementType, uid),
-                        from: encrypt(item.from, uid),
-                        to: encrypt(item.to, uid),
-                    })
-                } else if (item.operation === 'delete') {
-                    batch.delete(firestore().collection('users').doc(item.id))
+            if (data.length > 0) {
+                for (const item of data) {
+                    console.log("abcdefgh", item)
+                    let url = '';
+                    if (item.operation === 'add' || item.operation === 'update') {
+                        if (item.attachementType !== 'none') {
+                            if (item.attachement !== '') {
+                                if (!item.attachement?.startsWith('https://firebasestorage.googleapis.com')) {
+                                    console.log(item.attachement)
+                                    await storage().ref(`users/${uid}/${item.id}`).putString(item.attachement!, firebase.storage.StringFormat.BASE64);
+                                    url = await storage().ref(`users/${uid}/${item.id}`).getDownloadURL();
+                                } else {
+                                    url = item.attachement;
+                                }
+                            }
+                        }
+                        batch.set(firestore().collection('users').doc(uid).collection('transactions').doc(item.id), {
+                            amount: encrypt(String((Number(item.amount) / conversion.usd[currency.toLowerCase()]).toFixed(1)), uid),
+                            category: encrypt(item.category, uid),
+                            desc: encrypt(item.desc, uid),
+                            wallet: encrypt(item.wallet, uid),
+                            attachement: encrypt(url, uid),
+                            repeat: item.freq !== undefined,
+                            freq: item.freq ? {
+                                freq: encrypt(item.freq.freq, uid),
+                                month: encrypt(String(item.freq.month), uid),
+                                day: encrypt(String(item.freq.day), uid),
+                                weekDay: encrypt(String(item.freq.weekDay), uid),
+                                end: encrypt(item.freq.end, uid),
+                                date: item.freq.date,
+                            } : null,
+                            id: item.id,
+                            timeStamp: Timestamp.now(),
+                            type: encrypt(item.type, uid),
+                            attachementType: encrypt(item.attachementType, uid),
+                            from: encrypt(item.from, uid),
+                            to: encrypt(item.to, uid),
+                        })
+                    } else if (item.operation === 'delete') {
+                        batch.delete(firestore().collection('users').doc(item.id))
+                        if (item.attachementType !== 'none') {
+                            await storage().ref(`users/${uid}/${item.id}`).delete();
+                        }
+                    }
                 }
-            })
-            realm.write(() => {
-                realm.delete(data)
-            })
+                realm.write(() => {
+                    realm.delete(data)
+                })
+            }
+            if (budget.length > 0) {
+                for (const item of budget) {
+                    const month = item.id.split('_')[0]
+                    const category = item.id.split('_')[1]
+                    if (item.delete) {
+                        batch.update(firestore().collection('users').doc(uid), {
+                            [`budget.${month}.${category}`]: deleteField()
+                        })
+                    } else {
+                        batch.update(firestore().collection('users').doc(uid), {
+                            [`budget.${month}.${category}`]: {
+                                limit: encrypt(
+                                    String(item.limit),
+                                    uid,
+                                ),
+                                alert: item.alert,
+                                percentage: encrypt(String(item.percentage), uid),
+                            },
+                        })
+                    }
+                }
+                realm.write(() => {
+                    realm.delete(budget)
+                })
+            }
             await batch.commit()
             console.log('DB SYNC Done');
         } catch (e) {
-            console.log("dskfmnsdfk", e)
+            console.log("SYNC ERROR", e)
         }
 
     }

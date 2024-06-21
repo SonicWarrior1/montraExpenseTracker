@@ -245,13 +245,18 @@ export async function getAttachmentUrl({
     uid: string;
 }) {
     let url = '';
-    if (attachement !== '') {
-        if (!attachement?.startsWith('https://firebasestorage.googleapis.com')) {
-            await storage().ref(`users/${uid}/${id}`).putFile(attachement);
-            url = await storage().ref(`users/${uid}/${id}`).getDownloadURL();
-        } else {
-            url = attachement;
+    try{
+
+        if (attachement !== '') {
+            if (!attachement?.startsWith('https://firebasestorage.googleapis.com')) {
+                await storage().ref(`users/${uid}/${id}`).putFile(attachement);
+                url = await storage().ref(`users/${uid}/${id}`).getDownloadURL();
+            } else {
+                url = attachement;
+            }
         }
+    }catch(e){
+        console.log(e)
     }
     return url;
 }
