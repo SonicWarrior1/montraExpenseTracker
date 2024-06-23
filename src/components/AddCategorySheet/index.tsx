@@ -22,6 +22,8 @@ import {STRINGS} from '../../constants/strings';
 import {useAppTheme} from '../../hooks/themeHook';
 import {COLORS} from '../../constants/commonStyles';
 import Toast from 'react-native-toast-message';
+import {useNetInfo} from '@react-native-community/netinfo';
+import {useRealm} from '@realm/react';
 
 function AddCategorySheet({
   bottomSheetModalRef,
@@ -30,7 +32,7 @@ function AddCategorySheet({
 }: Readonly<{
   bottomSheetModalRef: React.RefObject<BottomSheetModalMethods>;
   type: transactionType['type'];
-  setMyCategory: React.Dispatch<React.SetStateAction<string|undefined>>;
+  setMyCategory: React.Dispatch<React.SetStateAction<string | undefined>>;
 }>) {
   // redux
   const uid = useAppSelector(state => state.user.currentUser?.uid);
@@ -45,6 +47,8 @@ function AddCategorySheet({
   const snapPoints = useMemo(() => ['25%'], []);
   const COLOR = useAppTheme();
   const styles = style(COLOR);
+  const {isConnected} = useNetInfo();
+  const realm = useRealm();
   // state
   const [category, setCategory] = useState('');
   // functions
@@ -53,27 +57,47 @@ function AddCategorySheet({
     if (category !== '') {
       dispatch(setLoading(true));
       if (expenseCats?.includes(category.toLowerCase())) {
-        Toast.show({text1: `${category} is already added`, type: 'error'});
+        Toast.show({text1: `${category} is already added`, type: 'error',position:'top'});
         dispatch(setLoading(false));
         return;
       }
       try {
-        if (type === 'expense') {
-          dispatch(addExpenseCategory(category.toLowerCase()));
-          await userDoc.update({
-            expenseCategory: [...expenseCats!, category.toLowerCase()].map(
-              item => encrypt(item, uid!),
-            ),
-          });
-        } else if (type === 'income') {
-          dispatch(addIncomeCategory(category.toLowerCase()));
-          await userDoc.update({
-            incomeCategory: [...incomeCats!, category.toLowerCase()].map(item =>
-              encrypt(item, uid!),
-            ),
-          });
+        if (!isConnected) {
+          if (type === 'expense') {
+            dispatch(addExpenseCategory(category.toLowerCase()));
+            realm.write(() => {
+              realm.create('category', {
+                name: category.toLowerCase(),
+                type: 'expense',
+              });
+            });
+          } else if (type === 'income') {
+            dispatch(addIncomeCategory(category.toLowerCase()));
+            realm.write(() => {
+              realm.create('category', {
+                name: category.toLowerCase(),
+                type: 'income',
+              });
+            });
+          }
+        } else {
+          if (type === 'expense') {
+            dispatch(addExpenseCategory(category.toLowerCase()));
+            await userDoc.update({
+              expenseCategory: [...expenseCats!, category.toLowerCase()].map(
+                item => encrypt(item, uid!),
+              ),
+            });
+          } else if (type === 'income') {
+            dispatch(addIncomeCategory(category.toLowerCase()));
+            await userDoc.update({
+              incomeCategory: [...incomeCats!, category.toLowerCase()].map(
+                item => encrypt(item, uid!),
+              ),
+            });
+          }
         }
-        setMyCategory(category.toLocaleLowerCase().trim())
+        setMyCategory(category.toLocaleLowerCase().trim());
       } catch (e) {
         console.log(e);
       } finally {

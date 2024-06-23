@@ -1,11 +1,12 @@
-import { OfflineTransactionModel } from "../DbModels/OfflineTransactionModel"
-import firestore, { deleteField, Timestamp } from '@react-native-firebase/firestore'
-import storage, { firebase } from '@react-native-firebase/storage'
-import { encrypt } from "../utils/encryption"
-import Realm, { Results } from "realm"
-import { BudgetModel } from "../DbModels/BudgetModel"
+import { OfflineTransactionModel } from '../DbModels/OfflineTransactionModel';
+import firestore, { deleteField, Timestamp } from '@react-native-firebase/firestore';
+import storage, { firebase } from '@react-native-firebase/storage';
+import { encrypt } from '../utils/encryption';
+import Realm, { Results } from 'realm';
+import { BudgetModel } from '../DbModels/BudgetModel';
+import { CategoryModel } from '../DbModels/CategoryModel';
 export const syncDb = async ({
-    uid, data, isConnected, conversion, currency, realm, budget
+    uid, data, isConnected, conversion, currency, realm, budget, incomeCategory, expenseCategory, category,
 }: {
     uid: string,
     data: Results<OfflineTransactionModel>,
@@ -18,21 +19,23 @@ export const syncDb = async ({
     currency: string,
     realm: Realm
     budget: Results<BudgetModel>
+    incomeCategory: string[],
+    expenseCategory: string[],
+    category: Results<CategoryModel>,
 }) => {
-    console.log(uid)
-    console.log("sync")
-    if ((data.length > 0 || budget.length > 0) && isConnected) {
+    console.log(uid);
+    console.log('sync');
+    if ((data.length > 0 || budget.length > 0 || category.length > 0) && isConnected) {
         try {
             const batch = firestore().batch();
             if (data.length > 0) {
                 for (const item of data) {
-                    console.log("abcdefgh", item)
                     let url = '';
                     if (item.operation === 'add' || item.operation === 'update') {
                         if (item.attachementType !== 'none') {
                             if (item.attachement !== '') {
                                 if (!item.attachement?.startsWith('https://firebasestorage.googleapis.com')) {
-                                    console.log(item.attachement)
+                                    console.log(item.attachement);
                                     await storage().ref(`users/${uid}/${item.id}`).putString(item.attachement!, firebase.storage.StringFormat.BASE64);
                                     url = await storage().ref(`users/${uid}/${item.id}`).getDownloadURL();
                                 } else {
@@ -61,26 +64,26 @@ export const syncDb = async ({
                             attachementType: encrypt(item.attachementType, uid),
                             from: encrypt(item.from, uid),
                             to: encrypt(item.to, uid),
-                        })
+                        });
                     } else if (item.operation === 'delete') {
-                        batch.delete(firestore().collection('users').doc(item.id))
+                        batch.delete(firestore().collection('users').doc(uid).collection('transactions').doc(item.id));
                         if (item.attachementType !== 'none') {
                             await storage().ref(`users/${uid}/${item.id}`).delete();
                         }
                     }
                 }
                 realm.write(() => {
-                    realm.delete(data)
-                })
+                    realm.delete(data);
+                });
             }
             if (budget.length > 0) {
                 for (const item of budget) {
-                    const month = item.id.split('_')[0]
-                    const category = item.id.split('_')[1]
+                    const month = item.id.split('_')[0];
+                    const category = item.id.split('_')[1];
                     if (item.delete) {
                         batch.update(firestore().collection('users').doc(uid), {
-                            [`budget.${month}.${category}`]: deleteField()
-                        })
+                            [`budget.${month}.${category}`]: deleteField(),
+                        });
                     } else {
                         batch.update(firestore().collection('users').doc(uid), {
                             [`budget.${month}.${category}`]: {
@@ -91,18 +94,37 @@ export const syncDb = async ({
                                 alert: item.alert,
                                 percentage: encrypt(String(item.percentage), uid),
                             },
-                        })
+                        });
                     }
                 }
                 realm.write(() => {
-                    realm.delete(budget)
-                })
+                    realm.delete(budget);
+                });
             }
-            await batch.commit()
+            console.log('CATSSS', expenseCategory, incomeCategory);
+            if (category.length > 0) {
+                batch.update(firestore().collection('users').doc(uid), {
+                    expenseCategory: expenseCategory.concat(category.filter((cat) => cat.type === 'expense').reduce((acc: string[], item) => {
+                        acc.push(item.name);
+                        return acc;
+                    }, [])).map(
+                        item => encrypt(item, uid),
+                    ), incomeCategory: incomeCategory.concat(category.filter((cat) => cat.type === 'income').reduce((acc: string[], item) => {
+                        acc.push(item.name);
+                        return acc;
+                    }, [])).map(
+                        item => encrypt(item, uid),
+                    ),
+                });
+                realm.write(() => {
+                    realm.delete(category);
+                });
+            }
+            await batch.commit();
             console.log('DB SYNC Done');
         } catch (e) {
-            console.log("SYNC ERROR", e)
+            console.log('SYNC ERROR', e);
         }
 
     }
-}
+};

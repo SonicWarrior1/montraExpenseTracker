@@ -3,6 +3,8 @@ import { transactionType } from './transaction';
 import { CompositeScreenProps } from '@react-navigation/native';
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { StackScreenProps } from '@react-navigation/stack';
+import { OnlineTransactionModel } from '../DbModels/OnlineTransactionModel';
+import { OfflineTransactionModel } from '../DbModels/OfflineTransactionModel';
 
 export type RootStackParamList = {
     Onboarding: undefined,
@@ -11,9 +13,9 @@ export type RootStackParamList = {
     BottomTab: undefined,
     ForgotPassword: undefined,
     ForgotEmailSent: { email: string },
-    Pin: { setup?: boolean, pin?: string ,uid?:string}
-    AddExpense: { type: 'expense' | 'income' | 'transfer', isEdit: boolean, transaction?: transactionType }
-    TransactionDetail: { transaction: transactionType },
+    Pin: { setup?: boolean, pin?: string, uid?: string }
+    AddExpense: { type: 'expense' | 'income' | 'transfer', isEdit: boolean, transaction?: transactionType | OnlineTransactionModel | OfflineTransactionModel }
+    TransactionDetail: { transaction: OnlineTransactionModel | OfflineTransactionModel },
     DocView: { uri: string },
     CreateBudget: { isEdit: boolean, category?: string },
     DetailBudget: { category: string, month: number },

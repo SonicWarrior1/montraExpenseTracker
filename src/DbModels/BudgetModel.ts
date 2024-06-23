@@ -1,10 +1,10 @@
-import Realm, { ObjectSchema } from "realm";
+import Realm, { ObjectSchema } from 'realm';
 export class BudgetModel extends Realm.Object {
     alert!: boolean;
     limit!: number;
     percentage!: number;
     id!: string;
-    delete!:boolean
+    delete!: boolean;
     static readonly schema: ObjectSchema = {
         name: 'budget',
         properties: {
@@ -12,8 +12,8 @@ export class BudgetModel extends Realm.Object {
             limit: 'double',
             percentage: 'int',
             id: 'string',
-            delete:'bool'
+            delete: 'bool',
         },
-        primaryKey:'id'
-    }
+        primaryKey: 'id',
+    };
 }

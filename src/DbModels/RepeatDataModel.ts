@@ -1,11 +1,11 @@
-import Realm, { ObjectSchema } from "realm";
-import { TimestampModel } from "./TimestampModel";
+import Realm, { ObjectSchema } from 'realm';
+import { TimestampModel } from './TimestampModel';
 
 export class RepeatDataModel extends Realm.Object {
     freq!: string;
-    month?: number;
-    day?: number;
-    weekDay?: number;
+    month!: number;
+    day!: number;
+    weekDay!: number;
     end!: string;
     date?: TimestampModel;
 
@@ -18,6 +18,6 @@ export class RepeatDataModel extends Realm.Object {
             weekDay: 'int',
             end: 'string',
             date: 'timestamp',
-        }
-    }
+        },
+    };
 }

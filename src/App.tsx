@@ -11,14 +11,14 @@ import Toast from 'react-native-toast-message';
 import {enableFreeze, enableScreens} from 'react-native-screens';
 import {toastConfig} from './components/customToast';
 import BootSplash from 'react-native-bootsplash';
-import InternetCheck from './components/InternetCheck';
 import {RealmProvider} from '@realm/react';
 import {TimestampModel} from './DbModels/TimestampModel';
 import {RepeatDataModel} from './DbModels/RepeatDataModel';
 import {OnlineTransactionModel} from './DbModels/OnlineTransactionModel';
 import {OfflineTransactionModel} from './DbModels/OfflineTransactionModel';
 import firestore from '@react-native-firebase/firestore';
-import { BudgetModel } from './DbModels/BudgetModel';
+import {BudgetModel} from './DbModels/BudgetModel';
+import {CategoryModel} from './DbModels/CategoryModel';
 
 enableFreeze(true);
 enableScreens(false);
@@ -36,7 +36,8 @@ function App(): React.JSX.Element {
           RepeatDataModel,
           OnlineTransactionModel,
           OfflineTransactionModel,
-          BudgetModel
+          BudgetModel,
+          CategoryModel,
         ]}>
         <Provider store={store}>
           <PersistGate persistor={persistor}>

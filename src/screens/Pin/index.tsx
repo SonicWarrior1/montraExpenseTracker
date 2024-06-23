@@ -39,6 +39,7 @@ function Pin({route, navigation}: Readonly<PinSentScreenProps>) {
   const currentUser = useAppSelector(state => state.user.currentUser);
   const isSetup = currentUser?.pin === '';
   const oldPin = route.params.pin ?? '';
+  // dispatch(setLoading(false));
   // state
   const [pin, setPin] = useState<number[]>([]);
   const [menu, setMenu] = useState(false);

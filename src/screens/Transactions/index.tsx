@@ -35,6 +35,7 @@ function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
     ...offlineData.filter(item => item.operation !== 'delete'),
   ];
 
+  console.log('ONLINE', onlineData, 'OFFLINE', offlineData);
   const [offset, setOffset] = useState<number>(0);
   const limit = 10;
   const filters = useAppSelector(state => state.transaction.filters);

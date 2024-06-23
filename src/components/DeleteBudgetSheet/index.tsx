@@ -20,9 +20,8 @@ import {BottomSheetModalMethods} from '@gorhom/bottom-sheet/lib/typescript/types
 import Toast from 'react-native-toast-message';
 import firestore, {deleteField} from '@react-native-firebase/firestore';
 import {useNetInfo} from '@react-native-community/netinfo';
-import {useObject, useRealm} from '@realm/react';
+import {useRealm} from '@realm/react';
 import {UpdateMode} from 'realm';
-import {BudgetModel} from '../../DbModels/BudgetModel';
 function DeleteBudgetSheet({
   bottomSheetModalRef,
   navigation,
@@ -59,7 +58,6 @@ function DeleteBudgetSheet({
       bottomSheetModalRef.current?.dismiss();
       navigation.pop();
       if (!isConnected) {
-        console.log(budget);
         dispatch(deleteBudget({month: month, cat: category}));
         realm.write(() => {
           realm.create(

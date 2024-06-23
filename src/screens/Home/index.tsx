@@ -42,7 +42,7 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
   const offlineData = useQuery(OfflineTransactionModel);
   const data = [
     ...onlineData.filter(item => item.changed !== true),
-    ...offlineData.filter(item=>item.operation!=='delete'),
+    ...offlineData.filter(item => item.operation !== 'delete'),
   ];
   const theme = useAppSelector(state => state.user.currentUser?.theme);
   // constants

@@ -9,10 +9,10 @@ import {BottomParamList, RootStackParamList} from '../../../defs/navigation';
 import {BottomTabNavigationProp} from '@react-navigation/bottom-tabs';
 import {CompositeNavigationProp} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
-import {transactionType} from '../../../defs/transaction';
 import {useAppSelector} from '../../../redux/store';
 import React from 'react';
-import { OnlineTransactionModel } from '../../../DbModels/OnlineTransactionModel';
+import {OnlineTransactionModel} from '../../../DbModels/OnlineTransactionModel';
+import {OfflineTransactionModel} from '../../../DbModels/OfflineTransactionModel';
 
 const TransactionItem = ({
   item,
@@ -21,7 +21,7 @@ const TransactionItem = ({
   navigation,
   dateShow,
 }: {
-  item: OnlineTransactionModel;
+  item: OnlineTransactionModel | OfflineTransactionModel;
   theme: 'light' | 'device' | 'dark' | undefined;
   scheme: ColorSchemeName;
   navigation: CompositeNavigationProp<
@@ -38,7 +38,9 @@ const TransactionItem = ({
   const user = useAppSelector(state => state.user.currentUser);
   const conversion = useAppSelector(state => state.transaction.conversion);
   // functions
-  const getAmtSymbol = (item: OnlineTransactionModel) => {
+  const getAmtSymbol = (
+    item: OnlineTransactionModel | OfflineTransactionModel,
+  ) => {
     if (item.type === 'expense') {
       return '-';
     } else if (item.type === 'income') {
@@ -47,7 +49,9 @@ const TransactionItem = ({
       return '';
     }
   };
-  const getAmtColor = (item: OnlineTransactionModel) => {
+  const getAmtColor = (
+    item: OnlineTransactionModel | OfflineTransactionModel,
+  ) => {
     if (item.type === 'expense') {
       return COLORS.PRIMARY.RED;
     } else if (item.type === 'income') {

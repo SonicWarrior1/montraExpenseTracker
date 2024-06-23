@@ -34,6 +34,8 @@ import {OfflineTransactionModel} from '../../DbModels/OfflineTransactionModel';
 import ReactNativeBlobUtil from 'react-native-blob-util';
 import FileViewer from 'react-native-file-viewer';
 import {setLoading} from '../../redux/reducers/userSlice';
+import {useNetInfo} from '@react-native-community/netinfo';
+import Toast from 'react-native-toast-message';
 
 function TransactionDetails({
   route,
@@ -53,6 +55,7 @@ function TransactionDetails({
   );
   console.log('djsfskdfnl', online, offline);
   const trans = offline ?? online;
+  const {isConnected} = useNetInfo();
   console.log(trans, route.params.transaction.id, online, offline);
   // ref
   const bottomSheetModalRef = useRef<BottomSheetModalMethods>(null);
@@ -217,21 +220,36 @@ function TransactionDetails({
                     )}
                     <Pressable
                       onPress={() => {
-                        setShowImage(true);
+                        if (isConnected) {
+                          setShowImage(true);
+                        }
                       }}>
                       {trans.attachement?.startsWith(
                         'https://firebasestorage.googleapis.com',
                       ) ? (
-                        <Image
-                          source={{uri: trans.attachement}}
-                          style={styles.img}
-                          onLoadStart={() => {
-                            setIsLoading(true);
-                          }}
-                          onLoadEnd={() => {
-                            setIsLoading(false);
-                          }}
-                        />
+                        !isConnected ? (
+                          <Text
+                            style={{
+                              alignSelf: 'center',
+                              fontSize: 16,
+                              fontWeight: '500',
+                              color: COLOR.RED[40],
+                              marginTop: 20,
+                            }}>
+                            No Internet Access
+                          </Text>
+                        ) : (
+                          <Image
+                            source={{uri: trans.attachement}}
+                            style={styles.img}
+                            onLoadStart={() => {
+                              setIsLoading(true);
+                            }}
+                            onLoadEnd={() => {
+                              setIsLoading(false);
+                            }}
+                          />
+                        )
                       ) : (
                         <Image
                           source={{
@@ -253,6 +271,13 @@ function TransactionDetails({
                     title={STRINGS.ViewDocument}
                     onPress={async () => {
                       try {
+                        if (!isConnected) {
+                          Toast.show({
+                            text1: 'No Internet Access',
+                            type: 'error',
+                          });
+                          return;
+                        }
                         dispatch(setLoading(true));
                         const res = await ReactNativeBlobUtil.config({
                           fileCache: true,
@@ -279,7 +304,7 @@ function TransactionDetails({
               title={STRINGS.Edit}
               onPress={() => {
                 navigation.navigate(NAVIGATION.AddExpense, {
-                  type: trans.type,
+                  type: trans.type as 'income' | 'expense' | 'transfer',
                   isEdit: true,
                   transaction: trans,
                 });
@@ -291,7 +316,7 @@ function TransactionDetails({
           bottomSheetModalRef={bottomSheetModalRef}
           id={trans.id}
           navigation={navigation}
-          type={trans.type}
+          type={trans.type as 'income' | 'expense' | 'transfer'}
           category={trans.category}
           amt={trans.amount}
           url={trans.attachement ?? ''}
