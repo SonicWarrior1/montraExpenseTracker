@@ -1,5 +1,5 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react';
-import {SafeAreaView, Switch, Text, TextInput, View} from 'react-native';
+import {SafeAreaView, Text, TextInput, View} from 'react-native';
 import Spacer from '../../components/Spacer';
 import CustomButton from '../../components/CustomButton';
 import style from './styles';
@@ -10,11 +10,7 @@ import AddCategorySheet from '../../components/AddCategorySheet';
 import {COLORS} from '../../constants/commonStyles';
 import {Slider} from '@miblanchard/react-native-slider';
 import firestore from '@react-native-firebase/firestore';
-import {
-  setLoading,
-  userLoggedIn,
-  addBudget,
-} from '../../redux/reducers/userSlice';
+import {setLoading, addBudget} from '../../redux/reducers/userSlice';
 import {CreateBudgetScreenProps} from '../../defs/navigation';
 import {currencies, STRINGS} from '../../constants/strings';
 import {encrypt} from '../../utils/encryption';
@@ -24,6 +20,7 @@ import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {useNetInfo} from '@react-native-community/netinfo';
 import {useRealm} from '@realm/react';
 import {UpdateMode} from 'realm';
+import {Switch} from 'react-native-switch';
 function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
   // constants
   const COLOR = useAppTheme();
@@ -185,11 +182,17 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
               </Text>
             </View>
             <Switch
-              trackColor={{
-                false: COLORS.VIOLET[20],
-                true: COLORS.VIOLET[100],
-              }}
-              ios_backgroundColor={COLORS.VIOLET[20]}
+              backgroundActive={COLORS.VIOLET[100]}
+              backgroundInactive={COLORS.VIOLET[20]}
+              activeText=""
+              inActiveText=""
+              barHeight={30}
+              circleSize={24}
+              switchBorderRadius={16}
+              innerCircleStyle={{width: 24, height: 24}}
+              switchLeftPx={5}
+              switchRightPx={5}
+              circleBorderWidth={0}
               onValueChange={val => {
                 setAlert(val);
                 setSliderVal(0);
@@ -218,12 +221,23 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
           ) : (
             <></>
           )}
-          <Spacer height={30} />
+          {form && sliderVal === 0 && <Spacer height={20} />}
+          <EmptyZeroError
+            formKey={alert! && form}
+            value={String(sliderVal)}
+            errorText="Value cannot be zero. Please adjust the slider"
+          />
+          <Spacer height={10} />
           <CustomButton
             title={STRINGS.Continue}
             onPress={async () => {
               setForm(true);
-              if (amount !== '' && Number(amount) > 0 && category !== '') {
+              if (
+                amount !== '' &&
+                Number(amount) > 0 &&
+                category !== '' &&
+                (alert === true ? sliderVal! > 0 : true)
+              ) {
                 try {
                   dispatch(setLoading(true));
                   if (!isConnected) {
@@ -235,7 +249,7 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
                           alert: alert,
                           percentage: sliderVal,
                           id: month + '_' + category,
-                          delete:false,
+                          delete: false,
                         },
                         UpdateMode.Modified,
                       );

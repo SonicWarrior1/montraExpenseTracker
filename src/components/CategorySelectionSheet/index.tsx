@@ -3,7 +3,7 @@ import {
   BottomSheetModalProvider,
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
-import React, {useEffect, useMemo, useRef} from 'react';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux/store';
 import {Pressable, Text, View} from 'react-native';
 import {
@@ -15,7 +15,7 @@ import style from './styles';
 import CustomButton from '../CustomButton';
 import {useAppTheme} from '../../hooks/themeHook';
 import {RFValue} from 'react-native-responsive-fontsize';
-import { ScrollView } from 'react-native-gesture-handler';
+import {ScrollView} from 'react-native-gesture-handler';
 
 function CategorySelectionSheet() {
   // constants
@@ -35,13 +35,17 @@ function CategorySelectionSheet() {
     state => state.user.currentUser?.expenseCategory,
   );
 
+  // state
+  const [category, setCategory] = useState<string[]>([]);
+
   useEffect(() => {
     if (isOpen === true) {
+      setCategory(selected);
       ref.current?.present();
     } else {
       ref.current?.close();
     }
-  }, [isOpen]);
+  }, [isOpen, selected]);
 
   return (
     <BottomSheetModalProvider>
@@ -76,19 +80,25 @@ function CategorySelectionSheet() {
                   style={[
                     styles.filterBtn,
                     {
-                      backgroundColor: selected.includes(item)
+                      backgroundColor: category.includes(item)
                         ? COLOR.VIOLET[20]
                         : COLOR.LIGHT[100],
                     },
                   ]}
                   onPress={() => {
-                    dispatch(setCatFilter(item));
+                    setCategory(cat => {
+                      if (cat.includes(item)) {
+                        return cat.filter(i => i !== item);
+                      }
+                      return [...cat, item];
+                    });
+                    // dispatch(setCatFilter(item));
                   }}>
                   <Text
                     style={[
                       styles.filterBtnText,
                       {
-                        color: selected.includes(item)
+                        color: category.includes(item)
                           ? COLOR.VIOLET[100]
                           : COLOR.DARK[100],
                       },
@@ -114,19 +124,25 @@ function CategorySelectionSheet() {
                   style={[
                     styles.filterBtn,
                     {
-                      backgroundColor: selected.includes(item)
+                      backgroundColor: category.includes(item)
                         ? COLOR.VIOLET[20]
                         : COLOR.LIGHT[100],
                     },
                   ]}
                   onPress={() => {
-                    dispatch(setCatFilter(item));
+                    setCategory(cat => {
+                      if (cat.includes(item)) {
+                        return cat.filter(i => i !== item);
+                      }
+                      return [...cat, item];
+                    });
+                    // dispatch(setCatFilter(item));
                   }}>
                   <Text
                     style={[
                       styles.filterBtnText,
                       {
-                        color: selected.includes(item)
+                        color: category.includes(item)
                           ? COLOR.VIOLET[100]
                           : COLOR.DARK[100],
                       },
@@ -140,6 +156,8 @@ function CategorySelectionSheet() {
           <CustomButton
             title="Continue"
             onPress={() => {
+              // console.log(category);
+              dispatch(setCatFilter(category));
               dispatch(openCatSheet(false));
             }}
           />

@@ -2,20 +2,20 @@ import React, {useEffect, useState} from 'react';
 import {Dimensions, Pressable, Text, useColorScheme, View} from 'react-native';
 import {LineChart} from 'react-native-gifted-charts';
 import {COLORS} from '../../../constants/commonStyles';
-import {transactionType} from '../../../defs/transaction';
 import style from '../styles';
 import {STRINGS} from '../../../constants/strings';
 import {useAppTheme} from '../../../hooks/themeHook';
 import {useAppSelector} from '../../../redux/store';
 import {Timestamp} from '@react-native-firebase/firestore';
 import LinegraphLabel from '../../../components/LinegraphLabel';
-import { OnlineTransactionModel } from '../../../DbModels/OnlineTransactionModel';
+import {OnlineTransactionModel} from '../../../DbModels/OnlineTransactionModel';
+import {OfflineTransactionModel} from '../../../DbModels/OfflineTransactionModel';
 
 function Graph({
   data,
   month,
 }: Readonly<{
-  data:OnlineTransactionModel[];
+  data: (OnlineTransactionModel | OfflineTransactionModel)[];
   month: number;
 }>) {
   const theme = useAppSelector(state => state.user.currentUser?.theme);

@@ -24,6 +24,7 @@ import TabBackdrop from '../../components/TabBackdrop';
 import {useQuery} from '@realm/react';
 import {OnlineTransactionModel} from '../../DbModels/OnlineTransactionModel';
 import {OfflineTransactionModel} from '../../DbModels/OfflineTransactionModel';
+import {formatAMPM} from '../../utils/firebase';
 
 function Home({navigation, route}: Readonly<HomeScreenProps>) {
   // state
@@ -56,7 +57,9 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
   const styles = style(COLOR);
   const scheme = useColorScheme();
   const finalTheme = theme === 'device' ? scheme : theme;
-  const getAmtColor = (item: OnlineTransactionModel) => {
+  const getAmtColor = (
+    item: OnlineTransactionModel | OfflineTransactionModel,
+  ) => {
     if (item.type === 'expense') {
       return COLORS.PRIMARY.RED;
     } else if (item.type === 'income') {
@@ -65,7 +68,9 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
       return COLORS.PRIMARY.BLUE;
     }
   };
-  const getAmtSymbol = (item: OnlineTransactionModel) => {
+  const getAmtSymbol = (
+    item: OnlineTransactionModel | OfflineTransactionModel,
+  ) => {
     if (item.type === 'expense') {
       return '-';
     } else if (item.type === 'income') {
@@ -278,20 +283,11 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
                       ).toFixed(1)}
                     </Text>
                     <Text style={styles.listtext2}>
-                      {Timestamp.fromMillis(item.timeStamp.seconds * 1000)
-                        .toDate()
-                        .getHours()}
-                      :
-                      {Timestamp.fromMillis(item.timeStamp.seconds * 1000)
-                        .toDate()
-                        .getMinutes() < 10
-                        ? '0' +
-                          Timestamp.fromMillis(item.timeStamp.seconds * 1000)
-                            .toDate()
-                            .getMinutes()
-                        : Timestamp.fromMillis(item.timeStamp.seconds * 1000)
-                            .toDate()
-                            .getMinutes()}
+                      {formatAMPM(
+                        Timestamp.fromMillis(
+                          item.timeStamp.seconds * 1000,
+                        ).toDate(),
+                      )}
                     </Text>
                   </View>
                 </Pressable>

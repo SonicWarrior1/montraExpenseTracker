@@ -226,13 +226,30 @@ function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
           {applyFilters(offset).length === 2 &&
           applyFilters(offset)[0].data.length === 0 &&
           applyFilters(offset)[1].data.length === 0 ? (
-            <View
-              style={{
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}>
-              <Text style={styles.emptyText}>{STRINGS.NoTransactions}</Text>
-            </View>
+            <>
+              <TouchableOpacity
+                style={styles.financialBtn}
+                onPress={() => {
+                  navigation.navigate(NAVIGATION.Story);
+                }}>
+                <Text style={styles.financialText}>
+                  {STRINGS.SeeFinancialReport}
+                </Text>
+                {ICONS.ArrowRight({
+                  height: 30,
+                  width: 25,
+                  color: COLOR.VIOLET[100],
+                  borderColor: COLOR.VIOLET[100],
+                })}
+              </TouchableOpacity>
+              <View
+                style={{
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                <Text style={styles.emptyText}>{STRINGS.NoTransactions}</Text>
+              </View>
+            </>
           ) : (
             <SectionList
               ListHeaderComponent={

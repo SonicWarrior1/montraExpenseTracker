@@ -245,7 +245,7 @@ export async function getAttachmentUrl({
     uid: string;
 }) {
     let url = '';
-    try{
+    try {
 
         if (attachement !== '') {
             if (!attachement?.startsWith('https://firebasestorage.googleapis.com')) {
@@ -255,8 +255,8 @@ export async function getAttachmentUrl({
                 url = attachement;
             }
         }
-    }catch(e){
-        console.log(e)
+    } catch (e) {
+        console.log(e);
     }
     return url;
 }
@@ -298,7 +298,7 @@ export async function handleNotify({
                             id: notificationId,
                             time: Timestamp.now(),
                             read: false,
-                            percentage: totalBudget.percentage
+                            percentage: totalBudget.percentage,
                         },
                     });
                 await notifee.displayNotification({
@@ -326,7 +326,7 @@ export async function handleNotify({
                             id: notificationId,
                             time: Timestamp.now(),
                             read: false,
-                            percentage: totalBudget.percentage
+                            percentage: totalBudget.percentage,
                         },
                     });
                 await notifee.displayNotification({
@@ -370,8 +370,28 @@ export async function singupUser({ name, email, pass }: { name: string, email: s
     } catch (e: any) {
         const error: FirebaseAuthTypes.NativeFirebaseAuthError = e;
         console.log(e);
-        Toast.show({ text1: error.nativeErrorMessage, type: "error" })
+        Toast.show({ text1: ErrorHandler(error.code), type: 'error' });
         return false;
     }
     return false;
+}
+
+export function ErrorHandler(code: string) {
+    if (code === 'auth/email-already-in-use') {
+        return 'The email address is already in use by another account.';
+    } else if (code === 'auth/invalid-credential') {
+        return 'The supplied auth credential is malformed or has expired.';
+    } else if (code === 'auth/network-request-failed') {
+        return 'A network error (such as timeout, interrupted connection or unreachable host) has occurred.';
+    }
+    return 'An unknown error occurred. Please try again later.';
+}
+
+export function formatAMPM(date: Date) {
+    let hours = date.getHours();
+    let minutes = date.getMinutes();
+    let ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours || 12; // the hour '0' should be '12'
+    return hours + ':' + (minutes < 10 ? '0' + minutes : minutes) + ' ' + ampm;
 }

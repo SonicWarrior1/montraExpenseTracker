@@ -30,11 +30,11 @@ import {SignupScreenProps} from '../../defs/navigation';
 import {setLoading, userLoggedIn} from '../../redux/reducers/userSlice.ts';
 import {useAppDispatch} from '../../redux/store/index.ts';
 import {UserFromJson, UserToJson} from '../../utils/userFuncs.ts';
-import {singupUser} from '../../utils/firebase.ts';
+import {ErrorHandler, singupUser} from '../../utils/firebase.ts';
 import {useAppTheme} from '../../hooks/themeHook.ts';
 // Third party libraries
 import BouncyCheckbox from 'react-native-bouncy-checkbox/build/dist/BouncyCheckbox';
-import auth from '@react-native-firebase/auth';
+import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import Toast from 'react-native-toast-message';
@@ -98,7 +98,9 @@ function Signup({navigation}: Readonly<SignupScreenProps>) {
           navigation.replace(NAVIGATION.LOGIN);
         }
         dispatch(setLoading(false));
-      } catch (e) {
+      } catch (e: any) {
+        const error: FirebaseAuthTypes.NativeFirebaseAuthError = e;
+        Toast.show({text1: ErrorHandler(error.code), type: 'error'});
         console.log(e);
         dispatch(setLoading(false));
       }

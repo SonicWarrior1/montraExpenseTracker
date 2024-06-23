@@ -31,6 +31,7 @@ function VerifyPassModal({
       <Pressable
         style={styles.modalBackground}
         onPress={() => {
+          setPass('');
           setShowModal(false);
         }}>
         <Pressable

@@ -13,6 +13,7 @@ import {useAppSelector} from '../../../redux/store';
 import React from 'react';
 import {OnlineTransactionModel} from '../../../DbModels/OnlineTransactionModel';
 import {OfflineTransactionModel} from '../../../DbModels/OfflineTransactionModel';
+import {formatAMPM} from '../../../utils/firebase';
 
 const TransactionItem = ({
   item,
@@ -131,20 +132,9 @@ const TransactionItem = ({
               Timestamp.fromMillis(item.timeStamp.seconds * 1000)
                 ?.toDate()
                 ?.getFullYear()}{' '}
-          {Timestamp.fromMillis(item.timeStamp.seconds * 1000)
-            .toDate()
-            .getHours()}
-          :
-          {Timestamp.fromMillis(item.timeStamp.seconds * 1000)
-            .toDate()
-            .getMinutes() < 10
-            ? '0' +
-              Timestamp.fromMillis(item.timeStamp.seconds * 1000)
-                .toDate()
-                .getMinutes()
-            : Timestamp.fromMillis(item.timeStamp.seconds * 1000)
-                .toDate()
-                .getMinutes()}
+          {formatAMPM(
+            Timestamp.fromMillis(item.timeStamp.seconds * 1000).toDate(),
+          )}
         </Text>
       </View>
     </Pressable>

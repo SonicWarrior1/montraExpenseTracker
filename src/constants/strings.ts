@@ -156,7 +156,7 @@ export const STRINGS = {
     ThisMonth: 'This Month',
     YouSpend: 'You Spend',
     YouEarned: 'You Earned',
-    BudgetLimitExceed: ' of 12 Budget exceeds the limit',
+    BudgetLimitExceed: ' Budget exceeds the limit',
     Quote: '“Financial freedom is freedom from fear.”',
     QuoteAuthor: '-Robert Kiyosaki',
     BiggestSpending: 'and your biggest spending is from',
@@ -175,20 +175,20 @@ export const STRINGS = {
     SeeAll: 'See All',
     From: 'From',
     To: 'To',
-    WhatExport: 'What data do your want to export?',
+    WhatExport: 'What data do you want to export?',
     SureLogout: 'Are you sure do you wanna logout?',
     NoInternetAccess: 'No Internet Access',
     CheckInternet: 'Please check your internet connection',
     PasswordDoNotMatch: 'Password do not match',
     ConfirmPasswordCannotBeEmpty: 'Confirm Password cannot be Empty',
-    PasswordNotValid: "Password must be at least 6 characters long",
-    PasswordCannotBeEmpty: "Password cannot be Empty",
-    EmailIsNotValid: "Email is not Valid",
-    EmailCannotBeEmpty: "Email cannot be Empty",
-    NameIsNotValid: "Name is not Valid",
-    NameCannotBeEmpty: "Name cannot be Empty",
-    NoRecentTransactions: "No Recent Transactions",
-    NoTransactions:"No Transactions"
+    PasswordNotValid: 'Password must be at least 6 characters long',
+    PasswordCannotBeEmpty: 'Password cannot be Empty',
+    EmailIsNotValid: 'Email is not Valid',
+    EmailCannotBeEmpty: 'Email cannot be Empty',
+    NameIsNotValid: 'Name is not Valid',
+    NameCannotBeEmpty: 'Name cannot be Empty',
+    NoRecentTransactions: 'No Recent Transactions',
+    NoTransactions:'No Transactions',
 };
 export const OnboardData = [
     {
@@ -200,15 +200,15 @@ export const OnboardData = [
       icon: '../../assets/Images/onboarding2.png',
       text1: 'Know where your money goes',
       text2:
-        'Track your transaction easily,with categories and financial report ',
+        'Track your transactions easily with categories and financial report ',
     },
     {
       icon: '../../assets/Images/onboarding3.png',
       text1: 'Planning ahead',
-      text2: 'Setup your budget for each category so you in control',
+      text2: 'Setup your budget for each category so you are in control',
     },
   ];
-export const emailRegex = /^[a-zA-Z0-9_-]+@([a-zA-Z0-9-]+\.)+[a-zA-Z0-9]+$/;;
+export const emailRegex = /^[a-zA-Z0-9_-]+@([a-zA-Z0-9-]+\.)+[a-zA-Z0-9]+$/;
 export const nameRegex = /^[a-zA-Z ]*$/;
 export const passRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&\s])[A-Za-z\d@$!%*?&\s]{8,}$/;
 
@@ -258,5 +258,5 @@ export const currencies: { [key: string]: { name: string, symbol: string, code: 
     'KRW': { name: 'South Korean Won', symbol: '₩', code: 'KRW' },
 };
 
-export const initialExpenseCategories = ['add', 'food', 'bill', 'shopping', 'subscription', 'transportation']
-export const initialIncomeCategories = ['add', 'salary', 'passive income']
+export const initialExpenseCategories = ['add', 'food', 'bill', 'shopping', 'subscription', 'transportation'];
+export const initialIncomeCategories = ['add', 'salary', 'passive income'];

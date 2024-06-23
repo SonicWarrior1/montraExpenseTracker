@@ -26,6 +26,7 @@ import auth, {FirebaseAuthTypes} from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import Toast from 'react-native-toast-message';
+import {ErrorHandler} from '../../utils/firebase';
 
 function Login({navigation}: Readonly<LoginScreenProps>) {
   // constants
@@ -99,7 +100,7 @@ function Login({navigation}: Readonly<LoginScreenProps>) {
       } catch (e: any) {
         const error: FirebaseAuthTypes.NativeFirebaseAuthError = e;
         console.log(e);
-        Toast.show({text1: error.nativeErrorMessage, type: 'error'});
+        Toast.show({text1: ErrorHandler(error.code), type: 'error'});
       }
       dispatch(setLoading(false));
     }
@@ -140,10 +141,13 @@ function Login({navigation}: Readonly<LoginScreenProps>) {
           }
         }
       }
-    } catch (e) {
+    } catch (e: any) {
+      const error: FirebaseAuthTypes.NativeFirebaseAuthError = e;
+      Toast.show({text1: ErrorHandler(error.code), type: 'error'});
       console.log(e);
+    } finally {
+      dispatch(setLoading(false));
     }
-    dispatch(setLoading(false));
   }
   return (
     <SafeAreaView style={styles.safeView}>

@@ -7,8 +7,9 @@ import {COLORS} from '../../../constants/commonStyles';
 import {catIcons, ICONS} from '../../../constants/icons';
 import {transactionType} from '../../../defs/transaction';
 import {useAppTheme} from '../../../hooks/themeHook';
-import { OnlineTransactionModel } from '../../../DbModels/OnlineTransactionModel';
-import { OfflineTransactionModel } from '../../../DbModels/OfflineTransactionModel';
+import {OnlineTransactionModel} from '../../../DbModels/OnlineTransactionModel';
+import {OfflineTransactionModel} from '../../../DbModels/OfflineTransactionModel';
+import {formatAMPM} from '../../../utils/firebase';
 
 function TransactionList({
   data,
@@ -21,7 +22,7 @@ function TransactionList({
   incomeOffset,
   limit,
 }: Readonly<{
-  data: (OnlineTransactionModel|OfflineTransactionModel)[];
+  data: (OnlineTransactionModel | OfflineTransactionModel)[];
   transType: 'income' | 'expense';
   month: number;
   conversion: {
@@ -96,27 +97,16 @@ function TransactionList({
                 {item.type === 'expense' ? '-' : '+'}{' '}
                 {currencies[currency!].symbol}{' '}
                 {(
-                  conversion['usd'][currency!.toLowerCase()] * item.amount
+                  conversion.usd[currency!.toLowerCase()] * item.amount
                 ).toFixed(1)}
               </Text>
               <Text style={styles.text2}>
                 {Timestamp.fromMillis(item.timeStamp.seconds * 1000)
                   .toDate()
                   .toLocaleDateString()}{' '}
-                {Timestamp.fromMillis(item.timeStamp.seconds * 1000)
-                  .toDate()
-                  .getHours()}
-                :
-                {Timestamp.fromMillis(item.timeStamp.seconds * 1000)
-                  .toDate()
-                  .getMinutes() < 10
-                  ? '0' +
-                    Timestamp.fromMillis(item.timeStamp.seconds * 1000)
-                      .toDate()
-                      .getMinutes()
-                  : Timestamp.fromMillis(item.timeStamp.seconds * 1000)
-                      .toDate()
-                      .getMinutes()}
+                {formatAMPM(
+                  Timestamp.fromMillis(item.timeStamp.seconds * 1000).toDate(),
+                )}
               </Text>
             </View>
           </Pressable>

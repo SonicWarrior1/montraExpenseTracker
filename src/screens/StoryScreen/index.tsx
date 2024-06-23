@@ -45,6 +45,11 @@ export default function StoryScreen({navigation}: Readonly<StoryScreenProps>) {
           item => item[1].limit <= user?.spend[new Date().getMonth()][item[0]],
         )
       : undefined;
+  const totalBudgets =
+    user?.budget[new Date().getMonth()] !== undefined &&
+    user?.spend[new Date().getMonth()] !== undefined
+      ? Object.entries(user?.budget[new Date().getMonth()])
+      : undefined;
   // state
   const [index, setIndex] = useState(0);
 
@@ -66,6 +71,9 @@ export default function StoryScreen({navigation}: Readonly<StoryScreenProps>) {
     } else if (index === 2) {
       return (
         (budgetExceed === undefined ? 0 : budgetExceed.length) +
+        ' of ' +
+        (totalBudgets === undefined ? 0 : totalBudgets.length) +
+        ' ' +
         STRINGS.BudgetLimitExceed
       );
     } else {

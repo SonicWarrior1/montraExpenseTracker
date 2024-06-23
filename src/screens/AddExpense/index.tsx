@@ -17,7 +17,7 @@ import {ICONS} from '../../constants/icons';
 import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import FilePickerSheet from '../../components/FilePickerSheet';
 import RepeatTransactionSheet from '../../components/RepeatTranscationSheet';
-import firestore, {Timestamp} from '@react-native-firebase/firestore';
+import {Timestamp} from '@react-native-firebase/firestore';
 import {
   currencies,
   monthData,

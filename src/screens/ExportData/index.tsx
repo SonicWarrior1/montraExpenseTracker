@@ -1,7 +1,7 @@
 import React, {useCallback, useState} from 'react';
 import {Platform, SafeAreaView, Text, View} from 'react-native';
 import style from './styles';
-import {useAppDispatch, useAppSelector} from '../../redux/store';
+import {useAppDispatch} from '../../redux/store';
 import {monthData, STRINGS, weekData} from '../../constants/strings';
 import CustomDropdown from '../../components/CustomDropDown';
 import CustomButton from '../../components/CustomButton';

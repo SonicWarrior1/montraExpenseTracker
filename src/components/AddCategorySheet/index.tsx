@@ -56,8 +56,16 @@ function AddCategorySheet({
     const userDoc = firestore().collection('users').doc(uid);
     if (category !== '') {
       dispatch(setLoading(true));
-      if (expenseCats?.includes(category.toLowerCase())) {
-        Toast.show({text1: `${category} is already added`, type: 'error',position:'top'});
+      if (
+        type === 'expense'
+          ? expenseCats?.includes(category.toLowerCase())
+          : incomeCats?.includes(category.toLowerCase())
+      ) {
+        Toast.show({
+          text1: `${category} is already added`,
+          type: 'error',
+          position: 'top',
+        });
         dispatch(setLoading(false));
         return;
       }
