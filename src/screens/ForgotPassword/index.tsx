@@ -36,15 +36,8 @@ function ForgotPassword({navigation}: Readonly<ForgotScreenProps>) {
     try {
       const snapshot = await firestore().collection('users').get();
       const res = snapshot.docs.filter(doc => {
-        console.log(
-          doc.data()['email'],
-          doc.data()['uid'],
-          decrypt(doc.data()['email'], doc.data()['uid']),
-        );
-        console.log((decrypt(doc.data()['email'], doc.data()['uid']) ?? '') === email)
         return (decrypt(doc.data()['email'], doc.data()['uid']) ?? '') === email;
       });
-      console.log(res[0]);
       return res.length !== 0;
     } catch (e) {
       console.log(e);

@@ -10,7 +10,6 @@ import {
 import style from './styles';
 import {ICONS} from '../../constants/icons';
 import {useAppSelector} from '../../redux/store';
-import {transactionType} from '../../defs/transaction';
 import {COLORS} from '../../constants/commonStyles';
 import TransactionHeader from '../../components/TransactionHeader';
 import {TransactionScreenProps} from '../../defs/navigation';
@@ -19,13 +18,24 @@ import {useAppTheme} from '../../hooks/themeHook';
 import {Timestamp} from '@react-native-firebase/firestore';
 import TransactionItem from './atoms/TransactionItem';
 import TabBackdrop from '../../components/TabBackdrop';
+import {useQuery} from '@realm/react';
+import {OnlineTransactionModel} from '../../DbModels/OnlineTransactionModel';
+import {OfflineTransactionModel} from '../../DbModels/OfflineTransactionModel';
 function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
   // constants
   const COLOR = useAppTheme();
   const styles = style(COLOR);
   const scheme = useColorScheme();
   // redux
-  const transaction = useAppSelector(state => state.transaction.transactions);
+  const onlineData = useQuery(OnlineTransactionModel);
+  const offlineData = useQuery(OfflineTransactionModel);
+  console.log('dsjfndsijfn', onlineData, offlineData);
+  const transaction = [
+    ...onlineData.filter(item => item.changed !== true),
+    ...offlineData.filter(item => item.operation !== 'delete'),
+  ];
+
+  console.log('ONLINE', onlineData, 'OFFLINE', offlineData);
   const [offset, setOffset] = useState<number>(0);
   const limit = 10;
   const filters = useAppSelector(state => state.transaction.filters);
@@ -33,12 +43,13 @@ function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
   const [month, setMonth] = useState(new Date().getMonth());
   // functions
   function filterDataByDate(
-    data: {[key: string]: transactionType},
+    data: (OnlineTransactionModel | OfflineTransactionModel)[],
     offset: number,
   ) {
     const startOfToday = new Date().setHours(0, 0, 0, 0) / 1000;
     const startOfYesterday = startOfToday - 24 * 60 * 60;
-    const res = Object.values(data)
+    const res = data
+      .slice()
       .sort((a, b) => b.timeStamp.seconds - a.timeStamp.seconds)
       .slice(0, offset + limit)
       .filter(
@@ -47,41 +58,51 @@ function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
             .toDate()
             .getMonth() === month,
       )
-      .reduce((acc: {[key: string]: Array<transactionType>}, item) => {
-        const itemTime = item.timeStamp.seconds;
-        if (itemTime >= startOfToday) {
-          if (acc.today) {
-            acc.today.push(item);
+      .reduce(
+        (
+          acc: {
+            [key: string]: Array<
+              OnlineTransactionModel | OfflineTransactionModel
+            >;
+          },
+          item,
+        ) => {
+          const itemTime = item.timeStamp.seconds;
+          if (itemTime >= startOfToday) {
+            if (acc.today) {
+              acc.today.push(item);
+            } else {
+              acc.today = [item];
+            }
+          } else if (itemTime >= startOfYesterday) {
+            if (acc.yesterday) {
+              acc.yesterday.push(item);
+            } else {
+              acc.yesterday = [item];
+            }
+          } else if (
+            acc[
+              Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+                .toDate()
+                .toLocaleDateString()
+            ]
+          ) {
+            acc[
+              Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+                .toDate()
+                .toLocaleDateString()
+            ].push(item);
           } else {
-            acc.today = [item];
+            acc[
+              Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+                .toDate()
+                .toLocaleDateString()
+            ] = [item];
           }
-        } else if (itemTime >= startOfYesterday) {
-          if (acc.yesterday) {
-            acc.yesterday.push(item);
-          } else {
-            acc.yesterday = [item];
-          }
-        } else if (
-          acc[
-            Timestamp.fromMillis(item.timeStamp.seconds * 1000)
-              .toDate()
-              .toLocaleDateString()
-          ]
-        ) {
-          acc[
-            Timestamp.fromMillis(item.timeStamp.seconds * 1000)
-              .toDate()
-              .toLocaleDateString()
-          ].push(item);
-        } else {
-          acc[
-            Timestamp.fromMillis(item.timeStamp.seconds * 1000)
-              .toDate()
-              .toLocaleDateString()
-          ] = [item];
-        }
-        return acc;
-      }, {});
+          return acc;
+        },
+        {},
+      );
 
     const result = [
       {
@@ -106,7 +127,13 @@ function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
     delete res.today;
     delete res.yesterday;
     const x = Object.entries(res).reduce(
-      (acc: Array<{title: string; data: Array<transactionType>}>, curr) => {
+      (
+        acc: Array<{
+          title: string;
+          data: Array<OnlineTransactionModel | OfflineTransactionModel>;
+        }>,
+        curr,
+      ) => {
         acc.push({
           title: curr[0],
           data: [...curr[1]].sort(
@@ -120,7 +147,6 @@ function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
     // x.reverse();
     return [...result, ...x];
   }
-
   function applyFilters(offset: number) {
     const data = filterDataByDate(transaction, offset);
     const catFiltered =
@@ -153,6 +179,13 @@ function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
           title: '',
           data: Object.values(transaction)
             .slice()
+            .filter(
+              item =>
+                (filters.cat.length === 0
+                  ? true
+                  : filters.cat.includes(item.category)) &&
+                (item.type === 'none' ? true : item.type === filters.filter),
+            )
             .sort((a, b) => a.amount - b.amount),
         },
       ];
@@ -162,6 +195,13 @@ function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
           title: '',
           data: Object.values(transaction)
             .slice()
+            .filter(
+              item =>
+                (filters.cat.length === 0
+                  ? true
+                  : filters.cat.includes(item.category)) &&
+                (item.type === 'none' ? true : item.type === filters.filter),
+            )
             .sort((a, b) => b.amount - a.amount),
         },
       ];
@@ -213,7 +253,6 @@ function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
                 </TouchableOpacity>
               }
               onEndReached={() => {
-                console.log('OFFset', offset);
                 if (offset + limit < Object.values(transaction).length) {
                   setOffset(offset => offset + 10);
                 }

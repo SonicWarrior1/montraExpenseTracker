@@ -7,6 +7,8 @@ import {COLORS} from '../../../constants/commonStyles';
 import {catIcons, ICONS} from '../../../constants/icons';
 import {transactionType} from '../../../defs/transaction';
 import {useAppTheme} from '../../../hooks/themeHook';
+import { OnlineTransactionModel } from '../../../DbModels/OnlineTransactionModel';
+import { OfflineTransactionModel } from '../../../DbModels/OfflineTransactionModel';
 
 function TransactionList({
   data,
@@ -19,9 +21,7 @@ function TransactionList({
   incomeOffset,
   limit,
 }: Readonly<{
-  data: {
-    [key: string]: transactionType;
-  };
+  data: (OnlineTransactionModel|OfflineTransactionModel)[];
   transType: 'income' | 'expense';
   month: number;
   conversion: {
@@ -37,7 +37,7 @@ function TransactionList({
 }>) {
   const COLOR = useAppTheme();
   const styles = style(COLOR);
-  const listData = Object.values(data)
+  const listData = data
     .filter(
       item =>
         Timestamp.fromMillis(item.timeStamp.seconds * 1000)

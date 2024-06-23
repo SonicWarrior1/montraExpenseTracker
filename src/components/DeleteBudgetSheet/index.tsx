@@ -9,7 +9,7 @@ import CustomButton from '../CustomButton';
 import {useAppDispatch, useAppSelector} from '../../redux/store';
 import style from './styles';
 import {COLORS} from '../../constants/commonStyles';
-import {setLoading} from '../../redux/reducers/userSlice';
+import {deleteBudget, setLoading} from '../../redux/reducers/userSlice';
 import {RootStackParamList} from '../../defs/navigation';
 import {StackNavigationProp} from '@react-navigation/stack';
 import SheetBackdrop from '../SheetBackDrop';
@@ -19,10 +19,14 @@ import {useAppTheme} from '../../hooks/themeHook';
 import {BottomSheetModalMethods} from '@gorhom/bottom-sheet/lib/typescript/types';
 import Toast from 'react-native-toast-message';
 import firestore, {deleteField} from '@react-native-firebase/firestore';
+import {useNetInfo} from '@react-native-community/netinfo';
+import {useRealm} from '@realm/react';
+import {UpdateMode} from 'realm';
 function DeleteBudgetSheet({
   bottomSheetModalRef,
   navigation,
   category,
+  budget,
 }: Readonly<{
   bottomSheetModalRef: React.RefObject<BottomSheetModalMethods>;
   navigation: StackNavigationProp<
@@ -31,13 +35,20 @@ function DeleteBudgetSheet({
     undefined
   >;
   category: string;
+  budget: {
+    alert: boolean;
+    limit: number;
+    percentage: number;
+  };
 }>) {
   // constants
   const COLOR = useAppTheme();
   const styles = style(COLOR);
   const dispatch = useAppDispatch();
   const snapPoints = useMemo(() => ['34%'], []);
-  const month=new Date().getMonth()
+  const month = new Date().getMonth();
+  const {isConnected} = useNetInfo();
+  const realm = useRealm();
   // redux
   const uid = useAppSelector(state => state.user.currentUser?.uid);
   // functions
@@ -46,12 +57,27 @@ function DeleteBudgetSheet({
       dispatch(setLoading(true));
       bottomSheetModalRef.current?.dismiss();
       navigation.pop();
-      await firestore()
-        .collection('users')
-        .doc(uid)
-        .update({
-          [`budget.${month}.${category}`]: deleteField(),
+      if (!isConnected) {
+        dispatch(deleteBudget({month: month, cat: category}));
+        realm.write(() => {
+          realm.create(
+            'budget',
+            {
+              ...budget,
+              delete: true,
+              id: month + '_' + category,
+            },
+            UpdateMode.Modified,
+          );
         });
+      } else {
+        await firestore()
+          .collection('users')
+          .doc(uid)
+          .update({
+            [`budget.${month}.${category}`]: deleteField(),
+          });
+      }
       Toast.show({text1: STRINGS.BudgetDeletedSuccesfully, type: 'custom'});
       dispatch(setLoading(false));
     } catch (e) {

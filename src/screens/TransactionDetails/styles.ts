@@ -40,7 +40,7 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
         backgroundColor: COLOR.LIGHT[100],
         paddingVertical: 15,
         justifyContent: 'space-between',
-        paddingHorizontal: 40,
+        paddingHorizontal: 25,
         borderRadius: 12,
         borderWidth: 1,
         borderColor: COLOR.LIGHT[20],

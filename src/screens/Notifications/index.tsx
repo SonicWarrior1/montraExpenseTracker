@@ -60,7 +60,6 @@ function NotificationScreen({navigation}: Readonly<NotificationScreenProps>) {
       await userDoc.update({notification: readNotifications});
       setMenu(false);
     } catch (e) {
-      console.log(e);
     }
   }, [notifications, uid]);
   const handleDelete = useCallback(() => {

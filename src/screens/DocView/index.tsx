@@ -6,9 +6,10 @@ import styles from './styles';
 
 function DocView({route}: Readonly<DocScreenProps>) {
   const uri = route.params.uri;
+  console.log(uri);
   return (
     <SafeAreaView style={styles.flex}>
-      <Pdf source={{uri}} style={styles.docView} />
+      <Pdf source={{uri: uri}} style={styles.docView} trustAllCerts={false} />
     </SafeAreaView>
   );
 }

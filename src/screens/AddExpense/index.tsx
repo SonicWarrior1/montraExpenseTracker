@@ -1,7 +1,6 @@
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {
   Dimensions,
-  Image,
   Pressable,
   SafeAreaView,
   Text,
@@ -18,10 +17,7 @@ import {ICONS} from '../../constants/icons';
 import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import FilePickerSheet from '../../components/FilePickerSheet';
 import RepeatTransactionSheet from '../../components/RepeatTranscationSheet';
-import firestore, {
-  FirebaseFirestoreTypes,
-  Timestamp,
-} from '@react-native-firebase/firestore';
+import firestore, {Timestamp} from '@react-native-firebase/firestore';
 import {
   currencies,
   monthData,
@@ -31,36 +27,37 @@ import {
 import CustomButton from '../../components/CustomButton';
 import {repeatDataType, transactionType} from '../../defs/transaction';
 import {useAppDispatch, useAppSelector} from '../../redux/store';
-import {setLoading} from '../../redux/reducers/userSlice';
+import {setLoading, userLoggedIn} from '../../redux/reducers/userSlice';
 import uuid from 'react-native-uuid';
 import Toast from 'react-native-toast-message';
 import {ExpenseScreenProps} from '../../defs/navigation';
 import AddCategorySheet from '../../components/AddCategorySheet';
-import {UserType} from '../../defs/user';
+
 import {
   CompundEmptyError,
   EmptyError,
   EmptyZeroError,
 } from '../../constants/errors';
-import {UserFromJson} from '../../utils/userFuncs';
 import AttachementContainer from './atoms/attachementContainer';
 import {
   addNewTransaction,
   createTransaction,
   getAttachmentUrl,
-  handleExpenseUpdate,
-  handleIncomeUpdate,
-  handleNewExpense,
-  handleNewIncome,
-  handleNotify,
   updateTransaction,
 } from '../../utils/firebase';
 import {useAppTheme} from '../../hooks/themeHook';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {Switch} from 'react-native-switch';
+import {useNetInfo} from '@react-native-community/netinfo';
+import {useObject, useRealm} from '@realm/react';
+import {TransFromJson} from '../../utils/transFuncs';
+import {OnlineTransactionModel} from '../../DbModels/OnlineTransactionModel';
+import {UpdateMode} from 'realm';
 
 function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
   // constants
+  const {isConnected} = useNetInfo();
+  const realm = useRealm();
   const COLOR = useAppTheme();
   const styles = style(COLOR);
   const pageType = route.params.type;
@@ -68,8 +65,9 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
   let transaction: transactionType | undefined;
   if (isEdit) {
     transaction = route.params.transaction;
-    console.log(transaction);
+    // console.log(transaction);
   }
+  const TransOnline = useObject(OnlineTransactionModel, transaction?.id ?? '');
   const month = new Date().getMonth();
   const getBackgroundColor = useMemo(() => {
     if (pageType === 'expense') {
@@ -91,7 +89,8 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
             backgroundColor: getBackgroundColor,
             width: '100%',
             height: '100%',
-          }}></View>
+          }}
+        />
       ),
     });
   }, [pageType]);
@@ -103,7 +102,8 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
   const incomeCat = useAppSelector(
     state => state.user.currentUser?.incomeCategory,
   );
-  const uid = useAppSelector(state => state.user.currentUser?.uid);
+  const user = useAppSelector(state => state.user.currentUser);
+  const uid = useAppSelector(state => state.user.currentUser!.uid);
   const currency = useAppSelector(state => state.user.currentUser?.currency);
   // state
   const [image, setImage] = useState(
@@ -159,128 +159,6 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
     return {attachement, attachementType};
   }, [image, doc]);
 
-  const handleEditTransaction = async ({
-    trans,
-    transaction,
-    uid,
-    curr,
-    amount,
-    category,
-    conversion,
-    currency,
-    month,
-  }: {
-    trans: transactionType;
-    transaction: transactionType | undefined;
-    uid: string;
-    curr: FirebaseFirestoreTypes.DocumentSnapshot<FirebaseFirestoreTypes.DocumentData>;
-    amount: string;
-    category: string;
-    conversion: {
-      [key: string]: {
-        [key: string]: number;
-      };
-    };
-    currency: string | undefined;
-    month: number;
-  }) => {
-    await updateTransaction({
-      trans: trans,
-      transId: transaction?.id!,
-      uid: uid,
-    });
-    if (pageType === 'expense' || pageType === 'transfer') {
-      await handleExpenseUpdate({
-        curr: curr,
-        amount: Number(amount),
-        category: category,
-        conversion: conversion,
-        currency: currency!,
-        month: month,
-        transaction: transaction!,
-        uid: uid,
-      });
-      const totalSpent =
-        UserFromJson(curr.data() as UserType)?.spend?.[month]?.[category] ??
-        0 - transaction!.amount + Number(amount);
-      await handleNotify({
-        curr: curr,
-        totalSpent: totalSpent,
-        category: category,
-        month: month,
-        uid: uid,
-      });
-    } else if (pageType === 'income') {
-      await handleIncomeUpdate({
-        curr: curr,
-        amount: Number(amount),
-        category: category,
-        conversion: conversion,
-        currency: currency!,
-        month: month,
-        transaction: transaction!,
-        uid: uid,
-      });
-    }
-  };
-  const handleNewTransaction = async ({
-    trans,
-    uid,
-    curr,
-    amount,
-    category,
-    conversion,
-    currency,
-    month,
-    id,
-  }: {
-    trans: transactionType;
-    uid: string;
-    curr: FirebaseFirestoreTypes.DocumentSnapshot<FirebaseFirestoreTypes.DocumentData>;
-    amount: string;
-    category: string;
-    conversion: {
-      [key: string]: {
-        [key: string]: number;
-      };
-    };
-    currency: string | undefined;
-    month: number;
-    id: string;
-  }) => {
-    await addNewTransaction({id: id, trans: trans, uid: uid});
-    if (pageType === 'expense' || pageType === 'transfer') {
-      await handleNewExpense({
-        curr: curr,
-        amount: Number(amount),
-        category: category,
-        conversion: conversion,
-        currency: currency!,
-        month: month,
-        uid: uid,
-      });
-      const totalSpent =
-        (UserFromJson(curr.data() as UserType)?.spend[month]?.[category] ?? 0) +
-        Number(amount);
-      await handleNotify({
-        curr: curr,
-        totalSpent: totalSpent,
-        category: category,
-        month: month,
-        uid: uid,
-      });
-    } else if (pageType === 'income') {
-      await handleNewIncome({
-        curr: curr,
-        amount: Number(amount),
-        category: category,
-        conversion: conversion,
-        currency: currency!,
-        month: month,
-        uid: uid,
-      });
-    }
-  };
   const handlePress = async () => {
     setFormKey(true);
     if (
@@ -299,54 +177,122 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
     const {attachement, attachementType} = getAttachmentAndType();
     try {
       const id = uuid.v4().toString();
-      const curr = await firestore().collection('users').doc(uid).get();
-      const url = await getAttachmentUrl({
-        attachement: attachement,
-        id: id,
-        uid: uid!,
-      });
-      const trans = createTransaction({
-        id: id,
-        url: url,
-        attachementType: attachementType,
-        amount: amount,
-        category: pageType === 'transfer' ? 'transfer' : category!,
-        conversion: conversion,
-        currency: currency!,
-        desc: desc,
-        isEdit: isEdit,
-        pageType: pageType,
-        repeatData: repeatData!,
-        transaction: transaction!,
-        wallet: wallet,
-        uid: uid!,
-        from: from,
-        to: to,
-      });
-      if (isEdit) {
-        handleEditTransaction({
-          trans: trans,
-          transaction: transaction,
-          uid: uid!,
-          amount: amount,
-          category: pageType === 'transfer' ? 'transfer' : category!,
-          conversion: conversion,
-          curr: curr,
-          currency: currency,
-          month: month,
+      if (!isConnected) {
+        console.log('offline');
+        let trans = TransFromJson(
+          createTransaction({
+            id: id,
+            url: attachement,
+            attachementType: attachementType,
+            amount: amount,
+            category: pageType === 'transfer' ? 'transfer' : category!,
+            conversion: conversion,
+            currency: currency!,
+            desc: desc,
+            isEdit: isEdit,
+            pageType: pageType,
+            repeatData: repeatData!,
+            transaction: transaction!,
+            wallet: wallet,
+            uid: uid!,
+            from: from,
+            to: to,
+          }),
+          uid!,
+        );
+        console.log('trans', trans.freq);
+        if (!isConnected && trans.freq?.date?.seconds !== undefined) {
+          trans.freq.date = Timestamp.fromMillis(
+            trans.freq?.date.seconds * 1000,
+          ).toDate();
+        }
+        console.log(trans.freq);
+        if (pageType === 'income') {
+          dispatch(
+            userLoggedIn({
+              ...user,
+              income: {
+                ...user?.income,
+                [month]: {
+                  ...(user?.income?.[month] ?? {}),
+                  [category!]: isEdit
+                    ? user?.income[month][category!]! -
+                      transaction?.amount! +
+                      Number(amount)
+                    : (user?.income?.[month]?.[category!] ?? 0) +
+                      Number(amount),
+                },
+              },
+            }),
+          );
+        } else {
+          dispatch(
+            userLoggedIn({
+              ...user,
+              spend: {
+                ...user?.spend,
+                [month]: {
+                  ...(user?.spend?.[month] ?? {}),
+                  [category!]: isEdit
+                    ? user?.spend[month][category!]! -
+                      transaction?.amount! +
+                      Number(amount)
+                    : (user?.spend?.[month]?.[category!] ?? 0) + Number(amount),
+                },
+              },
+            }),
+          );
+        }
+        if (trans.freq) {
+          trans.freq.date = Timestamp.fromDate(trans.freq?.date as Date);
+        }
+        realm.write(() => {
+          if (isEdit && TransOnline) {
+            realm.create(
+              'OnlineTransaction',
+              {...trans, changed: true},
+              UpdateMode.Modified,
+            );
+          }
+          realm.create(
+            'OfflineTransaction',
+            {...trans, operation: isEdit ? 'update' : 'add'},
+            UpdateMode.All,
+          );
         });
       } else {
-        handleNewTransaction({
-          trans: trans,
+        const url = await getAttachmentUrl({
+          attachement: attachement,
+          id: id,
           uid: uid!,
+        });
+        const trans = createTransaction({
+          id: id,
+          url: url,
+          attachementType: attachementType,
           amount: amount,
           category: pageType === 'transfer' ? 'transfer' : category!,
           conversion: conversion,
-          curr: curr,
-          currency: currency,
-          month: month,
-          id: id,
+          currency: currency!,
+          desc: desc,
+          isEdit: isEdit,
+          pageType: pageType,
+          repeatData: repeatData!,
+          transaction: transaction!,
+          wallet: wallet,
+          uid: uid!,
+          from: from,
+          to: to,
         });
+        if (isEdit) {
+          await updateTransaction({
+            trans: trans,
+            transId: transaction?.id!,
+            uid: uid,
+          });
+        } else {
+          await addNewTransaction({id: id, trans: trans, uid: uid});
+        }
       }
       Toast.show({
         text1: `Transaction has been ${
@@ -365,12 +311,21 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
       if (isEdit) {
         if ((repeatData.date as Timestamp)?.seconds !== undefined) {
           return (
-            (repeatData.date as Timestamp)?.toDate()?.getDate() +
+            Timestamp.fromMillis((repeatData.date as Timestamp)?.seconds * 1000)
+              ?.toDate()
+              ?.getDate() +
             ' ' +
-            monthData[(repeatData.date as Timestamp)?.toDate()?.getMonth()]
-              .label +
+            monthData[
+              Timestamp.fromMillis(
+                (repeatData.date as Timestamp)?.seconds * 1000,
+              )
+                ?.toDate()
+                ?.getMonth()
+            ].label +
             ' ' +
-            (repeatData.date as Timestamp)?.toDate()?.getFullYear()
+            Timestamp.fromMillis((repeatData.date as Timestamp)?.seconds * 1000)
+              ?.toDate()
+              ?.getFullYear()
           );
         } else {
           return (
@@ -410,7 +365,6 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
       setCatColors(undefined);
     };
   }, [pageType, expenseCat, incomeCat]);
-  console.log(catColors);
   return (
     <>
       <KeyboardAwareScrollView
@@ -495,7 +449,6 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
               value={category}
               placeholder={STRINGS.Category}
               leftIcon={visible => {
-                console.log(category);
                 return !visible && category !== '' ? (
                   <View
                     style={{

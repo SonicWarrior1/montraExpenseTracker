@@ -20,6 +20,9 @@ import TransactionList from './atoms/TransactionList';
 import CategoryList from './atoms/CategoryList';
 import {useAppTheme} from '../../hooks/themeHook';
 import {STRINGS} from '../../constants/strings';
+import {useQuery} from '@realm/react';
+import {OnlineTransactionModel} from '../../DbModels/OnlineTransactionModel';
+import {OfflineTransactionModel} from '../../DbModels/OfflineTransactionModel';
 
 function FinancialReport() {
   // functions
@@ -42,9 +45,13 @@ function FinancialReport() {
   const incomes =
     useAppSelector(state => state.user.currentUser?.income?.[month]) ?? [];
   const currency = useAppSelector(state => state.user.currentUser?.currency);
-  const {conversion, transactions: data} = useAppSelector(
-    state => state.transaction,
-  );
+  const {conversion} = useAppSelector(state => state.transaction);
+  const onlineData = useQuery(OnlineTransactionModel);
+  const offlineData = useQuery(OfflineTransactionModel);
+  const data = [
+    ...onlineData.filter(item => item.changed !== true),
+    ...offlineData.filter(item => item.operation !== 'delete'),
+  ];
   //
   const totalSpend = useMemo(
     () =>
@@ -107,13 +114,12 @@ function FinancialReport() {
       style={[styles.safeView, {paddingBottom: 20}]}
       onScroll={({nativeEvent}) => {
         if (isCloseToBottom(nativeEvent)) {
-          console.log(incomeOffset);
           if (incomeOffset + limit < Object.values(data).length)
-            if (transType === 'expense') {
+            {if (transType === 'expense') {
               setExpenseOffset(offset => offset + 5);
             } else {
               setIncomeOffset(offset => offset + 5);
-            }
+            }}
         }
       }}
       scrollEventThrottle={400}>

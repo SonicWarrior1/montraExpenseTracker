@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { transactionType } from "../../defs/transaction";
 const initialState: {
-    transactions: { [key: string]: transactionType },
+    // transactions: { [key: string]: transactionType },
     isFilterOpen: boolean,
     isCatOpen: boolean,
     filters: { filter: 'income' | 'expense' | 'transfer' | 'none', sort: 'highest' | 'lowest' | 'newest' | 'oldest' | 'none', cat: string[] },
@@ -9,7 +9,7 @@ const initialState: {
     isLogoutOpen: boolean,
     isTabButtonOpen: boolean
 } = {
-    transactions: {},
+    // transactions: {},
     isFilterOpen: false,
     isCatOpen: false,
     filters: { filter: 'none', sort: 'none', cat: [] },
@@ -66,9 +66,9 @@ const TransactionSlice = createSlice({
         clearCatFilter(state) {
             state.filters.cat = []
         },
-        setTransaction(state, action) {
-            state.transactions = action.payload
-        },
+        // setTransaction(state, action) {
+        //     state.transactions = action.payload
+        // },
         setConversionData(state, action) {
             state.conversion = action.payload
         },
@@ -77,5 +77,5 @@ const TransactionSlice = createSlice({
         }
     }
 })
-export const { openFilterSheet, setFilters, openCatSheet, setSortFilter, setTransaction, setConversionData, setCatFilter, clearCatFilter, openLogoutSheet, setTabButton } = TransactionSlice.actions
+export const { openFilterSheet, setFilters, openCatSheet, setSortFilter, setConversionData, setCatFilter, clearCatFilter, openLogoutSheet, setTabButton } = TransactionSlice.actions
 export default TransactionSlice.reducer

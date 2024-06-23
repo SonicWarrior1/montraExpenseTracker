@@ -15,6 +15,7 @@ import {useAppTheme} from '../../hooks/themeHook';
 import {useAppDispatch, useAppSelector} from '../../redux/store';
 import {useEffect} from 'react';
 import {setTabButton} from '../../redux/reducers/transactionSlice';
+import React from 'react';
 
 function CustomTab(props: Readonly<BottomTabBarProps>): React.JSX.Element {
   const deg = useSharedValue('-45deg');
@@ -78,7 +79,6 @@ function CustomTab(props: Readonly<BottomTabBarProps>): React.JSX.Element {
   const scheme = useColorScheme();
   const theme = useAppSelector(state => state.user.currentUser?.theme);
   const isOpen = useAppSelector(state => state.transaction.isTabButtonOpen);
-  console.log(isOpen);
   const finalTheme = theme === 'device' ? scheme : theme;
   const dispatch = useAppDispatch();
   useEffect(() => {
@@ -200,4 +200,4 @@ function CustomTab(props: Readonly<BottomTabBarProps>): React.JSX.Element {
     </View>
   );
 }
-export default CustomTab;
+export default React.memo(CustomTab);

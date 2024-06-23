@@ -20,8 +20,10 @@ import Graph from './atoms/graph';
 // Third Party Libraries
 import {Timestamp} from '@react-native-firebase/firestore';
 import LinearGradient from 'react-native-linear-gradient';
-import {transactionType} from '../../defs/transaction';
 import TabBackdrop from '../../components/TabBackdrop';
+import {useQuery} from '@realm/react';
+import {OnlineTransactionModel} from '../../DbModels/OnlineTransactionModel';
+import {OfflineTransactionModel} from '../../DbModels/OfflineTransactionModel';
 
 function Home({navigation, route}: Readonly<HomeScreenProps>) {
   // state
@@ -36,7 +38,12 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
   const incomes = useAppSelector(
     state => state.user.currentUser?.income?.[month],
   );
-  const data = useAppSelector(state => state.transaction.transactions);
+  const onlineData = useQuery(OnlineTransactionModel);
+  const offlineData = useQuery(OfflineTransactionModel);
+  const data = [
+    ...onlineData.filter(item => item.changed !== true),
+    ...offlineData.filter(item => item.operation !== 'delete'),
+  ];
   const theme = useAppSelector(state => state.user.currentUser?.theme);
   // constants
   const totalSpend = Object.values(spends ?? [])
@@ -49,7 +56,7 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
   const styles = style(COLOR);
   const scheme = useColorScheme();
   const finalTheme = theme === 'device' ? scheme : theme;
-  const getAmtColor = (item: transactionType) => {
+  const getAmtColor = (item: OnlineTransactionModel) => {
     if (item.type === 'expense') {
       return COLORS.PRIMARY.RED;
     } else if (item.type === 'income') {
@@ -58,7 +65,7 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
       return COLORS.PRIMARY.BLUE;
     }
   };
-  const getAmtSymbol = (item: transactionType) => {
+  const getAmtSymbol = (item: OnlineTransactionModel) => {
     if (item.type === 'expense') {
       return '-';
     } else if (item.type === 'income') {

@@ -9,7 +9,6 @@ import {useAppTheme} from '../../hooks/themeHook';
 function TabBackdrop() {
   const isOpen = useAppSelector(state => state.transaction.isTabButtonOpen);
   const dispatch = useAppDispatch();
-  console.log(isOpen);
   const scheme = useColorScheme();
   const theme = useAppSelector(state => state.user.currentUser?.theme);
   const finalTheme = theme === 'device' ? scheme : theme;

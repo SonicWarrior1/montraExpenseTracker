@@ -108,6 +108,7 @@ function DetailBudget({navigation, route}: Readonly<DetailBudgetScreenProps>) {
         />
       </SafeAreaView>
       <DeleteBudgetSheet
+      budget={budget}
         category={selectedCategory}
         navigation={navigation}
         bottomSheetModalRef={bottomSheetModalRef}

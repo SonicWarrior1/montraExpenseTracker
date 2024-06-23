@@ -14,9 +14,18 @@ import ReactNativeBlobUtil from 'react-native-blob-util';
 import uuid from 'react-native-uuid';
 import Toast from 'react-native-toast-message';
 import {setLoading} from '../../redux/reducers/userSlice';
+import {useQuery} from '@realm/react';
+import {OnlineTransactionModel} from '../../DbModels/OnlineTransactionModel';
+import {OfflineTransactionModel} from '../../DbModels/OfflineTransactionModel';
 function ExportData() {
   // redux
-  const data = useAppSelector(state => state.transaction.transactions);
+  // const data = useAppSelector(state => state.transaction.transactions);
+  const onlineData = useQuery(OnlineTransactionModel);
+  const offlineData = useQuery(OfflineTransactionModel);
+  const data = [
+    ...onlineData.filter(item => item.changed !== true),
+    ...offlineData.filter(item => item.operation !== 'delete'),
+  ];
   const dispatch = useAppDispatch();
   // state
   const [dataType, setDataType] = useState<
@@ -40,7 +49,9 @@ function ExportData() {
           if (val.type === 'transfer') {
             return {
               ...val,
-              timeStamp: val.timeStamp.toDate(),
+              timeStamp: Timestamp.fromMillis(
+                val.timeStamp.seconds * 1000,
+              ).toDate(),
             };
           }
           let frequency = '';
@@ -49,25 +60,28 @@ function ExportData() {
           } else if (val.freq?.freq === 'monthly') {
             frequency = String(val.freq.day);
           } else if (val.freq?.freq === 'weekly') {
-            frequency = weekData[val.freq.weekDay].label;
+            frequency = weekData[val.freq.weekDay!].label;
           }
           return {
             ...val,
-            timeStamp: val.timeStamp.toDate(),
+            timeStamp: Timestamp.fromMillis(
+              val.timeStamp.seconds * 1000,
+            ).toDate(),
             freq:
               (val.freq?.freq ?? 'never') +
               ' ' +
               frequency +
               ' ' +
               (val.freq?.end !== undefined && val.freq.end === 'date'
-                ? ',end - ' + (val.freq.date as Timestamp).toDate()
+                ? ',end - ' +
+                  Timestamp.fromMillis(val.freq.date?.seconds! * 1000).toDate()
                 : ''),
           };
         }),
     );
-    if(csvData===''){
-      Toast.show({text1:"There is no data to be exported",type:"error"})
-      dispatch(setLoading(false))
+    if (csvData === '') {
+      Toast.show({text1: 'There is no data to be exported', type: 'error'});
+      dispatch(setLoading(false));
       return;
     }
     try {
@@ -119,7 +133,6 @@ function ExportData() {
             })}
             onChange={data => {
               setDataRange(data.value);
-              console.log(data);
             }}
             placeholder=""
             value={String(dataRange)}

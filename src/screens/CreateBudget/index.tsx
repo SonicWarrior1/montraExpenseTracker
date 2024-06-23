@@ -10,13 +10,20 @@ import AddCategorySheet from '../../components/AddCategorySheet';
 import {COLORS} from '../../constants/commonStyles';
 import {Slider} from '@miblanchard/react-native-slider';
 import firestore from '@react-native-firebase/firestore';
-import {setLoading} from '../../redux/reducers/userSlice';
+import {
+  setLoading,
+  userLoggedIn,
+  addBudget,
+} from '../../redux/reducers/userSlice';
 import {CreateBudgetScreenProps} from '../../defs/navigation';
 import {currencies, STRINGS} from '../../constants/strings';
 import {encrypt} from '../../utils/encryption';
 import {useAppTheme} from '../../hooks/themeHook';
 import {EmptyError, EmptyZeroError} from '../../constants/errors';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import {useNetInfo} from '@react-native-community/netinfo';
+import {useRealm} from '@realm/react';
+import {UpdateMode} from 'realm';
 function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
   // constants
   const COLOR = useAppTheme();
@@ -34,6 +41,7 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
       : undefined;
   }
   const dispatch = useAppDispatch();
+  const {isConnected} = useNetInfo();
   // redux
   const conversion = useAppSelector(state => state.transaction.conversion);
   const currency = useAppSelector(state => state.user.currentUser?.currency);
@@ -44,6 +52,7 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
     state => state.user.currentUser?.expenseCategory,
   );
   const uid = useAppSelector(state => state.user.currentUser?.uid);
+  const realm = useRealm();
   // state
   const [amount, setAmount] = useState(
     isEdit
@@ -53,7 +62,6 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
       : '0',
   );
   const [category, setCategory] = useState(isEdit ? selectedCategory : '');
-  console.log(category)
   const [alert, setAlert] = useState(isEdit ? oldBudget?.alert : false);
   const [sliderVal, setSliderVal] = useState(
     isEdit ? oldBudget?.percentage : 0,
@@ -128,7 +136,7 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
         <View style={styles.detailsCtr}>
           <CustomDropdown
             data={expenseCat!
-              .filter(cat => !Object.keys(budgets??[]).includes(cat))
+              .filter(cat => !Object.keys(budgets ?? []).includes(cat))
               .map(item => {
                 return {
                   label:
@@ -148,7 +156,6 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
             value={category}
             placeholder={STRINGS.Category}
             leftIcon={visible => {
-              console.log(category);
               return !visible && category !== '' ? (
                 <View
                   style={{
@@ -215,29 +222,55 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
           <CustomButton
             title={STRINGS.Continue}
             onPress={async () => {
-              console.log(amount);
               setForm(true);
               if (amount !== '' && Number(amount) > 0 && category !== '') {
                 try {
                   dispatch(setLoading(true));
-                  await firestore()
-                    .collection('users')
-                    .doc(uid)
-                    .update({
-                      [`budget.${month}.${category}`]: {
-                        limit: encrypt(
-                          String(
-                            (
-                              Number(amount) /
-                              conversion.usd[currency!.toLowerCase()]
-                            ).toFixed(1),
-                          ),
-                          uid!,
-                        ),
-                        alert: alert,
-                        percentage: encrypt(String(sliderVal), uid!),
-                      },
+                  if (!isConnected) {
+                    realm.write(() => {
+                      realm.create(
+                        'budget',
+                        {
+                          limit: Number(amount),
+                          alert: alert,
+                          percentage: sliderVal,
+                          id: month + '_' + category,
+                          delete:false,
+                        },
+                        UpdateMode.Modified,
+                      );
                     });
+                    dispatch(
+                      addBudget({
+                        month: month,
+                        cat: category,
+                        budget: {
+                          limit: Number(amount),
+                          alert: alert,
+                          percentage: sliderVal,
+                        },
+                      }),
+                    );
+                  } else {
+                    await firestore()
+                      .collection('users')
+                      .doc(uid)
+                      .update({
+                        [`budget.${month}.${category}`]: {
+                          limit: encrypt(
+                            String(
+                              (
+                                Number(amount) /
+                                conversion.usd[currency!.toLowerCase()]
+                              ).toFixed(1),
+                            ),
+                            uid!,
+                          ),
+                          alert: alert,
+                          percentage: encrypt(String(sliderVal), uid!),
+                        },
+                      });
+                  }
                   dispatch(setLoading(false));
                   navigation.pop();
                 } catch (e) {
