@@ -59,7 +59,7 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
         borderRadius: 24,
         columnGap: 7,
     },
-    catText: { fontSize: RFValue(14), fontWeight: '500', color: COLOR.DARK[100] },
+    catText: { fontSize: RFValue(14), fontWeight: '500', color: COLOR.DARK[100] ,maxWidth:180},
     catAmt: { fontSize: RFValue(24), fontWeight: '500' },
     safeView: { backgroundColor: COLOR.LIGHT[100] },
     monthRow: {

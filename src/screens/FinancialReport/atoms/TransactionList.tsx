@@ -10,6 +10,7 @@ import {useAppTheme} from '../../../hooks/themeHook';
 import {OnlineTransactionModel} from '../../../DbModels/OnlineTransactionModel';
 import {OfflineTransactionModel} from '../../../DbModels/OfflineTransactionModel';
 import {formatAMPM} from '../../../utils/firebase';
+import {formatWithCommas} from '../../../utils/commonFuncs';
 
 function TransactionList({
   data,
@@ -59,6 +60,7 @@ function TransactionList({
       style={{paddingHorizontal: 20}}
       data={listData}
       scrollEnabled={false}
+      showsVerticalScrollIndicator={false}
       ListEmptyComponent={ListEmptyComponent}
       renderItem={({item}) => {
         return (
@@ -75,7 +77,7 @@ function TransactionList({
                 ICONS.Money({height: 30, width: 30})}
             </View>
             <View style={styles.catCtr}>
-              <Text style={styles.text1}>
+              <Text style={styles.text1} numberOfLines={1}>
                 {item.category[0].toLocaleUpperCase() + item.category.slice(1)}
               </Text>
               <Text style={styles.text2} numberOfLines={1}>
@@ -96,9 +98,13 @@ function TransactionList({
                 ]}>
                 {item.type === 'expense' ? '-' : '+'}{' '}
                 {currencies[currency!].symbol}{' '}
-                {(
-                  conversion.usd[currency!.toLowerCase()] * item.amount
-                ).toFixed(1)}
+                {formatWithCommas(
+                  Number(
+                    (
+                      conversion.usd[currency!.toLowerCase()] * item.amount
+                    ).toFixed(1),
+                  ).toString(),
+                )}
               </Text>
               <Text style={styles.text2}>
                 {Timestamp.fromMillis(item.timeStamp.seconds * 1000)

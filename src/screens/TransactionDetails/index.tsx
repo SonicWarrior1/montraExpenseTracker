@@ -36,6 +36,8 @@ import FileViewer from 'react-native-file-viewer';
 import {setLoading} from '../../redux/reducers/userSlice';
 import {useNetInfo} from '@react-native-community/netinfo';
 import Toast from 'react-native-toast-message';
+import CustomHeader from '../../components/CustomHeader';
+import {formatWithCommas} from '../../utils/commonFuncs';
 
 function TransactionDetails({
   route,
@@ -53,10 +55,10 @@ function TransactionDetails({
     OfflineTransactionModel,
     route.params.transaction.id,
   );
-  console.log('djsfskdfnl', online, offline);
+  // console.log('djsfskdfnl', online, offline);
   const trans = offline ?? online;
   const {isConnected} = useNetInfo();
-  console.log(trans, route.params.transaction.id, online, offline);
+  // console.log(trans, route.params.transaction.id, online, offline);
   // ref
   const bottomSheetModalRef = useRef<BottomSheetModalMethods>(null);
   // state
@@ -68,17 +70,11 @@ function TransactionDetails({
       <Pressable
         onPress={() => {
           bottomSheetModalRef.current?.present();
-        }}
-        style={{marginRight: 15}}>
+        }}>
         {ICONS.Trash({height: 25, width: 25, color: COLOR.LIGHT[100]})}
       </Pressable>
     );
   };
-  useEffect(() => {
-    navigation.setOptions({
-      headerRight: headerRight,
-    });
-  }, []);
   const getBackgroundColor = useMemo(() => {
     if (trans) {
       if (trans.type === 'expense') {
@@ -113,13 +109,22 @@ function TransactionDetails({
               backgroundColor: getBackgroundColor,
             },
           ]}>
-          <Spacer height={Dimensions.get('screen').height * 0.075} />
-          <Text style={styles.amt}>
+          <CustomHeader
+            backgroundColor={getBackgroundColor!}
+            title="Detail Transaction"
+            navigation={navigation}
+            HeaderRight={headerRight}
+          />
+          <Spacer height={Dimensions.get('screen').height * 0.025} />
+          <Text style={styles.amt} numberOfLines={1}>
             {currencies[currency!].symbol ?? '$'}{' '}
-            {Number(
-              (
-                conversion.usd[(currency ?? 'USD').toLowerCase()] * trans.amount
-              ).toFixed(1),
+            {formatWithCommas(
+              Number(
+                (
+                  conversion.usd[(currency ?? 'USD').toLowerCase()] *
+                  trans.amount
+                ).toFixed(1),
+              ).toString(),
             )}
           </Text>
           <Text style={styles.desc} numberOfLines={1}>
@@ -283,7 +288,7 @@ function TransactionDetails({
                           fileCache: true,
                           appendExt: 'pdf',
                         }).fetch('GET', trans.attachement ?? '');
-                        console.log(res.path());
+                        // console.log(res.path());
                         dispatch(setLoading(false));
                         FileViewer.open(res.path(), {showOpenWithDialog: true});
                       } catch (e) {

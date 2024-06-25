@@ -45,7 +45,7 @@ function DeleteBudgetSheet({
   const COLOR = useAppTheme();
   const styles = style(COLOR);
   const dispatch = useAppDispatch();
-  const snapPoints = useMemo(() => ['34%'], []);
+  const snapPoints = useMemo(() => ['30%'], []);
   const month = new Date().getMonth();
   const {isConnected} = useNetInfo();
   const realm = useRealm();
@@ -78,7 +78,7 @@ function DeleteBudgetSheet({
             [`budget.${month}.${category}`]: deleteField(),
           });
       }
-      Toast.show({text1: STRINGS.BudgetDeletedSuccesfully, type: 'custom'});
+      Toast.show({text1: STRINGS.BudgetDeletedSuccesfully, type: 'custom', swipeable: false,});
       dispatch(setLoading(false));
     } catch (e) {
       console.log(e);

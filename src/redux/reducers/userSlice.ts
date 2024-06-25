@@ -2,9 +2,9 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { UserType } from "../../defs/user";
 
 const initialState: {
-    currentUser: UserType | undefined, loading: boolean,
+    currentUser: UserType | undefined, loading: boolean, theme?: 'device' | 'light' | 'dark'
 } = {
-    currentUser: undefined, loading: false,
+    currentUser: undefined, loading: false, theme: undefined
 
 }
 const UserSlice = createSlice({
@@ -31,9 +31,12 @@ const UserSlice = createSlice({
         },
         setCurrencyCode(state, action) {
             state.currentUser!.currency = action.payload;
+        },
+        setTheme(state, action) {
+            state.theme = action.payload
         }
     }
 })
 
-export const { userLoggedIn, setLoading, addExpenseCategory, addIncomeCategory, setCurrencyCode, addBudget,deleteBudget } = UserSlice.actions
+export const { userLoggedIn, setLoading, addExpenseCategory, addIncomeCategory, setCurrencyCode, addBudget, deleteBudget, setTheme } = UserSlice.actions
 export default UserSlice.reducer

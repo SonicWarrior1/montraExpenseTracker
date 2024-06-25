@@ -6,6 +6,7 @@ import {NAVIGATION, STRINGS} from '../../constants/strings';
 import {ICONS} from '../../constants/icons';
 import {useAppSelector} from '../../redux/store';
 import {useAppTheme} from '../../hooks/themeHook';
+import CustomHeader from '../../components/CustomHeader';
 
 function SettingsScreen({navigation}: Readonly<SettingsScreenProps>) {
   const currency = useAppSelector(state => state.user.currentUser?.currency);
@@ -14,6 +15,13 @@ function SettingsScreen({navigation}: Readonly<SettingsScreenProps>) {
   const styles = style(COLORS);
   return (
     <SafeAreaView style={styles.safeView}>
+      <CustomHeader
+        backgroundColor={COLORS.LIGHT[100]}
+        navigation={navigation}
+        title="Settings"
+        color={COLORS.DARK[100]}
+        bottomBorder={true}
+      />
       <ButtonRow
         onPress={() => {
           navigation.navigate(NAVIGATION.Currency);

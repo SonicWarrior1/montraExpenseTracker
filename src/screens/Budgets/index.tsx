@@ -18,6 +18,7 @@ import {useAppTheme} from '../../hooks/themeHook';
 import TabBackdrop from '../../components/TabBackdrop';
 import {useQuery} from '@realm/react';
 import {BudgetModel} from '../../DbModels/BudgetModel';
+import {formatWithCommas, getMyColor} from '../../utils/commonFuncs';
 
 function BudgetScreen({navigation}: Readonly<BudgetScreenProps>) {
   // constants
@@ -33,11 +34,8 @@ function BudgetScreen({navigation}: Readonly<BudgetScreenProps>) {
   const conversion = useAppSelector(state => state.transaction.conversion);
   const spend =
     useAppSelector(state => state.user.currentUser?.spend[month]) ?? {};
+  console.log(spend);
   // functions
-  const getMyColor = useCallback(() => {
-    let n = (Math.random() * 0xfffff * 1000000).toString(16);
-    return '#' + n.slice(0, 6);
-  }, []);
   const getValue = (
     val: {
       alert: boolean;
@@ -52,15 +50,11 @@ function BudgetScreen({navigation}: Readonly<BudgetScreenProps>) {
       return (conversion.usd[currency!.toLowerCase()] * val.limit).toFixed(1);
     } else {
       return (
-        conversion.usd[currency!.toLowerCase()] * val.limit -
-        (spend[key] ?? 0)
+        conversion.usd[currency!.toLowerCase()] *
+        (val.limit - (spend[key] ?? 0))
       ).toFixed(1);
     }
   };
-  const dbBudgets = useQuery(BudgetModel);
-  console.log('====================================');
-  console.log(dbBudgets);
-  console.log('====================================');
   return (
     <>
       <View style={styles.safeView}>
@@ -121,7 +115,7 @@ function BudgetScreen({navigation}: Readonly<BudgetScreenProps>) {
           ) : (
             <FlatList
               data={Object.entries(budgets)}
-              style={{marginTop: 15,width:"100%"}}
+              style={{marginTop: 15, width: '100%'}}
               showsVerticalScrollIndicator={false}
               renderItem={({item}) => {
                 const key = item[0];
@@ -155,7 +149,7 @@ function BudgetScreen({navigation}: Readonly<BudgetScreenProps>) {
                     </View>
                     <Text style={styles.text1}>
                       Remaining {currencies[currency!].symbol}
-                      {getValue(val, key)}
+                      {formatWithCommas(Number(getValue(val, key)).toString())}
                     </Text>
                     <Bar
                       progress={(spend[key] ?? 0) / val.limit}
@@ -165,14 +159,18 @@ function BudgetScreen({navigation}: Readonly<BudgetScreenProps>) {
                     />
                     <Text style={styles.text2}>
                       {currencies[currency!].symbol}
-                      {(
-                        conversion.usd[currency!.toLowerCase()] *
-                        (spend[key] ?? 0)
-                      ).toFixed(1)}{' '}
+                      {formatWithCommas(
+                        Number(
+                          (
+                            conversion.usd[currency!.toLowerCase()] *
+                            (spend[key] ?? 0)
+                          ).toFixed(1),
+                        ).toString(),
+                      )}{' '}
                       of {currencies[currency!].symbol}
-                      {(
+                      {formatWithCommas(Number((
                         conversion.usd[currency!.toLowerCase()] * val.limit
-                      ).toFixed(1)}
+                      ).toFixed(1)).toString())}
                     </Text>
                     {(spend[key] ?? 0) >= val.limit && (
                       <Text style={styles.limitText}>

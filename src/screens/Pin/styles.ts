@@ -1,6 +1,7 @@
 import { Dimensions, Platform, StyleSheet } from 'react-native';
 import { COLORS } from '../../constants/commonStyles';
 const screenWidth = Dimensions.get('screen').width;
+const screenHeight = Dimensions.get('screen').height;
 
 const styles = StyleSheet.create({
     safeView: { flex: 1, backgroundColor: COLORS.PRIMARY.VIOLET, paddingTop: 30 },
@@ -50,8 +51,8 @@ const styles = StyleSheet.create({
         backgroundColor: COLORS.LIGHT[100],
         shadowColor: 'grey',
         shadowOpacity: 0.3,
-        right: Dimensions.get('screen').width / 12,
-        top: Platform.OS === 'ios' ? Dimensions.get('screen').height / 18 : Dimensions.get('screen').height / 15,
+        right: screenWidth / 11,
+        top: Platform.OS === 'ios' ? screenHeight / 8.5 : screenHeight / 12,
         shadowRadius: 5,
         shadowOffset: {
             height: 2,
@@ -65,5 +66,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: 'rgba(0,0,0,0.7)',
     },
+    upperView: {
+        paddingTop: screenHeight * 0.03,
+        rowGap: 100,
+    }
 });
 export default styles;

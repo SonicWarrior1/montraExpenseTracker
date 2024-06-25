@@ -18,6 +18,7 @@ import {BottomSheetModalMethods} from '@gorhom/bottom-sheet/lib/typescript/types
 import {pickSingle} from 'react-native-document-picker';
 import {useNetInfo} from '@react-native-community/netinfo';
 import {Platform} from 'react-native';
+import { throttle } from '../../utils/transFuncs';
 
 function FilePickerSheet({
   bottomSheetModalRef,
@@ -84,7 +85,6 @@ function FilePickerSheet({
       let res = await pickSingle({
         copyTo: 'cachesDirectory',
         allowMultiSelection: false,
-        type: 'pdf',
       });
       let uri = res.fileCopyUri ?? res.uri;
       if (!isConnected) {
@@ -117,17 +117,17 @@ function FilePickerSheet({
         <SheetButtons
           title={STRINGS.Camera}
           icon={ICONS.Camera}
-          onPress={openCamera}
+          onPress={throttle(openCamera,1000)}
         />
         <SheetButtons
           title={STRINGS.Image}
           icon={ICONS.Gallery}
-          onPress={openImagePicker}
+          onPress={throttle(openImagePicker,1000)}
         />
         <SheetButtons
           title={STRINGS.Document}
           icon={ICONS.Document}
-          onPress={docPicker}
+          onPress={throttle(docPicker,1000)}
         />
       </BottomSheetView>
     </BottomSheetModal>

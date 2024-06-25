@@ -19,6 +19,7 @@ import {useAppDispatch} from '../../redux/store';
 import {setLoading} from '../../redux/reducers/userSlice';
 import Toast from 'react-native-toast-message';
 import {decrypt} from '../../utils/encryption';
+import CustomHeader from '../../components/CustomHeader';
 
 function ForgotPassword({navigation}: Readonly<ForgotScreenProps>) {
   // constants
@@ -36,7 +37,9 @@ function ForgotPassword({navigation}: Readonly<ForgotScreenProps>) {
     try {
       const snapshot = await firestore().collection('users').get();
       const res = snapshot.docs.filter(doc => {
-        return (decrypt(doc.data()['email'], doc.data()['uid']) ?? '') === email;
+        return (
+          (decrypt(doc.data()['email'], doc.data()['uid']) ?? '') === email
+        );
       });
       return res.length !== 0;
     } catch (e) {
@@ -75,6 +78,12 @@ function ForgotPassword({navigation}: Readonly<ForgotScreenProps>) {
   return (
     <SafeAreaView style={styles.safeView}>
       <ScrollView style={styles.flex} contentContainerStyle={styles.flex}>
+        <CustomHeader
+          backgroundColor={COLOR.LIGHT[100]}
+          title="Forgot Password"
+          color={COLOR.DARK[100]}
+          navigation={navigation}
+        />
         <View style={styles.mainView}>
           <Text style={styles.text}>{STRINGS.DontWorry}</Text>
           <Text style={styles.text}>{STRINGS.EnterEmailForReset}</Text>

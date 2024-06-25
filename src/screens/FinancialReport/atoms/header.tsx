@@ -24,6 +24,7 @@ function FinancialReportHeader({
   return (
     <View style={styles.monthRow}>
       <Dropdown
+        autoScroll={false}
         style={styles.dropdown}
         renderLeftIcon={() => (
           <View style={{marginRight: 10}}>

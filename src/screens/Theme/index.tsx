@@ -7,8 +7,10 @@ import {encrypt} from '../../utils/encryption';
 import style from './styles';
 import {useAppTheme} from '../../hooks/themeHook';
 import {STRINGS} from '../../constants/strings';
+import CustomHeader from '../../components/CustomHeader';
+import { ThemeScreenProps } from '../../defs/navigation';
 
-function ThemeScreen() {
+function ThemeScreen({navigation}:ThemeScreenProps) {
   // redux
   const theme = useAppSelector(state => state.user.currentUser?.theme);
   const uid = useAppSelector(state => state.user.currentUser?.uid);
@@ -18,6 +20,13 @@ function ThemeScreen() {
   const userDoc = firestore().collection('users').doc(uid);
   return (
     <SafeAreaView style={styles.safeView}>
+       <CustomHeader
+        backgroundColor={COLORS.LIGHT[100]}
+        navigation={navigation}
+        title="Theme"
+        color={COLORS.DARK[100]}
+        bottomBorder={true}
+      />
       <Pressable
         style={styles.row}
         onPress={async () => {

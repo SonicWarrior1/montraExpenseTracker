@@ -53,3 +53,7 @@ export type HomeScreenProps = CompositeScreenProps<BottomTabScreenProps<BottomPa
 export type StoryScreenProps = StackScreenProps<RootStackParamList, 'Story'>
 export type ProfileScreenProps = CompositeScreenProps<BottomTabScreenProps<BottomParamList, 'Profile'>, StackScreenProps<RootStackParamList>>
 export type SettingsScreenProps = StackScreenProps<RootStackParamList, 'Settings'>
+export type FinancialReportScreenProps = StackScreenProps<RootStackParamList, 'FinancialReport'>
+export type CurrencyScreenProps = StackScreenProps<RootStackParamList, 'Currency'>
+export type ThemeScreenProps = StackScreenProps<RootStackParamList, 'Theme'>
+export type ExportScreenProps = NativeStackScrStackScreenPropseenProps<RootStackParamList, 'ExportData'>

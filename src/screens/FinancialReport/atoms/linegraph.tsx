@@ -4,12 +4,12 @@ import {COLORS} from '../../../constants/commonStyles';
 import {LineChart} from 'react-native-gifted-charts';
 import style from '../styles';
 import {currencies} from '../../../constants/strings';
-import {transactionType} from '../../../defs/transaction';
 import {useAppTheme} from '../../../hooks/themeHook';
 import {Timestamp} from '@react-native-firebase/firestore';
 import LinegraphLabel from '../../../components/LinegraphLabel';
 import {OnlineTransactionModel} from '../../../DbModels/OnlineTransactionModel';
 import {OfflineTransactionModel} from '../../../DbModels/OfflineTransactionModel';
+import {formatWithCommas} from '../../../utils/commonFuncs';
 
 function Linegraph({
   totalSpend,
@@ -20,8 +20,8 @@ function Linegraph({
   conversion,
   month,
 }: Readonly<{
-  totalSpend: string;
-  totalIncome: string;
+  totalSpend: number;
+  totalIncome: number;
   data: (OnlineTransactionModel | OfflineTransactionModel)[];
   currency: string | undefined;
   transType: 'income' | 'expense';
@@ -38,12 +38,14 @@ function Linegraph({
     <>
       <Text style={styles.amt}>
         {currencies[currency!].symbol}
-        {(
-          conversion['usd']?.[currency!.toLowerCase()] *
-          Number(transType === 'expense' ? totalSpend : totalIncome)
-        )
-          .toFixed(1)
-          .toString()}
+        {formatWithCommas(
+          Number(
+            (
+              conversion['usd']?.[currency!.toLowerCase()] *
+              Number(transType === 'expense' ? totalSpend : totalIncome)
+            ).toFixed(1),
+          ).toString(),
+        )}
       </Text>
       <View style={styles.graphView}>
         {data

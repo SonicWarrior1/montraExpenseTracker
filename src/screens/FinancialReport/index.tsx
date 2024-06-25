@@ -1,7 +1,8 @@
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {
   NativeScrollEvent,
   Pressable,
+  SafeAreaView,
   ScrollView,
   Text,
   useColorScheme,
@@ -23,13 +24,11 @@ import {STRINGS} from '../../constants/strings';
 import {useQuery} from '@realm/react';
 import {OnlineTransactionModel} from '../../DbModels/OnlineTransactionModel';
 import {OfflineTransactionModel} from '../../DbModels/OfflineTransactionModel';
+import CustomHeader from '../../components/CustomHeader';
+import {FinancialReportScreenProps} from '../../defs/navigation';
+import {getMyColor} from '../../utils/commonFuncs';
 
-function FinancialReport() {
-  // functions
-  const getMyColor = useCallback(() => {
-    let n = (Math.random() * 0xfffff * 1000000).toString(16);
-    return '#' + n.slice(0, 6);
-  }, []);
+function FinancialReport({navigation}: Readonly<FinancialReportScreenProps>) {
   // state
   const [month, setMonth] = useState(new Date().getMonth());
   const [graph, setGraph] = useState(0);
@@ -54,17 +53,11 @@ function FinancialReport() {
   ];
   //
   const totalSpend = useMemo(
-    () =>
-      Object.values(spends)
-        .reduce((a, b) => a + b, 0)
-        .toFixed(1),
+    () => Object.values(spends).reduce((a, b) => a + b, 0),
     [spends],
   );
   const totalIncome = useMemo(
-    () =>
-      Object.values(incomes)
-        .reduce((a, b) => a + b, 0)
-        .toFixed(1),
+    () => Object.values(incomes).reduce((a, b) => a + b, 0),
     [incomes],
   );
   useEffect(() => {
@@ -114,180 +107,189 @@ function FinancialReport() {
       style={[styles.safeView, {paddingBottom: 20}]}
       onScroll={({nativeEvent}) => {
         if (isCloseToBottom(nativeEvent)) {
-          if (incomeOffset + limit < Object.values(data).length)
-            {if (transType === 'expense') {
+          if (incomeOffset + limit < Object.values(data).length) {
+            if (transType === 'expense') {
               setExpenseOffset(offset => offset + 5);
             } else {
               setIncomeOffset(offset => offset + 5);
-            }}
+            }
+          }
         }
       }}
       scrollEventThrottle={400}>
-      <FinancialReportHeader
-        graph={graph}
-        month={month}
-        setGraph={setGraph}
-        setMonth={setMonth}
-        setType={setType}
-      />
-      {graph === 0 ? (
-        <Linegraph
-          conversion={conversion}
-          currency={currency}
-          data={data}
+      <SafeAreaView>
+        <CustomHeader
+          backgroundColor={COLOR.LIGHT[100]}
+          title="Financial Report"
+          navigation={navigation}
+          color={COLOR.DARK[100]}
+        />
+        <FinancialReportHeader
+          graph={graph}
           month={month}
-          transType={transType}
-          totalIncome={totalIncome}
-          totalSpend={totalSpend}
+          setGraph={setGraph}
+          setMonth={setMonth}
+          setType={setType}
         />
-      ) : (
-        <Piegraph
-          catColors={catColors}
-          conversion={conversion}
-          currency={currency}
-          incomes={incomes}
-          spends={spends}
-          totalIncome={totalIncome}
-          totalSpend={totalSpend}
-          transType={transType}
-        />
-      )}
-      <View style={styles.typeRow}>
-        <View
-          style={[
-            styles.innerTypeRow,
-            {
-              backgroundColor:
-                finalTheme === 'dark' ? COLORS.DARK[75] : COLOR.LIGHT[60],
-            },
-          ]}>
+        {graph === 0 ? (
+          <Linegraph
+            conversion={conversion}
+            currency={currency}
+            data={data}
+            month={month}
+            transType={transType}
+            totalIncome={totalIncome}
+            totalSpend={totalSpend}
+          />
+        ) : (
+          <Piegraph
+            catColors={catColors}
+            conversion={conversion}
+            currency={currency}
+            incomes={incomes}
+            spends={spends}
+            totalIncome={totalIncome}
+            totalSpend={totalSpend}
+            transType={transType}
+          />
+        )}
+        <View style={styles.typeRow}>
+          <View
+            style={[
+              styles.innerTypeRow,
+              {
+                backgroundColor:
+                  finalTheme === 'dark' ? COLORS.DARK[75] : COLOR.LIGHT[60],
+              },
+            ]}>
+            <Pressable
+              style={[
+                styles.typeBtn,
+                {
+                  backgroundColor: typeBtnColor('expense'),
+                },
+              ]}
+              onPress={() => {
+                setTransType('expense');
+              }}>
+              <Text
+                style={[
+                  styles.typeText,
+                  {
+                    color:
+                      transType === 'expense'
+                        ? COLORS.LIGHT[100]
+                        : COLOR.DARK[100],
+                  },
+                ]}>
+                {STRINGS.Expense}
+              </Text>
+            </Pressable>
+            <Pressable
+              style={[
+                styles.typeBtn,
+                {
+                  backgroundColor: typeBtnColor('income'),
+                },
+              ]}
+              onPress={() => {
+                setTransType('income');
+              }}>
+              <Text
+                style={[
+                  styles.typeText,
+                  {
+                    color:
+                      transType === 'income'
+                        ? COLORS.LIGHT[100]
+                        : COLOR.DARK[100],
+                  },
+                ]}>
+                {STRINGS.Income}
+              </Text>
+            </Pressable>
+          </View>
+        </View>
+        <View style={styles.flexRow}>
+          <Dropdown
+            style={[styles.dropdown, {width: 160}]}
+            renderLeftIcon={() => (
+              <View style={{marginRight: 10}}>
+                {ICONS.ArrowDown({
+                  width: 15,
+                  height: 15,
+                  borderColor: COLOR.VIOLET[100],
+                })}
+              </View>
+            )}
+            renderRightIcon={() => <></>}
+            value={type}
+            data={['transaction', 'category'].map(item => {
+              return {
+                label: item[0].toUpperCase() + item.slice(1),
+                value: item,
+              };
+            })}
+            labelField={'label'}
+            valueField={'value'}
+            onChange={({value}) => {
+              setType(value as 'transaction' | 'category');
+              setGraph(
+                (value as 'transaction' | 'category') === 'transaction' ? 0 : 1,
+              );
+            }}
+            itemTextStyle={{color: COLOR.DARK[100]}}
+            containerStyle={{backgroundColor: COLOR.LIGHT[100]}}
+            activeColor={COLOR.LIGHT[100]}
+            selectedTextStyle={{color: COLOR.DARK[100]}}
+          />
           <Pressable
             style={[
-              styles.typeBtn,
+              styles.filterBtn,
               {
-                backgroundColor: typeBtnColor('expense'),
+                transform: [
+                  {rotateZ: sort ? '-180deg' : '0deg'},
+                  {rotateY: sort ? '180deg' : '0deg'},
+                ],
               },
             ]}
             onPress={() => {
-              setTransType('expense');
+              setSort(sort => !sort);
             }}>
-            <Text
-              style={[
-                styles.typeText,
-                {
-                  color:
-                    transType === 'expense'
-                      ? COLORS.LIGHT[100]
-                      : COLOR.DARK[100],
-                },
-              ]}>
-              {STRINGS.Expense}
-            </Text>
-          </Pressable>
-          <Pressable
-            style={[
-              styles.typeBtn,
-              {
-                backgroundColor: typeBtnColor('income'),
-              },
-            ]}
-            onPress={() => {
-              setTransType('income');
-            }}>
-            <Text
-              style={[
-                styles.typeText,
-                {
-                  color:
-                    transType === 'income'
-                      ? COLORS.LIGHT[100]
-                      : COLOR.DARK[100],
-                },
-              ]}>
-              {STRINGS.Income}
-            </Text>
+            {ICONS.SortwithArrow({
+              height: 25,
+              width: 25,
+              color: COLOR.DARK[100],
+            })}
           </Pressable>
         </View>
-      </View>
-      <View style={styles.flexRow}>
-        <Dropdown
-          style={[styles.dropdown, {width: 160}]}
-          renderLeftIcon={() => (
-            <View style={{marginRight: 10}}>
-              {ICONS.ArrowDown({
-                width: 15,
-                height: 15,
-                borderColor: COLOR.VIOLET[100],
-              })}
-            </View>
-          )}
-          renderRightIcon={() => <></>}
-          value={type}
-          data={['transaction', 'category'].map(item => {
-            return {
-              label: item[0].toUpperCase() + item.slice(1),
-              value: item,
-            };
-          })}
-          labelField={'label'}
-          valueField={'value'}
-          onChange={({value}) => {
-            setType(value as 'transaction' | 'category');
-            setGraph(
-              (value as 'transaction' | 'category') === 'transaction' ? 0 : 1,
-            );
-          }}
-          itemTextStyle={{color: COLOR.DARK[100]}}
-          containerStyle={{backgroundColor: COLOR.LIGHT[100]}}
-          activeColor={COLOR.LIGHT[100]}
-          selectedTextStyle={{color: COLOR.DARK[100]}}
-        />
-        <Pressable
-          style={[
-            styles.filterBtn,
-            {
-              transform: [
-                {rotateZ: sort ? '-180deg' : '0deg'},
-                {rotateY: sort ? '180deg' : '0deg'},
-              ],
-            },
-          ]}
-          onPress={() => {
-            setSort(sort => !sort);
-          }}>
-          {ICONS.SortwithArrow({
-            height: 25,
-            width: 25,
-            color: COLOR.DARK[100],
-          })}
-        </Pressable>
-      </View>
-      <Spacer height={10} />
-      {type === 'transaction' ? (
-        <TransactionList
-          conversion={conversion}
-          currency={currency}
-          data={data}
-          month={month}
-          transType={transType}
-          sort={sort}
-          limit={limit}
-          incomeOffset={incomeOffset}
-          expenseOffset={expenseOffest}
-        />
-      ) : (
-        <CategoryList
-          catColors={catColors}
-          conversion={conversion}
-          currency={currency}
-          incomes={incomes}
-          spends={spends}
-          totalIncome={totalIncome}
-          totalSpend={totalSpend}
-          transType={transType}
-          sort={sort}
-        />
-      )}
+        <Spacer height={10} />
+        {type === 'transaction' ? (
+          <TransactionList
+            conversion={conversion}
+            currency={currency}
+            data={data}
+            month={month}
+            transType={transType}
+            sort={sort}
+            limit={limit}
+            incomeOffset={incomeOffset}
+            expenseOffset={expenseOffest}
+          />
+        ) : (
+          <CategoryList
+            catColors={catColors}
+            conversion={conversion}
+            currency={currency}
+            incomes={incomes}
+            spends={spends}
+            totalIncome={totalIncome}
+            totalSpend={totalSpend}
+            transType={transType}
+            sort={sort}
+          />
+        )}
+      </SafeAreaView>
     </ScrollView>
   );
 }

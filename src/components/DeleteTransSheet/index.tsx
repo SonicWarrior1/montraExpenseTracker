@@ -63,7 +63,7 @@ function DeleteTransactionSheet({
   // console.log('djsfskdfnl', online, offline);
   const trans = offline ?? online;
   // functions
-  const handleDelete = useCallback(async () => {
+  const handleDelete = async () => {
     try {
       dispatch(setLoading(true));
       if (!isConnected) {
@@ -125,13 +125,14 @@ function DeleteTransactionSheet({
       Toast.show({
         text1: STRINGS.TransactionDeletedSuccesfully,
         type: 'custom',
+        swipeable: false,
       });
       dispatch(setLoading(false));
     } catch (e) {
       console.log(e);
       dispatch(setLoading(false));
     }
-  }, [uid, id, isConnected]);
+  };
   return (
     <BottomSheetModalProvider>
       <BottomSheetModal

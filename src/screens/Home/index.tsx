@@ -25,6 +25,7 @@ import {useQuery} from '@realm/react';
 import {OnlineTransactionModel} from '../../DbModels/OnlineTransactionModel';
 import {OfflineTransactionModel} from '../../DbModels/OfflineTransactionModel';
 import {formatAMPM} from '../../utils/firebase';
+import {formatWithCommas} from '../../utils/commonFuncs';
 
 function Home({navigation, route}: Readonly<HomeScreenProps>) {
   // state
@@ -45,14 +46,22 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
     ...onlineData.filter(item => item.changed !== true),
     ...offlineData.filter(item => item.operation !== 'delete'),
   ];
+  const listData = data
+    .slice()
+    .filter(item => {
+      return (
+        Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+          .toDate()
+          ?.getMonth() === new Date().getMonth()
+      );
+    })
+    .sort((a, b) => b.timeStamp.seconds - a.timeStamp.seconds);
+
   const theme = useAppSelector(state => state.user.currentUser?.theme);
+
   // constants
-  const totalSpend = Object.values(spends ?? [])
-    .reduce((a, b) => a + b, 0)
-    .toFixed(1);
-  const totalIncome = Object.values(incomes ?? [])
-    .reduce((a, b) => a + b, 0)
-    .toFixed(1);
+  const totalSpend = Object.values(spends ?? []).reduce((a, b) => a + b, 0);
+  const totalIncome = Object.values(incomes ?? []).reduce((a, b) => a + b, 0);
   const COLOR = useAppTheme();
   const styles = style(COLOR);
   const scheme = useColorScheme();
@@ -87,6 +96,8 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
           backgroundColor:
             finalTheme === 'light' ? COLORS.LIGHT[100] : COLORS.DARK[75],
         }}
+        bounces={false}
+        showsVerticalScrollIndicator={false}
         contentContainerStyle={[
           {
             backgroundColor:
@@ -101,7 +112,11 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
           }
           style={styles.gradient}>
           <SafeAreaView style={styles.safeView}>
-            <HomeHeader props={{navigation, route}} setMonth={setMonth} />
+            <HomeHeader
+              props={{navigation, route}}
+              setMonth={setMonth}
+              month={month}
+            />
             <Text style={styles.actText}>Account Balance</Text>
             <Text style={styles.amt}>
               {currencies[currency ?? 'USD'].symbol}
@@ -140,12 +155,14 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
                       ),
                     )
                       ? 0
-                      : (
-                          conversion.usd?.[currency.toLowerCase()] *
-                          Number(totalIncome)
-                        )
-                          .toFixed(1)
-                          .toString()}
+                      : formatWithCommas(
+                          Number(
+                            (
+                              conversion.usd?.[currency.toLowerCase()] *
+                              Number(totalIncome)
+                            ).toFixed(1),
+                          ).toString(),
+                        )}
                   </Text>
                 </View>
               </View>
@@ -171,12 +188,14 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
                       ),
                     )
                       ? 0
-                      : (
-                          conversion.usd?.[currency.toLowerCase()] *
-                          Number(totalSpend)
-                        )
-                          .toFixed(1)
-                          .toString()}
+                      : formatWithCommas(
+                          Number(
+                            (
+                              conversion.usd?.[currency.toLowerCase()] *
+                              Number(totalSpend)
+                            ).toFixed(1),
+                          ).toString(),
+                        )}
                   </Text>
                 </View>
               </View>
@@ -211,16 +230,7 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
           <FlatList
             style={{paddingHorizontal: 20}}
             ListEmptyComponent={ListEmptyComponent}
-            data={Object.values(data)
-              .filter(item => {
-                return (
-                  Timestamp.fromMillis(item.timeStamp.seconds * 1000)
-                    .toDate()
-                    ?.getMonth() === new Date().getMonth()
-                );
-              })
-              .sort((a, b) => b.timeStamp.seconds - a.timeStamp.seconds)
-              .slice(0, 3)}
+            data={listData}
             scrollEnabled={false}
             renderItem={({item}) => {
               return (
@@ -257,7 +267,7 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
                         }) ?? ICONS.Money({height: 30, width: 30})}
                   </View>
                   <View style={styles.catCtr}>
-                    <Text style={styles.listtext1}>
+                    <Text style={styles.listtext1} numberOfLines={1}>
                       {item.type === 'transfer'
                         ? item.from + ' - ' + item.to
                         : item.category[0].toLocaleUpperCase() +
@@ -277,10 +287,14 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
                         },
                       ]}>
                       {getAmtSymbol(item)} {currencies[currency].symbol}
-                      {(
-                        (conversion?.usd?.[currency.toLowerCase()] ?? 1) *
-                        item.amount
-                      ).toFixed(1)}
+                      {formatWithCommas(
+                        Number(
+                          (
+                            (conversion?.usd?.[currency.toLowerCase()] ?? 1) *
+                            item.amount
+                          ).toFixed(1),
+                        ).toString(),
+                      )}
                     </Text>
                     <Text style={styles.listtext2}>
                       {formatAMPM(

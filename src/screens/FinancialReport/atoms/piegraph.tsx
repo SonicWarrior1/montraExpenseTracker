@@ -4,6 +4,7 @@ import {PieChart} from 'react-native-gifted-charts';
 import style from '../styles';
 import {currencies, STRINGS} from '../../../constants/strings';
 import {useAppTheme} from '../../../hooks/themeHook';
+import {formatWithCommas} from '../../../utils/commonFuncs';
 
 function Piegraph({
   transType,
@@ -37,8 +38,8 @@ function Piegraph({
       [key: string]: number;
     };
   };
-  totalSpend: string;
-  totalIncome: string;
+  totalSpend: number;
+  totalIncome: number;
 }>) {
   const COLOR = useAppTheme();
   const styles = style(COLOR);
@@ -46,12 +47,14 @@ function Piegraph({
     return (
       <Text style={styles.pieCenterText}>
         {currencies[currency!].symbol}
-        {(
-          conversion.usd?.[currency!.toLowerCase()] *
-          Number(transType === 'expense' ? totalSpend : totalIncome)
-        )
-          .toFixed(1)
-          .toString()}
+        {formatWithCommas(
+          Number(
+            (
+              conversion.usd?.[currency!.toLowerCase()] *
+              Number(transType === 'expense' ? totalSpend : totalIncome)
+            ).toFixed(1),
+          ).toString(),
+        )}
       </Text>
     );
   }

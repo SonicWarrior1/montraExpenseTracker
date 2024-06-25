@@ -136,6 +136,7 @@ function AddCategorySheet({
           placeholderTextColor={COLORS.DARK[25]}
           autoCapitalize={'words'}
           autoCorrect={false}
+          maxLength={20}
         />
         <Spacer height={20} />
         <CustomButton title={STRINGS.Add} onPress={onPress} />

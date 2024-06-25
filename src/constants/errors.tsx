@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
 import {StyleSheet, Text} from 'react-native';
-import {emailRegex, nameRegex, passRegex, STRINGS} from './strings';
+import {emailRegex, nameRegex, STRINGS} from './strings';
 import Spacer from '../components/Spacer';
 import Animated, {useSharedValue, withTiming} from 'react-native-reanimated';
 
@@ -37,12 +37,8 @@ export function PassValidationError({
         {STRINGS.PasswordNotValid}
       </Text>
     );
-  } else if (pass === '' && formKey) {
-    return (
-      <Text style={[style.error]}>
-        {STRINGS.PasswordCannotBeEmpty}
-      </Text>
-    );
+  } else if (pass.trim() === '' && formKey) {
+    return <Text style={[style.error]}>{STRINGS.PasswordCannotBeEmpty}</Text>;
   } else {
     return <Spacer height={25} />;
   }
@@ -57,7 +53,7 @@ export function PassEmptyError({
 }>) {
   return (
     <>
-      {pass === '' && formKey ? (
+      {pass.trim() === '' && formKey ? (
         <Text style={style.error}>{STRINGS.PasswordCannotBeEmpty}</Text>
       ) : (
         <Spacer height={25} />
@@ -179,17 +175,23 @@ export function EmptyZeroError({
   color?: string;
   size?: number;
 }>) {
-  const height = useSharedValue(24);
+  const height = useSharedValue(0);
   useEffect(() => {
-    if ((value === '' || Number(value) <= 0) && formKey) {
+    if (
+      (value === '' || Number(value) <= 0 || value.trim() === '.') &&
+      formKey
+    ) {
+      // console.log(1);
       height.value = withTiming(24);
     } else {
+      // console.log(0);
       height.value = withTiming(0);
     }
   }, [value, formKey]);
   return (
     <>
-      {(value === '' || Number(value) <= 0) && formKey ? (
+      {(value === '' || Number(value) <= 0 || value.trim() === '.') &&
+      formKey ? (
         <Animated.Text
           style={[
             style.error,
@@ -204,7 +206,7 @@ export function EmptyZeroError({
           {errorText}
         </Animated.Text>
       ) : (
-        <Animated.View style={{height}}></Animated.View>
+        <Animated.View style={{height: height}}></Animated.View>
       )}
     </>
   );

@@ -11,5 +11,21 @@ const styles = (COLOR: typeof COLORS) =>
       borderColor: '#F1F1FA',
       width: '100%',
     },
+    itemCtr: {
+      paddingVertical: 15,
+      paddingHorizontal: 20,
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    icon: {
+      height: 15,
+      width: 15,
+      borderRadius: 20,
+      marginRight: 8,
+    },
+    text: {
+      fontSize: 16,
+      color: COLOR.DARK[100],
+    },
   });
 export default styles;

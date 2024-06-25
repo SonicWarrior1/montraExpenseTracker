@@ -23,7 +23,7 @@ function TransactionHeader({
   const styles = style(COLOR);
   // redux
   const filters = useAppSelector(state => state.transaction.filters);
-  console.log(filters.sort !== 'none' ? 1 : 0);
+  // console.log(filters.sort !== 'none' ? 1 : 0);
   return (
     <View style={styles.header}>
       <Dropdown
@@ -37,6 +37,7 @@ function TransactionHeader({
             })}
           </View>
         )}
+        autoScroll={false}
         renderRightIcon={() => <></>}
         placeholder={STRINGS.Month}
         value={monthData[month]}

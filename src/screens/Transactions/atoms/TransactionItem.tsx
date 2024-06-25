@@ -14,6 +14,7 @@ import React from 'react';
 import {OnlineTransactionModel} from '../../../DbModels/OnlineTransactionModel';
 import {OfflineTransactionModel} from '../../../DbModels/OfflineTransactionModel';
 import {formatAMPM} from '../../../utils/firebase';
+import {formatWithCommas} from '../../../utils/commonFuncs';
 
 const TransactionItem = ({
   item,
@@ -93,7 +94,7 @@ const TransactionItem = ({
             }) ?? ICONS.Money({height: 30, width: 30})}
       </View>
       <View style={styles.catCtr}>
-        <Text style={styles.text1}>
+        <Text style={styles.text1} numberOfLines={1}>
           {item.type === 'transfer'
             ? item.from + ' - ' + item.to
             : item.category[0].toLocaleUpperCase() + item.category.slice(1)}
@@ -112,10 +113,14 @@ const TransactionItem = ({
             },
           ]}>
           {getAmtSymbol(item)} {currencies[user?.currency ?? 'USD'].symbol}
-          {(
-            conversion.usd[(user?.currency ?? 'USD').toLowerCase()] *
-            item.amount
-          ).toFixed(1)}
+          {formatWithCommas(
+            Number(
+              (
+                conversion.usd[(user?.currency ?? 'USD').toLowerCase()] *
+                item.amount
+              ).toFixed(1),
+            ).toString(),
+          )}
         </Text>
         <Text style={styles.text2}>
           {dateShow &&
@@ -141,4 +146,4 @@ const TransactionItem = ({
   );
 };
 
-export default React.memo(TransactionItem);
+export default TransactionItem;

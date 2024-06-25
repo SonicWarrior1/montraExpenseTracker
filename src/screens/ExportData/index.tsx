@@ -17,9 +17,11 @@ import {setLoading} from '../../redux/reducers/userSlice';
 import {useQuery} from '@realm/react';
 import {OnlineTransactionModel} from '../../DbModels/OnlineTransactionModel';
 import {OfflineTransactionModel} from '../../DbModels/OfflineTransactionModel';
-function ExportData() {
+import CustomHeader from '../../components/CustomHeader';
+import {ExportScreenProps} from '../../defs/navigation';
+
+function ExportData({navigation}: ExportScreenProps) {
   // redux
-  // const data = useAppSelector(state => state.transaction.transactions);
   const onlineData = useQuery(OnlineTransactionModel);
   const offlineData = useQuery(OfflineTransactionModel);
   const data = [
@@ -107,6 +109,13 @@ function ExportData() {
   const styles = style(COLOR);
   return (
     <SafeAreaView style={styles.safeView}>
+      <CustomHeader
+        backgroundColor={COLOR.LIGHT[100]}
+        navigation={navigation}
+        title="Theme"
+        color={COLOR.DARK[100]}
+        bottomBorder={true}
+      />
       <View style={styles.mainView}>
         <View>
           <Text style={styles.text}>{STRINGS.WhatExport}</Text>
@@ -158,7 +167,11 @@ function ExportData() {
         <CustomButton
           title={STRINGS.Export}
           onPress={handleExport}
-          icon={ICONS.Download({height: 24, width: 24})}
+          icon={ICONS.Download({
+            height: 18,
+            width: 18,
+            color: 'transparent',
+          })}
         />
       </View>
     </SafeAreaView>

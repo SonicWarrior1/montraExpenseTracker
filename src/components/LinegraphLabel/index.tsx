@@ -30,7 +30,7 @@ const LinegraphLabel = ({items}: {items: {date: string; value: number}[]}) => {
           borderRadius: 16,
           backgroundColor: COLORS.VIOLET[20],
         }}>
-        <Text style={{fontWeight: 'bold', textAlign: 'center'}}>
+        <Text style={{fontWeight: 'bold', textAlign: 'center'}} numberOfLines={1}>
           {currencies[currency!].symbol}{' '}
           {(
             conversion['usd']?.[currency!.toLowerCase()] *

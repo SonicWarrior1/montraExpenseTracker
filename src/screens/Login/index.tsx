@@ -16,7 +16,11 @@ import {NAVIGATION, STRINGS} from '../../constants/strings';
 import Spacer from '../../components/Spacer';
 import {ICONS} from '../../constants/icons';
 import {LoginScreenProps} from '../../defs/navigation';
-import {setLoading, userLoggedIn} from '../../redux/reducers/userSlice';
+import {
+  setLoading,
+  setTheme,
+  userLoggedIn,
+} from '../../redux/reducers/userSlice';
 import {useAppDispatch} from '../../redux/store';
 import {UserFromJson, UserToJson} from '../../utils/userFuncs';
 import {useAppTheme} from '../../hooks/themeHook';
@@ -26,7 +30,8 @@ import auth, {FirebaseAuthTypes} from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import Toast from 'react-native-toast-message';
-import {ErrorHandler} from '../../utils/firebase';
+import {FirebaseAuthErrorHandler} from '../../utils/firebase';
+import CustomHeader from '../../components/CustomHeader';
 
 function Login({navigation}: Readonly<LoginScreenProps>) {
   // constants
@@ -50,7 +55,7 @@ function Login({navigation}: Readonly<LoginScreenProps>) {
   }
   async function handleLogin() {
     setForm({email: true, pass: true});
-    if (email !== '' && pass !== '') {
+    if (email !== '' && pass.trim() !== '') {
       try {
         dispatch(setLoading(true));
         const creds = await auth().signInWithEmailAndPassword(email, pass);
@@ -58,14 +63,8 @@ function Login({navigation}: Readonly<LoginScreenProps>) {
           if (creds.user.emailVerified) {
             const data = await userCollection.doc(creds.user.uid).get();
             const user = UserFromJson(data.data()!);
-            // if (user.pin === '') {
-            //   navigation.navigate(NAVIGATION.PIN, {
-            //     pin: user.pin === '' ? undefined : user.pin,
-            //     uid: creds.user.uid,
-            //   });
-            // } else {
             dispatch(userLoggedIn(user));
-            // }
+            dispatch(setTheme(undefined));
           } else {
             Alert.alert(
               'Please verify your email',
@@ -100,7 +99,10 @@ function Login({navigation}: Readonly<LoginScreenProps>) {
       } catch (e: any) {
         const error: FirebaseAuthTypes.NativeFirebaseAuthError = e;
         console.log(e);
-        Toast.show({text1: ErrorHandler(error.code), type: 'error'});
+        Toast.show({
+          text1: FirebaseAuthErrorHandler(error.code),
+          type: 'error',
+        });
       }
       dispatch(setLoading(false));
     }
@@ -133,17 +135,19 @@ function Login({navigation}: Readonly<LoginScreenProps>) {
           });
           await userCollection.doc(creds.user.uid).set(user);
           dispatch(userLoggedIn(user));
+          dispatch(setTheme(undefined));
         } else {
           const data = await userCollection.doc(creds.user.uid).get();
           const user = UserFromJson(data.data()!);
           if (user) {
             dispatch(userLoggedIn(user));
+            dispatch(setTheme(undefined));
           }
         }
       }
     } catch (e: any) {
       const error: FirebaseAuthTypes.NativeFirebaseAuthError = e;
-      Toast.show({text1: ErrorHandler(error.code), type: 'error'});
+      Toast.show({text1: FirebaseAuthErrorHandler(error.code), type: 'error'});
       console.log(e);
     } finally {
       dispatch(setLoading(false));
@@ -152,6 +156,12 @@ function Login({navigation}: Readonly<LoginScreenProps>) {
   return (
     <SafeAreaView style={styles.safeView}>
       <KeyboardAwareScrollView enableOnAndroid={true}>
+        <CustomHeader
+          backgroundColor={COLOR.LIGHT[100]}
+          title="Login"
+          color={COLOR.DARK[100]}
+          navigation={navigation}
+        />
         <View style={styles.mainView}>
           <CustomInput
             placeholderText={STRINGS.Email}
@@ -201,6 +211,12 @@ function Login({navigation}: Readonly<LoginScreenProps>) {
             <Text style={styles.dontHaveAcc}>{STRINGS.DontHaveAccount} </Text>
             <Pressable
               onPress={() => {
+                setEmail('');
+                setPass('');
+                setForm({
+                  email: false,
+                  pass: false,
+                });
                 navigation.navigate(NAVIGATION.SIGNUP);
               }}>
               <Text style={styles.signupText}>{STRINGS.SIGNUP}</Text>

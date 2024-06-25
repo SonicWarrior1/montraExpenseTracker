@@ -40,7 +40,7 @@ function AttachementContainer({
   const COLOR = useAppTheme();
   const styles = style(COLOR);
   const {isConnected} = useNetInfo();
-  console.log(isConnected)
+  // console.log(isConnected)
   if (image === '' && doc === undefined) {
     return (
       <Pressable

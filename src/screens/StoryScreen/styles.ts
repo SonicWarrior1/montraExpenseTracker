@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native';
+import { Dimensions, StyleSheet } from 'react-native';
 import { COLORS } from '../../constants/commonStyles';
 import { RFValue } from 'react-native-responsive-fontsize';
 
@@ -19,7 +19,7 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
         padding: 8,
         borderRadius: 10,
     },
-    catText: { fontSize: RFValue(16), fontWeight: '600', color: COLOR.DARK[100] },
+    catText: { fontSize: RFValue(16), fontWeight: '600', color: COLOR.DARK[100], maxWidth: Dimensions.get('screen').width / 2 },
     safeView: {
         flex: 1,
         paddingBottom: 30,

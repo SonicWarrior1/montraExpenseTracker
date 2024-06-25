@@ -14,6 +14,7 @@ import { BudgetModel } from '../DbModels/BudgetModel';
 import { encrypt } from '../utils/encryption';
 import { UpdateMode } from 'realm';
 import { CategoryModel } from '../DbModels/CategoryModel';
+import { handleNotify } from '../utils/firebase';
 export function useInitialSetup() {
     const realm = useRealm();
     const { isConnected } = useNetInfo();
@@ -34,7 +35,7 @@ export function useInitialSetup() {
             .doc(user!.uid)
             .onSnapshot(snapshot => {
                 const user = UserFromJson(snapshot.data() as UserType);
-                console.log(user);
+                // console.log(user);
                 dispatch(userLoggedIn(user));
             });
         return () => unsubscribe();
@@ -46,30 +47,33 @@ export function useInitialSetup() {
         if (user) {
             const unsubscribe = firestore()
                 .collection('users')
-                .doc(user!.uid)
+                .doc(user.uid)
                 .collection('transactions')
                 .orderBy('timeStamp', 'desc')
                 .onSnapshot(async (snapshot) => {
                     const data: transactionType[] = snapshot.docs.map(
-                        doc => (TransFromJson(doc.data(), user!.uid)),
+                        doc => (TransFromJson(doc.data(), user.uid)),
                     );
-                    console.log('DATATATATA', data);
+                    // console.log('DATATATATA', data);
                     let expense: { [key: string]: { [key: string]: number } } = {};
                     let income: { [key: string]: { [key: string]: number } } = {};
                     for (const item of data) {
-                        console.log('sdhbfsjdbfsjdfnksjdfnkdjsbkf', item);
+                        // console.log('sdhbfsjdbfsjdfnksjdfnkdjsbkf', item);
                         if (item.deleted) {
-                            firestore().collection('users').doc(user!.uid).collection('transactions').doc(item.id).delete();
+                            firestore().collection('users').doc(user.uid).collection('transactions').doc(item.id).delete();
                             setTimeout(() => realm.write(() => {
                                 const transaction = realm.objectForPrimaryKey('OnlineTransaction', item.id);
-                                console.log('transaction', transaction);
+                                // console.log('transaction', transaction);
                                 if (transaction !== undefined || transaction !== null) {
                                     realm.delete(transaction);
                                 }
-                            }), 500);
+                            }), 800);
                             break;
                         }
                         const month = Timestamp.fromMillis(item.timeStamp.seconds * 1000).toDate().getMonth();
+                        // console.log('====================================');
+                        // console.log(item.amount, item.id);
+                        // console.log('====================================');
                         if (item.type === 'income') {
                             if (income?.[month] !== undefined) {
                                 income[month][item.category] = (income?.[month]?.[item.category] ?? 0) + item.amount;
@@ -103,10 +107,9 @@ export function useInitialSetup() {
                             expense[month][category] = encrypt(String(expense[month][category]), user.uid);
                         }
                     }
-                    // console.log(income, expense)
                     await firestore()
                         .collection('users')
-                        .doc(user!.uid).update({
+                        .doc(user.uid).update({
                             income: income,
                             spend: expense,
                         });

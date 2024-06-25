@@ -1,22 +1,22 @@
-import { Platform, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { COLORS } from '../../constants/commonStyles';
 import { RFValue } from 'react-native-responsive-fontsize';
 
 const styles = (COLOR: typeof COLORS) => StyleSheet.create({
     safeView: {
         flex: 1,
-        paddingHorizontal: 30,
         backgroundColor: COLOR.LIGHT[100],
         paddingBottom: 20,
     },
     mainView: {
+        paddingHorizontal: 30,
         flex: 1,
         backgroundColor: COLOR.LIGHT[100],
         alignItems: 'center',
         justifyContent: 'flex-start',
     },
     catCtr: {
-        marginTop: Platform.OS === 'ios' ? 0 : 40,
+        marginTop: 40,
         flexDirection: 'row',
         alignItems: 'center',
         borderWidth: 1,
@@ -35,7 +35,7 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
     },
     catText: { fontSize: RFValue(18), fontWeight: '600', color: COLOR.DARK[100] },
     remainText: {
-        fontSize: RFValue(24), fontWeight: '600',  color: COLOR.DARK[100]
+        fontSize: RFValue(24), fontWeight: '600', color: COLOR.DARK[100]
     },
     amtText: { fontSize: RFValue(64), fontWeight: '600', marginBottom: 15, color: COLOR.DARK[100], maxWidth: "90%" },
     limitCtr: {

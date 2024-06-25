@@ -38,30 +38,24 @@ function CustomDropdown({
       value={{label: value, value: value}}
       renderItem={item => {
         return (
-          <View
-            style={{
-              paddingVertical: 15,
-              paddingHorizontal: 20,
-              flexDirection: 'row',
-              alignItems: 'center',
-            }}>
+          <View style={styles.itemCtr}>
             {leftIcon && item.value !== 'add' && (
               <View
-                style={{
-                  height: 15,
-                  width: 15,
-                  backgroundColor: catColors?.[item.value ?? ''] ?? 'green',
-                  borderRadius: 20,
-                  marginRight: 8,
-                }}
+                style={[
+                  styles.icon,
+                  {
+                    backgroundColor: catColors?.[item.value ?? ''] ?? 'green',
+                  },
+                ]}
               />
             )}
             <Text
-              style={{
-                fontSize: 16,
-                fontWeight: item.value === 'add' ? '700' : undefined,
-                color: COLOR.DARK[100],
-              }}>
+              style={[
+                styles.text,
+                {
+                  fontWeight: item.value === 'add' ? '700' : undefined,
+                },
+              ]}>
               {item.label}
             </Text>
           </View>
@@ -89,4 +83,4 @@ function CustomDropdown({
   );
 }
 
-export default CustomDropdown;
+export default React.memo(CustomDropdown);

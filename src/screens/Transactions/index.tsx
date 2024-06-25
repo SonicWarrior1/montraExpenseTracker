@@ -29,13 +29,13 @@ function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
   // redux
   const onlineData = useQuery(OnlineTransactionModel);
   const offlineData = useQuery(OfflineTransactionModel);
-  console.log('dsjfndsijfn', onlineData, offlineData);
+  // console.log('dsjfndsijfn', onlineData, offlineData);
   const transaction = [
     ...onlineData.filter(item => item.changed !== true),
     ...offlineData.filter(item => item.operation !== 'delete'),
   ];
 
-  console.log('ONLINE', onlineData, 'OFFLINE', offlineData);
+  // console.log('ONLINE', onlineData, 'OFFLINE', offlineData);
   const [offset, setOffset] = useState<number>(0);
   const limit = 10;
   const filters = useAppSelector(state => state.transaction.filters);
@@ -144,7 +144,6 @@ function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
       },
       [],
     );
-    // x.reverse();
     return [...result, ...x];
   }
   function applyFilters(offset: number) {
@@ -184,7 +183,9 @@ function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
                 (filters.cat.length === 0
                   ? true
                   : filters.cat.includes(item.category)) &&
-                (item.type === 'none' ? true : item.type === filters.filter),
+                (filters.filter === 'none'
+                  ? true
+                  : item.type === filters.filter),
             )
             .sort((a, b) => a.amount - b.amount),
         },
@@ -200,7 +201,9 @@ function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
                 (filters.cat.length === 0
                   ? true
                   : filters.cat.includes(item.category)) &&
-                (item.type === 'none' ? true : item.type === filters.filter),
+                (filters.filter === 'none'
+                  ? true
+                  : item.type === filters.filter),
             )
             .sort((a, b) => b.amount - a.amount),
         },

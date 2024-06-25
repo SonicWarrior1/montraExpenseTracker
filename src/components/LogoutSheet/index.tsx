@@ -9,7 +9,7 @@ import CustomButton from '../CustomButton';
 import {useAppDispatch, useAppSelector} from '../../redux/store';
 import style from './styles';
 import {COLORS} from '../../constants/commonStyles';
-import {userLoggedIn} from '../../redux/reducers/userSlice';
+import {setTheme, userLoggedIn} from '../../redux/reducers/userSlice';
 import SheetBackdrop from '../SheetBackDrop';
 import {STRINGS} from '../../constants/strings';
 import {useAppTheme} from '../../hooks/themeHook';
@@ -18,11 +18,13 @@ import {BottomSheetModalMethods} from '@gorhom/bottom-sheet/lib/typescript/types
 import auth from '@react-native-firebase/auth';
 import {openLogoutSheet} from '../../redux/reducers/transactionSlice';
 import {useRealm} from '@realm/react';
+import {GoogleSignin} from '@react-native-google-signin/google-signin';
 function LogoutSheet() {
   // constants
   const COLOR = useAppTheme();
   const styles = style(COLOR);
   const dispatch = useAppDispatch();
+  const authTheme = useAppSelector(state => state.user.currentUser?.theme);
   const snapPoints = useMemo(() => ['25%'], []);
   const ref = useRef<BottomSheetModalMethods>(null);
   const realm = useRealm();
@@ -31,16 +33,22 @@ function LogoutSheet() {
   // functions
   const onLogout = useCallback(async () => {
     try {
-      await auth().signOut();
+      if (await GoogleSignin.isSignedIn()) {
+        await GoogleSignin.signOut();
+      } else {
+        await auth().signOut();
+      }
+      // console.log('auththeme', authTheme);
+      dispatch(setTheme(authTheme));
       dispatch(userLoggedIn(undefined));
       dispatch(openLogoutSheet(false));
-      realm.write(() => {
-        realm.deleteAll();
-      });
+      // realm.write(() => {
+      //   realm.deleteAll();
+      // });
     } catch (e) {
       console.log(e);
     }
-  }, []);
+  }, [authTheme]);
   useEffect(() => {
     if (isOpen === true) {
       ref.current?.present();

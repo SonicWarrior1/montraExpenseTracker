@@ -37,7 +37,7 @@ function ProfileScreen({navigation}: Readonly<ProfileScreenProps>) {
                   />
                 </View>
                 <View>
-                  <Text style={styles.text1}>{STRINGS.Username}</Text>
+                  <Text style={styles.text1} numberOfLines={1}>{STRINGS.Username}</Text>
                   <Text style={styles.text2}>{username}</Text>
                 </View>
               </View>

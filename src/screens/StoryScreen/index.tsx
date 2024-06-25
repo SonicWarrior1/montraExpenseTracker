@@ -15,6 +15,7 @@ import {StoryScreenProps} from '../../defs/navigation';
 import {useAppSelector} from '../../redux/store';
 import {currencies, NAVIGATION, STRINGS} from '../../constants/strings';
 import {useAppTheme} from '../../hooks/themeHook';
+import {formatWithCommas} from '../../utils/commonFuncs';
 
 export default function StoryScreen({navigation}: Readonly<StoryScreenProps>) {
   // redux
@@ -28,16 +29,18 @@ export default function StoryScreen({navigation}: Readonly<StoryScreenProps>) {
   const styles = style(COLOR);
   const biggestSpend: [string, number][] =
     user?.spend[new Date().getMonth()] !== undefined
-      ? Object.entries(user?.spend[new Date().getMonth()]).sort(
-          (a, b) => b[1] - a[1],
-        )
+      ? Object.entries(user?.spend[new Date().getMonth()])
+          .sort((a, b) => b[1] - a[1])
+          .filter(([, value], index, array) => value === array[0][1])
       : [['', 0]];
+  console.log(biggestSpend);
   const biggestIncome: [string, number][] =
     user?.income[new Date().getMonth()] !== undefined
-      ? Object.entries(user?.income[new Date().getMonth()]).sort(
-          (a, b) => b[1] - a[1],
-        )
+      ? Object.entries(user?.income[new Date().getMonth()])
+          .sort((a, b) => b[1] - a[1])
+          .filter(([, value], index, array) => value === array[0][1])
       : [['', 0]];
+  console.log(biggestIncome);
   const budgetExceed =
     user?.budget[new Date().getMonth()] !== undefined &&
     user?.spend[new Date().getMonth()] !== undefined
@@ -180,22 +183,26 @@ export default function StoryScreen({navigation}: Readonly<StoryScreenProps>) {
             <Text style={[styles.amt, {marginTop: 15}]} numberOfLines={1}>
               {currencies[currency!].symbol}
               {index === 0
-                ? (
-                    conversion.usd[currency!.toLowerCase()] *
-                    Object.values(
-                      user?.spend[new Date().getMonth()] ?? [],
-                    ).reduce((acc, curr) => acc + curr, 0)
+                ? formatWithCommas(
+                    Number(
+                      (
+                        conversion.usd[currency!.toLowerCase()] *
+                        Object.values(
+                          user?.spend[new Date().getMonth()] ?? [],
+                        ).reduce((acc, curr) => acc + curr, 0)
+                      ).toFixed(1),
+                    ).toString(),
                   )
-                    .toFixed(1)
-                    .toString()
-                : (
-                    conversion.usd[currency!.toLowerCase()] *
-                    Object.values(
-                      user?.income[new Date().getMonth()] ?? [],
-                    ).reduce((acc, curr) => acc + curr, 0)
-                  )
-                    .toFixed(1)
-                    .toString()}
+                : formatWithCommas(
+                    Number(
+                      (
+                        conversion.usd[currency!.toLowerCase()] *
+                        Object.values(
+                          user?.income[new Date().getMonth()] ?? [],
+                        ).reduce((acc, curr) => acc + curr, 0)
+                      ).toFixed(1),
+                    ).toString(),
+                  )}
             </Text>
           )}
         </View>
@@ -206,51 +213,56 @@ export default function StoryScreen({navigation}: Readonly<StoryScreenProps>) {
             <Text style={styles.cardText}>
               {index === 0 ? STRINGS.BiggestSpending : STRINGS.BiggestIncome}
             </Text>
-            <View style={styles.catCtr}>
-              <View
-                style={[
-                  styles.colorBox,
-                  {
-                    backgroundColor:
-                      index === 0
-                        ? catIcons[biggestSpend[0][0]]?.color ??
-                          COLORS.LIGHT[20]
-                        : catIcons[biggestIncome[0][0]]?.color ??
-                          COLORS.LIGHT[20],
-                  },
-                ]}>
-                {index === 0
-                  ? catIcons[biggestSpend[0][0]]?.icon({
-                      height: 20,
-                      width: 20,
-                    }) ?? ICONS.Money({height: 20, width: 20})
-                  : catIcons[biggestIncome[0][0]]?.icon({
+            <View
+              style={{
+                flexDirection: 'row',
+                columnGap: 10,
+                flexWrap: 'wrap',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}>
+              {(index === 0 ? biggestSpend : biggestIncome).map(item => (
+                <View style={styles.catCtr} key={item[0]}>
+                  <View
+                    style={[
+                      styles.colorBox,
+                      {
+                        backgroundColor:
+                          catIcons[item[0]]?.color ?? COLORS.LIGHT[20],
+                      },
+                    ]}>
+                    {catIcons[item[0]]?.icon({
                       height: 20,
                       width: 20,
                     }) ?? ICONS.Money({height: 20, width: 20})}
-              </View>
-              {(biggestSpend[0][0] !== '' || biggestIncome[0][0] !== '') && (
-                <Text style={styles.catText}>
-                  {index === 0
-                    ? biggestSpend[0][0][0].toUpperCase() +
-                      biggestSpend[0][0].slice(1)
-                    : biggestIncome[0][0][0].toUpperCase() +
-                      biggestIncome[0][0].slice(1)}
-                </Text>
-              )}
+                  </View>
+                  {item[0] !== '' && (
+                    <Text style={styles.catText} numberOfLines={1}>
+                      {item[0][0].toUpperCase() + item[0].slice(1)}
+                    </Text>
+                  )}
+                </View>
+              ))}
             </View>
             <Text style={styles.amt2} numberOfLines={1}>
               {currencies[currency!].symbol}
               {index === 0
-                ? (conversion.usd[currency!.toLowerCase()] * biggestSpend[0][1])
-                    .toFixed(1)
-                    .toString()
-                : (
-                    conversion.usd[currency!.toLowerCase()] *
-                    biggestIncome[0][1]
+                ? formatWithCommas(
+                    Number(
+                      (
+                        conversion.usd[currency!.toLowerCase()] *
+                        biggestSpend[0][1]
+                      ).toFixed(1),
+                    ).toString(),
                   )
-                    .toFixed(1)
-                    .toString()}
+                : formatWithCommas(
+                    Number(
+                      (
+                        conversion.usd[currency!.toLowerCase()] *
+                        biggestIncome[0][1]
+                      ).toFixed(1),
+                    ).toString(),
+                  )}
             </Text>
           </View>
         )}

@@ -1,5 +1,4 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { transactionType } from '../../defs/transaction';
 const initialState: {
     // transactions: { [key: string]: transactionType },
     isFilterOpen: boolean,

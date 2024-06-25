@@ -27,18 +27,24 @@ import {
 import {COLORS} from '../../constants/commonStyles';
 import {ICONS} from '../../constants/icons';
 import {SignupScreenProps} from '../../defs/navigation';
-import {setLoading, userLoggedIn} from '../../redux/reducers/userSlice.ts';
+import {
+  setLoading,
+  setTheme,
+  userLoggedIn,
+} from '../../redux/reducers/userSlice.ts';
 import {useAppDispatch} from '../../redux/store/index.ts';
 import {UserFromJson, UserToJson} from '../../utils/userFuncs.ts';
-import {ErrorHandler, singupUser} from '../../utils/firebase.ts';
+import {FirebaseAuthErrorHandler, singupUser} from '../../utils/firebase.ts';
 import {useAppTheme} from '../../hooks/themeHook.ts';
 // Third party libraries
 import BouncyCheckbox from 'react-native-bouncy-checkbox/build/dist/BouncyCheckbox';
-import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
+import auth, {FirebaseAuthTypes} from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import Toast from 'react-native-toast-message';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import CustomHeader from '../../components/CustomHeader/index.tsx';
+import {useFocusEffect} from '@react-navigation/native';
 function Signup({navigation}: Readonly<SignupScreenProps>) {
   // constants
   const dispatch = useAppDispatch();
@@ -81,11 +87,11 @@ function Signup({navigation}: Readonly<SignupScreenProps>) {
       terms: true,
     });
     if (
-      name !== '' &&
+      name.trim() !== '' &&
       testInput(nameRegex, name) &&
       email !== '' &&
       testInput(emailRegex, email) &&
-      pass !== '' &&
+      pass.trim() !== '' &&
       pass.length >= 6 &&
       pass === confirmPass &&
       checked
@@ -100,7 +106,10 @@ function Signup({navigation}: Readonly<SignupScreenProps>) {
         dispatch(setLoading(false));
       } catch (e: any) {
         const error: FirebaseAuthTypes.NativeFirebaseAuthError = e;
-        Toast.show({text1: ErrorHandler(error.code), type: 'error'});
+        Toast.show({
+          text1: FirebaseAuthErrorHandler(error.code),
+          type: 'error',
+        });
         console.log(e);
         dispatch(setLoading(false));
       }
@@ -129,11 +138,13 @@ function Signup({navigation}: Readonly<SignupScreenProps>) {
           await userCollection.doc(creds.user.uid).set(user);
           // });
           dispatch(userLoggedIn(user));
+          dispatch(setTheme(undefined));
         } else {
           const data = await userCollection.doc(creds.user.uid).get();
           const user = UserFromJson(data.data()!);
           if (user) {
             dispatch(userLoggedIn(user));
+            dispatch(setTheme(undefined));
           }
         }
       }
@@ -146,6 +157,12 @@ function Signup({navigation}: Readonly<SignupScreenProps>) {
   return (
     <SafeAreaView style={styles.safeView}>
       <KeyboardAwareScrollView enableOnAndroid={true}>
+        <CustomHeader
+          backgroundColor={COLOR.LIGHT[100]}
+          title="Sign Up"
+          color={COLOR.DARK[100]}
+          navigation={navigation}
+        />
         <View style={styles.mainView}>
           <CustomInput
             placeholderText={STRINGS.Name}
@@ -158,8 +175,9 @@ function Signup({navigation}: Readonly<SignupScreenProps>) {
                 setForm(formkey => ({...formkey, name: true}));
               }
             }}
+            maxLength={30}
           />
-          <NameValError name={name} formKey={form.name} />
+          <NameValError name={name.trim()} formKey={form.name} />
           <CustomInput
             placeholderText={STRINGS.Email}
             onChangeText={onChangeEmail}
@@ -243,6 +261,18 @@ function Signup({navigation}: Readonly<SignupScreenProps>) {
             <Pressable
               onPress={() => {
                 navigation.navigate(NAVIGATION.LOGIN);
+                setEmail('');
+                setName('');
+                setChecked(false);
+                setPass('');
+                setConfirmPass('');
+                setForm({
+                  name: false,
+                  email: false,
+                  pass: false,
+                  confirmPass: false,
+                  terms: false,
+                });
               }}>
               <Text style={styles.text3}>{STRINGS.LOGIN}</Text>
             </Pressable>

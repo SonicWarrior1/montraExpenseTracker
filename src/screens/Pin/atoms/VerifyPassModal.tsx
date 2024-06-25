@@ -11,6 +11,7 @@ import firestore from '@react-native-firebase/firestore';
 import {UserFromJson} from '../../../utils/userFuncs';
 import {encrypt} from '../../../utils/encryption';
 import {userLoggedIn} from '../../../redux/reducers/userSlice';
+import {FirebaseAuthErrorHandler} from '../../../utils/firebase';
 
 function VerifyPassModal({
   showModal,
@@ -33,6 +34,7 @@ function VerifyPassModal({
         onPress={() => {
           setPass('');
           setShowModal(false);
+          setFormKey(false);
         }}>
         <Pressable
           onPress={() => {}}
@@ -73,7 +75,6 @@ function VerifyPassModal({
                         .doc(creds.user.uid)
                         .get();
                       const user = UserFromJson(res.data()!);
-
                       await firestore()
                         .collection('users')
                         .doc(creds.user.uid)
@@ -88,7 +89,7 @@ function VerifyPassModal({
                     }
                   } catch (e: any) {
                     const error: FirebaseAuthTypes.NativeFirebaseAuthError = e;
-                    Alert.alert(error.nativeErrorMessage);
+                    Alert.alert(FirebaseAuthErrorHandler(error.code));
                     setLoading(false);
                     console.log(e);
                   }
@@ -103,4 +104,4 @@ function VerifyPassModal({
   );
 }
 
-export default VerifyPassModal;
+export default React.memo(VerifyPassModal);

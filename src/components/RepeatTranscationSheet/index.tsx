@@ -1,4 +1,4 @@
-import React, {useMemo, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {Pressable, View} from 'react-native';
 import style from './styles';
 import CustomDropdown from '../CustomDropDown';
@@ -12,29 +12,49 @@ import {useAppTheme} from '../../hooks/themeHook';
 import {BottomSheetModalMethods} from '@gorhom/bottom-sheet/lib/typescript/types';
 import DatePicker from 'react-native-date-picker';
 import {BottomSheetModal, BottomSheetView} from '@gorhom/bottom-sheet';
-import {AnimatedEmptyError, EmptyError} from '../../constants/errors';
+import {AnimatedEmptyError} from '../../constants/errors';
 import Spacer from '../Spacer';
+import {RepeatDataModel} from '../../DbModels/RepeatDataModel';
+import {Timestamp} from '@react-native-firebase/firestore';
 
 function RepeatTransactionSheet({
   bottomSheetModalRef,
   setRepeatData,
+  repeatData,
+  setIsSwitchOn,
 }: Readonly<{
   bottomSheetModalRef: React.RefObject<BottomSheetModalMethods>;
   setRepeatData: React.Dispatch<
-    React.SetStateAction<repeatDataType | undefined>
+    React.SetStateAction<repeatDataType | RepeatDataModel | undefined>
   >;
+  repeatData?: repeatDataType | RepeatDataModel;
+  setIsSwitchOn: React.Dispatch<React.SetStateAction<boolean>>;
 }>) {
   // state
-  const [freq, setFreq] = useState<'yearly' | 'monthly' | 'weekly' | 'daily'>();
-  const [month, setMonth] = useState(1);
-  const [day, setDay] = useState(1);
-  const [weekDay, setWeekDay] = useState(1);
-  const [end, setEnd] = useState<'date' | 'never'>();
-  const [date, setDate] = useState<Date>(new Date());
+  // console.log('repeatSheet', repeatData);
+  const [freq, setFreq] = useState<'yearly' | 'monthly' | 'weekly' | 'daily'>(
+    (repeatData?.freq as 'yearly' | 'monthly' | 'weekly' | 'daily') ??
+      undefined,
+  );
+  const [month, setMonth] = useState(repeatData?.month ?? 1);
+  const [day, setDay] = useState(repeatData?.day ?? 1);
+  const [weekDay, setWeekDay] = useState(repeatData?.weekDay ?? 1);
+  const [end, setEnd] = useState<'date' | 'never'>(
+    (repeatData?.end as 'date' | 'never') ?? undefined,
+  );
+  const [date, setDate] = useState<Date>(
+    repeatData?.date
+      ? (repeatData?.date as Timestamp)?.seconds
+        ? Timestamp.fromMillis(
+            (repeatData?.date as Timestamp)?.seconds * 1000,
+          ).toDate()
+        : (repeatData?.date as Date)
+      : new Date(),
+  );
   const [isDateOpen, setIsDateOpen] = useState(false);
   const [formkey, setFormkey] = useState(false);
   // constants
-  const snapPoints = useMemo(() => ['40%'], []);
+  const snapPoints = useMemo(() => ['35%'], []);
   const year = new Date().getFullYear();
   const COLOR = useAppTheme();
   const styles = style(COLOR);
@@ -63,6 +83,25 @@ function RepeatTransactionSheet({
     }
     return daysInYear;
   }, [year]);
+  useEffect(() => {
+    setFreq(
+      (repeatData?.freq as 'yearly' | 'monthly' | 'weekly' | 'daily') ??
+        undefined,
+    );
+    setMonth(repeatData?.month ?? 1);
+    setDay(repeatData?.day ?? 1);
+    setWeekDay(repeatData?.weekDay ?? 1);
+    setEnd((repeatData?.end as 'date' | 'never') ?? undefined);
+    setDate(
+      repeatData?.date
+        ? (repeatData?.date as Timestamp)?.seconds
+          ? Timestamp.fromMillis(
+              (repeatData?.date as Timestamp)?.seconds * 1000,
+            ).toDate()
+          : (repeatData?.date as Date)
+        : new Date(),
+    );
+  }, [repeatData]);
   const daysInYear = generateDaysInYear;
   return (
     <BottomSheetModal
@@ -75,6 +114,9 @@ function RepeatTransactionSheet({
       handleIndicatorStyle={{backgroundColor: COLOR.VIOLET[40]}}
       onDismiss={() => {
         setFormkey(false);
+        if (repeatData === undefined) {
+          setIsSwitchOn(false);
+        }
       }}>
       <BottomSheetView style={styles.sheetView}>
         <View style={styles.flexRow}>
@@ -106,7 +148,7 @@ function RepeatTransactionSheet({
             </View>
           )}
           {(freq === 'yearly' || freq === 'monthly') && (
-            <View style={styles.flex}>
+            <View style={[styles.flex, {minWidth: 24}]}>
               <CustomDropdown
                 data={
                   freq === 'monthly'
@@ -161,7 +203,7 @@ function RepeatTransactionSheet({
               }}
               placeholder="End After"
               value={end}
-              disable={freq===undefined}
+              disable={freq === undefined}
             />
           </View>
           {end === 'date' && (
@@ -199,12 +241,17 @@ function RepeatTransactionSheet({
             </Pressable>
           )}
         </View>
+        <AnimatedEmptyError
+          errorText="Please select an option"
+          value={end ?? ''}
+          formKey={formkey}
+        />
         <Spacer height={10} />
         <CustomButton
           title={STRINGS.Next}
           onPress={() => {
             setFormkey(true);
-            if (freq) {
+            if (freq && end) {
               setRepeatData({
                 freq: freq ?? 'daily',
                 month: month,
@@ -213,7 +260,8 @@ function RepeatTransactionSheet({
                 end: end ?? 'never',
                 date: date,
               });
-              bottomSheetModalRef.current?.close();
+              setIsSwitchOn(true);
+              bottomSheetModalRef.current?.dismiss();
             }
           }}
         />
@@ -222,4 +270,4 @@ function RepeatTransactionSheet({
   );
 }
 
-export default RepeatTransactionSheet;
+export default React.memo(RepeatTransactionSheet);

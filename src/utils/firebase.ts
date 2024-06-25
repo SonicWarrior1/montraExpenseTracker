@@ -8,6 +8,9 @@ import uuid from 'react-native-uuid';
 import { encrypt } from './encryption';
 import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
 import Toast from 'react-native-toast-message';
+import { OnlineTransactionModel } from '../DbModels/OnlineTransactionModel';
+import { OfflineTransactionModel } from '../DbModels/OfflineTransactionModel';
+import { RepeatDataModel } from '../DbModels/RepeatDataModel';
 export function createTransaction({
     id,
     url,
@@ -38,16 +41,17 @@ export function createTransaction({
     category: string,
     desc: string,
     wallet: string,
-    repeatData: repeatDataType,
+    repeatData: repeatDataType | RepeatDataModel,
     isEdit: boolean,
-    transaction: transactionType,
+    transaction: transactionType | OnlineTransactionModel | OfflineTransactionModel,
     pageType: 'income' | 'expense' | 'transfer',
     uid: string,
     from: string,
     to: string
 }) {
+    // console.log("dsfdsfsdfdsc Amount:", Number(amount), conversion.usd[currency.toLowerCase()], (Number(amount) / conversion.usd[currency.toLowerCase()]).toFixed(10))
     return {
-        amount: encrypt(String((Number(amount) / conversion.usd[currency.toLowerCase()]).toFixed(1)), uid),
+        amount: encrypt(String((Number(amount) / conversion.usd[currency.toLowerCase()]).toFixed(10)), uid),
         category: encrypt(category, uid),
         desc: encrypt(desc, uid),
         wallet: encrypt(wallet, uid),
@@ -370,13 +374,13 @@ export async function singupUser({ name, email, pass }: { name: string, email: s
     } catch (e: any) {
         const error: FirebaseAuthTypes.NativeFirebaseAuthError = e;
         console.log(e);
-        Toast.show({ text1: ErrorHandler(error.code), type: 'error' });
+        Toast.show({ text1: FirebaseAuthErrorHandler(error.code), type: 'error' });
         return false;
     }
     return false;
 }
 
-export function ErrorHandler(code: string) {
+export function FirebaseAuthErrorHandler(code: string) {
     if (code === 'auth/email-already-in-use') {
         return 'The email address is already in use by another account.';
     } else if (code === 'auth/invalid-credential') {

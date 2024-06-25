@@ -1,6 +1,7 @@
-import { StyleSheet } from 'react-native';
+import { Dimensions, StyleSheet } from 'react-native';
 import { COLORS } from '../../constants/commonStyles';
 import { RFValue } from 'react-native-responsive-fontsize';
+const screenWidth=Dimensions.get('screen').width
 const styles = (COLOR: typeof COLORS) => StyleSheet.create({
     moneyCtr: {
         height: 80,
@@ -9,7 +10,7 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
         paddingHorizontal: 15,
         columnGap: 10,
         alignItems: 'center',
-        width: 180,
+        width: screenWidth/2.2,
     },
     iconCtr: {
         backgroundColor: COLOR.LIGHT[100],
@@ -27,7 +28,6 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
         fontWeight: '600',
         color: COLOR.LIGHT[100],
         maxWidth: 100,
-
     },
     filterBtn: {
         paddingVertical: 10,
