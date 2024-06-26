@@ -1,5 +1,5 @@
-import React, {useCallback, useState} from 'react';
-import {Pressable, Text, View} from 'react-native';
+import React, {useCallback, useEffect} from 'react';
+import {Alert, Pressable, Text, View} from 'react-native';
 import {Switch} from 'react-native-switch';
 import {monthData, STRINGS, weekData} from '../../../constants/strings';
 import {COLORS} from '../../../constants/commonStyles';
@@ -19,6 +19,7 @@ function RepeatInput({
   isEdit,
   isSwitchOn,
   setIsSwitchOn,
+  firstTime,
 }: Readonly<{
   pageType: 'expense' | 'income' | 'transfer';
   repeatData: repeatDataType | RepeatDataModel | undefined;
@@ -29,6 +30,7 @@ function RepeatInput({
   isEdit: boolean;
   isSwitchOn: boolean;
   setIsSwitchOn: React.Dispatch<React.SetStateAction<boolean>>;
+  firstTime: boolean;
 }>) {
   const getDate = useCallback(() => {
     if (repeatData) {
@@ -73,7 +75,14 @@ function RepeatInput({
   }, [isEdit, repeatData]);
   const COLOR = useAppTheme();
   const styles = style(COLOR);
-
+  useEffect(() => {
+    console.log(isSwitchOn, firstTime);
+    if (isSwitchOn && !firstTime) {
+      repeatSheetRef.current?.present();
+    } else if (!isSwitchOn) {
+      setRepeatData(undefined);
+    }
+  }, [isSwitchOn]);
   return (
     <>
       {pageType !== 'transfer' && (
@@ -100,21 +109,25 @@ function RepeatInput({
               switchRightPx={5}
               circleBorderWidth={0}
               onValueChange={val => {
-                if (repeatData?.freq !== undefined) {
-                  setIsSwitchOn(false);
+                if (!val) {
+                  Alert.alert(
+                    'Clearing Repeating Transaction Frequency',
+                    'Are you sure you want to clear the repeating transaction frequency?',
+                    [
+                      {
+                        text: 'Cancel',
+                      },
+                      {
+                        text: 'Ok',
+                        onPress: () => {
+                          setIsSwitchOn(false);
+                        },
+                      },
+                    ],
+                  );
                 } else {
                   setIsSwitchOn(true);
                 }
-                if (val) {
-                  repeatSheetRef.current?.present();
-                }
-                // if (val) {
-                //   setTimeout(() => {
-                //   }, 500);
-                // } else {
-                //   setRepeatData(undefined);
-                //   setIsSwitchOn(false);
-                // }
               }}
               value={isSwitchOn}
             />

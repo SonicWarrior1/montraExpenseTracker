@@ -1,5 +1,12 @@
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {Alert, BackHandler, SafeAreaView, View} from 'react-native';
+import {
+  Alert,
+  BackHandler,
+  Dimensions,
+  Platform,
+  SafeAreaView,
+  View,
+} from 'react-native';
 import style from './styles';
 
 import CustomInput from '../../components/CustomInput';
@@ -10,7 +17,7 @@ import {ICONS} from '../../constants/icons';
 import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import FilePickerSheet from '../../components/FilePickerSheet';
 import RepeatTransactionSheet from '../../components/RepeatTranscationSheet';
-import {Timestamp} from '@react-native-firebase/firestore';
+import firestore, {Timestamp} from '@react-native-firebase/firestore';
 import {STRINGS} from '../../constants/strings';
 import CustomButton from '../../components/CustomButton';
 import {repeatDataType, transactionType} from '../../defs/transaction';
@@ -27,6 +34,10 @@ import {
   addNewTransaction,
   createTransaction,
   getAttachmentUrl,
+  handleExpenseUpdate,
+  handleIncomeUpdate,
+  handleNewExpense,
+  handleNewIncome,
   handleNotify,
   updateTransaction,
 } from '../../utils/firebase';
@@ -43,7 +54,7 @@ import MoneyInput from './atoms/MoneyInput';
 import {RepeatDataModel} from '../../DbModels/RepeatDataModel';
 import {formatWithCommas, getMyColor} from '../../utils/commonFuncs';
 import RepeatInput from './atoms/RepeatInput';
-
+import notifee from '@notifee/react-native';
 function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
   // constants
   const {isConnected} = useNetInfo();
@@ -52,15 +63,19 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
   const styles = style(COLOR);
   const pageType = route.params.type;
   const isEdit = route.params.isEdit;
-  let transaction:
+  let prevTransaction:
     | transactionType
     | OnlineTransactionModel
     | OfflineTransactionModel
     | undefined;
   if (isEdit) {
-    transaction = route.params.transaction;
+    prevTransaction = route.params.transaction;
   }
-  const TransOnline = useObject(OnlineTransactionModel, transaction?.id ?? '');
+  console.log(prevTransaction);
+  const TransOnline = useObject(
+    OnlineTransactionModel,
+    prevTransaction?.id ?? '',
+  );
   const month = new Date().getMonth();
   const getBackgroundColor = useMemo(() => {
     if (pageType === 'expense') {
@@ -85,40 +100,44 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
   const uid = useAppSelector(state => state.user.currentUser!.uid);
   const currency = useAppSelector(state => state.user.currentUser?.currency);
   // state
+  const [firstTime, setFirstTime] = useState(true);
+  const [prevAmt, setPrevAmt] = useState<number>();
   const [image, setImage] = useState(
-    transaction && transaction.attachementType === 'image'
-      ? transaction.attachement
+    prevTransaction && prevTransaction.attachementType === 'image'
+      ? prevTransaction.attachement
       : '',
   );
   const [doc, setDoc] = useState<{uri: string; name: string} | undefined>(
-    transaction && transaction.attachementType === 'doc'
-      ? {uri: transaction.attachement!, name: 'Document'}
+    prevTransaction && prevTransaction.attachementType === 'doc'
+      ? {uri: prevTransaction.attachement!, name: 'Document'}
       : undefined,
   );
   const [repeatData, setRepeatData] = useState<
     repeatDataType | RepeatDataModel | undefined
-  >(transaction ? transaction.freq! : undefined);
-  // console.log('RepeatData', repeatData);
-  const [desc, setDesc] = useState(transaction ? transaction.desc : '');
+  >(prevTransaction ? prevTransaction.freq! : undefined);
+  // console.log('RepeatData', repeatData)
+  const [desc, setDesc] = useState(prevTransaction ? prevTransaction.desc : '');
   const [zindex, setZindex] = useState(1);
   const [amount, setAmount] = useState(
-    transaction
+    prevTransaction
       ? formatWithCommas(
           Number(
             (
               conversion.usd[(currency ?? 'USD').toLowerCase()] *
-              transaction.amount
+              prevTransaction.amount
             ).toFixed(1),
           ).toString(),
         )
       : '0',
   );
   const [category, setCategory] = useState<string | undefined>(
-    transaction ? transaction.category : '',
+    prevTransaction ? prevTransaction.category : '',
   );
-  const [wallet, setWallet] = useState(transaction ? transaction.wallet : '');
-  const [from, setFrom] = useState(transaction ? transaction.from : '');
-  const [to, setTo] = useState(transaction ? transaction.to : '');
+  const [wallet, setWallet] = useState(
+    prevTransaction ? prevTransaction.wallet : '',
+  );
+  const [from, setFrom] = useState(prevTransaction ? prevTransaction.from : '');
+  const [to, setTo] = useState(prevTransaction ? prevTransaction.to : '');
   const [formKey, setFormKey] = useState(false);
   const [catColors, setCatColors] = useState<{[key: string]: string}>();
   const [isSwitchOn, setIsSwitchOn] = useState(
@@ -143,6 +162,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
     }
     return {attachement, attachementType};
   }, [image, doc]);
+
   const handleOffline = async ({
     id,
     attachement,
@@ -166,7 +186,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
         isEdit: isEdit,
         pageType: pageType,
         repeatData: repeatData!,
-        transaction: transaction!,
+        transaction: prevTransaction!,
         wallet: wallet,
         uid: uid,
         from: from,
@@ -174,7 +194,6 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
       }),
       uid,
     );
-    // console.log('trans', trans.freq);
     if (
       !isConnected &&
       (trans.freq?.date as Timestamp)?.seconds !== undefined
@@ -183,43 +202,224 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
         (trans.freq?.date as Timestamp).seconds * 1000,
       ).toDate();
     }
-    // console.log(trans.freq);
     if (pageType === 'income') {
       dispatch(
         userLoggedIn({
           ...user,
           income: {
-            ...user?.income,
+            ...(user?.income ?? {}),
             [month]: {
               ...(user?.income?.[month] ?? {}),
               [category!]: isEdit
                 ? user?.income[month][category!]! -
-                  transaction?.amount! +
-                  Number(amount.replace(/,/g, ''))
+                  prevTransaction?.amount! +
+                  Number(amount.replace(/,/g, '')) /
+                    (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1)
                 : (user?.income?.[month]?.[category!] ?? 0) +
-                  Number(amount.replace(/,/g, '')),
+                  Number(amount.replace(/,/g, '')) /
+                    (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1),
             },
           },
         }),
       );
+      realm.write(() => {
+        realm.create(
+          'amount',
+          {
+            id: month + '_' + category + '_' + pageType,
+            amount: isEdit
+              ? user?.income[month][category!]! -
+                prevTransaction?.amount! +
+                Number(amount.replace(/,/g, '')) /
+                  (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1)
+              : (user?.income?.[month]?.[category!] ?? 0) +
+                Number(amount.replace(/,/g, '')) /
+                  (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1),
+          },
+          UpdateMode.All,
+        );
+        console.log('done');
+      });
     } else {
+      // console.log(
+      //   'djfnsdjf',
+      //   user?.spend?.[month]?.[pageType === 'transfer' ? 'transfer' : category!]!,
+      //   prevAmt!,
+      //   Number(amount.replace(/,/g, '')) /
+      //     (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1),
+      //   user?.spend?.[month]?.[pageType === 'transfer' ? 'transfer' : category!]! -
+      //     prevAmt! +
+      //     Number(amount.replace(/,/g, '')) /
+      //       (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1),
+      // );
       dispatch(
         userLoggedIn({
           ...user,
           spend: {
-            ...user?.spend,
+            ...(user?.spend ?? {}),
             [month]: {
               ...(user?.spend?.[month] ?? {}),
-              [category!]: isEdit
-                ? user?.spend[month][category!]! -
-                  transaction?.amount! +
-                  Number(amount.replace(/,/g, ''))
-                : (user?.spend?.[month]?.[category!] ?? 0) +
-                  Number(amount.replace(/,/g, '')),
+              [pageType === 'transfer' ? 'transfer' : category!]: isEdit
+                ? user?.spend?.[month]?.[
+                    pageType === 'transfer' ? 'transfer' : category!
+                  ]! -
+                  prevAmt! +
+                  Number(amount.replace(/,/g, '')) /
+                    (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1)
+                : (user?.spend?.[month]?.[
+                    pageType === 'transfer' ? 'transfer' : category!
+                  ] ?? 0) +
+                  Number(amount.replace(/,/g, '')) /
+                    (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1),
             },
           },
         }),
       );
+      realm.write(() => {
+        realm.create(
+          'amount',
+          {
+            id:
+              month +
+              '_' +
+              (pageType === 'transfer' ? 'transfer' : category) +
+              '_' +
+              pageType,
+            amount: isEdit
+              ? user?.spend[month][
+                  pageType === 'transfer' ? 'transfer' : category!
+                ]! -
+                prevTransaction?.amount! +
+                Number(amount.replace(/,/g, '')) /
+                  (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1)
+              : (user?.spend?.[month]?.[
+                  pageType === 'transfer' ? 'transfer' : category!
+                ] ?? 0) +
+                Number(amount.replace(/,/g, '')) /
+                  (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1),
+          },
+          UpdateMode.All,
+        );
+        console.log('done');
+      });
+      if (pageType !== 'transfer') {
+        const totalBudget = user?.budget?.[month]?.[category!];
+        const totalSpent = isEdit
+          ? user?.spend[month][category!]! -
+            prevTransaction?.amount! +
+            Number(amount.replace(/,/g, '')) /
+              (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1)
+          : (user?.spend?.[month]?.[category!] ?? 0) +
+            Number(amount.replace(/,/g, '')) /
+              (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1);
+        if (
+          totalBudget &&
+          (totalSpent >= totalBudget.limit ||
+            totalSpent >= totalBudget.limit * (totalBudget.percentage / 100))
+        ) {
+          try {
+            const notificationId = uuid.v4();
+            await notifee.requestPermission();
+            const channelId = await notifee.createChannel({
+              id: 'default',
+              name: 'Default Channel',
+            });
+            if (totalSpent >= totalBudget.limit) {
+              realm.write(() => {
+                realm.create(
+                  'notification',
+                  {
+                    type: 'budget-limit',
+                    category: category!,
+                    id: notificationId,
+                    time: Timestamp.now(),
+                    read: false,
+                    percentage: totalBudget.percentage,
+                  },
+                  UpdateMode.Never,
+                );
+              });
+              dispatch(
+                userLoggedIn({
+                  ...user,
+                  notification: {
+                    ...user.notification,
+                    [notificationId as string]: {
+                      type: 'budget-limit',
+                      category: category!,
+                      id: notificationId,
+                      time: Timestamp.now(),
+                      read: false,
+                      percentage: totalBudget.percentage,
+                    },
+                  },
+                }),
+              );
+              await notifee.displayNotification({
+                title:
+                  category![0].toUpperCase() +
+                  category!.slice(1) +
+                  ' Budget Limit Exceeded',
+                body:
+                  'Your ' +
+                  category![0].toUpperCase() +
+                  category!.slice(1) +
+                  ' budget has exceeded the limit',
+                android: {
+                  channelId,
+                },
+              });
+            } else if (
+              totalSpent >=
+              totalBudget.limit * (totalBudget.percentage / 100)
+            ) {
+              realm.write(() => {
+                realm.create(
+                  'notification',
+                  {
+                    type: 'budget-percent',
+                    category: category!,
+                    id: notificationId,
+                    time: Timestamp.now(),
+                    read: false,
+                    percentage: totalBudget.percentage,
+                  },
+                  UpdateMode.Never,
+                );
+              });
+              dispatch(
+                userLoggedIn({
+                  ...user,
+                  notification: {
+                    ...user.notification,
+                    [notificationId as string]: {
+                      type: 'budget-percent',
+                      category: category!,
+                      id: notificationId,
+                      time: Timestamp.now(),
+                      read: false,
+                      percentage: totalBudget.percentage,
+                    },
+                  },
+                }),
+              );
+              await notifee.displayNotification({
+                title: `Exceeded ${totalBudget.percentage}% of ${
+                  category![0].toUpperCase() + category!.slice(1)
+                } budget`,
+                body: `You've exceeded ${totalBudget.percentage}% of your ${
+                  category![0].toUpperCase() + category!.slice(1)
+                } budget. Take action to stay on track.`,
+                android: {
+                  channelId,
+                },
+              });
+            }
+          } catch (e) {
+            console.log(e);
+          }
+        }
+      }
     }
     if (trans.freq) {
       trans.freq.date = Timestamp.fromDate(trans.freq?.date as Date);
@@ -239,6 +439,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
       );
     });
   };
+
   const handleOnline = async ({
     id,
     attachement,
@@ -265,19 +466,64 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
       isEdit: isEdit,
       pageType: pageType,
       repeatData: repeatData!,
-      transaction: transaction!,
+      transaction: prevTransaction!,
       wallet: wallet,
       uid: uid,
       from: from,
       to: to,
     });
+    const curr = await firestore().collection('users').doc(uid).get();
     if (isEdit) {
+      if (pageType === 'expense' || pageType === 'transfer') {
+        handleExpenseUpdate({
+          curr: curr,
+          amount: Number(amount.replace(/,/g, '')),
+          category: pageType === 'transfer' ? 'transfer' : category!,
+          conversion: conversion,
+          currency: currency!,
+          month: month,
+          transaction: prevTransaction!,
+          uid: uid,
+        });
+      } else if (pageType === 'income') {
+        handleIncomeUpdate({
+          curr: curr,
+          amount: Number(amount.replace(/,/g, '')),
+          category: category!,
+          conversion: conversion,
+          currency: currency!,
+          month: month,
+          transaction: prevTransaction!,
+          uid: uid,
+        });
+      }
       await updateTransaction({
         trans: trans,
-        transId: transaction?.id!,
+        transId: prevTransaction?.id!,
         uid: uid,
       });
     } else {
+      if (pageType === 'expense' || pageType === 'transfer') {
+        handleNewExpense({
+          curr: curr,
+          amount: Number(amount.replace(/,/g, '')),
+          category: pageType === 'transfer' ? 'transfer' : category!,
+          conversion: conversion,
+          currency: currency!,
+          month: month,
+          uid: uid,
+        });
+      } else if (pageType === 'income') {
+        handleNewIncome({
+          curr: curr,
+          amount: Number(amount.replace(/,/g, '')),
+          category: category!,
+          conversion: conversion,
+          currency: currency!,
+          month: month,
+          uid: uid,
+        });
+      }
       await addNewTransaction({id: id, trans: trans, uid: uid});
     }
   };
@@ -304,7 +550,6 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
     ) {
       return;
     }
-    // console.log(Number(amount.replace(/,/g, '')));
     dispatch(setLoading(true));
     const {attachement, attachementType} = getAttachmentAndType();
     try {
@@ -335,7 +580,13 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
       dispatch(setLoading(false));
     }
   };
-
+  useEffect(() => {
+    setFirstTime(false);
+    if (isEdit) {
+      setPrevAmt(prevTransaction?.amount);
+    }
+  }, []);
+  console.log(prevAmt);
   useEffect(() => {
     setCatColors(
       Object.values(pageType === 'expense' ? expenseCat! : incomeCat!).reduce(
@@ -400,17 +651,21 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
   return (
     <>
       <KeyboardAwareScrollView
-        style={[{backgroundColor: backgroundColor}]}
-        contentContainerStyle={[
-          {backgroundColor: backgroundColor, flexGrow: 1},
-        ]}
-        // enableOnAndroid={true}
-      >
+        style={{backgroundColor: backgroundColor}}
+        contentContainerStyle={{flexGrow: 1}}>
         <SafeAreaView
           style={[
             styles.safeView,
             {
               backgroundColor: backgroundColor,
+              height:
+                Platform.OS !== 'ios'
+                  ? pageType !== 'transfer'
+                    ? Dimensions.get('screen').height / 3.138
+                    : Dimensions.get('screen').height / 2.06
+                  : pageType !== 'transfer'
+                  ? Dimensions.get('screen').height / 2.65
+                  : Dimensions.get('screen').height / 1.85,
             },
           ]}>
           <CustomHeader
@@ -579,6 +834,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
           />
           <Spacer height={20} />
           <RepeatInput
+            firstTime={firstTime}
             isEdit={isEdit}
             pageType={pageType}
             repeatData={repeatData}
@@ -591,6 +847,13 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
           <CustomButton title={STRINGS.Continue} onPress={handlePress} />
           <Spacer height={20} />
         </View>
+        <BottomSheetModalProvider>
+          <AddCategorySheet
+            bottomSheetModalRef={addCategorySheetRef}
+            type={pageType}
+            setMyCategory={setCategory}
+          />
+        </BottomSheetModalProvider>
       </KeyboardAwareScrollView>
       <BottomSheetModalProvider>
         <FilePickerSheet
@@ -606,11 +869,6 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
           setRepeatData={setRepeatData}
           repeatData={repeatData}
           setIsSwitchOn={setIsSwitchOn}
-        />
-        <AddCategorySheet
-          bottomSheetModalRef={addCategorySheetRef}
-          type={pageType}
-          setMyCategory={setCategory}
         />
       </BottomSheetModalProvider>
     </>

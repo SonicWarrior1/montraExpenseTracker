@@ -19,6 +19,8 @@ import auth from '@react-native-firebase/auth';
 import {openLogoutSheet} from '../../redux/reducers/transactionSlice';
 import {useRealm} from '@realm/react';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
+import {useNetInfo} from '@react-native-community/netinfo';
+import Toast from 'react-native-toast-message';
 function LogoutSheet() {
   // constants
   const COLOR = useAppTheme();
@@ -28,11 +30,17 @@ function LogoutSheet() {
   const snapPoints = useMemo(() => ['25%'], []);
   const ref = useRef<BottomSheetModalMethods>(null);
   const realm = useRealm();
+  const {isConnected} = useNetInfo();
   // redux
   const isOpen = useAppSelector(state => state.transaction.isLogoutOpen);
   // functions
   const onLogout = useCallback(async () => {
     try {
+      if (!isConnected) {
+        ref.current?.dismiss();
+        Toast.show({text1: 'No Internet', type: 'error'});
+        return;
+      }
       if (await GoogleSignin.isSignedIn()) {
         await GoogleSignin.signOut();
       } else {
@@ -48,7 +56,7 @@ function LogoutSheet() {
     } catch (e) {
       console.log(e);
     }
-  }, [authTheme]);
+  }, [authTheme, isConnected]);
   useEffect(() => {
     if (isOpen === true) {
       ref.current?.present();

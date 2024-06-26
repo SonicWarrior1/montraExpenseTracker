@@ -25,6 +25,8 @@ import {OnlineTransactionModel} from '../../DbModels/OnlineTransactionModel';
 import {UpdateMode} from 'realm';
 import storage from '@react-native-firebase/storage';
 import {OfflineTransactionModel} from '../../DbModels/OfflineTransactionModel';
+import {encrypt} from '../../utils/encryption';
+import {UserFromJson} from '../../utils/userFuncs';
 
 function DeleteTransactionSheet({
   bottomSheetModalRef,
@@ -94,6 +96,17 @@ function DeleteTransactionSheet({
               },
             }),
           );
+          realm.write(() => {
+            realm.create(
+              'amount',
+              {
+                id: month + '_' + category + '_' + type,
+                amount: user?.income[month][category]! - Number(amt),
+              },
+              UpdateMode.All,
+            );
+            console.log('done');
+          });
         } else {
           dispatch(
             userLoggedIn({
@@ -102,16 +115,69 @@ function DeleteTransactionSheet({
                 ...user?.spend,
                 [month]: {
                   ...user?.spend[month],
-                  [category]: user?.spend[month][category]! - Number(amt),
+                  [category]:
+                    user?.spend[month][
+                      type === 'transfer' ? 'transfer' : category
+                    ]! - Number(amt),
                 },
               },
             }),
           );
+          realm.write(() => {
+            realm.create(
+              'amount',
+              {
+                id:
+                  month +
+                  '_' +
+                  (type === 'transfer' ? 'transfer' : category) +
+                  '_' +
+                  type,
+                amount:
+                  user?.spend[month][
+                    type === 'transfer' ? 'transfer' : category
+                  ]! - Number(amt),
+              },
+              UpdateMode.All,
+            );
+            console.log('done');
+          });
         }
         bottomSheetModalRef.current?.dismiss();
         navigation.pop();
       } else {
         const userDoc = firestore().collection('users').doc(uid);
+        const data = await firestore().collection('users').doc(uid).get();
+        // console.log(UserFromJson(data.data()!));
+        if (type === 'expense' || type === 'transfer') {
+          await firestore()
+            .collection('users')
+            .doc(uid)
+            .update({
+              [`spend.${month}.${type === 'transfer' ? 'transfer' : category}`]:
+                encrypt(
+                  String(
+                    (UserFromJson(data.data()!)?.spend?.[month]?.[
+                      type === 'transfer' ? 'transfer' : category
+                    ] ?? 0) - amt,
+                  ),
+                  uid!,
+                ),
+            });
+        } else {
+          await firestore()
+            .collection('users')
+            .doc(uid)
+            .update({
+              [`income.${month}.${category}`]: encrypt(
+                String(
+                  (UserFromJson(data.data()!)?.spend?.[month]?.[category] ??
+                    0) - amt,
+                ),
+                uid!,
+              ),
+            });
+        }
         bottomSheetModalRef.current?.dismiss();
         navigation.pop();
         await userDoc

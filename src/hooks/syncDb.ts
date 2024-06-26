@@ -5,30 +5,116 @@ import { encrypt } from '../utils/encryption';
 import Realm, { Results } from 'realm';
 import { BudgetModel } from '../DbModels/BudgetModel';
 import { CategoryModel } from '../DbModels/CategoryModel';
+import { AmountModel } from '../DbModels/AmountModel';
+import { NotificationModel } from '../DbModels/NotificationModel';
 export const syncDb = async ({
-    uid, data, isConnected, conversion, currency, realm, budget, incomeCategory, expenseCategory, category,
+    uid, data, isConnected, realm, budget, incomeCategory, expenseCategory, category,
+    amounts, notifications
 }: {
     uid: string,
     data: Results<OfflineTransactionModel>,
     isConnected: boolean,
-    conversion: {
-        [key: string]: {
-            [key: string]: number;
-        };
-    },
-    currency: string,
     realm: Realm
     budget: Results<BudgetModel>
     incomeCategory: string[],
     expenseCategory: string[],
     category: Results<CategoryModel>,
+    amounts: Results<AmountModel>
+    notifications: Results<NotificationModel>
 }) => {
     console.log(uid);
     console.log('sync');
-    if ((data.length > 0 || budget.length > 0 || category.length > 0) && isConnected) {
+    if ((data.length > 0 || budget.length > 0 || category.length > 0 || amounts.length > 0 || notifications.length > 0) && isConnected) {
         try {
             const batch = firestore().batch();
+            if (amounts.length > 0) {
+                console.log("Amount Syncing")
+                for (const item of amounts) {
+                    const month = item.id.split('_')[0]
+                    const category = item.id.split('_')[1]
+                    const type = item.id.split('_')[2];
+                    console.log(item)
+                    if (type === 'income') {
+                        batch.update(firestore().collection('users').doc(uid), {
+                            [`income.${month}.${category}`]: encrypt(String(item.amount), uid)
+                        })
+                    } else {
+                        batch.update(firestore().collection('users').doc(uid), {
+                            [`spend.${month}.${category}`]: encrypt(String(item.amount), uid)
+                        })
+                    }
+                }
+                realm.write(() => {
+                    realm.delete(amounts);
+                });
+            }
+            // if (budget.length > 0) {
+            //     console.log("Budget Syncing")
+            //     for (const item of budget) {
+            //         const month = item.id.split('_')[0];
+            //         const category = item.id.split('_')[1];
+            //         if (item.delete) {
+            //             batch.update(firestore().collection('users').doc(uid), {
+            //                 [`budget.${month}.${category}`]: deleteField(),
+            //             });
+            //         } else {
+            //             batch.update(firestore().collection('users').doc(uid), {
+            //                 [`budget.${month}.${category}`]: {
+            //                     limit: encrypt(
+            //                         String(item.limit),
+            //                         uid,
+            //                     ),
+            //                     alert: item.alert,
+            //                     percentage: encrypt(String(item.percentage), uid),
+            //                 },
+            //             });
+            //         }
+            //     }
+            //     realm.write(() => {
+            //         realm.delete(budget);
+            //     });
+            // }
+            // if (category.length > 0) {
+            //     console.log("Category Syncing")
+            //     batch.update(firestore().collection('users').doc(uid), {
+            //         expenseCategory: expenseCategory.concat(category.filter((cat) => cat.type === 'expense').reduce((acc: string[], item) => {
+            //             acc.push(item.name);
+            //             return acc;
+            //         }, [])).map(
+            //             item => encrypt(item, uid),
+            //         ), incomeCategory: incomeCategory.concat(category.filter((cat) => cat.type === 'income').reduce((acc: string[], item) => {
+            //             acc.push(item.name);
+            //             return acc;
+            //         }, [])).map(
+            //             item => encrypt(item, uid),
+            //         ),
+            //     });
+            //     realm.write(() => {
+            //         realm.delete(category);
+            //     });
+            // }
+            // if (notifications.length > 0) {
+            //     console.log("Notification Syncing")
+            //     for (const item of notifications) {
+            //         console.log("chlaa")
+            //         batch.update(firestore().collection('users').doc('uid'), {
+            //             [`notification.${item.id}`]: {
+            //                 type: encrypt(item.type, uid),
+            //                 category: encrypt(item.category, uid),
+            //                 id: item.id,
+            //                 time: item.time,
+            //                 read: item.read,
+            //                 percentage: item.percentage,
+            //             },
+
+            //         })
+            //     }
+            //     realm.write(() => {
+            //         realm.delete(notifications)
+            //     })
+            // }
             if (data.length > 0) {
+                console.log("Transanction Syncing")
                 for (const item of data) {
                     let url = '';
                     if (item.operation === 'add' || item.operation === 'update') {
@@ -44,7 +130,7 @@ export const syncDb = async ({
                             }
                         }
                         batch.set(firestore().collection('users').doc(uid).collection('transactions').doc(item.id), {
-                            amount: encrypt(String((Number(item.amount) / conversion.usd[currency.toLowerCase()]).toFixed(1)), uid),
+                            amount: encrypt(String((Number(item.amount))), uid),
                             category: encrypt(item.category, uid),
                             desc: encrypt(item.desc, uid),
                             wallet: encrypt(item.wallet, uid),
@@ -76,55 +162,12 @@ export const syncDb = async ({
                     realm.delete(data);
                 });
             }
-            if (budget.length > 0) {
-                for (const item of budget) {
-                    const month = item.id.split('_')[0];
-                    const category = item.id.split('_')[1];
-                    if (item.delete) {
-                        batch.update(firestore().collection('users').doc(uid), {
-                            [`budget.${month}.${category}`]: deleteField(),
-                        });
-                    } else {
-                        batch.update(firestore().collection('users').doc(uid), {
-                            [`budget.${month}.${category}`]: {
-                                limit: encrypt(
-                                    String(item.limit),
-                                    uid,
-                                ),
-                                alert: item.alert,
-                                percentage: encrypt(String(item.percentage), uid),
-                            },
-                        });
-                    }
-                }
-                realm.write(() => {
-                    realm.delete(budget);
-                });
-            }
-            console.log('CATSSS', expenseCategory, incomeCategory);
-            if (category.length > 0) {
-                batch.update(firestore().collection('users').doc(uid), {
-                    expenseCategory: expenseCategory.concat(category.filter((cat) => cat.type === 'expense').reduce((acc: string[], item) => {
-                        acc.push(item.name);
-                        return acc;
-                    }, [])).map(
-                        item => encrypt(item, uid),
-                    ), incomeCategory: incomeCategory.concat(category.filter((cat) => cat.type === 'income').reduce((acc: string[], item) => {
-                        acc.push(item.name);
-                        return acc;
-                    }, [])).map(
-                        item => encrypt(item, uid),
-                    ),
-                });
-                realm.write(() => {
-                    realm.delete(category);
-                });
-            }
+
             await batch.commit();
             console.log('DB SYNC Done');
         } catch (e) {
             console.log('SYNC ERROR', e);
         }
-
     }
+
 };

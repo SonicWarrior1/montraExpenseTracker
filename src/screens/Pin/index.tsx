@@ -9,17 +9,14 @@ import {
 } from 'react-native';
 import styles from './styles';
 import {TouchableOpacity} from 'react-native-gesture-handler';
-import {COLORS} from '../../constants/commonStyles';
 import {PinSentScreenProps} from '../../defs/navigation';
 import {NAVIGATION, STRINGS} from '../../constants/strings';
 import {useAppDispatch, useAppSelector} from '../../redux/store';
 import {setLoading, userLoggedIn} from '../../redux/reducers/userSlice';
 import firestore from '@react-native-firebase/firestore';
-import {ICONS} from '../../constants/icons';
 import {encrypt} from '../../utils/encryption';
 // Third Party Libraries
 import Toast from 'react-native-toast-message';
-import uuid from 'react-native-uuid';
 import auth from '@react-native-firebase/auth';
 import {UserFromJson} from '../../utils/userFuncs';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
@@ -34,7 +31,7 @@ function Pin({route, navigation}: Readonly<PinSentScreenProps>) {
   const currentUser = useAppSelector(state => state.user.currentUser);
   const isSetup = currentUser?.pin === '';
   const oldPin = route.params.pin ?? '';
-  // dispatch(setLoading(false));
+  // dispatch(setLoading(false))
   // state
   const [pin, setPin] = useState<number[]>([]);
   const [menu, setMenu] = useState(false);

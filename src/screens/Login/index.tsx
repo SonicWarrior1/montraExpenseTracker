@@ -155,7 +155,7 @@ function Login({navigation}: Readonly<LoginScreenProps>) {
   }
   return (
     <SafeAreaView style={styles.safeView}>
-      <KeyboardAwareScrollView enableOnAndroid={true}>
+      <KeyboardAwareScrollView style={{flex:1}}>
         <CustomHeader
           backgroundColor={COLOR.LIGHT[100]}
           title="Login"

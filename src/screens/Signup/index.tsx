@@ -1,7 +1,10 @@
 import React, {useState} from 'react';
 import {
+  Dimensions,
+  KeyboardAvoidingView,
   Pressable,
   SafeAreaView,
+  ScrollView,
   Text,
   TouchableOpacity,
   View,
@@ -156,7 +159,7 @@ function Signup({navigation}: Readonly<SignupScreenProps>) {
   }
   return (
     <SafeAreaView style={styles.safeView}>
-      <KeyboardAwareScrollView enableOnAndroid={true}>
+      <KeyboardAwareScrollView style={{flex: 1}}>
         <CustomHeader
           backgroundColor={COLOR.LIGHT[100]}
           title="Sign Up"

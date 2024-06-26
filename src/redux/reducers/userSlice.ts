@@ -13,8 +13,12 @@ const UserSlice = createSlice({
     reducers: {
         userLoggedIn(state, action) {
             state.currentUser = action.payload
+            console.log("USER SET")
         },
         addBudget(state, action) {
+            if (state.currentUser!.budget?.[action.payload.month] === undefined) {
+                state.currentUser!.budget[action.payload.month] = {}
+            }
             state.currentUser!.budget[action.payload.month][action.payload.cat] = action.payload.budget
         },
         deleteBudget(state, action) {

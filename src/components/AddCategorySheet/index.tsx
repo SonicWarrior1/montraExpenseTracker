@@ -1,4 +1,4 @@
-import React, {useMemo, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux/store';
 import {
   BottomSheetModal,
@@ -24,6 +24,8 @@ import {COLORS} from '../../constants/commonStyles';
 import Toast from 'react-native-toast-message';
 import {useNetInfo} from '@react-native-community/netinfo';
 import {useRealm} from '@realm/react';
+import {Keyboard} from 'react-native';
+import {EmptyError} from '../../constants/errors';
 
 function AddCategorySheet({
   bottomSheetModalRef,
@@ -51,10 +53,12 @@ function AddCategorySheet({
   const realm = useRealm();
   // state
   const [category, setCategory] = useState('');
+  const [formKey, setFormKey] = useState(false);
   // functions
   const onPress = async () => {
-    const userDoc = firestore().collection('users').doc(uid);
+    setFormKey(true);
     if (category !== '') {
+      const userDoc = firestore().collection('users').doc(uid);
       dispatch(setLoading(true));
       if (
         type === 'expense'
@@ -114,7 +118,12 @@ function AddCategorySheet({
       }
     }
   };
-
+  useEffect(() => {
+    const keyboard = Keyboard.addListener('keyboardDidHide', () => {
+      bottomSheetModalRef.current?.snapToIndex(0);
+    });
+    return () => keyboard.remove();
+  }, []);
   return (
     <BottomSheetModal
       enablePanDownToClose
@@ -138,7 +147,11 @@ function AddCategorySheet({
           autoCorrect={false}
           maxLength={20}
         />
-        <Spacer height={20} />
+        <EmptyError
+          errorText="Category cannot be empty"
+          formKey={formKey}
+          value={category.trim()}
+        />
         <CustomButton title={STRINGS.Add} onPress={onPress} />
       </BottomSheetView>
     </BottomSheetModal>

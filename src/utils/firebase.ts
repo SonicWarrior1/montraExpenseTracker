@@ -122,17 +122,25 @@ export async function handleIncomeUpdate({
     },
     currency: string
 }) {
+    const finalAmount = (
+        (
+            (
+                UserFromJson(curr.data() as UserType)
+            )?.income?.[month]?.[category] ?? 0
+        ) -
+        transaction.amount +
+        Number(amount / conversion.usd[currency.toLowerCase()])
+    )
     await firestore()
         .collection('users')
         .doc(uid)
         .update({
             [`income.${month}.${category}`]:
-                encrypt(String(((((
-                    UserFromJson(curr.data() as UserType)
-                ).income[month][category] ?? 0) -
-                    transaction.amount +
-                    Number(amount)) /
-                    conversion.usd[currency.toLowerCase()]).toFixed(1)), uid),
+                encrypt(
+                    String(
+                        finalAmount
+                    ),
+                    uid),
         });
 }
 export async function handleNewIncome({
@@ -156,16 +164,25 @@ export async function handleNewIncome({
     },
     currency: string
 }) {
+    const finalAmount = (
+        (
+            (
+                UserFromJson(curr.data() as UserType)
+            )?.income[month]?.[category] ?? 0
+        ) +
+        (Number(amount) /
+            conversion.usd[currency.toLowerCase()]
+        )
+    )
     await firestore()
         .collection('users')
         .doc(uid)
         .update({
             [`income.${month}.${category}`]:
-                encrypt(String(((((
-                    UserFromJson(curr.data() as UserType)
-                )?.income[month]?.[category] ?? 0) +
-                    Number(amount)) /
-                    conversion.usd[currency.toLowerCase()]).toFixed(1)), uid),
+                encrypt(
+                    String(
+                        finalAmount
+                    ), uid),
         });
 }
 
@@ -192,18 +209,35 @@ export async function handleExpenseUpdate({
     },
     currency: string
 }) {
-    await firestore()
-        .collection('users')
-        .doc(uid)
-        .update({
-            [`spend.${month}.${category}`]:
-                encrypt(String(((((
+    try {
+        const finalAmount = (
+            (
+                (
                     UserFromJson(curr.data() as UserType)
-                ).spend[month][category] ?? 0) -
-                    transaction.amount +
-                    Number(amount)) /
-                    conversion.usd[currency.toLowerCase()]).toFixed(1)), uid),
-        });
+                )?.spend?.[month]?.[category] ?? 0
+            ) -
+            transaction.amount +
+            (Number(amount) / conversion.usd[currency.toLowerCase()])
+        )
+        await firestore()
+            .collection('users')
+            .doc(uid)
+            .update({
+                [`spend.${month}.${category}`]:
+                    encrypt(
+                        String(
+                            finalAmount
+                        ),
+                        uid),
+            });
+        if (category !== 'transfer') {
+            await handleNotify({
+                category: category, month: month, uid: uid, totalSpent: finalAmount, curr: curr
+            })
+        }
+    } catch (e) {
+        console.log("ERROR", e)
+    }
 }
 
 export async function handleNewExpense({
@@ -227,17 +261,32 @@ export async function handleNewExpense({
     },
     currency: string
 }) {
-    await firestore()
-        .collection('users')
-        .doc(uid)
-        .update({
-            [`spend.${month}.${category}`]:
-                encrypt(String(((((
+    try {
+        const finalAmount = (
+            (
+                (
                     UserFromJson(curr.data() as UserType)
-                )?.spend[month]?.[category] ?? 0) +
-                    Number(amount)) /
-                    conversion.usd[currency.toLowerCase()]).toFixed(1)), uid),
-        });
+                )?.spend[month]?.[category] ?? 0
+            ) +
+            (Number(amount) /
+                conversion.usd[currency.toLowerCase()]
+            )
+        );
+        await firestore()
+            .collection('users')
+            .doc(uid)
+            .update({
+                [`spend.${month}.${category}`]:
+                    encrypt(String(finalAmount), uid)
+            });
+        if (category !== 'transfer') {
+            await handleNotify({
+                category: category, month: month, uid: uid, totalSpent: finalAmount, curr: curr
+            })
+        }
+    } catch (e) {
+        console.log(e)
+    }
 }
 export async function getAttachmentUrl({
     attachement,
@@ -277,12 +326,13 @@ export async function handleNotify({
     month: number,
     category: string
 }) {
+    console.log("notifyyy")
     const totalBudget = (UserFromJson(curr.data() as UserType))?.budget?.[
         month
     ]?.[category];
     if (
         totalBudget &&
-        (totalSpent >= totalBudget.limit || totalSpent >= totalBudget.limit * (totalBudget.percentage / 100))
+        ((totalSpent >= totalBudget.limit) || (totalSpent >= totalBudget.limit * (totalBudget.percentage / 100)))
     ) {
         try {
             const notificationId = uuid.v4();
@@ -363,7 +413,7 @@ export async function singupUser({ name, email, pass }: { name: string, email: s
                 uid: creds.user.uid,
                 pin: '',
             });
-            console.log(encrpytedUser);
+            // console.log(encrpytedUser);
             await firestore()
                 .collection('users')
                 .doc(creds.user.uid)

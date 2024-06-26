@@ -1,4 +1,4 @@
-import React, {useCallback, useState} from 'react';
+import React, {useState} from 'react';
 import {FlatList, Pressable, SafeAreaView, Text, View} from 'react-native';
 import style from './styles';
 import {ICONS} from '../../constants/icons';
@@ -16,8 +16,6 @@ import {Bar} from 'react-native-progress';
 import {COLORS} from '../../constants/commonStyles';
 import {useAppTheme} from '../../hooks/themeHook';
 import TabBackdrop from '../../components/TabBackdrop';
-import {useQuery} from '@realm/react';
-import {BudgetModel} from '../../DbModels/BudgetModel';
 import {formatWithCommas, getMyColor} from '../../utils/commonFuncs';
 
 function BudgetScreen({navigation}: Readonly<BudgetScreenProps>) {
@@ -168,9 +166,13 @@ function BudgetScreen({navigation}: Readonly<BudgetScreenProps>) {
                         ).toString(),
                       )}{' '}
                       of {currencies[currency!].symbol}
-                      {formatWithCommas(Number((
-                        conversion.usd[currency!.toLowerCase()] * val.limit
-                      ).toFixed(1)).toString())}
+                      {formatWithCommas(
+                        Number(
+                          (
+                            conversion.usd[currency!.toLowerCase()] * val.limit
+                          ).toFixed(1),
+                        ).toString(),
+                      )}
                     </Text>
                     {(spend[key] ?? 0) >= val.limit && (
                       <Text style={styles.limitText}>

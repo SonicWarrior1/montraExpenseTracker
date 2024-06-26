@@ -26,6 +26,8 @@ import {OnlineTransactionModel} from '../../DbModels/OnlineTransactionModel';
 import {OfflineTransactionModel} from '../../DbModels/OfflineTransactionModel';
 import {formatAMPM} from '../../utils/firebase';
 import {formatWithCommas} from '../../utils/commonFuncs';
+import {AmountModel} from '../../DbModels/AmountModel';
+import { NotificationModel } from '../../DbModels/NotificationModel';
 
 function Home({navigation, route}: Readonly<HomeScreenProps>) {
   // state
@@ -55,10 +57,13 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
           ?.getMonth() === new Date().getMonth()
       );
     })
-    .sort((a, b) => b.timeStamp.seconds - a.timeStamp.seconds);
+    .sort((a, b) => b.timeStamp.seconds - a.timeStamp.seconds)
+    .slice(0, 3);
 
   const theme = useAppSelector(state => state.user.currentUser?.theme);
-
+  const zz = useQuery(NotificationModel);
+  const gg = useQuery(AmountModel);
+  console.log("DB",zz,gg);
   // constants
   const totalSpend = Object.values(spends ?? []).reduce((a, b) => a + b, 0);
   const totalIncome = Object.values(incomes ?? []).reduce((a, b) => a + b, 0);
@@ -226,7 +231,6 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
               </Pressable>
             )}
           </View>
-
           <FlatList
             style={{paddingHorizontal: 20}}
             ListEmptyComponent={ListEmptyComponent}

@@ -80,6 +80,7 @@ export const STRINGS = {
   No: 'No',
   Yes: 'Yes',
   BudgetDeletedSuccesfully: 'Budget Deleted Successfully',
+  BudgetCreatedSuccesfully: 'Budget Created Successfully',
   RemovethisTransaction: 'Remove this Transaction?',
   sureRemoveTransaction: 'Are you sure you want to remove this transaction?',
   TransactionDeletedSuccesfully: 'Transaction Deleted Successfully',

@@ -7,7 +7,9 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
     paddingTop: 15,
     justifyContent: 'center',
     paddingHorizontal: 20,
-  }, input: {
+  }, 
+  input: {
+    color:COLOR.DARK[100],
     borderWidth: 1,
     borderRadius: 20,
     height: 60,

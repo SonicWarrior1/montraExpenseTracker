@@ -19,9 +19,11 @@ import {OfflineTransactionModel} from './DbModels/OfflineTransactionModel';
 import firestore from '@react-native-firebase/firestore';
 import {BudgetModel} from './DbModels/BudgetModel';
 import {CategoryModel} from './DbModels/CategoryModel';
+import {AmountModel} from './DbModels/AmountModel';
+import {NotificationModel} from './DbModels/NotificationModel';
 
-enableFreeze(true);
-enableScreens(false);
+// enableFreeze(true);
+// enableScreens(false);
 GoogleSignin.configure({
   webClientId:
     '426728684733-08hbgavcdljaclium152ea992drr4ev3.apps.googleusercontent.com',
@@ -38,6 +40,8 @@ function App(): React.JSX.Element {
           OfflineTransactionModel,
           BudgetModel,
           CategoryModel,
+          AmountModel,
+          NotificationModel,
         ]}>
         <Provider store={store}>
           <PersistGate persistor={persistor}>

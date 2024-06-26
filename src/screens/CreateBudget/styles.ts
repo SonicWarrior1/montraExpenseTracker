@@ -7,7 +7,7 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
     safeView: { flex: 1, backgroundColor: COLOR.PRIMARY.VIOLET },
     mainView: {
         // flex:1,
-        height: screenHeight / 2,
+        height: screenHeight / 1.9,
         justifyContent: 'flex-end',
     },
     text1: {
@@ -31,6 +31,7 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
         paddingHorizontal: 30,
     },
     detailsCtr: {
+        flex: 1,
         width: '100%',
         paddingHorizontal: 20,
         paddingVertical: 30,
@@ -42,7 +43,7 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingTop: 20,
+        paddingTop: 10,
         paddingBottom: 10
     },
     flexRowText1: { fontWeight: '500', fontSize: RFValue(16), color: COLOR.DARK[100] },
