@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import {
   Alert,
+  NativeModules,
   Pressable,
   SafeAreaView,
   Text,
@@ -114,11 +115,11 @@ function Login({navigation}: Readonly<LoginScreenProps>) {
         await GoogleSignin.signOut();
       }
       // Check if your device supports Google Play
-      await GoogleSignin.hasPlayServices({showPlayServicesUpdateDialog: true});
+      // await GoogleSignin.hasPlayServices({showPlayServicesUpdateDialog: true});
 
-      // Get the users ID token
-      const {idToken} = await GoogleSignin.signIn();
-
+      // // Get the users ID token
+      // const {idToken} = await GoogleSignin.signIn();
+      const idToken = await NativeModules.GoogleSignInHandler.signIn();
       // Create a Google credential with the token
       const googleCredential = auth.GoogleAuthProvider.credential(idToken);
 

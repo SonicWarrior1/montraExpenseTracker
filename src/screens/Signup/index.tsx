@@ -1,10 +1,7 @@
 import React, {useState} from 'react';
 import {
-  Dimensions,
-  KeyboardAvoidingView,
   Pressable,
   SafeAreaView,
-  ScrollView,
   Text,
   TouchableOpacity,
   View,
@@ -47,7 +44,7 @@ import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import Toast from 'react-native-toast-message';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import CustomHeader from '../../components/CustomHeader/index.tsx';
-import {useFocusEffect} from '@react-navigation/native';
+
 function Signup({navigation}: Readonly<SignupScreenProps>) {
   // constants
   const dispatch = useAppDispatch();
@@ -159,7 +156,9 @@ function Signup({navigation}: Readonly<SignupScreenProps>) {
   }
   return (
     <SafeAreaView style={styles.safeView}>
-      <KeyboardAwareScrollView style={{flex: 1}} keyboardShouldPersistTaps="handled">
+      <KeyboardAwareScrollView
+        style={{flex: 1}}
+        keyboardShouldPersistTaps="handled">
         <CustomHeader
           backgroundColor={COLOR.LIGHT[100]}
           title="Sign Up"
