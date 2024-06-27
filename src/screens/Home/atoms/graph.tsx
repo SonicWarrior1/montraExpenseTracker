@@ -94,7 +94,7 @@ function Graph({
           <Text style={styles.emptyText}>{STRINGS.NotEnoughData}</Text>
         </View>
       ) : (
-        <View style={{transform: [{translateX: -10}]}}>
+        <View style={{transform: [{translateX: -28}]}}>
           <LineChart
             height={180}
             data={graphData}
@@ -103,8 +103,8 @@ function Graph({
             startFillColor1={COLORS.VIOLET[40]}
             endFillColor1={COLOR.LIGHT[100]}
             isAnimated={true}
-            initialSpacing={0}
-            width={Dimensions.get('screen').width}
+            // initialSpacing={0}
+            width={Dimensions.get('screen').width * 1.04}
             hideDataPoints
             thickness={12}
             hideRules
@@ -118,7 +118,8 @@ function Graph({
             disableScroll
             yAxisExtraHeight={30}
             pointerConfig={{
-              pointerStripHeight: 220,
+              stripOverPointer: true,
+              pointerStripHeight: 190,
               pointerStripColor: 'lightgray',
               pointerStripWidth: 2,
               pointerColor: 'lightgray',

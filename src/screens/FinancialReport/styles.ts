@@ -75,7 +75,7 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
         paddingHorizontal: 10,
     },
     amt: { fontSize: RFValue(32), fontWeight: '700', paddingLeft: 20, color: COLOR.DARK[100] },
-    graphView: { transform: [{ translateX: -10 }] },
+    graphView: { transform: [{ translateX: -28 }] },
     pieView: {
         alignItems: 'center',
         paddingVertical: 20,

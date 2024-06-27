@@ -8,6 +8,7 @@ export class NotificationModel extends Realm.Object {
     time!: TimestampModel
     read!: boolean
     percentage!: number
+    deleted!: boolean
     static readonly schema: ObjectSchema = {
         name: 'notification',
         properties: {
@@ -17,6 +18,7 @@ export class NotificationModel extends Realm.Object {
             time: 'timestamp',
             read: 'bool',
             percentage: 'int',
+            deleted: 'bool'
         },
         primaryKey: 'id'
     }

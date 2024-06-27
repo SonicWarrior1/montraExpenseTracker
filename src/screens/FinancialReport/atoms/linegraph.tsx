@@ -99,8 +99,8 @@ function Linegraph({
             startFillColor1={COLORS.VIOLET[40]}
             endFillColor1={COLOR.LIGHT[100]}
             isAnimated={true}
-            initialSpacing={0}
-            width={Dimensions.get('screen').width}
+            // initialSpacing={1}
+            width={Dimensions.get('screen').width * 1.04}
             hideDataPoints
             thickness={12}
             hideRules
@@ -114,7 +114,7 @@ function Linegraph({
             disableScroll
             yAxisExtraHeight={40}
             pointerConfig={{
-              pointerStripHeight: 250,
+              pointerStripHeight: 220,
               pointerStripColor: 'lightgray',
               pointerStripWidth: 2,
               pointerColor: 'lightgray',

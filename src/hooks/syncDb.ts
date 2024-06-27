@@ -48,71 +48,74 @@ export const syncDb = async ({
                     realm.delete(amounts);
                 });
             }
-            // if (budget.length > 0) {
-            //     console.log("Budget Syncing")
-            //     for (const item of budget) {
-            //         const month = item.id.split('_')[0];
-            //         const category = item.id.split('_')[1];
-            //         if (item.delete) {
-            //             batch.update(firestore().collection('users').doc(uid), {
-            //                 [`budget.${month}.${category}`]: deleteField(),
-            //             });
-            //         } else {
-            //             batch.update(firestore().collection('users').doc(uid), {
-            //                 [`budget.${month}.${category}`]: {
-            //                     limit: encrypt(
-            //                         String(item.limit),
-            //                         uid,
-            //                     ),
-            //                     alert: item.alert,
-            //                     percentage: encrypt(String(item.percentage), uid),
-            //                 },
-            //             });
-            //         }
-            //     }
-            //     realm.write(() => {
-            //         realm.delete(budget);
-            //     });
-            // }
-            // if (category.length > 0) {
-            //     console.log("Category Syncing")
-            //     batch.update(firestore().collection('users').doc(uid), {
-            //         expenseCategory: expenseCategory.concat(category.filter((cat) => cat.type === 'expense').reduce((acc: string[], item) => {
-            //             acc.push(item.name);
-            //             return acc;
-            //         }, [])).map(
-            //             item => encrypt(item, uid),
-            //         ), incomeCategory: incomeCategory.concat(category.filter((cat) => cat.type === 'income').reduce((acc: string[], item) => {
-            //             acc.push(item.name);
-            //             return acc;
-            //         }, [])).map(
-            //             item => encrypt(item, uid),
-            //         ),
-            //     });
-            //     realm.write(() => {
-            //         realm.delete(category);
-            //     });
-            // }
-            // if (notifications.length > 0) {
-            //     console.log("Notification Syncing")
-            //     for (const item of notifications) {
-            //         console.log("chlaa")
-            //         batch.update(firestore().collection('users').doc('uid'), {
-            //             [`notification.${item.id}`]: {
-            //                 type: encrypt(item.type, uid),
-            //                 category: encrypt(item.category, uid),
-            //                 id: item.id,
-            //                 time: item.time,
-            //                 read: item.read,
-            //                 percentage: item.percentage,
-            //             },
+            if (budget.length > 0) {
+                console.log("Budget Syncing")
+                for (const item of budget) {
+                    const month = item.id.split('_')[0];
+                    const category = item.id.split('_')[1];
+                    if (item.delete) {
+                        batch.update(firestore().collection('users').doc(uid), {
+                            [`budget.${month}.${category}`]: deleteField(),
+                        });
+                    } else {
+                        batch.update(firestore().collection('users').doc(uid), {
+                            [`budget.${month}.${category}`]: {
+                                limit: encrypt(
+                                    String(item.limit),
+                                    uid,
+                                ),
+                                alert: item.alert,
+                                percentage: encrypt(String(item.percentage), uid),
+                            },
+                        });
+                    }
+                }
+                realm.write(() => {
+                    realm.delete(budget);
+                });
+            }
+            if (category.length > 0) {
+                console.log("Category Syncing")
+                batch.update(firestore().collection('users').doc(uid), {
+                    expenseCategory: expenseCategory.concat(category.filter((cat) => cat.type === 'expense' && !expenseCategory.includes(cat.name)).reduce((acc: string[], item) => {
+                        acc.push(item.name);
+                        return acc;
+                    }, [])).map(
+                        item => encrypt(item, uid),
+                    ), incomeCategory: incomeCategory.concat(category.filter((cat) => cat.type === 'income' && !incomeCategory.includes(cat.name)).reduce((acc: string[], item) => {
+                        acc.push(item.name);
+                        return acc;
+                    }, [])).map(
+                        item => encrypt(item, uid),
+                    ),
+                });
+                realm.write(() => {
+                    realm.delete(category);
+                });
+            }
+            if (notifications.length > 0) {
+                console.log("Notification Syncing")
+                for (const item of notifications) {
+                    if (item.deleted) {
+                        batch.update(firestore().collection('users').doc(uid), { [`notification.${item.id}`]: deleteField() })
+                    } else {
+                        batch.update(firestore().collection('users').doc(uid), {
+                            [`notification.${item.id}`]: {
+                                type: encrypt(item.type, uid),
+                                category: encrypt(item.category, uid),
+                                id: item.id,
+                                time: item.time,
+                                read: item.read,
+                                percentage: item.percentage,
+                            },
 
-            //         })
-            //     }
-            //     realm.write(() => {
-            //         realm.delete(notifications)
-            //     })
-            // }
+                        })
+                    }
+                }
+                realm.write(() => {
+                    realm.delete(notifications)
+                })
+            }
             if (data.length > 0) {
                 console.log("Transanction Syncing")
                 for (const item of data) {

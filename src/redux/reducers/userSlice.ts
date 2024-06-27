@@ -38,9 +38,28 @@ const UserSlice = createSlice({
         },
         setTheme(state, action) {
             state.theme = action.payload
+        },
+        setIncome(state, action) {
+            if (state.currentUser?.income?.[action.payload.month] === undefined) {
+                state.currentUser!.income[action.payload.month] = {}
+            }
+            state.currentUser!.income[action.payload.month][action.payload.category] = action.payload.amount
+        },
+        setExpense(state, action) {
+            if (state.currentUser?.spend?.[action.payload.month] === undefined) {
+                state.currentUser!.spend[action.payload.month] = {}
+            }
+            state.currentUser!.spend[action.payload.month][action.payload.category] = action.payload.amount
+        },
+        updateNotification(state, action) {
+            if (action.payload.type === 'read') {
+                state.currentUser!.notification[action.payload.id].read = true;
+            } else if (action.payload.type === 'delete') {
+                delete state.currentUser!.notification[action.payload.id];
+            }
         }
     }
 })
 
-export const { userLoggedIn, setLoading, addExpenseCategory, addIncomeCategory, setCurrencyCode, addBudget, deleteBudget, setTheme } = UserSlice.actions
+export const { userLoggedIn, setLoading, addExpenseCategory, addIncomeCategory, setCurrencyCode, addBudget, deleteBudget, setTheme, setIncome, setExpense, updateNotification } = UserSlice.actions
 export default UserSlice.reducer

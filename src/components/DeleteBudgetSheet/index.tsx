@@ -27,6 +27,7 @@ function DeleteBudgetSheet({
   navigation,
   category,
   budget,
+  month,
 }: Readonly<{
   bottomSheetModalRef: React.RefObject<BottomSheetModalMethods>;
   navigation: StackNavigationProp<
@@ -40,13 +41,13 @@ function DeleteBudgetSheet({
     limit: number;
     percentage: number;
   };
+  month: number;
 }>) {
   // constants
   const COLOR = useAppTheme();
   const styles = style(COLOR);
   const dispatch = useAppDispatch();
   const snapPoints = useMemo(() => ['30%'], []);
-  const month = new Date().getMonth();
   const {isConnected} = useNetInfo();
   const realm = useRealm();
   // redux
@@ -78,7 +79,11 @@ function DeleteBudgetSheet({
             [`budget.${month}.${category}`]: deleteField(),
           });
       }
-      Toast.show({text1: STRINGS.BudgetDeletedSuccesfully, type: 'custom', swipeable: false,});
+      Toast.show({
+        text1: STRINGS.BudgetDeletedSuccesfully,
+        type: 'custom',
+        swipeable: false,
+      });
       dispatch(setLoading(false));
     } catch (e) {
       console.log(e);

@@ -12,7 +12,12 @@ import firestore from '@react-native-firebase/firestore';
 import {useAppDispatch, useAppSelector} from '../../redux/store';
 import Toast from 'react-native-toast-message';
 import {RootStackParamList} from '../../defs/navigation';
-import {setLoading, userLoggedIn} from '../../redux/reducers/userSlice';
+import {
+  setExpense,
+  setIncome,
+  setLoading,
+  userLoggedIn,
+} from '../../redux/reducers/userSlice';
 import style from './styles';
 import {transactionType} from '../../defs/transaction';
 import SheetBackdrop from '../SheetBackDrop';
@@ -85,15 +90,10 @@ function DeleteTransactionSheet({
         });
         if (type === 'income') {
           dispatch(
-            userLoggedIn({
-              ...user,
-              income: {
-                ...user?.income,
-                [month]: {
-                  ...user?.income[month],
-                  [category]: user?.income[month][category]! - Number(amt),
-                },
-              },
+            setIncome({
+              month: month,
+              category: category,
+              amount: user?.income[month][category]! - Number(amt),
             }),
           );
           realm.write(() => {
@@ -107,36 +107,39 @@ function DeleteTransactionSheet({
             );
             console.log('done');
           });
-        } else {
+        } else if (type === 'expense') {
           dispatch(
-            userLoggedIn({
-              ...user,
-              spend: {
-                ...user?.spend,
-                [month]: {
-                  ...user?.spend[month],
-                  [category]:
-                    user?.spend[month][
-                      type === 'transfer' ? 'transfer' : category
-                    ]! - Number(amt),
-                },
-              },
+            setExpense({
+              month: month,
+              category: category,
+              amount: user?.spend[month][category]! - Number(amt),
             }),
           );
           realm.write(() => {
             realm.create(
               'amount',
               {
-                id:
-                  month +
-                  '_' +
-                  (type === 'transfer' ? 'transfer' : category) +
-                  '_' +
-                  type,
-                amount:
-                  user?.spend[month][
-                    type === 'transfer' ? 'transfer' : category
-                  ]! - Number(amt),
+                id: month + '_' + category + '_' + type,
+                amount: user?.spend[month][category]! - Number(amt),
+              },
+              UpdateMode.All,
+            );
+            console.log('done');
+          });
+        } else {
+          dispatch(
+            setExpense({
+              month: month,
+              category: 'transfer',
+              amount: user?.spend[month]['transfer']! - Number(amt),
+            }),
+          );
+          realm.write(() => {
+            realm.create(
+              'amount',
+              {
+                id: month + '_' + 'transfer' + '_' + type,
+                amount: user?.spend[month]['transfer']! - Number(amt),
               },
               UpdateMode.All,
             );
@@ -171,7 +174,7 @@ function DeleteTransactionSheet({
             .update({
               [`income.${month}.${category}`]: encrypt(
                 String(
-                  (UserFromJson(data.data()!)?.spend?.[month]?.[category] ??
+                  (UserFromJson(data.data()!)?.income?.[month]?.[category] ??
                     0) - amt,
                 ),
                 uid!,

@@ -295,7 +295,16 @@ function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
                 data.length === 0 || title === '' ? (
                   <View />
                 ) : (
-                  <Text style={styles.sectionHeader}>
+                  <Text
+                    style={[
+                      styles.sectionHeader,
+                      {
+                        backgroundColor:
+                          finaltheme === 'light'
+                            ? COLOR.LIGHT[100]
+                            : COLOR.DARK[75],
+                      },
+                    ]}>
                     {title !== 'today' && title !== 'yesterday'
                       ? title
                       : title[0].toUpperCase() + title.slice(1)}

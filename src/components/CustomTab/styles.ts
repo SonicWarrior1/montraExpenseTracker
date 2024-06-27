@@ -12,7 +12,7 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
     animatedBtnOuter: {
         width: 75,
         height: 75,
-        borderRadius: 80,
+        borderRadius: 100,
         justifyContent: 'center',
         alignItems: 'center',
     },

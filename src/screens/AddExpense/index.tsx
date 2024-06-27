@@ -17,12 +17,11 @@ import {ICONS} from '../../constants/icons';
 import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import FilePickerSheet from '../../components/FilePickerSheet';
 import RepeatTransactionSheet from '../../components/RepeatTranscationSheet';
-import firestore, {Timestamp} from '@react-native-firebase/firestore';
 import {STRINGS} from '../../constants/strings';
 import CustomButton from '../../components/CustomButton';
 import {repeatDataType, transactionType} from '../../defs/transaction';
 import {useAppDispatch, useAppSelector} from '../../redux/store';
-import {setLoading, userLoggedIn} from '../../redux/reducers/userSlice';
+import {setLoading} from '../../redux/reducers/userSlice';
 import uuid from 'react-native-uuid';
 import Toast from 'react-native-toast-message';
 import {ExpenseScreenProps} from '../../defs/navigation';
@@ -30,31 +29,18 @@ import AddCategorySheet from '../../components/AddCategorySheet';
 
 import {CompundEmptyError, EmptyError} from '../../constants/errors';
 import AttachementContainer from './atoms/attachementContainer';
-import {
-  addNewTransaction,
-  createTransaction,
-  getAttachmentUrl,
-  handleExpenseUpdate,
-  handleIncomeUpdate,
-  handleNewExpense,
-  handleNewIncome,
-  handleNotify,
-  updateTransaction,
-} from '../../utils/firebase';
+import {handleOffline, handleOnline} from '../../utils/firebase';
 import {useAppTheme} from '../../hooks/themeHook';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {useNetInfo} from '@react-native-community/netinfo';
 import {useObject, useRealm} from '@realm/react';
-import {TransFromJson} from '../../utils/transFuncs';
 import {OnlineTransactionModel} from '../../DbModels/OnlineTransactionModel';
-import {UpdateMode} from 'realm';
 import {OfflineTransactionModel} from '../../DbModels/OfflineTransactionModel';
 import CustomHeader from '../../components/CustomHeader';
 import MoneyInput from './atoms/MoneyInput';
 import {RepeatDataModel} from '../../DbModels/RepeatDataModel';
 import {formatWithCommas, getMyColor} from '../../utils/commonFuncs';
 import RepeatInput from './atoms/RepeatInput';
-import notifee from '@notifee/react-native';
 function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
   // constants
   const {isConnected} = useNetInfo();
@@ -163,371 +149,6 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
     return {attachement, attachementType};
   }, [image, doc]);
 
-  const handleOffline = async ({
-    id,
-    attachement,
-    attachementType,
-  }: {
-    id: string;
-    attachement: string;
-    attachementType: 'none' | 'image' | 'doc';
-  }) => {
-    console.log('offline');
-    let trans = TransFromJson(
-      createTransaction({
-        id: id,
-        url: attachement,
-        attachementType: attachementType,
-        amount: amount.replace(/,/g, ''),
-        category: pageType === 'transfer' ? 'transfer' : category!,
-        conversion: conversion,
-        currency: currency!,
-        desc: desc,
-        isEdit: isEdit,
-        pageType: pageType,
-        repeatData: repeatData!,
-        transaction: prevTransaction!,
-        wallet: wallet,
-        uid: uid,
-        from: from,
-        to: to,
-      }),
-      uid,
-    );
-    if (
-      !isConnected &&
-      (trans.freq?.date as Timestamp)?.seconds !== undefined
-    ) {
-      trans.freq!.date = Timestamp.fromMillis(
-        (trans.freq?.date as Timestamp).seconds * 1000,
-      ).toDate();
-    }
-    if (pageType === 'income') {
-      dispatch(
-        userLoggedIn({
-          ...user,
-          income: {
-            ...(user?.income ?? {}),
-            [month]: {
-              ...(user?.income?.[month] ?? {}),
-              [category!]: isEdit
-                ? user?.income[month][category!]! -
-                  prevTransaction?.amount! +
-                  Number(amount.replace(/,/g, '')) /
-                    (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1)
-                : (user?.income?.[month]?.[category!] ?? 0) +
-                  Number(amount.replace(/,/g, '')) /
-                    (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1),
-            },
-          },
-        }),
-      );
-      realm.write(() => {
-        realm.create(
-          'amount',
-          {
-            id: month + '_' + category + '_' + pageType,
-            amount: isEdit
-              ? user?.income[month][category!]! -
-                prevTransaction?.amount! +
-                Number(amount.replace(/,/g, '')) /
-                  (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1)
-              : (user?.income?.[month]?.[category!] ?? 0) +
-                Number(amount.replace(/,/g, '')) /
-                  (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1),
-          },
-          UpdateMode.All,
-        );
-        console.log('done');
-      });
-    } else {
-      // console.log(
-      //   'djfnsdjf',
-      //   user?.spend?.[month]?.[pageType === 'transfer' ? 'transfer' : category!]!,
-      //   prevAmt!,
-      //   Number(amount.replace(/,/g, '')) /
-      //     (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1),
-      //   user?.spend?.[month]?.[pageType === 'transfer' ? 'transfer' : category!]! -
-      //     prevAmt! +
-      //     Number(amount.replace(/,/g, '')) /
-      //       (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1),
-      // );
-      dispatch(
-        userLoggedIn({
-          ...user,
-          spend: {
-            ...(user?.spend ?? {}),
-            [month]: {
-              ...(user?.spend?.[month] ?? {}),
-              [pageType === 'transfer' ? 'transfer' : category!]: isEdit
-                ? user?.spend?.[month]?.[
-                    pageType === 'transfer' ? 'transfer' : category!
-                  ]! -
-                  prevAmt! +
-                  Number(amount.replace(/,/g, '')) /
-                    (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1)
-                : (user?.spend?.[month]?.[
-                    pageType === 'transfer' ? 'transfer' : category!
-                  ] ?? 0) +
-                  Number(amount.replace(/,/g, '')) /
-                    (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1),
-            },
-          },
-        }),
-      );
-      realm.write(() => {
-        realm.create(
-          'amount',
-          {
-            id:
-              month +
-              '_' +
-              (pageType === 'transfer' ? 'transfer' : category) +
-              '_' +
-              pageType,
-            amount: isEdit
-              ? user?.spend[month][
-                  pageType === 'transfer' ? 'transfer' : category!
-                ]! -
-                prevTransaction?.amount! +
-                Number(amount.replace(/,/g, '')) /
-                  (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1)
-              : (user?.spend?.[month]?.[
-                  pageType === 'transfer' ? 'transfer' : category!
-                ] ?? 0) +
-                Number(amount.replace(/,/g, '')) /
-                  (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1),
-          },
-          UpdateMode.All,
-        );
-        console.log('done');
-      });
-      if (pageType !== 'transfer') {
-        const totalBudget = user?.budget?.[month]?.[category!];
-        const totalSpent = isEdit
-          ? user?.spend[month][category!]! -
-            prevTransaction?.amount! +
-            Number(amount.replace(/,/g, '')) /
-              (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1)
-          : (user?.spend?.[month]?.[category!] ?? 0) +
-            Number(amount.replace(/,/g, '')) /
-              (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1);
-        if (
-          totalBudget &&
-          (totalSpent >= totalBudget.limit ||
-            totalSpent >= totalBudget.limit * (totalBudget.percentage / 100))
-        ) {
-          try {
-            const notificationId = uuid.v4();
-            await notifee.requestPermission();
-            const channelId = await notifee.createChannel({
-              id: 'default',
-              name: 'Default Channel',
-            });
-            if (totalSpent >= totalBudget.limit) {
-              realm.write(() => {
-                realm.create(
-                  'notification',
-                  {
-                    type: 'budget-limit',
-                    category: category!,
-                    id: notificationId,
-                    time: Timestamp.now(),
-                    read: false,
-                    percentage: totalBudget.percentage,
-                  },
-                  UpdateMode.Never,
-                );
-              });
-              dispatch(
-                userLoggedIn({
-                  ...user,
-                  notification: {
-                    ...user.notification,
-                    [notificationId as string]: {
-                      type: 'budget-limit',
-                      category: category!,
-                      id: notificationId,
-                      time: Timestamp.now(),
-                      read: false,
-                      percentage: totalBudget.percentage,
-                    },
-                  },
-                }),
-              );
-              await notifee.displayNotification({
-                title:
-                  category![0].toUpperCase() +
-                  category!.slice(1) +
-                  ' Budget Limit Exceeded',
-                body:
-                  'Your ' +
-                  category![0].toUpperCase() +
-                  category!.slice(1) +
-                  ' budget has exceeded the limit',
-                android: {
-                  channelId,
-                },
-              });
-            } else if (
-              totalSpent >=
-              totalBudget.limit * (totalBudget.percentage / 100)
-            ) {
-              realm.write(() => {
-                realm.create(
-                  'notification',
-                  {
-                    type: 'budget-percent',
-                    category: category!,
-                    id: notificationId,
-                    time: Timestamp.now(),
-                    read: false,
-                    percentage: totalBudget.percentage,
-                  },
-                  UpdateMode.Never,
-                );
-              });
-              dispatch(
-                userLoggedIn({
-                  ...user,
-                  notification: {
-                    ...user.notification,
-                    [notificationId as string]: {
-                      type: 'budget-percent',
-                      category: category!,
-                      id: notificationId,
-                      time: Timestamp.now(),
-                      read: false,
-                      percentage: totalBudget.percentage,
-                    },
-                  },
-                }),
-              );
-              await notifee.displayNotification({
-                title: `Exceeded ${totalBudget.percentage}% of ${
-                  category![0].toUpperCase() + category!.slice(1)
-                } budget`,
-                body: `You've exceeded ${totalBudget.percentage}% of your ${
-                  category![0].toUpperCase() + category!.slice(1)
-                } budget. Take action to stay on track.`,
-                android: {
-                  channelId,
-                },
-              });
-            }
-          } catch (e) {
-            console.log(e);
-          }
-        }
-      }
-    }
-    if (trans.freq) {
-      trans.freq.date = Timestamp.fromDate(trans.freq?.date as Date);
-    }
-    realm.write(() => {
-      if (isEdit && TransOnline) {
-        realm.create(
-          'OnlineTransaction',
-          {...trans, changed: true},
-          UpdateMode.Modified,
-        );
-      }
-      realm.create(
-        'OfflineTransaction',
-        {...trans, operation: isEdit ? 'update' : 'add'},
-        UpdateMode.All,
-      );
-    });
-  };
-
-  const handleOnline = async ({
-    id,
-    attachement,
-    attachementType,
-  }: {
-    id: string;
-    attachement: string;
-    attachementType: 'none' | 'image' | 'doc';
-  }) => {
-    const url = await getAttachmentUrl({
-      attachement: attachement,
-      id: id,
-      uid: uid,
-    });
-    const trans = createTransaction({
-      id: id,
-      url: url,
-      attachementType: attachementType,
-      amount: amount.replace(/,/g, ''),
-      category: pageType === 'transfer' ? 'transfer' : category!,
-      conversion: conversion,
-      currency: currency!,
-      desc: desc,
-      isEdit: isEdit,
-      pageType: pageType,
-      repeatData: repeatData!,
-      transaction: prevTransaction!,
-      wallet: wallet,
-      uid: uid,
-      from: from,
-      to: to,
-    });
-    const curr = await firestore().collection('users').doc(uid).get();
-    if (isEdit) {
-      if (pageType === 'expense' || pageType === 'transfer') {
-        handleExpenseUpdate({
-          curr: curr,
-          amount: Number(amount.replace(/,/g, '')),
-          category: pageType === 'transfer' ? 'transfer' : category!,
-          conversion: conversion,
-          currency: currency!,
-          month: month,
-          transaction: prevTransaction!,
-          uid: uid,
-        });
-      } else if (pageType === 'income') {
-        handleIncomeUpdate({
-          curr: curr,
-          amount: Number(amount.replace(/,/g, '')),
-          category: category!,
-          conversion: conversion,
-          currency: currency!,
-          month: month,
-          transaction: prevTransaction!,
-          uid: uid,
-        });
-      }
-      await updateTransaction({
-        trans: trans,
-        transId: prevTransaction?.id!,
-        uid: uid,
-      });
-    } else {
-      if (pageType === 'expense' || pageType === 'transfer') {
-        handleNewExpense({
-          curr: curr,
-          amount: Number(amount.replace(/,/g, '')),
-          category: pageType === 'transfer' ? 'transfer' : category!,
-          conversion: conversion,
-          currency: currency!,
-          month: month,
-          uid: uid,
-        });
-      } else if (pageType === 'income') {
-        handleNewIncome({
-          curr: curr,
-          amount: Number(amount.replace(/,/g, '')),
-          category: category!,
-          conversion: conversion,
-          currency: currency!,
-          month: month,
-          uid: uid,
-        });
-      }
-      await addNewTransaction({id: id, trans: trans, uid: uid});
-    }
-  };
-
   const handlePress = async () => {
     setFormKey(true);
     if (
@@ -559,12 +180,46 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
           attachement: attachement,
           attachementType: attachementType,
           id: id,
+          amount: amount,
+          category: category,
+          conversion: conversion,
+          currency: currency,
+          desc: desc,
+          dispatch: dispatch,
+          from: from,
+          isConnected: isConnected,
+          isEdit: isEdit,
+          month: month,
+          pageType: pageType,
+          prevAmt: prevAmt,
+          prevTransaction: prevTransaction,
+          realm: realm,
+          repeatData: repeatData,
+          to: to,
+          uid: uid,
+          user: user,
+          wallet: wallet,
+          TransOnline: TransOnline,
         });
       } else {
         await handleOnline({
           attachement: attachement,
           attachementType: attachementType,
           id: id,
+          amount: amount,
+          category: category,
+          conversion: conversion,
+          currency: currency,
+          desc: desc,
+          from: from,
+          isEdit: isEdit,
+          month: month,
+          pageType: pageType,
+          prevTransaction: prevTransaction,
+          repeatData: repeatData,
+          to: to,
+          uid: uid,
+          wallet: wallet,
         });
       }
       Toast.show({
@@ -661,7 +316,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
               height:
                 Platform.OS !== 'ios'
                   ? pageType !== 'transfer'
-                    ? Dimensions.get('screen').height / 3.138
+                    ? Dimensions.get('screen').height / 3.13
                     : Dimensions.get('screen').height / 2.06
                   : pageType !== 'transfer'
                   ? Dimensions.get('screen').height / 2.65

@@ -1,4 +1,4 @@
-import React, {useEffect, useRef} from 'react';
+import React, {useRef} from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import style from './styles';
 import {Pressable, Text, View} from 'react-native';
@@ -122,6 +122,7 @@ function DetailBudget({navigation, route}: Readonly<DetailBudgetScreenProps>) {
         category={selectedCategory}
         navigation={navigation}
         bottomSheetModalRef={bottomSheetModalRef}
+        month={month}
       />
     </>
   );

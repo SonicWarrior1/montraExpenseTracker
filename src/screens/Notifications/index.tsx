@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import {useAppSelector} from '../../redux/store';
+import {useAppDispatch, useAppSelector} from '../../redux/store';
 import {NotificationScreenProps} from '../../defs/navigation';
 import {ICONS} from '../../constants/icons';
 import firestore, {Timestamp} from '@react-native-firebase/firestore';
@@ -18,6 +18,10 @@ import {STRINGS} from '../../constants/strings';
 import {useAppTheme} from '../../hooks/themeHook';
 import {Swipeable} from 'react-native-gesture-handler';
 import Spacer from '../../components/Spacer';
+import {useNetInfo} from '@react-native-community/netinfo';
+import {useRealm} from '@realm/react';
+import {UpdateMode} from 'realm';
+import {updateNotification} from '../../redux/reducers/userSlice';
 
 function NotificationScreen({navigation}: Readonly<NotificationScreenProps>) {
   // redux
@@ -25,42 +29,61 @@ function NotificationScreen({navigation}: Readonly<NotificationScreenProps>) {
     state => state.user.currentUser?.notification,
   );
   const uid = useAppSelector(state => state.user.currentUser?.uid);
+  const dispatch = useAppDispatch();
   // constants
   const COLOR = useAppTheme();
   const styles = style(COLOR);
   const userDoc = firestore().collection('users').doc(uid);
+  const {isConnected} = useNetInfo();
+  const realm = useRealm();
+
   // state
   const [menu, setMenu] = useState(false);
   // functions
   const handleMarkRead = useCallback(async () => {
     try {
-      const readNotifications = Object.values(notifications!).reduce(
-        (
-          acc: {
-            [key: string]: {
-              category: string;
-              type: string;
-              id: string;
-              time: Timestamp;
-              read: boolean;
+      if (!isConnected) {
+        for (const item of Object.values(notifications!)) {
+          dispatch(updateNotification({type: 'read', id: item.id}));
+          realm.write(() => {
+            realm.create(
+              'notification',
+              {
+                ...item,
+                read: true,
+              },
+              UpdateMode.All,
+            );
+          });
+        }
+      } else {
+        const readNotifications = Object.values(notifications!).reduce(
+          (
+            acc: {
+              [key: string]: {
+                category: string;
+                type: string;
+                id: string;
+                time: Timestamp;
+                read: boolean;
+              };
+            },
+            val,
+          ) => {
+            acc[val.id] = {
+              ...val,
+              category: encrypt(val.category, uid!),
+              type: encrypt(val.type, uid!),
+              read: true,
             };
+            return acc;
           },
-          val,
-        ) => {
-          acc[val.id] = {
-            ...val,
-            category: encrypt(val.category, uid!),
-            type: encrypt(val.type, uid!),
-            read: true,
-          };
-          return acc;
-        },
-        {},
-      );
-      await userDoc.update({notification: readNotifications});
+          {},
+        );
+        await userDoc.update({notification: readNotifications});
+      }
       setMenu(false);
-    } catch (e) {
-    }
+    } catch (e) {}
   }, [notifications, uid]);
   const handleDelete = useCallback(() => {
     Alert.alert(
@@ -71,6 +94,7 @@ function NotificationScreen({navigation}: Readonly<NotificationScreenProps>) {
           text: 'No',
           onPress: () => {
             (async () => {
+              setMenu(false);
               console.log('OK Pressed');
             })();
           },
@@ -81,7 +105,23 @@ function NotificationScreen({navigation}: Readonly<NotificationScreenProps>) {
             (async () => {
               try {
                 setMenu(false);
-                await userDoc.update({notification: {}});
+                if (!isConnected) {
+                  for (const item of Object.values(notifications!)) {
+                    dispatch(updateNotification({type: 'delete', id: item.id}));
+                    realm.write(() => {
+                      realm.create(
+                        'notification',
+                        {
+                          ...item,
+                          deleted: true,
+                        },
+                        UpdateMode.All,
+                      );
+                    });
+                  }
+                } else {
+                  await userDoc.update({notification: {}});
+                }
               } catch (e) {
                 console.log(e);
               }
@@ -101,34 +141,48 @@ function NotificationScreen({navigation}: Readonly<NotificationScreenProps>) {
       }) =>
       async () => {
         try {
-          const deletedNotifications = Object.values(notifications!).reduce(
-            (
-              acc: {
-                [key: string]: {
-                  category: string;
-                  type: string;
-                  id: string;
-                  time: Timestamp;
-                  read: boolean;
-                };
+          if (!isConnected) {
+            dispatch(updateNotification({type: 'delete', id: item.id}));
+            realm.write(() => {
+              realm.create(
+                'notification',
+                {
+                  ...item,
+                  deleted: true,
+                },
+                UpdateMode.All,
+              );
+            });
+          } else {
+            const deletedNotifications = Object.values(notifications!).reduce(
+              (
+                acc: {
+                  [key: string]: {
+                    category: string;
+                    type: string;
+                    id: string;
+                    time: Timestamp;
+                    read: boolean;
+                  };
+                },
+                val,
+              ) => {
+                if (val.id !== item.id) {
+                  acc[val.id] = {
+                    ...val,
+                    category: encrypt(val.category, uid!),
+                    type: encrypt(val.type, uid!),
+                    read: true,
+                  };
+                }
+                return acc;
               },
-              val,
-            ) => {
-              if (val.id !== item.id) {
-                acc[val.id] = {
-                  ...val,
-                  category: encrypt(val.category, uid!),
-                  type: encrypt(val.type, uid!),
-                  read: true,
-                };
-              }
-              return acc;
-            },
-            {},
-          );
-          await userDoc.update({
-            notification: deletedNotifications,
-          });
+              {},
+            );
+            await userDoc.update({
+              notification: deletedNotifications,
+            });
+          }
         } catch (e) {
           console.log(e);
         }
@@ -142,7 +196,7 @@ function NotificationScreen({navigation}: Readonly<NotificationScreenProps>) {
     ) {
       handleMarkRead();
     }
-  });
+  }, []);
   return (
     <SafeAreaView style={styles.safeView}>
       <View style={styles.header}>
@@ -230,10 +284,20 @@ function NotificationScreen({navigation}: Readonly<NotificationScreenProps>) {
                       </Text>
                     </View>
                     <Text style={styles.text2}>
-                      {item.time.toDate().getHours()}.
-                      {item.time.toDate().getMinutes() < 10
-                        ? '0' + item.time.toDate().getMinutes()
-                        : item.time.toDate().getMinutes()}
+                      {Timestamp.fromMillis(item.time.seconds * 1000)
+                        .toDate()
+                        .getHours()}
+                      .
+                      {Timestamp.fromMillis(item.time.seconds * 1000)
+                        .toDate()
+                        .getMinutes() < 10
+                        ? '0' +
+                          Timestamp.fromMillis(item.time.seconds * 1000)
+                            .toDate()
+                            .getMinutes()
+                        : Timestamp.fromMillis(item.time.seconds * 1000)
+                            .toDate()
+                            .getMinutes()}
                     </Text>
                   </View>
                 </Swipeable>

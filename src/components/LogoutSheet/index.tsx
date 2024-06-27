@@ -50,9 +50,9 @@ function LogoutSheet() {
       dispatch(setTheme(authTheme));
       dispatch(userLoggedIn(undefined));
       dispatch(openLogoutSheet(false));
-      // realm.write(() => {
-      //   realm.deleteAll();
-      // });
+      realm.write(() => {
+        realm.deleteAll();
+      });
     } catch (e) {
       console.log(e);
     }

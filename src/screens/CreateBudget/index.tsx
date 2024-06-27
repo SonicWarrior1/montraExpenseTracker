@@ -34,6 +34,10 @@ import {Switch} from 'react-native-switch';
 import CustomHeader from '../../components/CustomHeader';
 import {formatWithCommas, getMyColor} from '../../utils/commonFuncs';
 import Toast from 'react-native-toast-message';
+import {
+  handleOfflineNotification,
+  handleOnlineNotify,
+} from '../../utils/firebase';
 function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
   // constants
   const COLOR = useAppTheme();
@@ -62,7 +66,7 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
   const expenseCat = useAppSelector(
     state => state.user.currentUser?.expenseCategory,
   );
-  const uid = useAppSelector(state => state.user.currentUser?.uid);
+  const user = useAppSelector(state => state.user.currentUser);
   const realm = useRealm();
   // state
   const [amount, setAmount] = useState(
@@ -144,10 +148,28 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
               },
             }),
           );
+          const totalSpent = user?.spend?.[month]?.[category!] ?? 0;
+          handleOfflineNotification({
+            category: category!,
+            dispatch: dispatch,
+            realm: realm,
+            totalBudget: {
+              limit: Number(
+                (
+                  Number(amount.replace(/,/g, '')) /
+                  conversion.usd[currency!.toLowerCase()]
+                ).toFixed(10),
+              ),
+              alert: alert!,
+              percentage: sliderVal!,
+            },
+            totalSpent: totalSpent,
+            user: user,
+          });
         } else {
           await firestore()
             .collection('users')
-            .doc(uid)
+            .doc(user!.uid)
             .update({
               [`budget.${month}.${category}`]: {
                 limit: encrypt(
@@ -157,12 +179,24 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
                       conversion.usd[currency!.toLowerCase()]
                     ).toFixed(10),
                   ),
-                  uid!,
+                  user!.uid,
                 ),
                 alert: alert,
-                percentage: encrypt(String(sliderVal), uid!),
+                percentage: encrypt(String(sliderVal), user!.uid),
               },
             });
+          const curr = await firestore()
+            .collection('users')
+            .doc(user!.uid)
+            .get();
+          const totalSpent = user?.spend?.[month]?.[category!] ?? 0;
+          await handleOnlineNotify({
+            category: category!,
+            month: month,
+            totalSpent: totalSpent,
+            uid: user!.uid,
+            curr: curr,
+          });
         }
         Toast.show({text1: STRINGS.BudgetCreatedSuccesfully, type: 'custom'});
         dispatch(setLoading(false));
@@ -180,7 +214,7 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
     month,
     currency,
     conversion,
-    uid,
+    user!.uid,
     isConnected,
   ]);
   const dropdownLeft = (visible?: boolean) => {

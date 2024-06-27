@@ -46,7 +46,7 @@ export function useInitialSetup() {
             .doc(user!.uid)
             .onSnapshot(snapshot => {
                 const user = UserFromJson(snapshot.data() as UserType);
-                console.log(user);
+                console.log("USERRR", user);
                 dispatch(userLoggedIn(user));
             });
         return () => unsubscribe();
@@ -64,7 +64,6 @@ export function useInitialSetup() {
                     const data: transactionType[] = snapshot.docs.map(
                         doc => (TransFromJson(doc.data(), user.uid)),
                     );
-
                     for (const item of data) {
                         if (item.deleted) {
                             firestore().collection('users').doc(user.uid).collection('transactions').doc(item.id).delete();

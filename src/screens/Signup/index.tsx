@@ -159,7 +159,7 @@ function Signup({navigation}: Readonly<SignupScreenProps>) {
   }
   return (
     <SafeAreaView style={styles.safeView}>
-      <KeyboardAwareScrollView style={{flex: 1}}>
+      <KeyboardAwareScrollView style={{flex: 1}} keyboardShouldPersistTaps="handled">
         <CustomHeader
           backgroundColor={COLOR.LIGHT[100]}
           title="Sign Up"
