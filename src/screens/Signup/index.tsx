@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import {
+  NativeModules,
   Pressable,
   SafeAreaView,
   Text,
@@ -119,11 +120,13 @@ function Signup({navigation}: Readonly<SignupScreenProps>) {
   async function onGoogleButtonPress() {
     try {
       dispatch(setLoading(true));
-      if (await GoogleSignin.isSignedIn()) {
-        await GoogleSignin.signOut();
-      }
-      await GoogleSignin.hasPlayServices({showPlayServicesUpdateDialog: true});
-      const {idToken} = await GoogleSignin.signIn();
+      // if (await GoogleSignin.isSignedIn()) {
+      //   await GoogleSignin.signOut();
+      // }
+      // await GoogleSignin.hasPlayServices({showPlayServicesUpdateDialog: true});
+      // const {idToken} = await GoogleSignin.signIn();
+
+      const idToken = await NativeModules.GoogleSignInHandler.signIn();
       const googleCredential = auth.GoogleAuthProvider.credential(idToken);
       const creds = await auth().signInWithCredential(googleCredential);
       if (creds) {
@@ -149,7 +152,9 @@ function Signup({navigation}: Readonly<SignupScreenProps>) {
         }
       }
       dispatch(setLoading(false));
-    } catch (e) {
+    } catch (e: any) {
+      const error: FirebaseAuthTypes.NativeFirebaseAuthError = e;
+      Toast.show({text1: FirebaseAuthErrorHandler(error.code), type: 'error'});
       console.log(e);
       dispatch(setLoading(false));
     }

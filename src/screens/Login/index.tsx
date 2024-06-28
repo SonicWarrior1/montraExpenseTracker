@@ -111,9 +111,9 @@ function Login({navigation}: Readonly<LoginScreenProps>) {
   async function onGoogleButtonPress() {
     try {
       dispatch(setLoading(true));
-      if (await GoogleSignin.isSignedIn()) {
-        await GoogleSignin.signOut();
-      }
+      // if (await GoogleSignin.isSignedIn()) {
+      //   await GoogleSignin.signOut();
+      // }
       // Check if your device supports Google Play
       // await GoogleSignin.hasPlayServices({showPlayServicesUpdateDialog: true});
 

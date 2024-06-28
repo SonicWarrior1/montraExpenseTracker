@@ -21,8 +21,8 @@ export function useInitialSetup() {
     const data = useQuery(OfflineTransactionModel);
     const budget = useQuery(BudgetModel);
     const category = useQuery(CategoryModel);
-    const amounts = useQuery(AmountModel)
-    const notfications = useQuery(NotificationModel)
+    const amounts = useQuery(AmountModel);
+    const notfications = useQuery(NotificationModel);
     const user = useAppSelector(state => state.user.currentUser);
     useEffect(() => {
         if (user !== undefined) {
@@ -35,26 +35,28 @@ export function useInitialSetup() {
                 expenseCategory: user.expenseCategory,
                 category: category,
                 amounts: amounts,
-                notifications: notfications
+                notifications: notfications,
             });
         }
     }, [isConnected]);
     const dispatch = useAppDispatch();
     useEffect(() => {
-        const unsubscribe = firestore()
-            .collection('users')
-            .doc(user!.uid)
-            .onSnapshot(snapshot => {
-                const user = UserFromJson(snapshot.data() as UserType);
-                console.log("USERRR", user);
-                dispatch(userLoggedIn(user));
-            });
-        return () => unsubscribe();
-    }, []);
+        if (isConnected) {
+            const unsubscribe = firestore()
+                .collection('users')
+                .doc(user!.uid)
+                .onSnapshot(snapshot => {
+                    const user = UserFromJson(snapshot.data() as UserType);
+                    console.log('USERRR', user);
+                    dispatch(userLoggedIn(user));
+                });
+            return () => unsubscribe();
+        }
+    }, [isConnected]);
 
     useEffect(() => {
         console.log('uid', user?.uid);
-        if (user) {
+        if (user && isConnected) {
             const unsubscribe = firestore()
                 .collection('users')
                 .doc(user.uid)
@@ -83,6 +85,6 @@ export function useInitialSetup() {
                 });
             return () => unsubscribe();
         }
-    }, []);
+    }, [isConnected]);
 
 }

@@ -4,7 +4,7 @@ import {
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import React, {useCallback, useEffect, useMemo, useRef} from 'react';
-import {Text, View} from 'react-native';
+import {NativeModules, Text, View} from 'react-native';
 import CustomButton from '../CustomButton';
 import {useAppDispatch, useAppSelector} from '../../redux/store';
 import style from './styles';
@@ -41,12 +41,8 @@ function LogoutSheet() {
         Toast.show({text1: 'No Internet', type: 'error'});
         return;
       }
-      if (await GoogleSignin.isSignedIn()) {
-        await GoogleSignin.signOut();
-      } else {
-        await auth().signOut();
-      }
-      // console.log('auththeme', authTheme);
+      await NativeModules.GoogleSignInHandler.signOut();
+      await auth().signOut();
       dispatch(setTheme(authTheme));
       dispatch(userLoggedIn(undefined));
       dispatch(openLogoutSheet(false));

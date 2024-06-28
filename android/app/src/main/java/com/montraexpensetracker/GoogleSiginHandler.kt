@@ -5,6 +5,7 @@ import androidx.credentials.CredentialManager
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.credentials.ClearCredentialStateRequest
 import androidx.credentials.exceptions.GetCredentialException
 import com.facebook.react.bridge.*
 import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption
@@ -37,6 +38,19 @@ class GoogleSignInHandler(reactContext: ReactApplicationContext) : ReactContextB
                 val googleIdTokenCredential=GoogleIdTokenCredential.createFrom(credential.data)
                 val idToken=googleIdTokenCredential.idToken
                 promise.resolve(idToken)
+            } catch (e: GetCredentialException) {
+                promise.reject("ERROR", e)
+            }
+        }
+    }
+
+    private val clearCredentialStateRequest:ClearCredentialStateRequest=ClearCredentialStateRequest()
+    @ReactMethod
+    fun signOut(promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                credentialManager.clearCredentialState(request = clearCredentialStateRequest)
+                promise.resolve("Sign out successful")
             } catch (e: GetCredentialException) {
                 promise.reject("ERROR", e)
             }
