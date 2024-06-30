@@ -9,7 +9,7 @@ import { AmountModel } from '../DbModels/AmountModel';
 import { NotificationModel } from '../DbModels/NotificationModel';
 export const syncDb = async ({
     uid, data, isConnected, realm, budget, incomeCategory, expenseCategory, category,
-    amounts, notifications
+    amounts, notifications,
 }: {
     uid: string,
     data: Results<OfflineTransactionModel>,
@@ -28,20 +28,20 @@ export const syncDb = async ({
         try {
             const batch = firestore().batch();
             if (amounts.length > 0) {
-                console.log("Amount Syncing")
+                console.log('Amount Syncing');
                 for (const item of amounts) {
-                    const month = item.id.split('_')[0]
-                    const category = item.id.split('_')[1]
+                    const month = item.id.split('_')[0];
+                    const category = item.id.split('_')[1];
                     const type = item.id.split('_')[2];
-                    console.log(item)
+                    console.log(item);
                     if (type === 'income') {
                         batch.update(firestore().collection('users').doc(uid), {
-                            [`income.${month}.${category}`]: encrypt(String(item.amount), uid)
-                        })
+                            [`income.${month}.${category}`]: encrypt(String(item.amount), uid),
+                        });
                     } else {
                         batch.update(firestore().collection('users').doc(uid), {
-                            [`spend.${month}.${category}`]: encrypt(String(item.amount), uid)
-                        })
+                            [`spend.${month}.${category}`]: encrypt(String(item.amount), uid),
+                        });
                     }
                 }
                 realm.write(() => {
@@ -49,7 +49,7 @@ export const syncDb = async ({
                 });
             }
             if (budget.length > 0) {
-                console.log("Budget Syncing")
+                console.log('Budget Syncing');
                 for (const item of budget) {
                     const month = item.id.split('_')[0];
                     const category = item.id.split('_')[1];
@@ -75,7 +75,7 @@ export const syncDb = async ({
                 });
             }
             if (category.length > 0) {
-                console.log("Category Syncing")
+                console.log('Category Syncing');
                 batch.update(firestore().collection('users').doc(uid), {
                     expenseCategory: expenseCategory.concat(category.filter((cat) => cat.type === 'expense' && !expenseCategory.includes(cat.name)).reduce((acc: string[], item) => {
                         acc.push(item.name);
@@ -94,10 +94,10 @@ export const syncDb = async ({
                 });
             }
             if (notifications.length > 0) {
-                console.log("Notification Syncing")
+                console.log('Notification Syncing');
                 for (const item of notifications) {
                     if (item.deleted) {
-                        batch.update(firestore().collection('users').doc(uid), { [`notification.${item.id}`]: deleteField() })
+                        batch.update(firestore().collection('users').doc(uid), { [`notification.${item.id}`]: deleteField() });
                     } else {
                         batch.update(firestore().collection('users').doc(uid), {
                             [`notification.${item.id}`]: {
@@ -109,15 +109,15 @@ export const syncDb = async ({
                                 percentage: item.percentage,
                             },
 
-                        })
+                        });
                     }
                 }
                 realm.write(() => {
-                    realm.delete(notifications)
-                })
+                    realm.delete(notifications);
+                });
             }
             if (data.length > 0) {
-                console.log("Transanction Syncing")
+                console.log('Transanction Syncing');
                 for (const item of data) {
                     let url = '';
                     if (item.operation === 'add' || item.operation === 'update') {
@@ -155,9 +155,14 @@ export const syncDb = async ({
                             to: encrypt(item.to, uid),
                         });
                     } else if (item.operation === 'delete') {
-                        batch.delete(firestore().collection('users').doc(uid).collection('transactions').doc(item.id));
-                        if (item.attachementType !== 'none') {
-                            await storage().ref(`users/${uid}/${item.id}`).delete();
+                        try {
+
+                            batch.delete(firestore().collection('users').doc(uid).collection('transactions').doc(item.id));
+                            if (item.attachementType !== 'none') {
+                                await storage().ref(`users/${uid}/${item.id}`).delete();
+                            }
+                        } catch (e) {
+                            console.log('inner', e);
                         }
                     }
                 }

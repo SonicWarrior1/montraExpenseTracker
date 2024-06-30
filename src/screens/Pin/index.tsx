@@ -2,6 +2,7 @@ import React, {useCallback, useEffect, useState} from 'react';
 import {
   Alert,
   BackHandler,
+  NativeModules,
   Pressable,
   SafeAreaView,
   Text,
@@ -19,7 +20,6 @@ import {encrypt} from '../../utils/encryption';
 import Toast from 'react-native-toast-message';
 import auth from '@react-native-firebase/auth';
 import {UserFromJson} from '../../utils/userFuncs';
-import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import VerifyPassModal from './atoms/VerifyPassModal';
 import PinHeader from './atoms/PinHeader';
 import ProgressDot from './atoms/ProgressDot';
@@ -36,7 +36,7 @@ function Pin({route, navigation}: Readonly<PinSentScreenProps>) {
   const [pin, setPin] = useState<number[]>([]);
   const [menu, setMenu] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const [reset, setReset] = useState(true);
+  // const [reset, setReset] = useState(true);
   //functions
   const handlePin = useCallback(
     (value: number) => {
@@ -145,11 +145,12 @@ function Pin({route, navigation}: Readonly<PinSentScreenProps>) {
   }, [isSetup, oldPin]);
   const handleLogout = useCallback(async () => {
     dispatch(setLoading(true));
-    if (await GoogleSignin.isSignedIn()) {
-      GoogleSignin.signOut();
-    } else {
-      await auth().signOut();
-    }
+    // if (await GoogleSignin.isSignedIn()) {
+    // GoogleSignin.signOut();
+    // } else {
+    await NativeModules.GoogleSignInHandler.signOut();
+    await auth().signOut();
+    // }
     dispatch(userLoggedIn(undefined));
     setTimeout(() => {
       navigation.reset({
@@ -166,13 +167,13 @@ function Pin({route, navigation}: Readonly<PinSentScreenProps>) {
     );
     return () => backHandler.remove();
   }, []);
-  useEffect(() => {
-    (async () => {
-      if (await GoogleSignin.isSignedIn()) {
-        setReset(false);
-      }
-    })();
-  }, []);
+  // useEffect(() => {
+  //   (async () => {
+  //     if (await GoogleSignin.isSignedIn()) {
+  //       setReset(false);
+  //     }
+  //   })();
+  // }, []);
   return (
     <SafeAreaView style={styles.safeView}>
       <VerifyPassModal
@@ -206,7 +207,7 @@ function Pin({route, navigation}: Readonly<PinSentScreenProps>) {
       </Pressable>
       {menu && (
         <View style={styles.menu}>
-          {reset && (
+          {!(currentUser?.isSocial ?? false) && (
             <TouchableOpacity
               onPress={() => {
                 setShowModal(true);

@@ -419,7 +419,7 @@ export async function singupUser({ name, email, pass }: { name: string, email: s
                 name: name,
                 email: email,
                 uid: creds.user.uid,
-                pin: '',
+                isSocial: false,
             });
             // console.log(encrpytedUser)
             await firestore()
@@ -620,6 +620,7 @@ export const handleOffline = async ({
     TransOnline: OnlineTransactionModel | null
 }) => {
     console.log('offline');
+    // const gg = new Date.now();
     let trans = TransFromJson(
         createTransaction({
             id: id,
@@ -811,6 +812,7 @@ export const handleOffline = async ({
     if (trans.freq) {
         trans.freq.date = Timestamp.fromDate(trans.freq?.date as Date);
     }
+    // console.log('hsdbfshdbfjshdbfshdn');
     realm.write(() => {
         if (isEdit && TransOnline) {
             realm.create(
@@ -825,6 +827,9 @@ export const handleOffline = async ({
             UpdateMode.All,
         );
     });
+    const yy = new Date.now();
+    console.log(yy - gg);
+    // console.log('dsjfnsdkj nfsejkb fuizh difzhd luk');
 };
 export async function handleOfflineNotification({ totalBudget, totalSpent, realm, category, dispatch, user }:
     {

@@ -4,7 +4,7 @@ const screenWidth = Dimensions.get('screen').width;
 const screenHeight = Dimensions.get('screen').height;
 
 const styles = StyleSheet.create({
-    safeView: { flex: 1, backgroundColor: COLORS.PRIMARY.VIOLET, paddingTop: 30 },
+    safeView: { flex: 1, backgroundColor: COLORS.PRIMARY.VIOLET, paddingTop: 10 },
     mainView: {
         flex: 1,
         justifyContent: 'space-between',

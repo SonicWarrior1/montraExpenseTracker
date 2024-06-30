@@ -1,4 +1,4 @@
-import { Timestamp } from "@react-native-firebase/firestore"
+import { Timestamp } from '@react-native-firebase/firestore';
 
 export type UserType = {
     name: string,
@@ -13,4 +13,5 @@ export type UserType = {
     notification: { [id: string]: { category: string, type: string, id: string, time: Timestamp, read: boolean, percentage: number } },
     currency: string
     theme: 'device' | 'light' | 'dark'
+    isSocial: boolean
 }

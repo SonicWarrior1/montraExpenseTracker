@@ -129,7 +129,7 @@ function Signup({navigation}: Readonly<SignupScreenProps>) {
             name: creds.user.displayName!,
             email: creds.user.email!,
             uid: creds.user.uid,
-            pin: '',
+            isSocial: true,
           });
           await userCollection.doc(creds.user.uid).set(user);
           // });

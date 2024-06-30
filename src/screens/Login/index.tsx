@@ -66,34 +66,30 @@ function Login({navigation}: Readonly<LoginScreenProps>) {
             dispatch(userLoggedIn(user));
             dispatch(setTheme(undefined));
           } else {
-            Alert.alert(
-              STRINGS.PleaseVerifyEmail,
-              STRINGS.VerifyEmailSent,
-              [
-                {
-                  text: 'Resend',
-                  onPress: () => {
-                    (async () => {
-                      try {
-                        await creds.user.sendEmailVerification();
-                        await auth().signOut();
-                      } catch (e) {
-                        console.log(e);
-                        await auth().signOut();
-                      }
-                    })();
-                  },
-                },
-                {
-                  text: 'OK',
-                  onPress: () => {
-                    (async () => {
+            Alert.alert(STRINGS.PleaseVerifyEmail, STRINGS.VerifyEmailSent, [
+              {
+                text: 'Resend',
+                onPress: () => {
+                  (async () => {
+                    try {
+                      await creds.user.sendEmailVerification();
                       await auth().signOut();
-                    })();
-                  },
+                    } catch (e) {
+                      console.log(e);
+                      await auth().signOut();
+                    }
+                  })();
                 },
-              ],
-            );
+              },
+              {
+                text: 'OK',
+                onPress: () => {
+                  (async () => {
+                    await auth().signOut();
+                  })();
+                },
+              },
+            ]);
           }
         }
       } catch (e: any) {
@@ -131,7 +127,7 @@ function Login({navigation}: Readonly<LoginScreenProps>) {
             name: creds.user.displayName!,
             email: creds.user.email!,
             uid: creds.user.uid,
-            pin: '',
+            isSocial: true,
           });
           await userCollection.doc(creds.user.uid).set(user);
           dispatch(userLoggedIn(user));
