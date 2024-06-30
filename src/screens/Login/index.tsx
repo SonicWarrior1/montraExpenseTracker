@@ -26,7 +26,6 @@ import {useAppDispatch} from '../../redux/store';
 import {UserFromJson, UserToJson} from '../../utils/userFuncs';
 import {useAppTheme} from '../../hooks/themeHook';
 // Third Party Libraries
-import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import auth, {FirebaseAuthTypes} from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
@@ -68,8 +67,8 @@ function Login({navigation}: Readonly<LoginScreenProps>) {
             dispatch(setTheme(undefined));
           } else {
             Alert.alert(
-              'Please verify your email',
-              'A verification email has already been sent to your registered email address, so verify your email before login.',
+              STRINGS.PleaseVerifyEmail,
+              STRINGS.VerifyEmailSent,
               [
                 {
                   text: 'Resend',
@@ -118,7 +117,7 @@ function Login({navigation}: Readonly<LoginScreenProps>) {
       // await GoogleSignin.hasPlayServices({showPlayServicesUpdateDialog: true});
 
       // // Get the users ID token
-      // const {idToken} = await GoogleSignin.signIn();
+      // const {idToken} = await GoogleSignin.signIn()
       const idToken = await NativeModules.GoogleSignInHandler.signIn();
       // Create a Google credential with the token
       const googleCredential = auth.GoogleAuthProvider.credential(idToken);
@@ -161,7 +160,7 @@ function Login({navigation}: Readonly<LoginScreenProps>) {
         keyboardShouldPersistTaps="handled">
         <CustomHeader
           backgroundColor={COLOR.LIGHT[100]}
-          title="Login"
+          title={STRINGS.LOGIN}
           color={COLOR.DARK[100]}
           navigation={navigation}
         />
@@ -172,7 +171,7 @@ function Login({navigation}: Readonly<LoginScreenProps>) {
             type="email"
             value={email}
             inputColor={COLOR.DARK[100]}
-            onBlur={e => {
+            onBlur={() => {
               if (email === '') {
                 setForm(formkey => ({...formkey, email: true}));
               }

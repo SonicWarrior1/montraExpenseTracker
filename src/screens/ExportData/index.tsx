@@ -58,11 +58,11 @@ function ExportData({navigation}: ExportScreenProps) {
           }
           let frequency = '';
           if (val.freq?.freq === 'yearly') {
-            frequency = val.freq.day! + monthData[val.freq.month!].label;
+            frequency = val.freq.day + monthData[val.freq.month].label;
           } else if (val.freq?.freq === 'monthly') {
             frequency = String(val.freq.day);
           } else if (val.freq?.freq === 'weekly') {
-            frequency = weekData[val.freq.weekDay!].label;
+            frequency = weekData[val.freq.weekDay].label;
           }
           return {
             ...val,
@@ -82,7 +82,7 @@ function ExportData({navigation}: ExportScreenProps) {
         }),
     );
     if (csvData === '') {
-      Toast.show({text1: 'There is no data to be exported', type: 'error'});
+      Toast.show({text1: STRINGS.NoDataToExport, type: 'error'});
       dispatch(setLoading(false));
       return;
     }

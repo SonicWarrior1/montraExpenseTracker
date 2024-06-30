@@ -1,13 +1,14 @@
 import React from 'react';
-import {Dimensions, Platform, Pressable, Text, View} from 'react-native';
+import {Pressable, Text, View} from 'react-native';
 import {ICONS} from '../../constants/icons';
 import {useAppTheme} from '../../hooks/themeHook';
 import {RootStackParamList} from '../../defs/navigation';
 import {StackNavigationProp} from '@react-navigation/stack';
+import style from './styles';
 function CustomHeader({
   backgroundColor,
   title,
-  HeaderRight = () => <View style={{width: 25}}></View>,
+  HeaderRight = () => <View style={{width: 25}} />,
   navigation,
   color,
   bottomBorder,
@@ -38,20 +39,17 @@ function CustomHeader({
   onPress?: () => void;
 }>) {
   const COLOR = useAppTheme();
+  const styles = style(COLOR);
   return (
     <View
-      style={{
-        width: Dimensions.get('screen').width,
-        paddingTop: Platform.OS === 'ios' ? 10 : 20,
-        paddingHorizontal: 15,
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        backgroundColor: backgroundColor,
-        flexDirection: 'row',
-        borderBottomWidth: bottomBorder ? 1 : 0,
-        borderColor: COLOR.LIGHT[40],
-        paddingBottom: bottomBorder ? 15 : 0,
-      }}>
+      style={[
+        styles.view,
+        {
+          backgroundColor: backgroundColor,
+          borderBottomWidth: bottomBorder ? 1 : 0,
+          paddingBottom: bottomBorder ? 15 : 0,
+        },
+      ]}>
       <Pressable onPress={onPress}>
         {ICONS.ArrowLeft({
           height: 25,
@@ -61,11 +59,12 @@ function CustomHeader({
         })}
       </Pressable>
       <Text
-        style={{
-          fontSize: 18,
-          fontWeight: '600',
-          color: color ?? COLOR.LIGHT[100],
-        }}>
+        style={[
+          styles.text,
+          {
+            color: color ?? COLOR.LIGHT[100],
+          },
+        ]}>
         {title}
       </Text>
       <HeaderRight />

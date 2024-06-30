@@ -41,7 +41,6 @@ import {useAppTheme} from '../../hooks/themeHook.ts';
 import BouncyCheckbox from 'react-native-bouncy-checkbox/build/dist/BouncyCheckbox';
 import auth, {FirebaseAuthTypes} from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
-import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import Toast from 'react-native-toast-message';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import CustomHeader from '../../components/CustomHeader/index.tsx';
@@ -120,12 +119,6 @@ function Signup({navigation}: Readonly<SignupScreenProps>) {
   async function onGoogleButtonPress() {
     try {
       dispatch(setLoading(true));
-      // if (await GoogleSignin.isSignedIn()) {
-      //   await GoogleSignin.signOut();
-      // }
-      // await GoogleSignin.hasPlayServices({showPlayServicesUpdateDialog: true});
-      // const {idToken} = await GoogleSignin.signIn();
-
       const idToken = await NativeModules.GoogleSignInHandler.signIn();
       const googleCredential = auth.GoogleAuthProvider.credential(idToken);
       const creds = await auth().signInWithCredential(googleCredential);

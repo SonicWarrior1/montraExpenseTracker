@@ -27,7 +27,6 @@ function BottomTabNavigator() {
   const navigation = useNavigation();
   useEffect(() => {
     const back = BackHandler.addEventListener('hardwareBackPress', () => {
-      // console.log('back');
       if (navigation.canGoBack()) {
         navigation.goBack();
       } else {

@@ -28,24 +28,24 @@ export function TransFromJson(json: FirebaseFirestoreTypes.DocumentData, uid: st
     };
 }
 
-// function debounce(fn: (...args) => void, delay = 300) {
-//     let timer: any = null;
-//     return (...args) => {
-//         if (timer !== null) {
-//             clearTimeout(timer);
-//         }
-//         timer = setTimeout(() => fn(args), delay);
-//     };
-// }
-
-export function throttle(func:(...args) => void, delay:number) {
-    let timeout=null
+export function debounce(fn: (...args) => void, delay = 300) {
+    let timer: any = null;
     return (...args) => {
-        if(!timeout) {
-            func(...args)
-            timeout=setTimeout(() => {
-                timeout=null
-            }, delay)
+        if (timer !== null) {
+            clearTimeout(timer);
         }
-    }
+        timer = setTimeout(() => fn(args), delay);
+    };
+}
+
+export function throttle(func: (...args) => void, delay: number) {
+    let timeout = null;
+    return (...args) => {
+        if (!timeout) {
+            func(...args);
+            timeout = setTimeout(() => {
+                timeout = null;
+            }, delay);
+        }
+    };
 }

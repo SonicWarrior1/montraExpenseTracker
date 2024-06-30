@@ -1,47 +1,36 @@
 import {Text, View} from 'react-native';
-import {COLORS} from '../../constants/commonStyles';
+import style from './styles';
 import {currencies} from '../../constants/strings';
-import {useAppSelector} from '../../redux/store';
+import {useAppTheme} from '../../hooks/themeHook';
 
-const LinegraphLabel = ({items}: {items: {date: string; value: number}[]}) => {
-  const currency = useAppSelector(state => state.user.currentUser?.currency);
-  const {conversion} = useAppSelector(
-    state => state.transaction,
-  );
+function LinegraphLabel({
+  items,
+  currency,
+  conversion,
+}: Readonly<{
+  items: {date: string; value: number}[];
+  currency: string | undefined;
+  conversion: {
+    [key: string]: {
+      [key: string]: number;
+    };
+  };
+}>) {
+  const COLOR = useAppTheme();
+  const styles = style(COLOR);
   return (
-    <View
-      style={{
-        width: 100,
-        justifyContent: 'center',
-      }}>
-      <Text
-        style={{
-          color: 'black',
-          fontSize: 14,
-          marginBottom: 6,
-          textAlign: 'center',
-        }}>
-        {items[0].date}
-      </Text>
-      <View
-        style={{
-          paddingHorizontal: 14,
-          paddingVertical: 6,
-          borderRadius: 16,
-          backgroundColor: COLORS.VIOLET[20],
-        }}>
-        <Text style={{fontWeight: 'bold', textAlign: 'center'}} numberOfLines={1}>
+    <View style={styles.ctr}>
+      <Text style={styles.text1}>{items[0].date}</Text>
+      <View style={styles.amtCtr}>
+        <Text style={styles.amt} numberOfLines={1}>
           {currencies[currency!].symbol}{' '}
-          {(
-            conversion['usd']?.[currency!.toLowerCase()] *
-            Number(items[0].value)
-          )
+          {(conversion.usd?.[currency!.toLowerCase()] * Number(items[0].value))
             .toFixed(1)
             .toString()}
         </Text>
       </View>
     </View>
   );
-};
+}
 
 export default LinegraphLabel;

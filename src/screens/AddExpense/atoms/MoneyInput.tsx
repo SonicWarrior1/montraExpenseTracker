@@ -4,7 +4,7 @@ import {EmptyZeroError} from '../../../constants/errors';
 import {currencies, STRINGS} from '../../../constants/strings';
 import {useAppTheme} from '../../../hooks/themeHook';
 import style from '../styles';
-import { formatWithCommas } from '../../../utils/commonFuncs';
+import {formatWithCommas} from '../../../utils/commonFuncs';
 
 function MoneyInput({
   amount,
@@ -17,7 +17,6 @@ function MoneyInput({
   currency: string;
   formKey: boolean;
 }>) {
-
   const COLOR = useAppTheme();
   const styles = style(COLOR);
   return (
@@ -57,10 +56,10 @@ function MoneyInput({
               numericValue[numericValue.length - 1] === '.'
             ) {
               // Allow only if it is not the only character
-              if (numericValue.length === 1) {
-                numericValue = numericValue.slice(0, -1);
-              } else if (numericValue[numericValue.length - 2] === '.') {
-                // Remove last character if there are two consecutive decimal points
+              if (
+                numericValue.length === 1 ||
+                numericValue[numericValue.length - 2] === '.'
+              ) {
                 numericValue = numericValue.slice(0, -1);
               }
             }

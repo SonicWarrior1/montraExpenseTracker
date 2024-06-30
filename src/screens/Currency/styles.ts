@@ -7,7 +7,7 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
     row: {
         flexDirection: 'row',
         paddingHorizontal: 20,
-        paddingVertical: 15,
+        paddingVertical: 10,
         justifyContent: 'space-between',
         alignItems: 'center',
     },

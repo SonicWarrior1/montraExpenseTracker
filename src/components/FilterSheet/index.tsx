@@ -66,7 +66,7 @@ function FilterSheet() {
         onDismiss={() => {
           dispatch(openFilterSheet(false));
         }}>
-        <BottomSheetView style={{paddingHorizontal: 20}}>
+        <BottomSheetView style={styles.sheet}>
           <View style={styles.sheetView}>
             <Text style={styles.text1}>{STRINGS.FilterTransaction}</Text>
             <Pressable
@@ -278,7 +278,7 @@ function FilterSheet() {
               }}
               style={styles.pressable}>
               <Text style={styles.text2}>
-                {selectedCats?.length ?? 0} Selected
+                {selectedCats?.length ?? 0} {STRINGS.Selected}
               </Text>
               {ICONS.ArrowRight({
                 height: 25,

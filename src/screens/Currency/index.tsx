@@ -9,8 +9,9 @@ import {useAppTheme} from '../../hooks/themeHook';
 import style from './styles';
 import CustomHeader from '../../components/CustomHeader';
 import {CurrencyScreenProps} from '../../defs/navigation';
+import {CheckboxFillColor} from '../../constants/commonStyles';
 
-function CurrencyScreen({navigation}: CurrencyScreenProps) {
+function CurrencyScreen({navigation}: Readonly<CurrencyScreenProps>) {
   // redux
   const code = useAppSelector(state => state.user.currentUser?.currency);
   const uid = useAppSelector(state => state.user.currentUser?.uid);
@@ -40,22 +41,21 @@ function CurrencyScreen({navigation}: CurrencyScreenProps) {
             <Text style={styles.text}>
               {item.name} {'(' + item.code + ')'}{' '}
             </Text>
-            {code === item.code && (
-              <BouncyCheckbox
-                style={styles.checkbox}
-                disabled
-                disableText={false}
-                fillColor={'#5233FF'}
-                isChecked={code === item.code}
-                onPress={async () => {
-                  if (code !== item.code) {
-                    await userDoc.update({currency: encrypt(item.code, uid!)});
-                  }
-                }}
-                iconStyle={{height: 24, width: 24}}
-                iconImageStyle={{height: 12.5, width: 12.5}}
-              />
-            )}
+
+            <BouncyCheckbox
+              style={styles.checkbox}
+              disabled
+              disableText={false}
+              fillColor={CheckboxFillColor}
+              isChecked={code === item.code}
+              onPress={async () => {
+                if (code !== item.code) {
+                  await userDoc.update({currency: encrypt(item.code, uid!)});
+                }
+              }}
+              iconStyle={{height: 24, width: 24}}
+              iconImageStyle={{height: 12.5, width: 12.5}}
+            />
           </Pressable>
         )}
       />

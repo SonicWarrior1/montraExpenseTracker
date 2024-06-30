@@ -37,7 +37,7 @@ function FinancialReport({navigation}: Readonly<FinancialReportScreenProps>) {
   const [catColors, setCatColors] = useState<{[key: string]: string}>();
   const [sort, setSort] = useState(false);
   const [incomeOffset, setIncomeOffset] = useState(0);
-  const [expenseOffest, setExpenseOffset] = useState(0);
+  const [expenseOffset, setExpenseOffset] = useState(0);
   // redux
   const spends =
     useAppSelector(state => state.user.currentUser?.spend?.[month]) ?? [];
@@ -101,21 +101,22 @@ function FinancialReport({navigation}: Readonly<FinancialReportScreenProps>) {
       return COLOR.DARK[75];
     }
   };
+  const onScroll = ({nativeEvent}: {nativeEvent: NativeScrollEvent}) => {
+    if (isCloseToBottom(nativeEvent)) {
+      if (incomeOffset + limit < Object.values(data).length) {
+        if (transType === 'expense') {
+          setExpenseOffset(offset => offset + 5);
+        } else {
+          setIncomeOffset(offset => offset + 5);
+        }
+      }
+    }
+  };
   return (
     <ScrollView
       contentContainerStyle={[styles.safeView]}
       style={[styles.safeView, {paddingBottom: 20}]}
-      onScroll={({nativeEvent}) => {
-        if (isCloseToBottom(nativeEvent)) {
-          if (incomeOffset + limit < Object.values(data).length) {
-            if (transType === 'expense') {
-              setExpenseOffset(offset => offset + 5);
-            } else {
-              setIncomeOffset(offset => offset + 5);
-            }
-          }
-        }
-      }}
+      onScroll={onScroll}
       scrollEventThrottle={400}>
       <SafeAreaView>
         <CustomHeader
@@ -274,7 +275,7 @@ function FinancialReport({navigation}: Readonly<FinancialReportScreenProps>) {
             sort={sort}
             limit={limit}
             incomeOffset={incomeOffset}
-            expenseOffset={expenseOffest}
+            expenseOffset={expenseOffset}
           />
         ) : (
           <CategoryList

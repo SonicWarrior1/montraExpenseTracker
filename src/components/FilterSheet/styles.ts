@@ -31,7 +31,7 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 15,
-    paddingTop:10
+    paddingTop: 10,
   },
   text1: { fontSize: RFValue(15), fontWeight: '600', color: COLOR.DARK[100] },
   flexRow: {
@@ -62,6 +62,7 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
     color: COLOR.DARK[25],
   },
   sheetBack: { borderTopLeftRadius: 32, borderTopRightRadius: 32, backgroundColor: COLOR.LIGHT[100] },
+  sheet: { paddingHorizontal: 20 },
 });
 
 export default styles;

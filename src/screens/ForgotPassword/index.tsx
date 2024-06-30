@@ -3,11 +3,7 @@ import {SafeAreaView, ScrollView, Text, View} from 'react-native';
 import style from './styles';
 import Spacer from '../../components/Spacer';
 import CustomInput from '../../components/CustomInput';
-import {
-  EmailEmptyError,
-  EmailValError,
-  testInput,
-} from '../../constants/errors';
+import {EmailValError, testInput} from '../../constants/errors';
 import CustomButton from '../../components/CustomButton';
 import {ForgotScreenProps} from '../../defs/navigation';
 import {emailRegex, NAVIGATION, STRINGS} from '../../constants/strings';
@@ -38,7 +34,7 @@ function ForgotPassword({navigation}: Readonly<ForgotScreenProps>) {
       const snapshot = await firestore().collection('users').get();
       const res = snapshot.docs.filter(doc => {
         return (
-          (decrypt(doc.data()['email'], doc.data()['uid']) ?? '') === email
+          (decrypt(doc.data().email, doc.data().uid) ?? '') === email
         );
       });
       return res.length !== 0;

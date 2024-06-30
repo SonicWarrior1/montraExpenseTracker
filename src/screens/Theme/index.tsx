@@ -8,9 +8,9 @@ import style from './styles';
 import {useAppTheme} from '../../hooks/themeHook';
 import {STRINGS} from '../../constants/strings';
 import CustomHeader from '../../components/CustomHeader';
-import { ThemeScreenProps } from '../../defs/navigation';
+import {ThemeScreenProps} from '../../defs/navigation';
 
-function ThemeScreen({navigation}:ThemeScreenProps) {
+function ThemeScreen({navigation}: Readonly<ThemeScreenProps>) {
   // redux
   const theme = useAppSelector(state => state.user.currentUser?.theme);
   const uid = useAppSelector(state => state.user.currentUser?.uid);
@@ -20,7 +20,7 @@ function ThemeScreen({navigation}:ThemeScreenProps) {
   const userDoc = firestore().collection('users').doc(uid);
   return (
     <SafeAreaView style={styles.safeView}>
-       <CustomHeader
+      <CustomHeader
         backgroundColor={COLORS.LIGHT[100]}
         navigation={navigation}
         title="Theme"
@@ -35,17 +35,16 @@ function ThemeScreen({navigation}:ThemeScreenProps) {
           }
         }}>
         <Text style={styles.text}>{STRINGS.Light}</Text>
-        {theme === 'light' && (
-          <BouncyCheckbox
-            disabled
-            style={{width: 28}}
-            disableText={false}
-            fillColor={'#5233FF'}
-            isChecked={theme === 'light'}
-            iconStyle={{height: 24, width: 24}}
-            iconImageStyle={{height: 12.5, width: 12.5}}
-          />
-        )}
+
+        <BouncyCheckbox
+          disabled
+          style={{width: 28}}
+          disableText={false}
+          fillColor={'#5233FF'}
+          isChecked={theme === 'light'}
+          iconStyle={{height: 24, width: 24}}
+          iconImageStyle={{height: 12.5, width: 12.5}}
+        />
       </Pressable>
       <Pressable
         style={styles.row}
@@ -55,17 +54,16 @@ function ThemeScreen({navigation}:ThemeScreenProps) {
           }
         }}>
         <Text style={styles.text}>{STRINGS.Dark}</Text>
-        {theme === 'dark' && (
-          <BouncyCheckbox
-            disabled
-            style={{width: 28}}
-            disableText={false}
-            fillColor={'#5233FF'}
-            isChecked={theme === 'dark'}
-            iconStyle={{height: 24, width: 24}}
-            iconImageStyle={{height: 12.5, width: 12.5}}
-          />
-        )}
+
+        <BouncyCheckbox
+          disabled
+          style={{width: 28}}
+          disableText={false}
+          fillColor={'#5233FF'}
+          isChecked={theme === 'dark'}
+          iconStyle={{height: 24, width: 24}}
+          iconImageStyle={{height: 12.5, width: 12.5}}
+        />
       </Pressable>
       <Pressable
         style={styles.row}
@@ -75,17 +73,16 @@ function ThemeScreen({navigation}:ThemeScreenProps) {
           }
         }}>
         <Text style={styles.text}>{STRINGS.UseDeviceTheme}</Text>
-        {theme === 'device' && (
-          <BouncyCheckbox
-            disabled
-            style={{width: 28}}
-            disableText={false}
-            fillColor={'#5233FF'}
-            isChecked={theme === 'device'}
-            iconStyle={{height: 24, width: 24}}
-            iconImageStyle={{height: 12.5, width: 12.5}}
-          />
-        )}
+
+        <BouncyCheckbox
+          disabled
+          style={{width: 28}}
+          disableText={false}
+          fillColor={'#5233FF'}
+          isChecked={theme === 'device'}
+          iconStyle={{height: 24, width: 24}}
+          iconImageStyle={{height: 12.5, width: 12.5}}
+        />
       </Pressable>
     </SafeAreaView>
   );

@@ -18,6 +18,8 @@ function Graph({
   data: (OnlineTransactionModel | OfflineTransactionModel)[];
   month: number;
 }>) {
+  const currency = useAppSelector(state => state.user.currentUser?.currency);
+  const conversion = useAppSelector(state => state.transaction.conversion);
   const theme = useAppSelector(state => state.user.currentUser?.theme);
   const COLOR = useAppTheme();
   const styles = style(COLOR);
@@ -126,9 +128,12 @@ function Graph({
               pointerLabelWidth: 100,
               activatePointersOnLongPress: true,
               autoAdjustPointerLabelPosition: true,
-              pointerLabelComponent: (
-                items: {date: string; value: number}[],
-              ) => <LinegraphLabel items={items} />,
+              pointerLabelComponent: (items: {date: string; value: number}[]) =>
+                LinegraphLabel({
+                  items: items,
+                  currency: currency,
+                  conversion: conversion,
+                }),
             }}
           />
         </View>

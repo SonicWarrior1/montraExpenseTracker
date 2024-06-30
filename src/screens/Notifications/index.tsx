@@ -22,6 +22,7 @@ import {useNetInfo} from '@react-native-community/netinfo';
 import {useRealm} from '@realm/react';
 import {UpdateMode} from 'realm';
 import {updateNotification} from '../../redux/reducers/userSlice';
+import NotificationListItem from './atoms/NotificationListItem';
 
 function NotificationScreen({navigation}: Readonly<NotificationScreenProps>) {
   // redux
@@ -84,53 +85,49 @@ function NotificationScreen({navigation}: Readonly<NotificationScreenProps>) {
       }
       setMenu(false);
     } catch (e) {}
-  }, [notifications, uid]);
+  }, [notifications, uid, isConnected, userDoc]);
   const handleDelete = useCallback(() => {
-    Alert.alert(
-      'Are you sure ?',
-      'Are you sure you want to delete all the notifications.',
-      [
-        {
-          text: 'No',
-          onPress: () => {
-            (async () => {
+    Alert.alert(STRINGS.AreYouSure, STRINGS.AreYouSureDelete, [
+      {
+        text: STRINGS.No,
+        onPress: () => {
+          (async () => {
+            setMenu(false);
+            console.log('OK Pressed');
+          })();
+        },
+      },
+      {
+        text: STRINGS.Yes,
+        onPress: () => {
+          (async () => {
+            try {
               setMenu(false);
-              console.log('OK Pressed');
-            })();
-          },
-        },
-        {
-          text: 'Yes',
-          onPress: () => {
-            (async () => {
-              try {
-                setMenu(false);
-                if (!isConnected) {
-                  for (const item of Object.values(notifications!)) {
-                    dispatch(updateNotification({type: 'delete', id: item.id}));
-                    realm.write(() => {
-                      realm.create(
-                        'notification',
-                        {
-                          ...item,
-                          deleted: true,
-                        },
-                        UpdateMode.All,
-                      );
-                    });
-                  }
-                } else {
-                  await userDoc.update({notification: {}});
+              if (!isConnected) {
+                for (const item of Object.values(notifications!)) {
+                  dispatch(updateNotification({type: 'delete', id: item.id}));
+                  realm.write(() => {
+                    realm.create(
+                      'notification',
+                      {
+                        ...item,
+                        deleted: true,
+                      },
+                      UpdateMode.All,
+                    );
+                  });
                 }
-              } catch (e) {
-                console.log(e);
+              } else {
+                await userDoc.update({notification: {}});
               }
-            })();
-          },
+            } catch (e) {
+              console.log(e);
+            }
+          })();
         },
-      ],
-    );
-  }, [uid]);
+      },
+    ]);
+  }, [uid, isConnected, notifications, userDoc]);
   const handleSingleDelete = useCallback(
     (item: {
         category: string;
@@ -187,7 +184,7 @@ function NotificationScreen({navigation}: Readonly<NotificationScreenProps>) {
           console.log(e);
         }
       },
-    [notifications],
+    [notifications, isConnected, userDoc, uid],
   );
   useEffect(() => {
     if (
@@ -196,15 +193,14 @@ function NotificationScreen({navigation}: Readonly<NotificationScreenProps>) {
     ) {
       handleMarkRead();
     }
-  }, []);
+  }, [notifications]);
   return (
     <SafeAreaView style={styles.safeView}>
       <View style={styles.header}>
         <Pressable
           onPress={() => {
             navigation.goBack();
-          }}
-          style={{marginLeft: 15}}>
+          }}>
           {ICONS.ArrowLeft({
             height: 25,
             width: 25,
@@ -214,10 +210,9 @@ function NotificationScreen({navigation}: Readonly<NotificationScreenProps>) {
         </Pressable>
         <Text style={styles.headerTitle}>{STRINGS.Notifications}</Text>
         {Object.values(notifications!).length === 0 ? (
-          <Spacer width={25}></Spacer>
+          <Spacer width={25} />
         ) : (
           <Pressable
-            style={{marginRight: 15}}
             onPress={() => {
               setMenu(menu => !menu);
             }}>
@@ -237,72 +232,17 @@ function NotificationScreen({navigation}: Readonly<NotificationScreenProps>) {
               setMenu(false);
             }
           }}
-          style={{flex: 1}}>
+          style={styles.flex}>
           <FlatList
             data={Object.values(notifications).sort(
               (a, b) => b.time.seconds - a.time.seconds,
             )}
-            renderItem={({item}) => {
-              return (
-                <Swipeable
-                  renderRightActions={() => {
-                    return (
-                      <Pressable
-                        style={styles.delete}
-                        onPress={handleSingleDelete(item)}>
-                        {ICONS.Trash({
-                          height: 30,
-                          width: 30,
-                          color: COLOR.LIGHT[100],
-                        })}
-                      </Pressable>
-                    );
-                  }}>
-                  <View style={styles.ctr}>
-                    <View style={{maxWidth: '85%'}}>
-                      <Text style={styles.text1} numberOfLines={1}>
-                        {item.type === 'budget-percent'
-                          ? `Exceeded ${item.percentage}% of ${
-                              item.category[0].toUpperCase() +
-                              item.category.slice(1)
-                            } budget`
-                          : item.category[0].toUpperCase() +
-                            item.category.slice(1) +
-                            ' Budget Limit Exceeded'}
-                      </Text>
-                      <Text style={styles.text2}>
-                        {item.type === 'budget-percent'
-                          ? `You've exceeded ${item.percentage}% of your ${
-                              item.category[0].toUpperCase() +
-                              item.category.slice(1)
-                            } budget. Take action to stay on track.`
-                          : 'Your ' +
-                            item.category[0].toUpperCase() +
-                            item.category.slice(1) +
-                            ' ' +
-                            STRINGS.BudgetExceed}
-                      </Text>
-                    </View>
-                    <Text style={styles.text2}>
-                      {Timestamp.fromMillis(item.time.seconds * 1000)
-                        .toDate()
-                        .getHours()}
-                      .
-                      {Timestamp.fromMillis(item.time.seconds * 1000)
-                        .toDate()
-                        .getMinutes() < 10
-                        ? '0' +
-                          Timestamp.fromMillis(item.time.seconds * 1000)
-                            .toDate()
-                            .getMinutes()
-                        : Timestamp.fromMillis(item.time.seconds * 1000)
-                            .toDate()
-                            .getMinutes()}
-                    </Text>
-                  </View>
-                </Swipeable>
-              );
-            }}
+            renderItem={({item}) => (
+              <NotificationListItem
+                handleSingleDelete={handleSingleDelete}
+                item={item}
+              />
+            )}
           />
         </Pressable>
       )}

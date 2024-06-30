@@ -1,31 +1,31 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import {Keyboard} from 'react-native';
+import style from './styles';
 import {useAppDispatch, useAppSelector} from '../../redux/store';
-import {
-  BottomSheetModal,
-  BottomSheetTextInput,
-  BottomSheetView,
-} from '@gorhom/bottom-sheet';
-import {BottomSheetModalMethods} from '@gorhom/bottom-sheet/lib/typescript/types';
 import CustomButton from '../CustomButton';
-import Spacer from '../Spacer';
-import firestore from '@react-native-firebase/firestore';
 import {
   addExpenseCategory,
   addIncomeCategory,
   setLoading,
 } from '../../redux/reducers/userSlice';
 import {transactionType} from '../../defs/transaction';
-import style from './styles';
 import SheetBackdrop from '../SheetBackDrop';
 import {encrypt} from '../../utils/encryption';
 import {STRINGS} from '../../constants/strings';
 import {useAppTheme} from '../../hooks/themeHook';
 import {COLORS} from '../../constants/commonStyles';
+import {EmptyError} from '../../constants/errors';
+// Third Party Libraries
+import firestore from '@react-native-firebase/firestore';
 import Toast from 'react-native-toast-message';
 import {useNetInfo} from '@react-native-community/netinfo';
+import {
+  BottomSheetModal,
+  BottomSheetTextInput,
+  BottomSheetView,
+} from '@gorhom/bottom-sheet';
+import {BottomSheetModalMethods} from '@gorhom/bottom-sheet/lib/typescript/types';
 import {useRealm} from '@realm/react';
-import {Keyboard} from 'react-native';
-import {EmptyError} from '../../constants/errors';
 
 function AddCategorySheet({
   bottomSheetModalRef,
@@ -55,10 +55,48 @@ function AddCategorySheet({
   const [category, setCategory] = useState('');
   const [formKey, setFormKey] = useState(false);
   // functions
-  const onPress = async () => {
+  const handleOffline = useCallback(async () => {
+    if (type === 'expense') {
+      dispatch(addExpenseCategory(category.toLowerCase()));
+      realm.write(() => {
+        realm.create('category', {
+          name: category.toLowerCase(),
+          type: 'expense',
+        });
+      });
+    } else if (type === 'income') {
+      dispatch(addIncomeCategory(category.toLowerCase()));
+      realm.write(() => {
+        realm.create('category', {
+          name: category.toLowerCase(),
+          type: 'income',
+        });
+      });
+    }
+  }, [category, type]);
+
+  const handleOnline = useCallback(async () => {
+    const userDoc = firestore().collection('users').doc(uid);
+    if (type === 'expense') {
+      dispatch(addExpenseCategory(category.toLowerCase()));
+      await userDoc.update({
+        expenseCategory: [...expenseCats!, category.toLowerCase()].map(item =>
+          encrypt(item, uid!),
+        ),
+      });
+    } else if (type === 'income') {
+      dispatch(addIncomeCategory(category.toLowerCase()));
+      await userDoc.update({
+        incomeCategory: [...incomeCats!, category.toLowerCase()].map(item =>
+          encrypt(item, uid!),
+        ),
+      });
+    }
+  }, [category, expenseCats, incomeCats, type, uid]);
+
+  const onPress = useCallback(async () => {
     setFormKey(true);
     if (category !== '') {
-      const userDoc = firestore().collection('users').doc(uid);
       dispatch(setLoading(true));
       if (
         type === 'expense'
@@ -66,7 +104,7 @@ function AddCategorySheet({
           : incomeCats?.includes(category.toLowerCase())
       ) {
         Toast.show({
-          text1: `${category} is already added`,
+          text1: `${category}` + STRINGS.AlreadyAdded,
           type: 'error',
           position: 'top',
         });
@@ -75,39 +113,9 @@ function AddCategorySheet({
       }
       try {
         if (!isConnected) {
-          if (type === 'expense') {
-            dispatch(addExpenseCategory(category.toLowerCase()));
-            realm.write(() => {
-              realm.create('category', {
-                name: category.toLowerCase(),
-                type: 'expense',
-              });
-            });
-          } else if (type === 'income') {
-            dispatch(addIncomeCategory(category.toLowerCase()));
-            realm.write(() => {
-              realm.create('category', {
-                name: category.toLowerCase(),
-                type: 'income',
-              });
-            });
-          }
+          await handleOffline();
         } else {
-          if (type === 'expense') {
-            dispatch(addExpenseCategory(category.toLowerCase()));
-            await userDoc.update({
-              expenseCategory: [...expenseCats!, category.toLowerCase()].map(
-                item => encrypt(item, uid!),
-              ),
-            });
-          } else if (type === 'income') {
-            dispatch(addIncomeCategory(category.toLowerCase()));
-            await userDoc.update({
-              incomeCategory: [...incomeCats!, category.toLowerCase()].map(
-                item => encrypt(item, uid!),
-              ),
-            });
-          }
+          await handleOnline();
         }
         setMyCategory(category.toLocaleLowerCase().trim());
       } catch (e) {
@@ -117,13 +125,23 @@ function AddCategorySheet({
         bottomSheetModalRef.current?.dismiss();
       }
     }
-  };
+  }, [
+    category,
+    expenseCats,
+    incomeCats,
+    isConnected,
+    type,
+    handleOffline,
+    handleOnline,
+  ]);
+
   useEffect(() => {
     const keyboard = Keyboard.addListener('keyboardDidHide', () => {
       bottomSheetModalRef.current?.snapToIndex(0);
     });
     return () => keyboard.remove();
   }, []);
+
   return (
     <BottomSheetModal
       enablePanDownToClose
@@ -148,7 +166,7 @@ function AddCategorySheet({
           maxLength={20}
         />
         <EmptyError
-          errorText="Category cannot be empty"
+          errorText={STRINGS.CategoryCannotBeEmpty}
           formKey={formKey}
           value={category.trim()}
         />
@@ -158,4 +176,4 @@ function AddCategorySheet({
   );
 }
 
-export default AddCategorySheet;
+export default React.memo(AddCategorySheet);

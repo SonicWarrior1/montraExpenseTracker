@@ -41,7 +41,7 @@ function Linegraph({
         {formatWithCommas(
           Number(
             (
-              conversion['usd']?.[currency!.toLowerCase()] *
+              conversion.usd?.[currency!.toLowerCase()] *
               Number(transType === 'expense' ? totalSpend : totalIncome)
             ).toFixed(1),
           ).toString(),
@@ -121,9 +121,12 @@ function Linegraph({
               pointerLabelWidth: 100,
               activatePointersOnLongPress: true,
               autoAdjustPointerLabelPosition: true,
-              pointerLabelComponent: (
-                items: {date: string; value: number}[],
-              ) => <LinegraphLabel items={items} />,
+              pointerLabelComponent: (items: {date: string; value: number}[]) =>
+                LinegraphLabel({
+                  items: items,
+                  currency: currency,
+                  conversion: conversion,
+                }),
             }}
           />
         )}

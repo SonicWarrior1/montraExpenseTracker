@@ -23,7 +23,6 @@ function TransactionHeader({
   const styles = style(COLOR);
   // redux
   const filters = useAppSelector(state => state.transaction.filters);
-  // console.log(filters.sort !== 'none' ? 1 : 0);
   return (
     <View style={styles.header}>
       <Dropdown

@@ -58,18 +58,10 @@ const TransactionSlice = createSlice({
         setCatFilter(state, action) {
             console.log(action.payload);
             state.filters.cat = action.payload;
-            // if (state.filters.cat.includes(action.payload)) {
-            //     state.filters.cat = state.filters.cat.filter((item) => item != action.payload);
-            // } else {
-            //     state.filters.cat.push(action.payload);
-            // }
         },
         clearCatFilter(state) {
             state.filters.cat = [];
         },
-        // setTransaction(state, action) {
-        //     state.transactions = action.payload
-        // },
         setConversionData(state, action) {
             state.conversion = action.payload;
         },

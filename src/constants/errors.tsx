@@ -181,10 +181,8 @@ export function EmptyZeroError({
       (value === '' || Number(value) <= 0 || value.trim() === '.') &&
       formKey
     ) {
-      // console.log(1);
       height.value = withTiming(24);
     } else {
-      // console.log(0);
       height.value = withTiming(0);
     }
   }, [value, formKey]);
@@ -206,7 +204,7 @@ export function EmptyZeroError({
           {errorText}
         </Animated.Text>
       ) : (
-        <Animated.View style={{height: height}}></Animated.View>
+        <Animated.View style={{height: height}} />
       )}
     </>
   );
@@ -240,7 +238,7 @@ export function AnimatedEmptyError({
           {errorText}
         </Animated.Text>
       ) : (
-        <Animated.View style={{height}}></Animated.View>
+        <Animated.View style={{height}} />
       )}
     </>
   );

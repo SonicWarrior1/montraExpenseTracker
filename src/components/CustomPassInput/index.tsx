@@ -9,6 +9,7 @@ import styles from './styles';
 import {useState} from 'react';
 import {ICONS} from '../../constants/icons';
 import {useAppTheme} from '../../hooks/themeHook';
+import {PlaceholderTextColor} from '../../constants/commonStyles';
 
 function CustomPassInput({
   value,
@@ -34,7 +35,7 @@ function CustomPassInput({
         secureTextEntry={showPass}
         value={value}
         onChangeText={onChangeText}
-        placeholderTextColor={'#91919F'}
+        placeholderTextColor={PlaceholderTextColor}
         textContentType="oneTimeCode"
         onBlur={onBlur}
       />

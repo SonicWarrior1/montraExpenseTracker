@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useCallback, useState} from 'react';
 import {FlatList, Pressable, SafeAreaView, Text, View} from 'react-native';
 import style from './styles';
 import {ICONS} from '../../constants/icons';
@@ -53,6 +53,14 @@ function BudgetScreen({navigation}: Readonly<BudgetScreenProps>) {
       ).toFixed(1);
     }
   };
+  const onPress = useCallback(() => {
+    setMonth(month => {
+      if (month < new Date().getMonth()) {
+        return month + 1;
+      }
+      return month;
+    });
+  }, []);
   return (
     <>
       <View style={styles.safeView}>
@@ -75,15 +83,7 @@ function BudgetScreen({navigation}: Readonly<BudgetScreenProps>) {
               })}
             </Pressable>
             <Text style={styles.month}>{monthData[month].label}</Text>
-            <Pressable
-              onPress={() => {
-                setMonth(month => {
-                  if (month < new Date().getMonth()) {
-                    return month + 1;
-                  }
-                  return month;
-                });
-              }}>
+            <Pressable onPress={onPress}>
               {ICONS.ArrowRight({
                 height: 30,
                 width: 30,

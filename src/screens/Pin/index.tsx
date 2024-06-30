@@ -47,7 +47,7 @@ function Pin({route, navigation}: Readonly<PinSentScreenProps>) {
           }
         } else if (value === 99) {
           if (pin.length < 4) {
-            Toast.show({text1: 'Pin must be of 4 digits', type: 'error'});
+            Toast.show({text1: STRINGS.PinMust4digits, type: 'error'});
             return;
           }
           if (isSetup && oldPin === '') {
@@ -70,13 +70,12 @@ function Pin({route, navigation}: Readonly<PinSentScreenProps>) {
                 .update({
                   pin: encrypt(pin.join(''), user.uid),
                 });
-              await dispatch(userLoggedIn({...user, pin: pin.join('')}));
+              dispatch(userLoggedIn({...user, pin: pin.join('')}));
               navigation.replace(NAVIGATION.BottomTab);
               dispatch(setLoading(false));
             } else {
-              console.log("Pin doesn't match");
               Toast.show({
-                text1: "Pin doesn't match",
+                text1: STRINGS.PinDontMatch,
                 type: 'error',
               });
             }
@@ -90,8 +89,7 @@ function Pin({route, navigation}: Readonly<PinSentScreenProps>) {
             console.log('home');
           } else {
             console.log(currentUser?.pin);
-            console.log('Incorrect Pin');
-            Toast.show({text1: 'Incorrect Pin', type: 'error'});
+            Toast.show({text1: STRINGS.IncorrectPin, type: 'error'});
             setPin([]);
           }
         } else if (pin.length < 4) {

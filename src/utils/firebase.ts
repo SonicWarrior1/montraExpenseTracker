@@ -134,7 +134,7 @@ export async function handleIncomeUpdate({
         ) -
         transaction.amount +
         Number(amount / conversion.usd[currency.toLowerCase()])
-    )
+    );
     await firestore()
         .collection('users')
         .doc(uid)
@@ -177,7 +177,7 @@ export async function handleNewIncome({
         (Number(amount) /
             conversion.usd[currency.toLowerCase()]
         )
-    )
+    );
     await firestore()
         .collection('users')
         .doc(uid)
@@ -222,7 +222,7 @@ export async function handleExpenseUpdate({
             ) -
             transaction.amount +
             (Number(amount) / conversion.usd[currency.toLowerCase()])
-        )
+        );
         await firestore()
             .collection('users')
             .doc(uid)
@@ -236,11 +236,11 @@ export async function handleExpenseUpdate({
             });
         if (category !== 'transfer') {
             await handleOnlineNotify({
-                category: category, month: month, uid: uid, totalSpent: finalAmount, curr: curr
-            })
+                category: category, month: month, uid: uid, totalSpent: finalAmount, curr: curr,
+            });
         }
     } catch (e) {
-        console.log("ERROR", e)
+        console.log('ERROR', e);
     }
 }
 
@@ -281,15 +281,15 @@ export async function handleNewExpense({
             .doc(uid)
             .update({
                 [`spend.${month}.${category}`]:
-                    encrypt(String(finalAmount), uid)
+                    encrypt(String(finalAmount), uid),
             });
         if (category !== 'transfer') {
             await handleOnlineNotify({
-                category: category, month: month, uid: uid, totalSpent: finalAmount, curr: curr
-            })
+                category: category, month: month, uid: uid, totalSpent: finalAmount, curr: curr,
+            });
         }
     } catch (e) {
-        console.log(e)
+        console.log(e);
     }
 }
 export async function getAttachmentUrl({
@@ -330,7 +330,7 @@ export async function handleOnlineNotify({
     month: number,
     category: string
 }) {
-    console.log("notifyyy")
+    console.log('notifyyy');
     const totalBudget = (UserFromJson(curr.data() as UserType))?.budget?.[
         month
     ]?.[category];
@@ -371,8 +371,8 @@ export async function handleOnlineNotify({
                         ' budget has exceeded the limit',
                     android: {
                         channelId, pressAction: {
-                            id: 'default'
-                        }
+                            id: 'default',
+                        },
                     },
                 });
             } else if (totalSpent >= totalBudget.limit * (totalBudget.percentage / 100)) {
@@ -399,8 +399,8 @@ export async function handleOnlineNotify({
                         category.slice(1)} budget. Take action to stay on track.`,
                     android: {
                         channelId, pressAction: {
-                            id: 'default'
-                        }
+                            id: 'default',
+                        },
                     },
                 });
             }
@@ -465,7 +465,7 @@ export const handleOnline = async ({
     attachement,
     attachementType,
     uid,
-    amount, pageType, conversion, currency, category, desc, isEdit, repeatData, prevTransaction, wallet, from, to, month
+    amount, pageType, conversion, currency, category, desc, isEdit, repeatData, prevTransaction, wallet, from, to, month,
 }: {
     id: string;
     attachement: string;
@@ -590,8 +590,7 @@ export const handleOffline = async ({
     dispatch,
     user,
     realm,
-    prevAmt,
-    TransOnline
+    TransOnline,
 }: {
     isConnected: boolean | null,
     id: string;
@@ -615,7 +614,6 @@ export const handleOffline = async ({
     from: string,
     to: string,
     month: number,
-    prevAmt: number | undefined,
     dispatch,
     user: UserType | undefined,
     realm: Realm,
@@ -657,8 +655,8 @@ export const handleOffline = async ({
                 month: month, category: category, amount: user?.income[month][category!]! -
                     prevTransaction?.amount! +
                     (Number(amount.replace(/,/g, '')) /
-                        (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1))
-            }))
+                        (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1)),
+            }));
             realm.write(() => {
                 realm.create(
                     'amount',
@@ -667,7 +665,7 @@ export const handleOffline = async ({
                         amount: user?.income[month][category!]! -
                             prevTransaction?.amount! +
                             (Number(amount.replace(/,/g, '')) /
-                                (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1))
+                                (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1)),
                     },
                     UpdateMode.All,
                 );
@@ -677,8 +675,8 @@ export const handleOffline = async ({
             dispatch(setIncome({
                 month: month, category: category, amount: (user?.income?.[month]?.[category!] ?? 0) +
                     (Number(amount.replace(/,/g, '')) /
-                        (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1))
-            }))
+                        (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1)),
+            }));
             realm.write(() => {
                 realm.create(
                     'amount',
@@ -686,7 +684,7 @@ export const handleOffline = async ({
                         id: month + '_' + category + '_' + pageType,
                         amount: (user?.income?.[month]?.[category!] ?? 0) +
                             (Number(amount.replace(/,/g, '')) /
-                                (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1))
+                                (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1)),
                     },
                     UpdateMode.All,
                 );
@@ -699,8 +697,8 @@ export const handleOffline = async ({
                 month: month, category: category, amount: (user?.spend?.[month]?.[category!] ?? 0) -
                     prevTransaction?.amount! +
                     (Number(amount.replace(/,/g, '')) /
-                        (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1))
-            }))
+                        (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1)),
+            }));
             realm.write(() => {
                 realm.create(
                     'amount',
@@ -714,7 +712,7 @@ export const handleOffline = async ({
                         amount: (user?.spend?.[month]?.[category!] ?? 0) -
                             prevTransaction?.amount! +
                             (Number(amount.replace(/,/g, '')) /
-                                (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1))
+                                (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1)),
                     },
                     UpdateMode.All,
                 );
@@ -724,8 +722,8 @@ export const handleOffline = async ({
             dispatch(setExpense({
                 month: month, category: category, amount: (user?.spend?.[month]?.[category!] ?? 0) +
                     (Number(amount.replace(/,/g, '')) /
-                        (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1))
-            }))
+                        (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1)),
+            }));
             realm.write(() => {
                 realm.create(
                     'amount',
@@ -738,7 +736,7 @@ export const handleOffline = async ({
                             pageType,
                         amount: (user?.spend?.[month]?.[category!] ?? 0) +
                             (Number(amount.replace(/,/g, '')) /
-                                (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1))
+                                (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1)),
                     },
                     UpdateMode.All,
                 );
@@ -748,11 +746,11 @@ export const handleOffline = async ({
     } else {
         if (isEdit) {
             dispatch(setExpense({
-                month: month, category: 'transfer', amount: (user?.spend?.[month]?.['transfer'] ?? 0) -
+                month: month, category: 'transfer', amount: (user?.spend?.[month]?.transfer ?? 0) -
                     prevTransaction?.amount! +
                     (Number(amount.replace(/,/g, '')) /
-                        (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1))
-            }))
+                        (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1)),
+            }));
             realm.write(() => {
                 realm.create(
                     'amount',
@@ -763,10 +761,10 @@ export const handleOffline = async ({
                             'transfer' +
                             '_' +
                             pageType,
-                        amount: (user?.spend?.[month]?.['transfer'] ?? 0) -
+                        amount: (user?.spend?.[month]?.transfer ?? 0) -
                             prevTransaction?.amount! +
                             (Number(amount.replace(/,/g, '')) /
-                                (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1))
+                                (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1)),
                     },
                     UpdateMode.All,
                 );
@@ -774,10 +772,10 @@ export const handleOffline = async ({
             });
         } else {
             dispatch(setExpense({
-                month: month, category: 'transfer', amount: (user?.spend?.[month]?.['transfer'] ?? 0) +
+                month: month, category: 'transfer', amount: (user?.spend?.[month]?.transfer ?? 0) +
                     (Number(amount.replace(/,/g, '')) /
-                        (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1))
-            }))
+                        (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1)),
+            }));
             realm.write(() => {
                 realm.create(
                     'amount',
@@ -788,9 +786,9 @@ export const handleOffline = async ({
                             'transfer' +
                             '_' +
                             pageType,
-                        amount: (user?.spend?.[month]?.['transfer'] ?? 0) +
+                        amount: (user?.spend?.[month]?.transfer ?? 0) +
                             (Number(amount.replace(/,/g, '')) /
-                                (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1))
+                                (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1)),
                     },
                     UpdateMode.All,
                 );
@@ -808,7 +806,7 @@ export const handleOffline = async ({
             : (user?.spend?.[month]?.[category!] ?? 0) +
             Number(amount.replace(/,/g, '')) /
             (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1);
-        await handleOfflineNotification({ category: category, dispatch: dispatch, realm: realm, totalBudget: totalBudget, totalSpent: totalSpent, user: user })
+        await handleOfflineNotification({ category: category, dispatch: dispatch, realm: realm, totalBudget: totalBudget, totalSpent: totalSpent, user: user });
     }
     if (trans.freq) {
         trans.freq.date = Timestamp.fromDate(trans.freq?.date as Date);
@@ -865,7 +863,7 @@ export async function handleOfflineNotification({ totalBudget, totalSpent, realm
                             time: Timestamp.now(),
                             read: false,
                             percentage: totalBudget.percentage,
-                            deleted: false
+                            deleted: false,
                         },
                         UpdateMode.All,
                     );
@@ -900,7 +898,7 @@ export async function handleOfflineNotification({ totalBudget, totalSpent, realm
                         channelId,
                         pressAction: {
                             id: 'default',
-                        }
+                        },
                     },
                 });
             } else if (
@@ -917,7 +915,7 @@ export async function handleOfflineNotification({ totalBudget, totalSpent, realm
                             time: Timestamp.now(),
                             read: false,
                             percentage: totalBudget.percentage,
-                            deleted: false
+                            deleted: false,
                         },
                         UpdateMode.All,
                     );
@@ -945,8 +943,8 @@ export async function handleOfflineNotification({ totalBudget, totalSpent, realm
                         } budget. Take action to stay on track.`,
                     android: {
                         channelId, pressAction: {
-                            id: 'default'
-                        }
+                            id: 'default',
+                        },
                     },
                 });
             }

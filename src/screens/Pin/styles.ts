@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
         fontSize: 48,
         fontWeight: '500',
         color: 'white',
-        fontFamily: 'Inter-Regular'
+        fontFamily: 'Inter-Regular',
     },
     menu: {
         paddingHorizontal: 20,
@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
             height: 2,
             width: 1,
         },
-        elevation: 20
+        elevation: 20,
     },
     menuText: { color: COLORS.DARK[100] }, modalBackground: {
         flex: 1,
@@ -69,6 +69,15 @@ const styles = StyleSheet.create({
     upperView: {
         paddingTop: screenHeight * 0.03,
         rowGap: 100,
-    }
+    },
+    modal: {
+        width: '90%',
+        paddingVertical: 30,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: 'white',
+        paddingHorizontal: 15,
+        borderRadius: 16,
+    },
 });
 export default styles;

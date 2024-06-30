@@ -124,4 +124,4 @@ function DeleteBudgetSheet({
   );
 }
 
-export default DeleteBudgetSheet;
+export default React.memo(DeleteBudgetSheet);

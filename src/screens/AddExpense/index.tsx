@@ -8,13 +8,11 @@ import {
   View,
 } from 'react-native';
 import style from './styles';
-
 import CustomInput from '../../components/CustomInput';
 import {COLORS} from '../../constants/commonStyles';
 import Spacer from '../../components/Spacer';
 import CustomDropdown from '../../components/CustomDropDown';
 import {ICONS} from '../../constants/icons';
-import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import FilePickerSheet from '../../components/FilePickerSheet';
 import RepeatTransactionSheet from '../../components/RepeatTranscationSheet';
 import {STRINGS} from '../../constants/strings';
@@ -22,18 +20,12 @@ import CustomButton from '../../components/CustomButton';
 import {repeatDataType, transactionType} from '../../defs/transaction';
 import {useAppDispatch, useAppSelector} from '../../redux/store';
 import {setLoading} from '../../redux/reducers/userSlice';
-import uuid from 'react-native-uuid';
-import Toast from 'react-native-toast-message';
 import {ExpenseScreenProps} from '../../defs/navigation';
 import AddCategorySheet from '../../components/AddCategorySheet';
-
 import {CompundEmptyError, EmptyError} from '../../constants/errors';
 import AttachementContainer from './atoms/attachementContainer';
 import {handleOffline, handleOnline} from '../../utils/firebase';
 import {useAppTheme} from '../../hooks/themeHook';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-import {useNetInfo} from '@react-native-community/netinfo';
-import {useObject, useRealm} from '@realm/react';
 import {OnlineTransactionModel} from '../../DbModels/OnlineTransactionModel';
 import {OfflineTransactionModel} from '../../DbModels/OfflineTransactionModel';
 import CustomHeader from '../../components/CustomHeader';
@@ -41,6 +33,15 @@ import MoneyInput from './atoms/MoneyInput';
 import {RepeatDataModel} from '../../DbModels/RepeatDataModel';
 import {formatWithCommas, getMyColor} from '../../utils/commonFuncs';
 import RepeatInput from './atoms/RepeatInput';
+import CategoryDropdownIcon from '../../components/CategoryColorIcon';
+// Third Party Libraries
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import {useNetInfo} from '@react-native-community/netinfo';
+import {useObject, useRealm} from '@realm/react';
+import uuid from 'react-native-uuid';
+import Toast from 'react-native-toast-message';
+import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
+
 function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
   // constants
   const {isConnected} = useNetInfo();
@@ -72,22 +73,27 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
       return COLORS.PRIMARY.GREEN;
     }
   }, [pageType]);
+  const screenHeight = Dimensions.get('screen').height;
+  const height = useMemo(() => {
+    if (Platform.OS !== 'ios') {
+      if (pageType !== 'transfer') {
+        return screenHeight / 3.13;
+      } else {
+        return screenHeight / 2.06;
+      }
+    } else if (pageType !== 'transfer') {
+      return screenHeight / 2.65;
+    } else {
+      return Dimensions.get('screen').height / 1.85;
+    }
+  }, [pageType, screenHeight]);
   const backgroundColor = getBackgroundColor;
   const dispatch = useAppDispatch();
-  // redux use
+  // redux
   const conversion = useAppSelector(state => state.transaction.conversion);
-  const expenseCat = useAppSelector(
-    state => state.user.currentUser?.expenseCategory,
-  );
-  const incomeCat = useAppSelector(
-    state => state.user.currentUser?.incomeCategory,
-  );
   const user = useAppSelector(state => state.user.currentUser);
-  const uid = useAppSelector(state => state.user.currentUser!.uid);
-  const currency = useAppSelector(state => state.user.currentUser?.currency);
   // state
   const [firstTime, setFirstTime] = useState(true);
-  const [prevAmt, setPrevAmt] = useState<number>();
   const [image, setImage] = useState(
     prevTransaction && prevTransaction.attachementType === 'image'
       ? prevTransaction.attachement
@@ -101,7 +107,6 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
   const [repeatData, setRepeatData] = useState<
     repeatDataType | RepeatDataModel | undefined
   >(prevTransaction ? prevTransaction.freq! : undefined);
-  // console.log('RepeatData', repeatData)
   const [desc, setDesc] = useState(prevTransaction ? prevTransaction.desc : '');
   const [zindex, setZindex] = useState(1);
   const [amount, setAmount] = useState(
@@ -109,7 +114,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
       ? formatWithCommas(
           Number(
             (
-              conversion.usd[(currency ?? 'USD').toLowerCase()] *
+              conversion.usd[(user?.currency ?? 'USD').toLowerCase()] *
               prevTransaction.amount
             ).toFixed(1),
           ).toString(),
@@ -183,7 +188,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
           amount: amount,
           category: category,
           conversion: conversion,
-          currency: currency,
+          currency: user?.currency,
           desc: desc,
           dispatch: dispatch,
           from: from,
@@ -191,12 +196,11 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
           isEdit: isEdit,
           month: month,
           pageType: pageType,
-          prevAmt: prevAmt,
           prevTransaction: prevTransaction,
           realm: realm,
           repeatData: repeatData,
           to: to,
-          uid: uid,
+          uid: user?.uid!,
           user: user,
           wallet: wallet,
           TransOnline: TransOnline,
@@ -209,7 +213,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
           amount: amount,
           category: category,
           conversion: conversion,
-          currency: currency,
+          currency: user?.currency,
           desc: desc,
           from: from,
           isEdit: isEdit,
@@ -218,7 +222,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
           prevTransaction: prevTransaction,
           repeatData: repeatData,
           to: to,
-          uid: uid,
+          uid: user?.uid!,
           wallet: wallet,
         });
       }
@@ -235,132 +239,77 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
       dispatch(setLoading(false));
     }
   };
-  useEffect(() => {
-    setFirstTime(false);
-    if (isEdit) {
-      setPrevAmt(prevTransaction?.amount);
-    }
-  }, []);
-  console.log(prevAmt);
-  useEffect(() => {
-    setCatColors(
-      Object.values(pageType === 'expense' ? expenseCat! : incomeCat!).reduce(
-        (acc: {[key: string]: string}, item) => {
-          acc[item] = getMyColor();
-          return acc;
-        },
-        {},
-      ),
-    );
-    return () => {
-      setCatColors(undefined);
-    };
-  }, [pageType, expenseCat, incomeCat]);
-  useEffect(() => {
-    const back = BackHandler.addEventListener('hardwareBackPress', () => {
-      if (
-        pageType === 'transfer' &&
+  const backAction = () => {
+    if (
+      (pageType === 'transfer' &&
         (((amount.replace(/,/g, '').trim() !== '' ||
           amount.replace(/,/g, '').trim() !== '0') &&
           amount.replace(/,/g, '').trim() === '.') ||
           Number(amount.replace(/,/g, '')) > 0 ||
           from !== '' ||
-          to !== '')
-      ) {
-        Alert.alert(
-          'Discard changes?',
-          'You have unsaved changes. Are you sure you want to discard them and leave the screen?',
-          [
-            {
-              text: 'No',
-            },
-            {text: 'Yes', onPress: () => [navigation.goBack()]},
-          ],
-        );
-      } else if (
-        pageType !== 'transfer' &&
+          to !== '')) ||
+      (pageType !== 'transfer' &&
         (((amount.replace(/,/g, '').trim() !== '' ||
           amount.replace(/,/g, '').trim() !== '0') &&
           amount.replace(/,/g, '').trim() === '.') ||
           Number(amount.replace(/,/g, '')) > 0 ||
           category !== '' ||
-          wallet !== '')
-      ) {
-        Alert.alert(
-          'Discard changes?',
-          'You have unsaved changes. Are you sure you want to discard them and leave the screen?',
-          [
-            {
-              text: 'No',
-            },
-            {text: 'Yes', onPress: () => [navigation.goBack()]},
-          ],
-        );
-      } else {
-        navigation.goBack();
-      }
-      return true;
-    });
+          wallet !== ''))
+    ) {
+      Alert.alert(
+        'Discard changes?',
+        'You have unsaved changes. Are you sure you want to discard them and leave the screen?',
+        [
+          {
+            text: 'No',
+          },
+          {text: 'Yes', onPress: () => [navigation.goBack()]},
+        ],
+      );
+    } else {
+      navigation.goBack();
+    }
+    return true;
+  };
+  useEffect(() => {
+    setCatColors(
+      Object.values(
+        pageType === 'expense' ? user?.expenseCategory! : user?.incomeCategory!,
+      ).reduce((acc: {[key: string]: string}, item) => {
+        acc[item] = getMyColor();
+        return acc;
+      }, {}),
+    );
+    return () => {
+      setCatColors(undefined);
+    };
+  }, [pageType, user?.expenseCategory, user?.incomeCategory]);
+
+  useEffect(() => {
+    setFirstTime(false);
+    const back = BackHandler.addEventListener('hardwareBackPress', backAction);
     return () => back.remove();
-  });
+  }, []);
   return (
     <>
-      <KeyboardAwareScrollView
-        style={{backgroundColor: backgroundColor}}
-        contentContainerStyle={{flexGrow: 1}}>
+      <KeyboardAwareScrollView style={{backgroundColor: backgroundColor}}>
         <SafeAreaView
           style={[
             styles.safeView,
             {
               backgroundColor: backgroundColor,
-              height:
-                Platform.OS !== 'ios'
-                  ? pageType !== 'transfer'
-                    ? Dimensions.get('screen').height / 3.13
-                    : Dimensions.get('screen').height / 2.06
-                  : pageType !== 'transfer'
-                  ? Dimensions.get('screen').height / 2.65
-                  : Dimensions.get('screen').height / 1.85,
+              height: height,
             },
           ]}>
           <CustomHeader
             backgroundColor={getBackgroundColor}
             title={pageType[0].toUpperCase() + pageType.slice(1)}
             navigation={navigation}
-            onPress={() => {
-              if (
-                pageType === 'transfer'
-                  ? ((amount.replace(/,/g, '').trim() !== '' ||
-                      amount.replace(/,/g, '').trim() !== '0') &&
-                      amount.replace(/,/g, '').trim() === '.') ||
-                    Number(amount.replace(/,/g, '')) > 0 ||
-                    from !== '' ||
-                    to !== ''
-                  : ((amount.replace(/,/g, '').trim() !== '' ||
-                      amount.replace(/,/g, '').trim() !== '0') &&
-                      amount.replace(/,/g, '').trim() === '.') ||
-                    Number(amount.replace(/,/g, '')) > 0 ||
-                    category !== '' ||
-                    wallet !== ''
-              ) {
-                Alert.alert(
-                  'Discard changes?',
-                  'You have unsaved changes. Are you sure you want to discard them and leave the screen?',
-                  [
-                    {
-                      text: 'No',
-                    },
-                    {text: 'Yes', onPress: () => [navigation.goBack()]},
-                  ],
-                );
-              } else {
-                navigation.goBack();
-              }
-            }}
+            onPress={backAction}
           />
           <MoneyInput
             amount={amount}
-            currency={currency!}
+            currency={user?.currency ?? 'usd'}
             formKey={formKey}
             setAmount={setAmount}
           />
@@ -369,17 +318,18 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
           {pageType !== 'transfer' && (
             <>
               <CustomDropdown
-                data={(pageType === 'expense' ? expenseCat! : incomeCat!)?.map(
-                  item => {
-                    return {
-                      label:
-                        item === 'add'
-                          ? 'ADD NEW CATEGORY'
-                          : item[0].toUpperCase() + item.slice(1),
-                      value: item,
-                    };
-                  },
-                )}
+                data={(pageType === 'expense'
+                  ? user?.expenseCategory!
+                  : user?.incomeCategory!
+                )?.map(item => {
+                  return {
+                    label:
+                      item === 'add'
+                        ? 'ADD NEW CATEGORY'
+                        : item[0].toUpperCase() + item.slice(1),
+                    value: item,
+                  };
+                })}
                 onChange={val => {
                   if (val.value === 'add') {
                     addCategorySheetRef.current?.present();
@@ -389,19 +339,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
                 }}
                 value={category}
                 placeholder={STRINGS.Category}
-                leftIcon={visible => {
-                  return !visible && category !== '' ? (
-                    <View
-                      style={{
-                        height: 15,
-                        width: 15,
-                        backgroundColor: catColors?.[category ?? ''] ?? 'green',
-                        borderRadius: 20,
-                        marginRight: 8,
-                      }}
-                    />
-                  ) : undefined;
-                }}
+                leftIcon={CategoryDropdownIcon(category!, catColors!)}
                 catColors={catColors}
               />
               <EmptyError

@@ -3,7 +3,7 @@ import Onboarding from '../screens/Onboarding';
 import {NAVIGATION} from '../constants/strings';
 import Signup from '../screens/Signup';
 import {ICONS} from '../constants/icons';
-import {Pressable, View} from 'react-native';
+import {Pressable} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import Login from '../screens/Login';
 import {useAppDispatch, useAppSelector} from '../redux/store';

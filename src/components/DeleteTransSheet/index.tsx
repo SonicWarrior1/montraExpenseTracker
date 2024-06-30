@@ -1,37 +1,37 @@
+import React, {useMemo} from 'react';
+import {Text, View} from 'react-native';
+import style from './styles';
+import {COLORS} from '../../constants/commonStyles';
+import CustomButton from '../CustomButton';
+import {useAppDispatch, useAppSelector} from '../../redux/store';
+import {RootStackParamList} from '../../defs/navigation';
+import {
+  setExpense,
+  setIncome,
+  setLoading,
+} from '../../redux/reducers/userSlice';
+import {transactionType} from '../../defs/transaction';
+import SheetBackdrop from '../SheetBackDrop';
+import {STRINGS} from '../../constants/strings';
+import {useAppTheme} from '../../hooks/themeHook';
+import {OnlineTransactionModel} from '../../DbModels/OnlineTransactionModel';
+import {OfflineTransactionModel} from '../../DbModels/OfflineTransactionModel';
+import {encrypt} from '../../utils/encryption';
+import {UserFromJson} from '../../utils/userFuncs';
+// Third Party Libraries
+import Toast from 'react-native-toast-message';
+import {StackNavigationProp} from '@react-navigation/stack';
+import firestore from '@react-native-firebase/firestore';
+import {useObject, useRealm} from '@realm/react';
+import {useNetInfo} from '@react-native-community/netinfo';
+import {UpdateMode} from 'realm';
+import storage from '@react-native-firebase/storage';
 import {
   BottomSheetModal,
   BottomSheetModalProvider,
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import {BottomSheetModalMethods} from '@gorhom/bottom-sheet/lib/typescript/types';
-import React, {useCallback, useMemo} from 'react';
-import {Text, View} from 'react-native';
-import {COLORS} from '../../constants/commonStyles';
-import CustomButton from '../CustomButton';
-import firestore from '@react-native-firebase/firestore';
-import {useAppDispatch, useAppSelector} from '../../redux/store';
-import Toast from 'react-native-toast-message';
-import {RootStackParamList} from '../../defs/navigation';
-import {
-  setExpense,
-  setIncome,
-  setLoading,
-  userLoggedIn,
-} from '../../redux/reducers/userSlice';
-import style from './styles';
-import {transactionType} from '../../defs/transaction';
-import SheetBackdrop from '../SheetBackDrop';
-import {STRINGS} from '../../constants/strings';
-import {useAppTheme} from '../../hooks/themeHook';
-import {StackNavigationProp} from '@react-navigation/stack';
-import {useNetInfo} from '@react-native-community/netinfo';
-import {useObject, useRealm} from '@realm/react';
-import {OnlineTransactionModel} from '../../DbModels/OnlineTransactionModel';
-import {UpdateMode} from 'realm';
-import storage from '@react-native-firebase/storage';
-import {OfflineTransactionModel} from '../../DbModels/OfflineTransactionModel';
-import {encrypt} from '../../utils/encryption';
-import {UserFromJson} from '../../utils/userFuncs';
 
 function DeleteTransactionSheet({
   bottomSheetModalRef,
@@ -67,129 +67,130 @@ function DeleteTransactionSheet({
   const realm = useRealm();
   const online = useObject(OnlineTransactionModel, id);
   const offline = useObject(OfflineTransactionModel, id);
-  // console.log('djsfskdfnl', online, offline);
   const trans = offline ?? online;
   // functions
+  const handleOffline = async () => {
+    realm.write(() => {
+      realm.create(
+        'OfflineTransaction',
+        {...trans, operation: 'delete'},
+        UpdateMode.Modified,
+      );
+      if (online) {
+        realm.create(
+          'OnlineTransaction',
+          {...trans, changed: true},
+          UpdateMode.Modified,
+        );
+      }
+    });
+    if (type === 'income') {
+      dispatch(
+        setIncome({
+          month: month,
+          category: category,
+          amount: user?.income[month][category]! - Number(amt),
+        }),
+      );
+      realm.write(() => {
+        realm.create(
+          'amount',
+          {
+            id: month + '_' + category + '_' + type,
+            amount: user?.income[month][category]! - Number(amt),
+          },
+          UpdateMode.All,
+        );
+        console.log('done');
+      });
+    } else if (type === 'expense') {
+      dispatch(
+        setExpense({
+          month: month,
+          category: category,
+          amount: user?.spend[month][category]! - Number(amt),
+        }),
+      );
+      realm.write(() => {
+        realm.create(
+          'amount',
+          {
+            id: month + '_' + category + '_' + type,
+            amount: user?.spend[month][category]! - Number(amt),
+          },
+          UpdateMode.All,
+        );
+        console.log('done');
+      });
+    } else {
+      dispatch(
+        setExpense({
+          month: month,
+          category: 'transfer',
+          amount: user?.spend[month].transfer! - Number(amt),
+        }),
+      );
+      realm.write(() => {
+        realm.create(
+          'amount',
+          {
+            id: month + '_' + 'transfer' + '_' + type,
+            amount: user?.spend[month].transfer! - Number(amt),
+          },
+          UpdateMode.All,
+        );
+        console.log('done');
+      });
+    }
+    bottomSheetModalRef.current?.dismiss();
+    navigation.pop();
+  };
+  const handleOnline = async () => {
+    const userDoc = firestore().collection('users').doc(uid);
+    const data = await firestore().collection('users').doc(uid).get();
+    if (type === 'expense' || type === 'transfer') {
+      await firestore()
+        .collection('users')
+        .doc(uid)
+        .update({
+          [`spend.${month}.${type === 'transfer' ? 'transfer' : category}`]:
+            encrypt(
+              String(
+                (UserFromJson(data.data()!)?.spend?.[month]?.[
+                  type === 'transfer' ? 'transfer' : category
+                ] ?? 0) - amt,
+              ),
+              uid!,
+            ),
+        });
+    } else {
+      await firestore()
+        .collection('users')
+        .doc(uid)
+        .update({
+          [`income.${month}.${category}`]: encrypt(
+            String(
+              (UserFromJson(data.data()!)?.income?.[month]?.[category] ?? 0) -
+                amt,
+            ),
+            uid!,
+          ),
+        });
+    }
+    bottomSheetModalRef.current?.dismiss();
+    navigation.pop();
+    await userDoc.collection('transactions').doc(id).update({deleted: true});
+    if (url !== '') {
+      await storage().refFromURL(url).delete();
+    }
+  };
   const handleDelete = async () => {
     try {
       dispatch(setLoading(true));
       if (!isConnected) {
-        realm.write(() => {
-          realm.create(
-            'OfflineTransaction',
-            {...trans, operation: 'delete'},
-            UpdateMode.Modified,
-          );
-          if (online) {
-            realm.create(
-              'OnlineTransaction',
-              {...trans, changed: true},
-              UpdateMode.Modified,
-            );
-          }
-        });
-        if (type === 'income') {
-          dispatch(
-            setIncome({
-              month: month,
-              category: category,
-              amount: user?.income[month][category]! - Number(amt),
-            }),
-          );
-          realm.write(() => {
-            realm.create(
-              'amount',
-              {
-                id: month + '_' + category + '_' + type,
-                amount: user?.income[month][category]! - Number(amt),
-              },
-              UpdateMode.All,
-            );
-            console.log('done');
-          });
-        } else if (type === 'expense') {
-          dispatch(
-            setExpense({
-              month: month,
-              category: category,
-              amount: user?.spend[month][category]! - Number(amt),
-            }),
-          );
-          realm.write(() => {
-            realm.create(
-              'amount',
-              {
-                id: month + '_' + category + '_' + type,
-                amount: user?.spend[month][category]! - Number(amt),
-              },
-              UpdateMode.All,
-            );
-            console.log('done');
-          });
-        } else {
-          dispatch(
-            setExpense({
-              month: month,
-              category: 'transfer',
-              amount: user?.spend[month]['transfer']! - Number(amt),
-            }),
-          );
-          realm.write(() => {
-            realm.create(
-              'amount',
-              {
-                id: month + '_' + 'transfer' + '_' + type,
-                amount: user?.spend[month]['transfer']! - Number(amt),
-              },
-              UpdateMode.All,
-            );
-            console.log('done');
-          });
-        }
-        bottomSheetModalRef.current?.dismiss();
-        navigation.pop();
+        await handleOffline();
       } else {
-        const userDoc = firestore().collection('users').doc(uid);
-        const data = await firestore().collection('users').doc(uid).get();
-        // console.log(UserFromJson(data.data()!));
-        if (type === 'expense' || type === 'transfer') {
-          await firestore()
-            .collection('users')
-            .doc(uid)
-            .update({
-              [`spend.${month}.${type === 'transfer' ? 'transfer' : category}`]:
-                encrypt(
-                  String(
-                    (UserFromJson(data.data()!)?.spend?.[month]?.[
-                      type === 'transfer' ? 'transfer' : category
-                    ] ?? 0) - amt,
-                  ),
-                  uid!,
-                ),
-            });
-        } else {
-          await firestore()
-            .collection('users')
-            .doc(uid)
-            .update({
-              [`income.${month}.${category}`]: encrypt(
-                String(
-                  (UserFromJson(data.data()!)?.income?.[month]?.[category] ??
-                    0) - amt,
-                ),
-                uid!,
-              ),
-            });
-        }
-        bottomSheetModalRef.current?.dismiss();
-        navigation.pop();
-        await userDoc
-          .collection('transactions')
-          .doc(id)
-          .update({deleted: true});
-        if (url !== '') {
-          await storage().refFromURL(url).delete();
-        }
+        await handleOnline();
       }
       Toast.show({
         text1: STRINGS.TransactionDeletedSuccesfully,
@@ -236,4 +237,4 @@ function DeleteTransactionSheet({
   );
 }
 
-export default DeleteTransactionSheet;
+export default React.memo(DeleteTransactionSheet);

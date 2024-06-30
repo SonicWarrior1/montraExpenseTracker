@@ -8,7 +8,6 @@ import {PersistGate} from 'redux-persist/integration/react';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import Loader from './components/Loader';
 import Toast from 'react-native-toast-message';
-import {enableFreeze, enableScreens} from 'react-native-screens';
 import {toastConfig} from './components/customToast';
 import BootSplash from 'react-native-bootsplash';
 import {RealmProvider} from '@realm/react';
@@ -22,8 +21,6 @@ import {CategoryModel} from './DbModels/CategoryModel';
 import {AmountModel} from './DbModels/AmountModel';
 import {NotificationModel} from './DbModels/NotificationModel';
 
-// enableFreeze(true);
-// enableScreens(false);
 GoogleSignin.configure({
   webClientId:
     '426728684733-08hbgavcdljaclium152ea992drr4ev3.apps.googleusercontent.com',
@@ -45,7 +42,6 @@ function App(): React.JSX.Element {
         ]}>
         <Provider store={store}>
           <PersistGate persistor={persistor}>
-            {/* <InternetCheck> */}
             <Loader>
               <NavigationContainer
                 onReady={() => BootSplash.hide({fade: true})}>
@@ -58,7 +54,6 @@ function App(): React.JSX.Element {
                 />
               </NavigationContainer>
             </Loader>
-            {/* </InternetCheck> */}
           </PersistGate>
         </Provider>
       </RealmProvider>

@@ -2,10 +2,9 @@ import {Timestamp} from '@react-native-firebase/firestore';
 import React from 'react';
 import {FlatList, Pressable, Text, View} from 'react-native';
 import style from '../styles';
-import {currencies} from '../../../constants/strings';
+import {currencies, STRINGS} from '../../../constants/strings';
 import {COLORS} from '../../../constants/commonStyles';
 import {catIcons, ICONS} from '../../../constants/icons';
-import {transactionType} from '../../../defs/transaction';
 import {useAppTheme} from '../../../hooks/themeHook';
 import {OnlineTransactionModel} from '../../../DbModels/OnlineTransactionModel';
 import {OfflineTransactionModel} from '../../../DbModels/OfflineTransactionModel';
@@ -129,7 +128,7 @@ const ListEmptyComponent = () => {
   const styles = style(COLOR);
   return (
     <View style={{justifyContent: 'center', alignItems: 'center'}}>
-      <Text style={styles.emptyText}>No Transactions for this Month</Text>
+      <Text style={styles.emptyText}>{STRINGS.NoTransactionsMonth}</Text>
     </View>
   );
 };

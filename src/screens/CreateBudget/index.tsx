@@ -2,10 +2,7 @@ import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {
   Alert,
   BackHandler,
-  KeyboardAvoidingView,
-  Platform,
   SafeAreaView,
-  ScrollView,
   Text,
   TextInput,
   View,
@@ -38,6 +35,7 @@ import {
   handleOfflineNotification,
   handleOnlineNotify,
 } from '../../utils/firebase';
+import CategoryDropdownIcon from '../../components/CategoryColorIcon';
 function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
   // constants
   const COLOR = useAppTheme();
@@ -54,7 +52,6 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
       ? x?.[selectedCategory] ?? undefined
       : undefined;
   }
-  // console.log('params', selectedCategory);
   const dispatch = useAppDispatch();
   const {isConnected} = useNetInfo();
   // redux
@@ -105,7 +102,6 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
     [expenseCat, isEdit, budgets],
   );
   const handleCreate = useCallback(async () => {
-    // console.log('helloo');
     setForm(true);
     if (
       amount.replace(/,/g, '') !== '' &&
@@ -216,20 +212,8 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
     conversion,
     user!.uid,
     isConnected,
+    user,
   ]);
-  const dropdownLeft = (visible?: boolean) => {
-    return !visible && category !== '' ? (
-      <View
-        style={{
-          height: 15,
-          width: 15,
-          backgroundColor: catColors?.[category ?? ''] ?? 'green',
-          borderRadius: 20,
-          marginRight: 8,
-        }}
-      />
-    ) : undefined;
-  };
   useEffect(() => {
     setCatColors(
       Object.values(expenseCat!).reduce(
@@ -330,10 +314,10 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
                     numericValue[numericValue.length - 1] === '.'
                   ) {
                     // Allow only if it is not the only character
-                    if (numericValue.length === 1) {
-                      numericValue = numericValue.slice(0, -1);
-                    } else if (numericValue[numericValue.length - 2] === '.') {
-                      // Remove last character if there are two consecutive decimal points
+                    if (
+                      numericValue.length === 1 ||
+                      numericValue[numericValue.length - 2] === '.'
+                    ) {
                       numericValue = numericValue.slice(0, -1);
                     }
                   }
@@ -386,7 +370,7 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
             }}
             value={category}
             placeholder={STRINGS.Category}
-            leftIcon={dropdownLeft}
+            leftIcon={CategoryDropdownIcon(category!, catColors!)}
             catColors={catColors}
           />
           <EmptyError

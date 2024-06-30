@@ -1,21 +1,22 @@
-import {
-  BottomSheetModal,
-  BottomSheetModalProvider,
-  BottomSheetView,
-} from '@gorhom/bottom-sheet';
 import React, {useEffect, useMemo, useRef, useState} from 'react';
-import {useAppDispatch, useAppSelector} from '../../redux/store';
 import {Pressable, Text, View} from 'react-native';
+import style from './styles';
+import {useAppDispatch, useAppSelector} from '../../redux/store';
 import {
   openCatSheet,
   setCatFilter,
 } from '../../redux/reducers/transactionSlice';
 import SheetBackdrop from '../SheetBackDrop';
-import style from './styles';
 import CustomButton from '../CustomButton';
 import {useAppTheme} from '../../hooks/themeHook';
-import {RFValue} from 'react-native-responsive-fontsize';
+// Third Party Libraries
 import {ScrollView} from 'react-native-gesture-handler';
+import {
+  BottomSheetModal,
+  BottomSheetModalProvider,
+  BottomSheetView,
+} from '@gorhom/bottom-sheet';
+import {STRINGS} from '../../constants/strings';
 
 function CategorySelectionSheet() {
   // constants
@@ -60,19 +61,9 @@ function CategorySelectionSheet() {
         backdropComponent={SheetBackdrop}
         backgroundStyle={styles.sheetBack}
         handleIndicatorStyle={{backgroundColor: COLOR.VIOLET[40]}}>
-        <BottomSheetView style={{paddingHorizontal: 20}}>
-          <ScrollView
-            style={{maxHeight: '72%', marginBottom: 15}}
-            contentContainerStyle={{}}>
-            <Text
-              style={{
-                fontSize: RFValue(15),
-                fontWeight: '600',
-                color: COLOR.DARK[100],
-                marginBottom: 10,
-              }}>
-              Expense
-            </Text>
+        <BottomSheetView style={styles.sheet}>
+          <ScrollView style={styles.scrollview}>
+            <Text style={styles.text1}>{STRINGS.Expense}</Text>
             <View style={styles.row}>
               {expenseCats?.slice(1)?.map(item => (
                 <Pressable
@@ -92,7 +83,6 @@ function CategorySelectionSheet() {
                       }
                       return [...cat, item];
                     });
-                    // dispatch(setCatFilter(item));
                   }}>
                   <Text
                     style={[
@@ -108,15 +98,7 @@ function CategorySelectionSheet() {
                 </Pressable>
               ))}
             </View>
-            <Text
-              style={{
-                fontSize: RFValue(15),
-                fontWeight: '600',
-                color: COLOR.DARK[100],
-                marginBottom: 10,
-              }}>
-              Income
-            </Text>
+            <Text style={styles.text1}>{STRINGS.Income}</Text>
             <View style={styles.row}>
               {incomeCats?.slice(1)?.map(item => (
                 <Pressable
@@ -136,7 +118,6 @@ function CategorySelectionSheet() {
                       }
                       return [...cat, item];
                     });
-                    // dispatch(setCatFilter(item));
                   }}>
                   <Text
                     style={[
@@ -154,9 +135,8 @@ function CategorySelectionSheet() {
             </View>
           </ScrollView>
           <CustomButton
-            title="Continue"
+            title={STRINGS.Continue}
             onPress={() => {
-              // console.log(category);
               dispatch(setCatFilter(category));
               dispatch(openCatSheet(false));
             }}
@@ -167,4 +147,4 @@ function CategorySelectionSheet() {
   );
 }
 
-export default CategorySelectionSheet;
+export default React.memo(CategorySelectionSheet);

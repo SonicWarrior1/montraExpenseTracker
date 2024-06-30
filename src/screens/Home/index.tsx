@@ -26,11 +26,6 @@ import {OnlineTransactionModel} from '../../DbModels/OnlineTransactionModel';
 import {OfflineTransactionModel} from '../../DbModels/OfflineTransactionModel';
 import {formatAMPM} from '../../utils/firebase';
 import {formatWithCommas} from '../../utils/commonFuncs';
-import {AmountModel} from '../../DbModels/AmountModel';
-import {NotificationModel} from '../../DbModels/NotificationModel';
-import {CategoryModel} from '../../DbModels/CategoryModel';
-import {BudgetModel} from '../../DbModels/BudgetModel';
-import {transactionType} from '../../defs/transaction';
 
 function Home({navigation, route}: Readonly<HomeScreenProps>) {
   // state
@@ -64,13 +59,6 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
     .slice(0, 3);
 
   const theme = useAppSelector(state => state.user.currentUser?.theme);
-  const zz = useQuery(NotificationModel);
-  const gg = useQuery(AmountModel);
-  const tt = useQuery(OfflineTransactionModel);
-  const cc = useQuery(CategoryModel);
-  const bb = useQuery(BudgetModel);
-
-  console.log('DB', zz, gg, tt, cc, bb);
   // constants
   const totalSpend = Object.values(spends ?? []).reduce((a, b) => a + b, 0);
   const totalIncome = Object.values(incomes ?? []).reduce((a, b) => a + b, 0);

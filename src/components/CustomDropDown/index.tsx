@@ -4,6 +4,7 @@ import style from './styles';
 import {useAppTheme} from '../../hooks/themeHook';
 import {ICONS} from '../../constants/icons';
 import {Text, View} from 'react-native';
+import {PlaceholderTextColor} from '../../constants/commonStyles';
 
 function CustomDropdown({
   data,
@@ -32,7 +33,7 @@ function CustomDropdown({
     <Dropdown
       style={styles.dropdown}
       placeholder={placeholder}
-      placeholderStyle={{color: '#91919F'}}
+      placeholderStyle={{color: PlaceholderTextColor}}
       data={data}
       labelField={'label'}
       value={{label: value, value: value}}

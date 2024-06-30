@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {Pressable, View} from 'react-native';
 import style from './styles';
 import CustomDropdown from '../CustomDropDown';
@@ -30,11 +30,23 @@ function RepeatTransactionSheet({
   repeatData?: repeatDataType | RepeatDataModel;
   setIsSwitchOn: React.Dispatch<React.SetStateAction<boolean>>;
 }>) {
+  const getDate = useCallback(() => {
+    if (repeatData?.date) {
+      if ((repeatData?.date as Timestamp)?.seconds) {
+        return Timestamp.fromMillis(
+          (repeatData?.date as Timestamp)?.seconds * 1000,
+        ).toDate();
+      } else {
+        return repeatData?.date as Date;
+      }
+    } else {
+      return new Date();
+    }
+  }, [repeatData]);
   // state
-  // console.log('repeatSheet', repeatData);
-  const [freq, setFreq] = useState<'yearly' | 'monthly' | 'weekly' | 'daily'>(
-    (repeatData?.freq as 'yearly' | 'monthly' | 'weekly' | 'daily') ??
-      undefined,
+  type freqType = 'yearly' | 'monthly' | 'weekly' | 'daily';
+  const [freq, setFreq] = useState<freqType>(
+    (repeatData?.freq as freqType) ?? undefined,
   );
   const [month, setMonth] = useState(repeatData?.month ?? 1);
   const [day, setDay] = useState(repeatData?.day ?? 1);
@@ -42,17 +54,9 @@ function RepeatTransactionSheet({
   const [end, setEnd] = useState<'date' | 'never'>(
     (repeatData?.end as 'date' | 'never') ?? undefined,
   );
-  const [date, setDate] = useState<Date>(
-    repeatData?.date
-      ? (repeatData?.date as Timestamp)?.seconds
-        ? Timestamp.fromMillis(
-            (repeatData?.date as Timestamp)?.seconds * 1000,
-          ).toDate()
-        : (repeatData?.date as Date)
-      : new Date(),
-  );
-  const [isDateOpen, setIsDateOpen] = useState(false);
-  const [formkey, setFormkey] = useState(false);
+  const [date, setDate] = useState<Date>(getDate());
+  const [isDateOpen, setIsDateOpen] = useState<boolean>(false);
+  const [formkey, setFormkey] = useState<boolean>(false);
   // constants
   const snapPoints = useMemo(() => ['35%'], []);
   const year = new Date().getFullYear();
@@ -92,16 +96,8 @@ function RepeatTransactionSheet({
     setDay(repeatData?.day ?? 1);
     setWeekDay(repeatData?.weekDay ?? 1);
     setEnd((repeatData?.end as 'date' | 'never') ?? undefined);
-    setDate(
-      repeatData?.date
-        ? (repeatData?.date as Timestamp)?.seconds
-          ? Timestamp.fromMillis(
-              (repeatData?.date as Timestamp)?.seconds * 1000,
-            ).toDate()
-          : (repeatData?.date as Date)
-        : new Date(),
-    );
-  }, [repeatData]);
+    setDate(getDate());
+  }, [repeatData, getDate]);
   const daysInYear = generateDaysInYear;
   return (
     <BottomSheetModal

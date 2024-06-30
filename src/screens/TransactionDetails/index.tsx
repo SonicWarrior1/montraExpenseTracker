@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useRef, useState} from 'react';
+import React, {useMemo, useRef, useState} from 'react';
 import {
   ActivityIndicator,
   Dimensions,
@@ -55,10 +55,10 @@ function TransactionDetails({
     OfflineTransactionModel,
     route.params.transaction.id,
   );
-  // console.log('djsfskdfnl', online, offline);
+  // console.log('djsfskdfnl', online, offline)
   const trans = offline ?? online;
   const {isConnected} = useNetInfo();
-  // console.log(trans, route.params.transaction.id, online, offline);
+  // console.log(trans, route.params.transaction.id, online, offline)
   // ref
   const bottomSheetModalRef = useRef<BottomSheetModalMethods>(null);
   // state
@@ -288,7 +288,7 @@ function TransactionDetails({
                           fileCache: true,
                           appendExt: 'pdf',
                         }).fetch('GET', trans.attachement ?? '');
-                        // console.log(res.path());
+                        // console.log(res.path())
                         dispatch(setLoading(false));
                         FileViewer.open(res.path(), {showOpenWithDialog: true});
                       } catch (e) {

@@ -18,7 +18,6 @@ import {BottomSheetModalMethods} from '@gorhom/bottom-sheet/lib/typescript/types
 import auth from '@react-native-firebase/auth';
 import {openLogoutSheet} from '../../redux/reducers/transactionSlice';
 import {useRealm} from '@realm/react';
-import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import {useNetInfo} from '@react-native-community/netinfo';
 import Toast from 'react-native-toast-message';
 function LogoutSheet() {

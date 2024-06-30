@@ -13,7 +13,7 @@ import {NAVIGATION, STRINGS} from '../../constants/strings';
 import AnimatedBtn from './atoms/animatedButton';
 import {useAppTheme} from '../../hooks/themeHook';
 import {useAppDispatch, useAppSelector} from '../../redux/store';
-import React, {useEffect} from 'react';
+import React, {useEffect, useMemo} from 'react';
 import {setTabButton} from '../../redux/reducers/transactionSlice';
 
 function CustomTab(props: Readonly<BottomTabBarProps>): React.JSX.Element {
@@ -80,6 +80,22 @@ function CustomTab(props: Readonly<BottomTabBarProps>): React.JSX.Element {
   const isOpen = useAppSelector(state => state.transaction.isTabButtonOpen);
   const finalTheme = theme === 'device' ? scheme : theme;
   const dispatch = useAppDispatch();
+  const backgrounColor = useMemo(() => {
+    if (finalTheme === 'dark') {
+      if (isOpen) {
+        return '#c0afe1';
+      } else {
+        return COLOR.LIGHT[40];
+      }
+    } else if (isOpen) {
+      return '#ddccff';
+    } else if (props.state.index === 2 || props.state.index === 3) {
+      return COLOR.LIGHT[40];
+    } else {
+      return COLOR.LIGHT[100];
+    }
+  }, [finalTheme, isOpen, props.state.index]);
+
   useEffect(() => {
     if (isOpen) {
       handleOpen();
@@ -154,16 +170,7 @@ function CustomTab(props: Readonly<BottomTabBarProps>): React.JSX.Element {
           styles.animatedBtnOuter,
           {
             transform: [{translateY: -15}, {rotateZ: deg}],
-            backgroundColor:
-              finalTheme === 'dark'
-                ? isOpen
-                  ? '#c0afe1'
-                  : COLOR.LIGHT[40]
-                : isOpen
-                ? '#ddccff'
-                : props.state.index === 2 || props.state.index === 3
-                ? COLOR.LIGHT[40]
-                : COLOR.LIGHT[100],
+            backgroundColor: backgrounColor,
           },
         ]}>
         <Pressable

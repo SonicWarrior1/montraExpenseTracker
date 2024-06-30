@@ -49,6 +49,8 @@ export const NAVIGATION: {
 };
 
 export const STRINGS = {
+  NoDataToExport: 'There is no data to be exported',
+  Verify: 'Verify',
   LOGIN: 'Login',
   SIGNUP: 'Sign Up',
   EmailOnWay: 'Your email is on the way',
@@ -190,7 +192,19 @@ export const STRINGS = {
   NameCannotBeEmpty: 'Name cannot be Empty',
   NoRecentTransactions: 'No Recent Transactions',
   NoTransactions: 'No Transactions',
-  ResetPin:'Reset Pin'
+  ResetPin: 'Reset Pin',
+  CategoryCannotBeEmpty: 'Category cannot be empty',
+  AlreadyAdded: ' is already added',
+  Selected: 'Selected',
+  PinMust4digits: 'Pin must be of 4 digits',
+  PinDontMatch: "Pin doesn't match",
+  IncorrectPin: 'Incorrect Pin',
+  NoTransactionsMonth: 'No Transactions for this Month',
+  PleaseVerifyEmail: 'Please verify your email',
+  VerifyEmailSent: 'A verification email has already been sent to your registered email address, so verify your email before login.',
+  AreYouSure: 'Are you sure ?',
+  AreYouSureDelete: 'Are you sure you want to delete all the notifications.',
+
 };
 export const OnboardData = [
   {

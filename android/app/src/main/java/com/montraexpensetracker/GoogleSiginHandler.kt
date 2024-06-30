@@ -2,15 +2,11 @@ package com.montraexpensetracker
 
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.CredentialManager
-import android.os.Build
-import android.util.Log
-import androidx.annotation.RequiresApi
 import androidx.credentials.ClearCredentialStateRequest
 import androidx.credentials.exceptions.GetCredentialException
 import com.facebook.react.bridge.*
 import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
-import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
