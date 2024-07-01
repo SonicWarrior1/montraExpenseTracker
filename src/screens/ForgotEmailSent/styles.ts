@@ -14,10 +14,11 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
         fontWeight: '600',
         fontSize: RFValue(24),
         color: COLOR.DARK[100],
+        textAlign: 'center',
     },
     text2: {
         fontWeight: '500',
-        fontSize: RFValue(16),
+        fontSize: RFValue(14),
         color: COLOR.DARK[100],
         textAlign: 'center',
     },

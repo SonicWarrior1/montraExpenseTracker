@@ -1,11 +1,12 @@
 import React from 'react';
 import {FlatList, Text, View} from 'react-native';
-import Sapcer from '../../../components/Spacer';
+import Spacer from '../../../components/Spacer';
 import {Bar} from 'react-native-progress';
 import {COLORS} from '../../../constants/commonStyles';
 import {currencies} from '../../../constants/strings';
 import style from '../styles';
 import {useAppTheme} from '../../../hooks/themeHook';
+import {formatWithCommas} from '../../../utils/commonFuncs';
 
 function CategoryList({
   spends,
@@ -40,8 +41,8 @@ function CategoryList({
       [key: string]: number;
     };
   };
-  totalSpend: string;
-  totalIncome: string;
+  totalSpend: number;
+  totalIncome: number;
   sort: boolean;
 }>) {
   const COLOR = useAppTheme();
@@ -68,7 +69,7 @@ function CategoryList({
                     styles.colorBox,
                     {backgroundColor: catColors![item[0]]},
                   ]}></View>
-                <Text style={styles.catText}>
+                <Text style={styles.catText} numberOfLines={1}>
                   {item[0][0].toUpperCase() + item[0].slice(1)}
                 </Text>
               </View>
@@ -84,12 +85,16 @@ function CategoryList({
                 ]}>
                 {transType === 'expense' ? '- ' : '+ '}
                 {currencies[currency!].symbol}
-                {(conversion['usd']?.[currency!.toLowerCase()] * item[1])
-                  .toFixed(1)
-                  .toString()}
+                {formatWithCommas(
+                  Number(
+                    (
+                      conversion['usd']?.[currency!.toLowerCase()] * item[1]
+                    ).toFixed(1),
+                  ).toString(),
+                )}
               </Text>
             </View>
-            <Sapcer height={5} />
+            <Spacer height={5} />
             <Bar
               progress={
                 item[1] /
@@ -105,7 +110,7 @@ function CategoryList({
               unfilledColor={COLOR.LIGHT[40]}
               color={catColors![item[0]]}
             />
-            <Sapcer height={20} />
+            <Spacer height={20} />
           </View>
         ) : (
           <View />

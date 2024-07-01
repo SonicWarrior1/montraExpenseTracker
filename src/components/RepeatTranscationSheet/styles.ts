@@ -5,7 +5,7 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
   sheetView: {
     justifyContent: 'center',
     alignItems: 'center',
-    gap: 10,
+    // gap: 10,
     marginTop: 20,
     paddingHorizontal: 15,
   },

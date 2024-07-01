@@ -1,6 +1,6 @@
-import { StyleSheet } from "react-native";
-import { COLORS } from "../../constants/commonStyles";
-import { RFValue } from "react-native-responsive-fontsize";
+import { Dimensions, Platform, StyleSheet } from 'react-native';
+import { COLORS } from '../../constants/commonStyles';
+import { RFValue } from 'react-native-responsive-fontsize';
 
 const styles = (COLOR: typeof COLORS) => StyleSheet.create({
     safeView: { flex: 1, backgroundColor: COLOR.LIGHT[100] },
@@ -10,7 +10,8 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
         alignItems: 'center',
         marginBottom: 15,
         marginTop: 15,
-    }, headerTitle: { fontSize: RFValue(18), fontWeight: '600', color: COLOR.DARK[100], },
+        marginHorizontal:15,
+    }, headerTitle: { fontSize: RFValue(18), fontWeight: '600', color: COLOR.DARK[100] },
     center: {
         flex: 1,
         justifyContent: 'center',
@@ -22,7 +23,7 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
         paddingHorizontal: 20,
         borderBottomWidth: 1,
         borderColor: COLOR.LIGHT[20],
-        backgroundColor:COLOR.LIGHT[100],
+        backgroundColor: COLOR.LIGHT[100],
         paddingVertical: 10,
         // columnGap:10,
         justifyContent: 'space-between',
@@ -33,7 +34,7 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
         fontSize: RFValue(13),
         fontWeight: '500',
         color: COLOR.DARK[25],
-        marginTop: 5,
+        // marginTop: 5,
     },
     menu: {
         paddingHorizontal: 20,
@@ -45,20 +46,23 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
         backgroundColor: COLOR.LIGHT[100],
         shadowColor: 'grey',
         shadowOpacity: 0.3,
-        right: 15,
-        top: 95,
+        right: Dimensions.get('screen').width / 20,
+        top: Platform.OS === 'ios' ? Dimensions.get('screen').height / 9 : Dimensions.get('screen').height / 22,
         shadowRadius: 5,
         shadowOffset: {
             height: 2,
             width: 1,
         },
+        elevation:20,
     },
     menuText: { color: COLOR.DARK[100] },
-    delete:{
+    delete: {
         backgroundColor: 'red',
         paddingHorizontal: 20,
         justifyContent: 'center',
         alignItems: 'center',
-      }
-})
-export default styles
+    },
+    flex:{flex:1},
+    textCtr:{maxWidth: '85%'},
+});
+export default styles;

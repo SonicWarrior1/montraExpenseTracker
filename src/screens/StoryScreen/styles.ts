@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native';
+import { Dimensions, StyleSheet } from 'react-native';
 import { COLORS } from '../../constants/commonStyles';
 import { RFValue } from 'react-native-responsive-fontsize';
 
@@ -19,7 +19,7 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
         padding: 8,
         borderRadius: 10,
     },
-    catText: { fontSize: RFValue(16), fontWeight: '600', color: COLOR.DARK[100] },
+    catText: { fontSize: RFValue(16), fontWeight: '600', color: COLOR.DARK[100], maxWidth: Dimensions.get('screen').width / 2 },
     safeView: {
         flex: 1,
         paddingBottom: 30,
@@ -27,7 +27,7 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
     progressRow: {
         flexDirection: 'row',
         width: '100%',
-        columnGap: 10,
+        columnGap: 4,
         paddingHorizontal: 15,
         marginTop: 20,
     },
@@ -39,7 +39,7 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
     },
     mainView: {
         flex: 1,
-        paddingTop: 35,
+        paddingTop: 40,
         alignItems: 'center',
         justifyContent: 'space-between',
         paddingHorizontal: 16,
@@ -61,16 +61,16 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
         color: COLOR.LIGHT[100],
         alignSelf: 'flex-start',
     },
-    catRow: { flexDirection: 'row', columnGap: 15, marginTop: 30 },
+    catRow: { flexDirection: 'row', columnGap: 15, marginTop: 30, flexWrap: "wrap", justifyContent: "center" },
     amt: {
         fontSize: RFValue(64),
         fontWeight: '700',
         color: COLOR.LIGHT[100],
-        
+
     },
     card: {
         backgroundColor: COLOR.LIGHT[100],
-        marginBottom: 60,
+        marginBottom: 10,
         paddingVertical: 15,
         paddingHorizontal: 10,
         width: '100%',

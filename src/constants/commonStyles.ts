@@ -135,6 +135,8 @@ export const DARKCOLORS = {
         100: '#0077FF',
     },
 };
-
-export const LightBackDropColor='rgba(0,0,0,0.5)'
-export const DarkBackDropColor='rgba(255,255,255,0.2)'
+export const InputBorderColor='#F1F1FA'
+export const PlaceholderTextColor = '#91919F';
+export const LightBackDropColor = 'rgba(0,0,0,0.5)';
+export const DarkBackDropColor = 'rgba(255,255,255,0.2)';
+export const CheckboxFillColor = '#5233FF';

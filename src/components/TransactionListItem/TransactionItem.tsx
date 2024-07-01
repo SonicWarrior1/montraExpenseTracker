@@ -1,30 +1,48 @@
 import {Timestamp} from '@react-native-firebase/firestore';
-import {ColorSchemeName, Pressable, Text, View} from 'react-native';
-import style from '../styles';
-import {currencies, NAVIGATION} from '../../../constants/strings';
-import {COLORS} from '../../../constants/commonStyles';
-import {catIcons, ICONS} from '../../../constants/icons';
-import {useAppTheme} from '../../../hooks/themeHook';
-import {BottomParamList, RootStackParamList} from '../../../defs/navigation';
 import {BottomTabNavigationProp} from '@react-navigation/bottom-tabs';
 import {CompositeNavigationProp} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
-import {transactionType} from '../../../defs/transaction';
-import {useAppSelector} from '../../../redux/store';
+import React from 'react';
+import {ColorSchemeName, Pressable, View, Text} from 'react-native';
+import {COLORS} from '../../constants/commonStyles';
+import {catIcons, ICONS} from '../../constants/icons';
+import {NAVIGATION, currencies, monthData} from '../../constants/strings';
+import {OfflineTransactionModel} from '../../DbModels/OfflineTransactionModel';
+import {OnlineTransactionModel} from '../../DbModels/OnlineTransactionModel';
+import {RootStackParamList, BottomParamList} from '../../defs/navigation';
+import {useAppTheme} from '../../hooks/themeHook';
+import {useAppSelector} from '../../redux/store';
+import {formatWithCommas} from '../../utils/commonFuncs';
+import {formatAMPM} from '../../utils/firebase';
+import style from './styles';
 
 const TransactionItem = ({
   item,
   theme,
   scheme,
   navigation,
+  dateShow,
+  disabled,
 }: {
-  item: transactionType;
+  item: OnlineTransactionModel | OfflineTransactionModel;
   theme: 'light' | 'device' | 'dark' | undefined;
   scheme: ColorSchemeName;
-  navigation: CompositeNavigationProp<
-    BottomTabNavigationProp<BottomParamList, 'Transaction', undefined>,
-    StackNavigationProp<RootStackParamList, keyof RootStackParamList, undefined>
-  >;
+  navigation:
+    | StackNavigationProp<RootStackParamList, 'FinancialReport', undefined>
+    | CompositeNavigationProp<
+        BottomTabNavigationProp<
+          BottomParamList,
+          'Transaction' | 'Home',
+          undefined
+        >,
+        StackNavigationProp<
+          RootStackParamList,
+          keyof RootStackParamList,
+          undefined
+        >
+      >;
+  dateShow?: boolean;
+  disabled?: boolean;
 }) => {
   // constants
   const COLOR = useAppTheme();
@@ -34,7 +52,9 @@ const TransactionItem = ({
   const user = useAppSelector(state => state.user.currentUser);
   const conversion = useAppSelector(state => state.transaction.conversion);
   // functions
-  const getAmtSymbol = (item: transactionType) => {
+  const getAmtSymbol = (
+    item: OnlineTransactionModel | OfflineTransactionModel,
+  ) => {
     if (item.type === 'expense') {
       return '-';
     } else if (item.type === 'income') {
@@ -43,7 +63,9 @@ const TransactionItem = ({
       return '';
     }
   };
-  const getAmtColor = (item: transactionType) => {
+  const getAmtColor = (
+    item: OnlineTransactionModel | OfflineTransactionModel,
+  ) => {
     if (item.type === 'expense') {
       return COLORS.PRIMARY.RED;
     } else if (item.type === 'income') {
@@ -61,6 +83,7 @@ const TransactionItem = ({
             finaltheme === 'light' ? COLORS.LIGHT[80] : COLORS.DARK[100],
         },
       ]}
+      disabled={disabled}
       onPress={() => {
         navigation.push(NAVIGATION.TransactionDetail, {
           transaction: item,
@@ -84,7 +107,7 @@ const TransactionItem = ({
             }) ?? ICONS.Money({height: 30, width: 30})}
       </View>
       <View style={styles.catCtr}>
-        <Text style={styles.text1}>
+        <Text style={styles.text1} numberOfLines={1}>
           {item.type === 'transfer'
             ? item.from + ' - ' + item.to
             : item.category[0].toLocaleUpperCase() + item.category.slice(1)}
@@ -103,30 +126,37 @@ const TransactionItem = ({
             },
           ]}>
           {getAmtSymbol(item)} {currencies[user?.currency ?? 'USD'].symbol}
-          {(
-            conversion.usd[(user?.currency ?? 'USD').toLowerCase()] *
-            item.amount
-          ).toFixed(1)}
+          {formatWithCommas(
+            Number(
+              (
+                conversion.usd[(user?.currency ?? 'USD').toLowerCase()] *
+                item.amount
+              ).toFixed(1),
+            ).toString(),
+          )}
         </Text>
         <Text style={styles.text2}>
-          {Timestamp.fromMillis(item.timeStamp.seconds * 1000)
-            .toDate()
-            .getHours()}
-          :
-          {Timestamp.fromMillis(item.timeStamp.seconds * 1000)
-            .toDate()
-            .getMinutes() < 10
-            ? '0' +
+          {dateShow &&
+            Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+              ?.toDate()
+              ?.getDate() +
+              ' ' +
+              monthData[
+                Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+                  ?.toDate()
+                  ?.getMonth()
+              ].label +
+              ' ' +
               Timestamp.fromMillis(item.timeStamp.seconds * 1000)
-                .toDate()
-                .getMinutes()
-            : Timestamp.fromMillis(item.timeStamp.seconds * 1000)
-                .toDate()
-                .getMinutes()}
+                ?.toDate()
+                ?.getFullYear()}{' '}
+          {formatAMPM(
+            Timestamp.fromMillis(item.timeStamp.seconds * 1000).toDate(),
+          )}
         </Text>
       </View>
     </Pressable>
   );
 };
 
-export default TransactionItem;
+export default React.memo(TransactionItem);

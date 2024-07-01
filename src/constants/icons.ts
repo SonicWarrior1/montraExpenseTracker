@@ -3,7 +3,7 @@ import User from '../assets/Svgs/user.svg';
 import Onboard1 from '../assets/Svgs/Onboard1.svg';
 import Onboard2 from '../assets/Svgs/Onboard2.svg';
 import Onboard3 from '../assets/Svgs/Onboard3.svg';
-import Show from '../assets/Svgs/show.svg';
+import Show from '../assets/Svgs/eye.svg';
 import Hide from '../assets/Svgs/eye-off.svg';
 import Google from '../assets/Svgs/google.svg';
 import ArrowLeft from '../assets/Svgs/arrow left.svg';
@@ -26,7 +26,7 @@ import ArrowRight from '../assets/Svgs/arrow-right.svg';
 import Trash from '../assets/Svgs/trash.svg';
 import Alert from '../assets/Svgs/alert.svg';
 import Notification from '../assets/Svgs/notifiaction.svg';
-import ArrowRight2 from '../assets/Svgs/right-arrow-svgrepo-com.svg';
+import ArrowRight2 from '../assets/Svgs/arrow right3.svg';
 import More from '../assets/Svgs/more-horizontal.svg';
 import Car from '../assets/Svgs/car.svg';
 import Bill from '../assets/Svgs/recurring bill.svg';
@@ -44,6 +44,7 @@ import LineChart from '../assets/Svgs/line chart.svg';
 import SortwithArrow from '../assets/Svgs/sort1.svg';
 import Transfer2 from '../assets/Svgs/transfer.svg';
 import Success from '../assets/Svgs/success.svg';
+import AttachmentBtn from '../assets/Svgs/attachementButton.svg';
 import { COLORS } from './commonStyles';
 const iconStyle = (
   { width = 0,
@@ -104,6 +105,7 @@ export const ICONS = {
   SortwithArrow: (params: iconProps) => SortwithArrow({ ...iconStyle({ ...params }) }),
   Transfer2: (params: iconProps) => Transfer2({ ...iconStyle({ ...params }) }),
   Success: (params: iconProps) => Success({ ...iconStyle({ ...params }) }),
+  AttachmentBtn: (params: iconProps) => AttachmentBtn({ ...iconStyle({ ...params }) }),
 };
 
 export const catIcons: { [key: string]: { icon: (params: iconProps) => React.ReactNode, color: string } } = {

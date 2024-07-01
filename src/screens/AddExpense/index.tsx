@@ -1,70 +1,67 @@
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {
+  Alert,
+  BackHandler,
   Dimensions,
-  Pressable,
+  Platform,
   SafeAreaView,
-  Switch,
-  Text,
-  TextInput,
   View,
 } from 'react-native';
 import style from './styles';
-
 import CustomInput from '../../components/CustomInput';
 import {COLORS} from '../../constants/commonStyles';
-import Sapcer from '../../components/Spacer';
+import Spacer from '../../components/Spacer';
 import CustomDropdown from '../../components/CustomDropDown';
 import {ICONS} from '../../constants/icons';
-import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import FilePickerSheet from '../../components/FilePickerSheet';
 import RepeatTransactionSheet from '../../components/RepeatTranscationSheet';
-import firestore, {
-  FirebaseFirestoreTypes,
-  Timestamp,
-} from '@react-native-firebase/firestore';
-import {
-  currencies,
-  monthData,
-  STRINGS,
-  weekData,
-} from '../../constants/strings';
+import {STRINGS} from '../../constants/strings';
 import CustomButton from '../../components/CustomButton';
 import {repeatDataType, transactionType} from '../../defs/transaction';
 import {useAppDispatch, useAppSelector} from '../../redux/store';
 import {setLoading} from '../../redux/reducers/userSlice';
-import uuid from 'react-native-uuid';
-import Toast from 'react-native-toast-message';
 import {ExpenseScreenProps} from '../../defs/navigation';
 import AddCategorySheet from '../../components/AddCategorySheet';
-import {UserType} from '../../defs/user';
 import {CompundEmptyError, EmptyError} from '../../constants/errors';
-import {UserFromJson} from '../../utils/userFuncs';
-import {
-  addNewTransaction,
-  createTransaction,
-  getAttachmentUrl,
-  handleExpenseUpdate,
-  handleIncomeUpdate,
-  handleNewExpense,
-  handleNewIncome,
-  handleNotify,
-  updateTransaction,
-} from '../../utils/firebase';
-import {useAppTheme} from '../../hooks/themeHook';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import AttachementContainer from './atoms/attachementContainer';
+import {handleOffline, handleOnline} from '../../utils/firebase';
+import {useAppTheme} from '../../hooks/themeHook';
+import {OnlineTransactionModel} from '../../DbModels/OnlineTransactionModel';
+import {OfflineTransactionModel} from '../../DbModels/OfflineTransactionModel';
+import CustomHeader from '../../components/CustomHeader';
+import MoneyInput from './atoms/MoneyInput';
+import {RepeatDataModel} from '../../DbModels/RepeatDataModel';
+import {formatWithCommas, getMyColor} from '../../utils/commonFuncs';
+import RepeatInput from './atoms/RepeatInput';
+import CategoryDropdownIcon from '../../components/CategoryColorIcon';
+// Third Party Libraries
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import {useNetInfo} from '@react-native-community/netinfo';
+import {useObject, useRealm} from '@realm/react';
+import uuid from 'react-native-uuid';
+import Toast from 'react-native-toast-message';
+import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 
 function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
   // constants
+  const {isConnected} = useNetInfo();
+  const realm = useRealm();
   const COLOR = useAppTheme();
   const styles = style(COLOR);
   const pageType = route.params.type;
   const isEdit = route.params.isEdit;
-  let transaction: transactionType | undefined;
+  let prevTransaction:
+    | transactionType
+    | OnlineTransactionModel
+    | OfflineTransactionModel
+    | undefined;
   if (isEdit) {
-    transaction = route.params.transaction;
-    console.log(transaction);
+    prevTransaction = route.params.transaction;
   }
+  const TransOnline = useObject(
+    OnlineTransactionModel,
+    prevTransaction?.id ?? '',
+  );
   const month = new Date().getMonth();
   const getBackgroundColor = useMemo(() => {
     if (pageType === 'expense') {
@@ -75,67 +72,82 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
       return COLORS.PRIMARY.GREEN;
     }
   }, [pageType]);
+  const screenHeight = Dimensions.get('screen').height;
+  const height = useMemo(() => {
+    if (Platform.OS !== 'ios') {
+      if (pageType !== 'transfer') {
+        return screenHeight / 3.13;
+      } else {
+        return screenHeight / 2.06;
+      }
+    } else if (pageType !== 'transfer') {
+      return screenHeight / 2.65;
+    } else {
+      return Dimensions.get('screen').height / 1.85;
+    }
+  }, [pageType, screenHeight]);
   const backgroundColor = getBackgroundColor;
   const dispatch = useAppDispatch();
-  useEffect(() => {
-    navigation.setOptions({
-      title: pageType[0].toUpperCase() + pageType.slice(1),
-    });
-  }, [pageType]);
-  // redux use
+  // redux
   const conversion = useAppSelector(state => state.transaction.conversion);
-  const expenseCat = useAppSelector(
-    state => state.user.currentUser?.expenseCategory,
-  );
-  const incomeCat = useAppSelector(
-    state => state.user.currentUser?.incomeCategory,
-  );
-  const uid = useAppSelector(state => state.user.currentUser?.uid);
-  const currency = useAppSelector(state => state.user.currentUser?.currency);
+  const user = useAppSelector(state => state.user.currentUser);
   // state
-  const [image, setImage] = useState(
-    transaction && transaction.attachementType === 'image'
-      ? transaction.attachement
+  const [firstTime, setFirstTime] = useState<boolean>(true);
+  const [image, setImage] = useState<string | undefined>(
+    prevTransaction && prevTransaction.attachementType === 'image'
+      ? prevTransaction.attachement
       : '',
   );
   const [doc, setDoc] = useState<{uri: string; name: string} | undefined>(
-    transaction && transaction.attachementType === 'doc'
-      ? {uri: transaction.attachement!, name: 'Document'}
+    prevTransaction && prevTransaction.attachementType === 'doc'
+      ? {uri: prevTransaction.attachement!, name: 'Document'}
       : undefined,
   );
-  const [repeatData, setRepeatData] = useState<repeatDataType | undefined>(
-    transaction ? transaction.freq! : undefined,
+  const [repeatData, setRepeatData] = useState<
+    repeatDataType | RepeatDataModel | undefined
+  >(prevTransaction ? prevTransaction.freq! : undefined);
+  const [desc, setDesc] = useState<string>(
+    prevTransaction ? prevTransaction.desc : '',
   );
-  const [desc, setDesc] = useState(transaction ? transaction.desc : '');
-  const [zindex, setZindex] = useState(1);
-  const [amount, setAmount] = useState(
-    transaction
-      ? Number(
-          (
-            conversion.usd[(currency ?? 'USD').toLowerCase()] *
-            transaction.amount
-          ).toFixed(1),
-        ).toString()
-      : '',
+  const [zindex, setZindex] = useState<number>(1);
+  const [amount, setAmount] = useState<string>(
+    prevTransaction
+      ? formatWithCommas(
+          Number(
+            (
+              conversion.usd[(user?.currency ?? 'USD').toLowerCase()] *
+              prevTransaction.amount
+            ).toFixed(1),
+          ).toString(),
+        )
+      : '0',
   );
-  const [category, setCategory] = useState(
-    transaction ? transaction.category : '',
+  const [category, setCategory] = useState<string | undefined>(
+    prevTransaction ? prevTransaction.category : '',
   );
-  const [wallet, setWallet] = useState(transaction ? transaction.wallet : '');
-  const [from, setFrom] = useState(transaction ? transaction.from : '');
-  const [to, setTo] = useState(transaction ? transaction.to : '');
-  const [formKey, setFormKey] = useState(false);
+  const [wallet, setWallet] = useState<string>(
+    prevTransaction ? prevTransaction.wallet : '',
+  );
+  const [from, setFrom] = useState<string>(
+    prevTransaction ? prevTransaction.from : '',
+  );
+  const [to, setTo] = useState<string>(
+    prevTransaction ? prevTransaction.to : '',
+  );
+  const [formKey, setFormKey] = useState<boolean>(false);
+  const [catColors, setCatColors] = useState<{[key: string]: string}>();
+  const [isSwitchOn, setIsSwitchOn] = useState<boolean>(
+    repeatData !== undefined ? repeatData !== null : repeatData !== undefined,
+  );
   // refs
   const filePickSheetRef = useRef<BottomSheetModal>(null);
   const repeatSheetRef = useRef<BottomSheetModal>(null);
   const addCategorySheetRef = useRef<BottomSheetModal>(null);
-
   // functions
   const getAttachmentAndType = useCallback(() => {
     let attachement = '';
     let attachementType: transactionType['attachementType'] = 'none';
     if (image !== '') {
-      console.log('IMAGE', image);
       attachement = image!;
       attachementType = 'image';
     } else if (doc) {
@@ -145,386 +157,280 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
     return {attachement, attachementType};
   }, [image, doc]);
 
-  const handleEditTransaction = async ({
-    trans,
-    transaction,
-    uid,
-    curr,
-    amount,
-    category,
-    conversion,
-    currency,
-    month,
-  }: {
-    trans: transactionType;
-    transaction: transactionType | undefined;
-    uid: string;
-    curr: FirebaseFirestoreTypes.DocumentSnapshot<FirebaseFirestoreTypes.DocumentData>;
-    amount: string;
-    category: string;
-    conversion: {
-      [key: string]: {
-        [key: string]: number;
-      };
-    };
-    currency: string | undefined;
-    month: number;
-  }) => {
-    await updateTransaction({
-      trans: trans,
-      transId: transaction?.id!,
-      uid: uid,
-    });
-    if (pageType === 'expense') {
-      await handleExpenseUpdate({
-        curr: curr,
-        amount: Number(amount),
-        category: category,
-        conversion: conversion,
-        currency: currency!,
-        month: month,
-        transaction: transaction!,
-        uid: uid,
-      });
-      const totalSpent =
-        UserFromJson(curr.data() as UserType)?.spend?.[month]?.[category] ??
-        0 - transaction!.amount + Number(amount);
-      await handleNotify({
-        curr: curr,
-        totalSpent: totalSpent,
-        category: category,
-        month: month,
-        uid: uid,
-      });
-    } else if (pageType === 'income') {
-      await handleIncomeUpdate({
-        curr: curr,
-        amount: Number(amount),
-        category: category,
-        conversion: conversion,
-        currency: currency!,
-        month: month,
-        transaction: transaction!,
-        uid: uid,
-      });
-    }
-  };
-  const handleNewTransaction = async ({
-    trans,
-    uid,
-    curr,
-    amount,
-    category,
-    conversion,
-    currency,
-    month,
-    id,
-  }: {
-    trans: transactionType;
-    uid: string;
-    curr: FirebaseFirestoreTypes.DocumentSnapshot<FirebaseFirestoreTypes.DocumentData>;
-    amount: string;
-    category: string;
-    conversion: {
-      [key: string]: {
-        [key: string]: number;
-      };
-    };
-    currency: string | undefined;
-    month: number;
-    id: string;
-  }) => {
-    await addNewTransaction({id: id, trans: trans, uid: uid});
-    if (pageType === 'expense') {
-      await handleNewExpense({
-        curr: curr,
-        amount: Number(amount),
-        category: category,
-        conversion: conversion,
-        currency: currency!,
-        month: month,
-        uid: uid,
-      });
-      const totalSpent =
-        (UserFromJson(curr.data() as UserType)?.spend[month]?.[category] ?? 0) +
-        Number(amount);
-      await handleNotify({
-        curr: curr,
-        totalSpent: totalSpent,
-        category: category,
-        month: month,
-        uid: uid,
-      });
-    } else if (pageType === 'income') {
-      await handleNewIncome({
-        curr: curr,
-        amount: Number(amount),
-        category: category,
-        conversion: conversion,
-        currency: currency!,
-        month: month,
-        uid: uid,
-      });
-    }
-  };
-  const handlePress = useCallback(async () => {
+  const handlePress = async () => {
     setFormKey(true);
-    if (pageType === 'transfer' && (from === '' || to === '')) {
+    if (
+      pageType === 'transfer' &&
+      (amount.replace(/,/g, '').trim() === '' ||
+        amount.replace(/,/g, '').trim() === '.' ||
+        Number(amount.replace(/,/g, '')) <= 0 ||
+        from === '' ||
+        to === '')
+    ) {
       return;
     }
     if (
       pageType !== 'transfer' &&
-      (amount === '' || category === '' || wallet === '')
+      (amount.replace(/,/g, '').trim() === '' ||
+        amount.replace(/,/g, '').trim() === '.' ||
+        Number(amount.replace(/,/g, '')) <= 0 ||
+        category === '' ||
+        wallet === '')
     ) {
       return;
     }
+    console.log('loading condition');
     dispatch(setLoading(true));
+
     const {attachement, attachementType} = getAttachmentAndType();
     try {
       const id = uuid.v4().toString();
-      const curr = await firestore().collection('users').doc(uid).get();
-      const url = await getAttachmentUrl({
-        attachement: attachement,
-        id: id,
-        uid: uid!,
-      });
-      console.log(repeatData, 'sdjufndsjhfbdshjfbsdjfbnsdjkfnb');
-      const trans = createTransaction({
-        id: id,
-        url: url,
-        attachementType: attachementType,
-        amount: amount,
-        category: category,
-        conversion: conversion,
-        currency: currency!,
-        desc: desc,
-        isEdit: isEdit,
-        pageType: pageType,
-        repeatData: repeatData!,
-        transaction: transaction!,
-        wallet: wallet,
-        uid: uid!,
-        from: from,
-        to: to,
-      });
-      if (isEdit) {
-        handleEditTransaction({
-          trans: trans,
-          transaction: transaction,
-          uid: uid!,
-          amount: amount,
-          category: category,
-          conversion: conversion,
-          curr: curr,
-          currency: currency,
-          month: month,
-        });
+      if (!isConnected) {
+        setTimeout(async () => {
+          await handleOffline({
+            attachement: attachement,
+            attachementType: attachementType,
+            id: id,
+            amount: amount,
+            category: category,
+            conversion: conversion,
+            currency: user?.currency,
+            desc: desc,
+            dispatch: dispatch,
+            from: from,
+            isConnected: isConnected,
+            isEdit: isEdit,
+            month: month,
+            pageType: pageType,
+            prevTransaction: prevTransaction,
+            realm: realm,
+            repeatData: repeatData,
+            to: to,
+            uid: user?.uid!,
+            user: user,
+            wallet: wallet,
+            TransOnline: TransOnline,
+          });
+          Toast.show({
+            text1: `Transaction has been ${
+              isEdit ? 'Updated' : 'Added'
+            } Successfully`,
+            type: 'custom',
+            swipeable: false,
+          });
+          navigation.pop();
+          dispatch(setLoading(false));
+        }, 250);
       } else {
-        handleNewTransaction({
-          trans: trans,
-          uid: uid!,
+        await handleOnline({
+          attachement: attachement,
+          attachementType: attachementType,
+          id: id,
           amount: amount,
           category: category,
           conversion: conversion,
-          curr: curr,
-          currency: currency,
+          currency: user?.currency,
+          desc: desc,
+          from: from,
+          isEdit: isEdit,
           month: month,
-          id: id,
+          pageType: pageType,
+          prevTransaction: prevTransaction,
+          repeatData: repeatData,
+          to: to,
+          uid: user?.uid!,
+          wallet: wallet,
         });
+        Toast.show({
+          text1: `Transaction has been ${
+            isEdit ? 'Updated' : 'Added'
+          } Successfully`,
+          type: 'custom',
+          swipeable: false,
+        });
+        navigation.pop();
+        dispatch(setLoading(false));
       }
-      Toast.show({
-        text1: 'Transaction has been Added Succesfully',
-        type: 'custom',
-      });
-      navigation.pop();
-      dispatch(setLoading(false));
     } catch (e) {
       dispatch(setLoading(false));
     }
-  }, [
-    pageType,
-    amount,
-    category,
-    wallet,
-    from,
-    to,
-    repeatData,
-    image,
-    doc,
-    desc,
-    conversion,
-    currency,
-    isEdit,
-    pageType,
-    transaction,
-    uid,
-  ]);
-  const getDate = useCallback(() => {
-    if (repeatData) {
-      if (isEdit) {
-        if ((repeatData.date as Timestamp)?.seconds !== undefined) {
-          return (repeatData.date as Timestamp).toDate().toLocaleDateString();
-        } else {
-          return (repeatData.date as Date)?.toLocaleDateString();
-        }
-      } else {
-        return (repeatData.date as Date)?.toLocaleDateString();
-      }
+  };
+  const backAction = () => {
+    if (
+      (pageType === 'transfer' &&
+        (((amount.replace(/,/g, '').trim() !== '' ||
+          amount.replace(/,/g, '').trim() !== '0') &&
+          amount.replace(/,/g, '').trim() === '.') ||
+          Number(amount.replace(/,/g, '')) > 0 ||
+          from !== '' ||
+          to !== '')) ||
+      (pageType !== 'transfer' &&
+        (((amount.replace(/,/g, '').trim() !== '' ||
+          amount.replace(/,/g, '').trim() !== '0') &&
+          amount.replace(/,/g, '').trim() === '.') ||
+          Number(amount.replace(/,/g, '')) > 0 ||
+          category !== '' ||
+          wallet !== ''))
+    ) {
+      Alert.alert(
+        'Discard changes?',
+        'You have unsaved changes. Are you sure you want to discard them and leave the screen?',
+        [
+          {
+            text: 'No',
+          },
+          {text: 'Yes', onPress: () => [navigation.goBack()]},
+        ],
+      );
+    } else {
+      navigation.goBack();
     }
-  }, [isEdit, repeatData]);
+    return true;
+  };
+  useEffect(() => {
+    setCatColors(
+      Object.values(
+        pageType === 'expense' ? user?.expenseCategory! : user?.incomeCategory!,
+      ).reduce((acc: {[key: string]: string}, item) => {
+        acc[item] = getMyColor();
+        return acc;
+      }, {}),
+    );
+    return () => {
+      setCatColors(undefined);
+    };
+  }, [pageType, user?.expenseCategory, user?.incomeCategory]);
+
+  useEffect(() => {
+    setFirstTime(false);
+    const back = BackHandler.addEventListener('hardwareBackPress', backAction);
+    return () => back.remove();
+  }, []);
   return (
     <>
-      <KeyboardAwareScrollView
-        style={[{backgroundColor: backgroundColor}]}
-        contentContainerStyle={[
-          {backgroundColor: backgroundColor, flexGrow: 1},
-        ]}
-        enableOnAndroid={true}>
+      <KeyboardAwareScrollView style={{backgroundColor: backgroundColor}}>
         <SafeAreaView
           style={[
             styles.safeView,
             {
               backgroundColor: backgroundColor,
+              height: height,
             },
           ]}>
-          <View
-            style={[
-              styles.mainView,
-              {
-                height:
-                  pageType === 'transfer'
-                    ? Dimensions.get('screen').height / 2
-                    : Dimensions.get('screen').height / 3.2,
-              },
-            ]}>
-            <Text style={styles.text1}>{STRINGS.HowMuch}</Text>
-            <View style={styles.moneyCtr}>
-              <Text style={styles.text2}>{currencies[currency!].symbol}</Text>
-              <TextInput
-                style={styles.input}
-                maxLength={6}
-                onChangeText={(str: string) => {
-                  let numericValue = str.replace(/[^0-9.]+/g, '');
-                  const decimalCount = numericValue.split('.').length - 1;
-                  if (decimalCount > 1) {
-                    const parts = numericValue.split('.');
-                    numericValue = parts[0] + '.' + parts.slice(1).join('');
-                  }
-                  setAmount(numericValue);
-                }}
-                value={amount}
-                keyboardType="numeric"
-              />
-            </View>
-            <View style={styles.amtError}>
-              <EmptyError
-                errorText={STRINGS.PleaseFillAnAmount}
-                value={amount}
-                formKey={formKey}
-                color={COLORS.LIGHT[100]}
-                size={18}
-              />
-            </View>
-          </View>
+          <CustomHeader
+            backgroundColor={getBackgroundColor}
+            title={pageType[0].toUpperCase() + pageType.slice(1)}
+            navigation={navigation}
+            onPress={backAction}
+          />
+          <MoneyInput
+            amount={amount}
+            currency={user?.currency ?? 'usd'}
+            formKey={formKey}
+            setAmount={setAmount}
+          />
         </SafeAreaView>
         <View style={styles.detailsCtr}>
           {pageType !== 'transfer' && (
-            <CustomDropdown
-              data={(pageType === 'expense' ? expenseCat! : incomeCat!)?.map(
-                item => {
+            <>
+              <CustomDropdown
+                data={(pageType === 'expense'
+                  ? user?.expenseCategory!
+                  : user?.incomeCategory!
+                )?.map(item => {
                   return {
                     label:
                       item === 'add'
-                        ? 'Add new Category'
+                        ? 'ADD NEW CATEGORY'
                         : item[0].toUpperCase() + item.slice(1),
                     value: item,
                   };
-                },
-              )}
-              onChange={val => {
-                if (val.value === 'add') {
-                  addCategorySheetRef.current?.present();
-                } else {
-                  setCategory(val.value);
-                }
-              }}
-              value={category}
-              placeholder={STRINGS.Category}
-            />
+                })}
+                onChange={val => {
+                  if (val.value === 'add') {
+                    addCategorySheetRef.current?.present();
+                  } else {
+                    setCategory(val.value);
+                  }
+                }}
+                value={category}
+                placeholder={STRINGS.Category}
+                leftIcon={CategoryDropdownIcon(category!, catColors!)}
+                catColors={catColors}
+              />
+              <EmptyError
+                errorText={STRINGS.PleaseSelectACategory}
+                value={category!}
+                formKey={formKey}
+              />
+            </>
           )}
           {pageType === 'transfer' && (
-            <View style={styles.transferRow}>
-              <View style={styles.flex}>
-                <CustomInput
-                  placeholderText={'From'}
-                  onChangeText={(str: string) => {
-                    setFrom(str);
-                  }}
-                  type="name"
-                  value={from}
-                  inputColor={COLOR.DARK[100]}
-                />
+            <>
+              <View style={styles.transferRow}>
+                <View style={styles.flex}>
+                  <CustomInput
+                    placeholderText={'From'}
+                    onChangeText={(str: string) => {
+                      setFrom(str);
+                    }}
+                    type="name"
+                    value={from}
+                    inputColor={COLOR.DARK[100]}
+                  />
+                </View>
+                <View style={[styles.transferIcon, {zIndex: zindex}]}>
+                  {ICONS.Transfer2({height: 25, width: 25})}
+                </View>
+                <View style={styles.flex}>
+                  <CustomInput
+                    placeholderText={'To'}
+                    onChangeText={(str: string) => {
+                      setTo(str);
+                    }}
+                    type="name"
+                    value={to}
+                    inputColor={COLOR.DARK[100]}
+                  />
+                </View>
               </View>
-              <View style={[styles.transferIcon, {zIndex: zindex}]}>
-                {ICONS.Transfer2({height: 25, width: 25})}
-              </View>
-              <View style={styles.flex}>
-                <CustomInput
-                  placeholderText={'To'}
-                  onChangeText={(str: string) => {
-                    setTo(str);
-                  }}
-                  type="name"
-                  value={to}
-                  inputColor={COLOR.DARK[100]}
-                />
-              </View>
-            </View>
-          )}
-          {pageType === 'transfer' && (
-            <CompundEmptyError
-              errorText="Please fill both the fields."
-              value1={to}
-              value2={from}
-              formKey={formKey}
-            />
-          )}
-          {pageType !== 'transfer' && (
-            <EmptyError
-              errorText={STRINGS.PleaseSelectACategory}
-              value={category}
-              formKey={formKey}
-            />
+              <CompundEmptyError
+                errorText="Please fill both the fields."
+                value1={to}
+                value2={from}
+                formKey={formKey}
+              />
+            </>
           )}
           <CustomInput
             placeholderText={STRINGS.Description}
             onChangeText={(str: string) => {
               setDesc(str);
             }}
-            type="name"
+            type="sentence"
             value={desc}
             inputColor={COLOR.DARK[100]}
           />
-          <Sapcer height={24} />
+          <Spacer height={24} />
           {pageType !== 'transfer' && (
-            <CustomDropdown
-              data={[
-                {label: 'Paypal', value: 'paypal'},
-                {label: 'Chase', value: 'chase'},
-              ]}
-              onChange={val => {
-                setWallet(val.value);
-              }}
-              value={wallet}
-              placeholder={STRINGS.Wallet}
-            />
-          )}
-          {pageType !== 'transfer' && (
-            <EmptyError
-              errorText={STRINGS.PleaseSelectAWallet}
-              value={wallet}
-              formKey={formKey}
-            />
+            <>
+              <CustomDropdown
+                data={[
+                  {label: 'Paypal', value: 'paypal'},
+                  {label: 'Chase', value: 'chase'},
+                ]}
+                onChange={val => {
+                  setWallet(val.value);
+                }}
+                value={wallet}
+                placeholder={STRINGS.Wallet}
+              />
+              <EmptyError
+                errorText={STRINGS.PleaseSelectAWallet}
+                value={wallet}
+                formKey={formKey}
+              />
+            </>
           )}
           <AttachementContainer
             doc={doc}
@@ -535,74 +441,28 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
             setZindex={setZindex}
             zindex={zindex}
           />
-          <Sapcer height={20} />
-          {pageType !== 'transfer' && (
-            <View style={styles.flexRow}>
-              <View>
-                <Text style={styles.flexRowText1}>{STRINGS.Repeat}</Text>
-                <Text style={styles.flexRowText2}>
-                  {STRINGS.RepeatTransaction}
-                </Text>
-              </View>
-              <Switch
-                trackColor={{
-                  false: COLORS.VIOLET[20],
-                  true: COLORS.VIOLET[100],
-                }}
-                ios_backgroundColor={COLORS.VIOLET[20]}
-                onValueChange={val => {
-                  if (val) {
-                    repeatSheetRef.current?.present({
-                      isEdit: isEdit,
-                      transaction: transaction,
-                    });
-                  } else {
-                    setRepeatData(undefined);
-                  }
-                }}
-                value={repeatData !== undefined && repeatData !== null}
-              />
-            </View>
-          )}
-          {pageType !== 'transfer' && <Sapcer height={20} />}
-          {repeatData && (
-            <View style={styles.flexRow}>
-              <View>
-                <Text style={styles.flexRowText1}>{STRINGS.Frequency}</Text>
-                <Text style={styles.flexRowText2}>
-                  {repeatData.freq[0].toUpperCase() + repeatData.freq.slice(1)}
-                  {repeatData.freq !== 'daily' && ' - '}
-                  {repeatData.freq === 'yearly' &&
-                    monthData[repeatData.month! - 1].label}{' '}
-                  {(repeatData.freq === 'yearly' ||
-                    repeatData.freq === 'monthly') &&
-                    repeatData.day}
-                  {repeatData.freq === 'weekly' &&
-                    weekData[repeatData.weekDay].label}
-                </Text>
-              </View>
-              {repeatData.end === 'date' && (
-                <View>
-                  <Text style={styles.flexRowText1}>{STRINGS.EndAfter}</Text>
-                  <Text style={styles.flexRowText2}>{getDate()}</Text>
-                </View>
-              )}
-              <Pressable
-                style={styles.editBtn}
-                onPress={() => {
-                  repeatSheetRef.current?.present({
-                    isEdit: isEdit,
-                    transaction: transaction,
-                  });
-                }}>
-                <Text style={styles.editBtnText}>Edit</Text>
-              </Pressable>
-            </View>
-          )}
-          <Sapcer height={20} />
+          <Spacer height={20} />
+          <RepeatInput
+            firstTime={firstTime}
+            isEdit={isEdit}
+            pageType={pageType}
+            repeatData={repeatData}
+            setRepeatData={setRepeatData}
+            repeatSheetRef={repeatSheetRef}
+            isSwitchOn={isSwitchOn}
+            setIsSwitchOn={setIsSwitchOn}
+          />
+          <Spacer height={20} />
           <CustomButton title={STRINGS.Continue} onPress={handlePress} />
-          <Sapcer height={20} />
+          <Spacer height={20} />
         </View>
+        <BottomSheetModalProvider>
+          <AddCategorySheet
+            bottomSheetModalRef={addCategorySheetRef}
+            type={pageType}
+            setMyCategory={setCategory}
+          />
+        </BottomSheetModalProvider>
       </KeyboardAwareScrollView>
       <BottomSheetModalProvider>
         <FilePickerSheet
@@ -616,14 +476,12 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
         <RepeatTransactionSheet
           bottomSheetModalRef={repeatSheetRef}
           setRepeatData={setRepeatData}
-        />
-        <AddCategorySheet
-          bottomSheetModalRef={addCategorySheetRef}
-          type={pageType}
+          repeatData={repeatData}
+          setIsSwitchOn={setIsSwitchOn}
         />
       </BottomSheetModalProvider>
     </>
   );
 }
 
-export default AddExpense;
+export default React.memo(AddExpense);

@@ -1,10 +1,13 @@
 import { Dimensions, StyleSheet } from 'react-native';
 import { COLORS } from '../../constants/commonStyles';
 import { RFValue } from 'react-native-responsive-fontsize';
+
+const screenHeight = Dimensions.get('screen').height
 const styles = (COLOR: typeof COLORS) => StyleSheet.create({
     safeView: { flex: 1, backgroundColor: COLOR.PRIMARY.VIOLET },
     mainView: {
-        height: Dimensions.get('screen').height / 1.85,
+        // flex:1,
+        height: screenHeight / 1.9,
         justifyContent: 'flex-end',
     },
     text1: {
@@ -28,18 +31,20 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
         paddingHorizontal: 30,
     },
     detailsCtr: {
+        flex: 1,
         width: '100%',
         paddingHorizontal: 20,
         paddingVertical: 30,
         borderTopLeftRadius: 32,
         borderTopRightRadius: 32,
-        backgroundColor: COLOR.LIGHT[100]
+        backgroundColor: COLOR.LIGHT[100],
     },
     flexRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-
+        paddingTop: 10,
+        paddingBottom: 10
     },
     flexRowText1: { fontWeight: '500', fontSize: RFValue(16), color: COLOR.DARK[100] },
     flexRowText2: {

@@ -1,5 +1,5 @@
 import React, {useEffect, useMemo, useRef, useState} from 'react';
-import {Pressable, Text, View} from 'react-native';
+import {BackHandler, Pressable, Text, View} from 'react-native';
 import {ICONS} from '../../constants/icons';
 import CustomButton from '../CustomButton';
 import style from './styles';
@@ -33,8 +33,8 @@ function FilterSheet() {
   const isOpen = useAppSelector(state => state.transaction.isFilterOpen);
   const selectedCats = useAppSelector(state => state.transaction.filters.cat);
   // state
-  const [filter, setFilter] = useState(-1);
-  const [sort, setSort] = useState(-1);
+  const [filter, setFilter] = useState<number>(-1);
+  const [sort, setSort] = useState<number>(-1);
   useEffect(() => {
     if (isOpen === true) {
       ref.current?.present();
@@ -42,7 +42,17 @@ function FilterSheet() {
       ref.current?.close();
     }
   }, [isOpen]);
-
+  const backAction = () => {
+    dispatch(openFilterSheet(false));
+    return true;
+  };
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      backAction,
+    );
+    return () => backHandler.remove();
+  }, []);
   return (
     <BottomSheetModalProvider>
       <BottomSheetModal
@@ -52,11 +62,11 @@ function FilterSheet() {
         ref={ref}
         backdropComponent={SheetBackdrop}
         backgroundStyle={styles.sheetBack}
-        handleIndicatorStyle={{backgroundColor: COLOR.DARK[100]}}
+        handleIndicatorStyle={{backgroundColor: COLOR.VIOLET[40]}}
         onDismiss={() => {
           dispatch(openFilterSheet(false));
         }}>
-        <BottomSheetView style={{paddingHorizontal: 20}}>
+        <BottomSheetView style={styles.sheet}>
           <View style={styles.sheetView}>
             <Text style={styles.text1}>{STRINGS.FilterTransaction}</Text>
             <Pressable
@@ -65,7 +75,7 @@ function FilterSheet() {
                 setFilter(-1);
                 setSort(-1);
                 dispatch(setFilters(-1));
-                dispatch(setSortFilter(2));
+                dispatch(setSortFilter(-1));
                 dispatch(clearCatFilter());
               }}>
               <Text style={styles.editBtnText}>{STRINGS.Reset}</Text>
@@ -84,7 +94,11 @@ function FilterSheet() {
                 },
               ]}
               onPress={() => {
-                setFilter(0);
+                if (filter === 0) {
+                  setFilter(-1);
+                } else {
+                  setFilter(0);
+                }
               }}>
               <Text
                 style={[
@@ -103,7 +117,11 @@ function FilterSheet() {
                 },
               ]}
               onPress={() => {
-                setFilter(1);
+                if (filter === 1) {
+                  setFilter(-1);
+                } else {
+                  setFilter(1);
+                }
               }}>
               <Text
                 style={[
@@ -122,7 +140,11 @@ function FilterSheet() {
                 },
               ]}
               onPress={() => {
-                setFilter(2);
+                if (filter === 2) {
+                  setFilter(-1);
+                } else {
+                  setFilter(2);
+                }
               }}>
               <Text
                 style={[
@@ -152,7 +174,11 @@ function FilterSheet() {
                 },
               ]}
               onPress={() => {
-                setSort(0);
+                if (sort === 0) {
+                  setSort(-1);
+                } else {
+                  setSort(0);
+                }
               }}>
               <Text
                 style={[
@@ -171,7 +197,11 @@ function FilterSheet() {
                 },
               ]}
               onPress={() => {
-                setSort(1);
+                if (sort === 1) {
+                  setSort(-1);
+                } else {
+                  setSort(1);
+                }
               }}>
               <Text
                 style={[
@@ -190,7 +220,11 @@ function FilterSheet() {
                 },
               ]}
               onPress={() => {
-                setSort(2);
+                if (sort === 2) {
+                  setSort(-1);
+                } else {
+                  setSort(2);
+                }
               }}>
               <Text
                 style={[
@@ -209,7 +243,11 @@ function FilterSheet() {
                 },
               ]}
               onPress={() => {
-                setSort(3);
+                if (sort === 3) {
+                  setSort(-1);
+                } else {
+                  setSort(3);
+                }
               }}>
               <Text
                 style={[
@@ -240,7 +278,7 @@ function FilterSheet() {
               }}
               style={styles.pressable}>
               <Text style={styles.text2}>
-                {selectedCats?.length ?? 0} Selected
+                {selectedCats?.length ?? 0} {STRINGS.Selected}
               </Text>
               {ICONS.ArrowRight({
                 height: 25,

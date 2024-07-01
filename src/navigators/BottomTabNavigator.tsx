@@ -1,4 +1,4 @@
-import {View} from 'react-native';
+import {BackHandler, View} from 'react-native';
 import Home from '../screens/Home';
 import {NAVIGATION} from '../constants/strings';
 import CustomTab from '../components/CustomTab';
@@ -15,6 +15,8 @@ import {
   BottomTabBarProps,
   createBottomTabNavigator,
 } from '@react-navigation/bottom-tabs';
+import {useEffect} from 'react';
+import {useNavigation} from '@react-navigation/native';
 
 const Tab = createBottomTabNavigator<BottomParamList>();
 function CustomTabBar(props: Readonly<BottomTabBarProps>) {
@@ -22,6 +24,18 @@ function CustomTabBar(props: Readonly<BottomTabBarProps>) {
 }
 function BottomTabNavigator() {
   useInitialSetup();
+  const navigation = useNavigation();
+  useEffect(() => {
+    const back = BackHandler.addEventListener('hardwareBackPress', () => {
+      if (navigation.canGoBack()) {
+        navigation.goBack();
+      } else {
+        BackHandler.exitApp();
+      }
+      return true;
+    });
+    return () => back.remove();
+  });
   return (
     <View style={{flex: 1}}>
       <Tab.Navigator screenOptions={{headerShown: false}} tabBar={CustomTabBar}>
@@ -35,7 +49,7 @@ function BottomTabNavigator() {
       </Tab.Navigator>
       <FilterSheet />
       <CategorySelectionSheet />
-      <LogoutSheet/>
+      <LogoutSheet />
     </View>
   );
 }

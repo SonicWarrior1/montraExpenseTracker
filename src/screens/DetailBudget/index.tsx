@@ -1,4 +1,4 @@
-import React, {useEffect, useRef} from 'react';
+import React, {useRef} from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import style from './styles';
 import {Pressable, Text, View} from 'react-native';
@@ -12,6 +12,8 @@ import DeleteBudgetSheet from '../../components/DeleteBudgetSheet';
 import {BottomSheetModalMethods} from '@gorhom/bottom-sheet/lib/typescript/types';
 import {COLORS} from '../../constants/commonStyles';
 import {useAppTheme} from '../../hooks/themeHook';
+import CustomHeader from '../../components/CustomHeader';
+import {formatWithCommas} from '../../utils/commonFuncs';
 
 function DetailBudget({navigation, route}: Readonly<DetailBudgetScreenProps>) {
   const month = route.params.month;
@@ -46,22 +48,25 @@ function DetailBudget({navigation, route}: Readonly<DetailBudgetScreenProps>) {
       </Pressable>
     );
   };
-  useEffect(() => {
-    navigation.setOptions({
-      headerRight: headerRight,
-    });
-  }, []);
 
   return (
     <>
       <SafeAreaView style={styles.safeView}>
+        <CustomHeader
+          backgroundColor={COLOR.LIGHT[100]}
+          title="Detail Budget"
+          navigation={navigation}
+          HeaderRight={headerRight}
+          color={COLOR.DARK[100]}
+        />
         <View style={styles.mainView}>
           <View style={styles.catCtr}>
             <View
               style={[
                 styles.colorBox,
                 {
-                  backgroundColor: catIcons[selectedCategory]?.color ?? COLORS.LIGHT[20],
+                  backgroundColor:
+                    catIcons[selectedCategory]?.color ?? COLORS.LIGHT[20],
                 },
               ]}>
               {catIcons[selectedCategory]?.icon({height: 20, width: 20}) ??
@@ -76,11 +81,14 @@ function DetailBudget({navigation, route}: Readonly<DetailBudgetScreenProps>) {
             {currencies[currency!].symbol}
             {budget.limit - spend < 0 || spend === undefined
               ? '0'
-              : (
-                  conversion.usd[currency!.toLowerCase()] *
-                    Number(budget.limit.toFixed(1)) -
-                  Number(spend.toFixed(1))
-                ).toFixed(1)}
+              : formatWithCommas(
+                  Number(
+                    (
+                      conversion.usd[currency!.toLowerCase()] *
+                      (Number(budget.limit) - Number(spend))
+                    ).toFixed(1),
+                  ).toString(),
+                )}
           </Text>
           <View style={styles.progressbar}>
             <Bar
@@ -97,20 +105,24 @@ function DetailBudget({navigation, route}: Readonly<DetailBudgetScreenProps>) {
             </View>
           )}
         </View>
-        <CustomButton
-          title={STRINGS.Edit}
-          onPress={() => {
-            navigation.push(NAVIGATION.CreateBudget, {
-              isEdit: true,
-              category: selectedCategory,
-            });
-          }}
-        />
+        <View style={{paddingHorizontal: 30, paddingBottom: 10}}>
+          <CustomButton
+            title={STRINGS.Edit}
+            onPress={() => {
+              navigation.push(NAVIGATION.CreateBudget, {
+                isEdit: true,
+                category: selectedCategory,
+              });
+            }}
+          />
+        </View>
       </SafeAreaView>
       <DeleteBudgetSheet
+        budget={budget}
         category={selectedCategory}
         navigation={navigation}
         bottomSheetModalRef={bottomSheetModalRef}
+        month={month}
       />
     </>
   );

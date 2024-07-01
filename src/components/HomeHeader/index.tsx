@@ -12,9 +12,11 @@ import {useAppTheme} from '../../hooks/themeHook';
 function HomeHeader({
   props,
   setMonth,
+  month,
 }: Readonly<{
   props: Readonly<HomeScreenProps>;
   setMonth: React.Dispatch<React.SetStateAction<number>>;
+  month: number;
 }>) {
   // redux
   const notifications = useAppSelector(
@@ -39,19 +41,26 @@ function HomeHeader({
       <Dropdown
         style={styles.dropdown}
         renderLeftIcon={() => (
-          <View>{ICONS.ArrowDown({width: 15, height: 15})}</View>
+          <View>
+            {ICONS.ArrowDown({
+              width: 15,
+              height: 15,
+              borderColor: COLOR.VIOLET[100],
+            })}
+          </View>
         )}
         renderRightIcon={() => <></>}
         placeholder={STRINGS.Month}
         placeholderStyle={{marginLeft: 10}}
         selectedTextStyle={{marginLeft: 10, color: COLOR.DARK[100]}}
-        value={monthData[new Date().getMonth()]}
+        value={monthData[month]}
         data={monthData}
         labelField={'label'}
         valueField={'value'}
         onChange={({value}) => {
-          setMonth(value-1);
+          setMonth(value - 1);
         }}
+        autoScroll={false}
         itemTextStyle={{color: COLOR.DARK[100]}}
         containerStyle={{backgroundColor: COLOR.LIGHT[100]}}
         activeColor={COLOR.LIGHT[100]}
@@ -74,4 +83,4 @@ function HomeHeader({
   );
 }
 
-export default HomeHeader;
+export default React.memo(HomeHeader);

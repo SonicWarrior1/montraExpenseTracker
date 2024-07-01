@@ -1,5 +1,5 @@
 import React from 'react';
-import {SafeAreaView, Text, View} from 'react-native';
+import {Pressable, SafeAreaView, Text} from 'react-native';
 import BouncyCheckbox from 'react-native-bouncy-checkbox/build/dist/BouncyCheckbox';
 import {useAppSelector} from '../../redux/store';
 import firestore from '@react-native-firebase/firestore';
@@ -7,8 +7,10 @@ import {encrypt} from '../../utils/encryption';
 import style from './styles';
 import {useAppTheme} from '../../hooks/themeHook';
 import {STRINGS} from '../../constants/strings';
+import CustomHeader from '../../components/CustomHeader';
+import {ThemeScreenProps} from '../../defs/navigation';
 
-function ThemeScreen() {
+function ThemeScreen({navigation}: Readonly<ThemeScreenProps>) {
   // redux
   const theme = useAppSelector(state => state.user.currentUser?.theme);
   const uid = useAppSelector(state => state.user.currentUser?.uid);
@@ -18,42 +20,70 @@ function ThemeScreen() {
   const userDoc = firestore().collection('users').doc(uid);
   return (
     <SafeAreaView style={styles.safeView}>
-      <View style={styles.row}>
-        <Text style={styles.text}>{STRINGS.Light}</Text>
-        <BouncyCheckbox
-          style={{width: 28}}
-          disableText={false}
-          fillColor={COLORS.BLUE[100]}
-          isChecked={theme === 'light'}
-          onPress={async () => {
+      <CustomHeader
+        backgroundColor={COLORS.LIGHT[100]}
+        navigation={navigation}
+        title="Theme"
+        color={COLORS.DARK[100]}
+        bottomBorder={true}
+      />
+      <Pressable
+        style={styles.row}
+        onPress={async () => {
+          if (theme !== 'light') {
             await userDoc.update({theme: encrypt('light', uid!)});
-          }}
-        />
-      </View>
-      <View style={styles.row}>
-        <Text style={styles.text}>{STRINGS.Dark}</Text>
+          }
+        }}>
+        <Text style={styles.text}>{STRINGS.Light}</Text>
+
         <BouncyCheckbox
+          disabled
           style={{width: 28}}
           disableText={false}
-          fillColor={COLORS.BLUE[100]}
-          isChecked={theme === 'dark'}
-          onPress={async () => {
+          fillColor={'#5233FF'}
+          isChecked={theme === 'light'}
+          iconStyle={{height: 24, width: 24}}
+          iconImageStyle={{height: 12.5, width: 12.5}}
+        />
+      </Pressable>
+      <Pressable
+        style={styles.row}
+        onPress={async () => {
+          if (theme !== 'dark') {
             await userDoc.update({theme: encrypt('dark', uid!)});
-          }}
-        />
-      </View>
-      <View style={styles.row}>
-        <Text style={styles.text}>{STRINGS.UseDeviceTheme}</Text>
+          }
+        }}>
+        <Text style={styles.text}>{STRINGS.Dark}</Text>
+
         <BouncyCheckbox
+          disabled
           style={{width: 28}}
           disableText={false}
-          fillColor={COLORS.BLUE[100]}
-          isChecked={theme === 'device'}
-          onPress={async () => {
-            await userDoc.update({theme: encrypt('device', uid!)});
-          }}
+          fillColor={'#5233FF'}
+          isChecked={theme === 'dark'}
+          iconStyle={{height: 24, width: 24}}
+          iconImageStyle={{height: 12.5, width: 12.5}}
         />
-      </View>
+      </Pressable>
+      <Pressable
+        style={styles.row}
+        onPress={async () => {
+          if (theme !== 'device') {
+            await userDoc.update({theme: encrypt('device', uid!)});
+          }
+        }}>
+        <Text style={styles.text}>{STRINGS.UseDeviceTheme}</Text>
+
+        <BouncyCheckbox
+          disabled
+          style={{width: 28}}
+          disableText={false}
+          fillColor={'#5233FF'}
+          isChecked={theme === 'device'}
+          iconStyle={{height: 24, width: 24}}
+          iconImageStyle={{height: 12.5, width: 12.5}}
+        />
+      </Pressable>
     </SafeAreaView>
   );
 }

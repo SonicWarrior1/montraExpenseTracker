@@ -24,5 +24,28 @@ export function TransFromJson(json: FirebaseFirestoreTypes.DocumentData, uid: st
         attachementType: decrypt(json.attachementType, uid) ?? json.attachementType,
         from: decrypt(json.from, uid) ?? json.from ?? '',
         to: decrypt(json.to, uid) ?? json.to ?? '',
+        deleted: json.deleted ?? false,
+    };
+}
+
+export function debounce(fn: (...args) => void, delay = 300) {
+    let timer: any = null;
+    return (...args) => {
+        if (timer !== null) {
+            clearTimeout(timer);
+        }
+        timer = setTimeout(() => fn(args), delay);
+    };
+}
+
+export function throttle(func: (...args) => void, delay: number) {
+    let timeout = null;
+    return (...args) => {
+        if (!timeout) {
+            func(...args);
+            timeout = setTimeout(() => {
+                timeout = null;
+            }, delay);
+        }
     };
 }

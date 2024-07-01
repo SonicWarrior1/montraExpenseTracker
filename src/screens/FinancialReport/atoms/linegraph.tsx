@@ -4,8 +4,12 @@ import {COLORS} from '../../../constants/commonStyles';
 import {LineChart} from 'react-native-gifted-charts';
 import style from '../styles';
 import {currencies} from '../../../constants/strings';
-import {transactionType} from '../../../defs/transaction';
 import {useAppTheme} from '../../../hooks/themeHook';
+import {Timestamp} from '@react-native-firebase/firestore';
+import LinegraphLabel from '../../../components/LinegraphLabel';
+import {OnlineTransactionModel} from '../../../DbModels/OnlineTransactionModel';
+import {OfflineTransactionModel} from '../../../DbModels/OfflineTransactionModel';
+import {formatWithCommas} from '../../../utils/commonFuncs';
 
 function Linegraph({
   totalSpend,
@@ -16,11 +20,9 @@ function Linegraph({
   conversion,
   month,
 }: Readonly<{
-  totalSpend: string;
-  totalIncome: string;
-  data: {
-    [key: string]: transactionType;
-  };
+  totalSpend: number;
+  totalIncome: number;
+  data: (OnlineTransactionModel | OfflineTransactionModel)[];
   currency: string | undefined;
   transType: 'income' | 'expense';
   conversion: {
@@ -36,19 +38,22 @@ function Linegraph({
     <>
       <Text style={styles.amt}>
         {currencies[currency!].symbol}
-        {(
-          conversion['usd']?.[currency!.toLowerCase()] *
-          Number(transType === 'expense' ? totalSpend : totalIncome)
-        )
-          .toFixed(1)
-          .toString()}
+        {formatWithCommas(
+          Number(
+            (
+              conversion.usd?.[currency!.toLowerCase()] *
+              Number(transType === 'expense' ? totalSpend : totalIncome)
+            ).toFixed(1),
+          ).toString(),
+        )}
       </Text>
       <View style={styles.graphView}>
-        {Object.values(data)
+        {data
           .filter(
             item =>
-              item.timeStamp.toDate().getMonth() === month &&
-              item.type === transType,
+              Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+                .toDate()
+                .getMonth() === month && item.type === transType,
           )
           .sort((a, b) => a.timeStamp.seconds - b.timeStamp.seconds)
           .map(item => {
@@ -64,23 +69,38 @@ function Linegraph({
           </View>
         ) : (
           <LineChart
-            data={Object.values(data)
+            data={data
               .filter(
                 item =>
-                  item.timeStamp.toDate().getMonth() === month &&
-                  item.type === transType,
+                  Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+                    .toDate()
+                    .getMonth() === month && item.type === transType,
               )
               .sort((a, b) => a.timeStamp.seconds - b.timeStamp.seconds)
               .map(item => {
-                return {value: item.amount};
+                return {
+                  value: item.amount,
+                  date:
+                    Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+                      .toDate()
+                      .getDay() +
+                    '/' +
+                    Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+                      .toDate()
+                      .getMonth() +
+                    '/' +
+                    Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+                      .toDate()
+                      .getFullYear(),
+                };
               })}
             areaChart
             adjustToWidth
             startFillColor1={COLORS.VIOLET[40]}
             endFillColor1={COLOR.LIGHT[100]}
             isAnimated={true}
-            initialSpacing={0}
-            width={Dimensions.get('screen').width}
+            // initialSpacing={1}
+            width={Dimensions.get('screen').width * 1.04}
             hideDataPoints
             thickness={12}
             hideRules
@@ -91,6 +111,24 @@ function Linegraph({
             curved={true}
             overflowBottom={-1}
             onlyPositive
+            disableScroll
+            yAxisExtraHeight={40}
+            pointerConfig={{
+              pointerStripHeight: 220,
+              pointerStripColor: 'lightgray',
+              pointerStripWidth: 2,
+              pointerColor: 'lightgray',
+              pointerLabelWidth: 100,
+              activatePointersOnLongPress: true,
+              autoAdjustPointerLabelPosition: true,
+              pointerLabelComponent: (items: {date: string; value: number}[]) =>
+                LinegraphLabel({
+                  items: items,
+                  currency: currency,
+                  conversion: conversion,
+                  COLOR:COLOR
+                }),
+            }}
           />
         )}
       </View>

@@ -1,23 +1,31 @@
-import {View, TextInput, Pressable} from 'react-native';
+import {
+  View,
+  TextInput,
+  Pressable,
+  NativeSyntheticEvent,
+  TextInputFocusEventData,
+} from 'react-native';
 import styles from './styles';
 import {useState} from 'react';
-import {COLORS} from '../../constants/commonStyles';
 import {ICONS} from '../../constants/icons';
 import {useAppTheme} from '../../hooks/themeHook';
+import {PlaceholderTextColor} from '../../constants/commonStyles';
 
 function CustomPassInput({
   value,
   onChangeText,
   placeholderText,
   inputColor = 'black',
+  onBlur,
 }: Readonly<{
   value: string | undefined;
   onChangeText: (str: string) => void;
+  onBlur?: (props: NativeSyntheticEvent<TextInputFocusEventData>) => void;
   placeholderText: string;
   eyeColor?: string;
   inputColor?: string;
 }>) {
-  const [showPass, setShowPass] = useState(true);
+  const [showPass, setShowPass] = useState<boolean>(true);
   const COLOR = useAppTheme();
   return (
     <View style={styles.passInputContainer}>
@@ -27,24 +35,25 @@ function CustomPassInput({
         secureTextEntry={showPass}
         value={value}
         onChangeText={onChangeText}
-        placeholderTextColor={COLORS.DARK[25]}
+        placeholderTextColor={PlaceholderTextColor}
         textContentType="oneTimeCode"
+        onBlur={onBlur}
       />
       <Pressable
         onPress={() => {
           setShowPass(pass => !pass);
         }}>
-        {showPass
+        {!showPass
           ? ICONS.Show({
-              height: 24,
-              width: 24,
-              color: 'transparent',
-              borderColor: COLOR.DARK[100],
+              height: 22,
+              width: 22,
+              color: COLOR.LIGHT[100],
+              borderColor: COLOR.DARK[25],
             })
           : ICONS.Hide({
               height: 22,
               width: 22,
-              color: COLOR.DARK[100],
+              color: COLOR.DARK[25],
             })}
       </Pressable>
     </View>

@@ -1,9 +1,10 @@
 import {Pressable, Text} from 'react-native';
 import {iconProps} from '../../../constants/icons';
-import Sapcer from '../../Spacer';
+import Spacer from '../../Spacer';
 import {COLORS} from '../../../constants/commonStyles';
 import style from '../styles';
 import {useAppTheme} from '../../../hooks/themeHook';
+import React from 'react';
 
 function TabButton({
   onPress,
@@ -24,7 +25,7 @@ function TabButton({
         width: 25,
         color: isActive ? COLORS.PRIMARY.VIOLET : '#C6C6C6',
       })}
-      <Sapcer height={10} />
+      <Spacer height={10} />
       <Text
         style={[
           styles.btnText,
@@ -36,4 +37,4 @@ function TabButton({
   );
 }
 
-export default TabButton;
+export default React.memo(TabButton);

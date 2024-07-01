@@ -1,4 +1,5 @@
 import { Timestamp } from '@react-native-firebase/firestore';
+import { TimestampModel } from '../DbModels/TimestampModel';
 
 export type transactionType = {
     id: string,
@@ -9,7 +10,7 @@ export type transactionType = {
     attachement?: string;
     repeat: boolean;
     freq: repeatDataType | null;
-    timeStamp: Timestamp,
+    timeStamp: Timestamp | TimestampModel,
     type: 'expense' | 'income' | 'transfer',
     attachementType: 'image' | 'doc' | 'none',
     from:string,

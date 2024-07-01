@@ -1,10 +1,11 @@
-import { StyleSheet } from "react-native";
-import { COLORS } from "../../constants/commonStyles";
+import { StyleSheet } from 'react-native';
+import { COLORS } from '../../constants/commonStyles';
+import { RFValue } from 'react-native-responsive-fontsize';
 
 const styles = (COLOR: typeof COLORS) => StyleSheet.create({
   filterBtn: {
-    paddingVertical: 12,
-    paddingHorizontal: 26,
+    paddingVertical: 8,
+    paddingHorizontal: 18,
     borderRadius: 40,
     borderWidth: 1,
     borderColor: COLOR.LIGHT[20],
@@ -19,7 +20,17 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
     flexWrap: 'wrap',
     columnGap: 10,
     rowGap: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  sheetBack: { borderTopLeftRadius: 32, borderTopRightRadius: 32, backgroundColor: COLOR.LIGHT[100] }
-})
-export default styles
+  sheetBack: { borderTopLeftRadius: 32, borderTopRightRadius: 32, backgroundColor: COLOR.LIGHT[100] },
+  text1: {
+    fontSize: RFValue(15),
+    fontWeight: '600',
+    color: COLOR.DARK[100],
+    marginBottom: 10,
+  },
+  sheet: { paddingHorizontal: 20 },
+  scrollview: { maxHeight: '72%', marginBottom: 15 },
+});
+export default styles;

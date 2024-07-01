@@ -1,7 +1,7 @@
-import { StyleSheet } from 'react-native';
+import { Dimensions, StyleSheet } from 'react-native';
 import { COLORS } from '../../constants/commonStyles';
 import { RFValue } from 'react-native-responsive-fontsize';
-
+const screenWidth = Dimensions.get('screen').width
 const styles = (COLOR: typeof COLORS) => StyleSheet.create({
     tabCtr: {
         height: 100,
@@ -10,9 +10,9 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
         justifyContent: 'space-around',
     },
     animatedBtnOuter: {
-        width: 80,
-        height: 80,
-        borderRadius: 40,
+        width: 75,
+        height: 75,
+        borderRadius: 100,
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -20,8 +20,8 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: COLOR.PRIMARY.VIOLET,
-        width: 70,
-        height: 70,
+        width: 60,
+        height: 60,
         borderRadius: 40,
         margin: 10,
     },
@@ -47,15 +47,15 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
         fontSize: 14,
         color: COLOR.PRIMARY.VIOLET,
     },
-    tabBtn:{
+    tabBtn: {
         justifyContent: 'center',
         alignItems: 'center',
-        width: 70,
-      },
-      btnText:{
-        fontSize: RFValue(9),
+        width: screenWidth / 5,
+        marginBottom: 5
+    },
+    btnText: {
+        fontSize: RFValue(10),
         fontWeight: '500',
-      },
+    },
 });
-
 export default styles;

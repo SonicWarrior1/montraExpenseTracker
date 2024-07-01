@@ -9,15 +9,16 @@ export const toastConfig: ToastConfig = {
     return (
       <BaseToast
         {...props}
+        
         text1NumberOfLines={2}
         text1Props={{
           style: {
             color: COLORS.LIGHT[100],
             alignSelf: 'center',
-            fontSize:16
+            fontSize: 16,
           },
         }}
-        style={[styles.success,{backgroundColor:COLORS.BLUE[100]}]}
+        style={[styles.success, {backgroundColor: COLORS.BLUE[100]}]}
       />
     );
   },
@@ -30,10 +31,10 @@ export const toastConfig: ToastConfig = {
           style: {
             color: COLORS.LIGHT[100],
             alignSelf: 'center',
-            fontSize:16
+            fontSize: 16,
           },
         }}
-        style={[styles.success,{backgroundColor:COLORS.RED[100]}]}
+        style={[styles.success, {backgroundColor: COLORS.RED[100]}]}
       />
     );
   },

@@ -7,8 +7,11 @@ import firestore from '@react-native-firebase/firestore';
 import {encrypt} from '../../utils/encryption';
 import {useAppTheme} from '../../hooks/themeHook';
 import style from './styles';
+import CustomHeader from '../../components/CustomHeader';
+import {CurrencyScreenProps} from '../../defs/navigation';
+import {CheckboxFillColor} from '../../constants/commonStyles';
 
-function CurrencyScreen() {
+function CurrencyScreen({navigation}: Readonly<CurrencyScreenProps>) {
   // redux
   const code = useAppSelector(state => state.user.currentUser?.currency);
   const uid = useAppSelector(state => state.user.currentUser?.uid);
@@ -18,6 +21,13 @@ function CurrencyScreen() {
   const userDoc = firestore().collection('users').doc(uid);
   return (
     <SafeAreaView style={styles.safeView}>
+      <CustomHeader
+        backgroundColor={COLORS.LIGHT[100]}
+        navigation={navigation}
+        title="Currency"
+        color={COLORS.DARK[100]}
+        bottomBorder={true}
+      />
       <FlatList
         data={Object.values(currencies)}
         renderItem={({item}) => (
@@ -31,16 +41,20 @@ function CurrencyScreen() {
             <Text style={styles.text}>
               {item.name} {'(' + item.code + ')'}{' '}
             </Text>
+
             <BouncyCheckbox
               style={styles.checkbox}
+              disabled
               disableText={false}
-              fillColor={COLORS.BLUE[100]}
+              fillColor={CheckboxFillColor}
               isChecked={code === item.code}
               onPress={async () => {
                 if (code !== item.code) {
                   await userDoc.update({currency: encrypt(item.code, uid!)});
                 }
               }}
+              iconStyle={{height: 24, width: 24}}
+              iconImageStyle={{height: 12.5, width: 12.5}}
             />
           </Pressable>
         )}

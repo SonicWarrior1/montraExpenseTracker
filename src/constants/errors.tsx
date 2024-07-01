@@ -1,7 +1,7 @@
 import React, {useEffect} from 'react';
 import {StyleSheet, Text} from 'react-native';
-import {emailRegex, nameRegex, passRegex, STRINGS} from './strings';
-import Sapcer from '../components/Spacer';
+import {emailRegex, nameRegex, STRINGS} from './strings';
+import Spacer from '../components/Spacer';
 import Animated, {useSharedValue, withTiming} from 'react-native-reanimated';
 
 export function ConfirmPassError({
@@ -20,7 +20,7 @@ export function ConfirmPassError({
       <Text style={style.error}>{STRINGS.ConfirmPasswordCannotBeEmpty}</Text>
     );
   } else {
-    return <Sapcer height={25} />;
+    return <Spacer height={25} />;
   }
 }
 export function testInput(re: RegExp, str: string): boolean {
@@ -31,29 +31,16 @@ export function PassValidationError({
   pass,
   formKey,
 }: Readonly<{pass: string; formKey: boolean}>) {
-  const height = useSharedValue(25);
-  useEffect(() => {
-    if (!!pass && !testInput(passRegex, pass)) {
-      height.value = withTiming(40);
-    } else {
-      height.value = withTiming(25);
-    }
-    console.log(height);
-  }, [pass, formKey]);
-  if (!!pass && !testInput(passRegex, pass)) {
+  if (!!pass && pass.length < 6) {
     return (
-      <Animated.Text style={[style.error, {height}]} numberOfLines={2}>
+      <Text style={[style.error]} numberOfLines={1}>
         {STRINGS.PasswordNotValid}
-      </Animated.Text>
+      </Text>
     );
-  } else if (pass === '' && formKey) {
-    return (
-      <Animated.Text style={[style.error, {height}]}>
-        {STRINGS.PasswordCannotBeEmpty}
-      </Animated.Text>
-    );
+  } else if (pass.trim() === '' && formKey) {
+    return <Text style={[style.error]}>{STRINGS.PasswordCannotBeEmpty}</Text>;
   } else {
-    return <Animated.View style={{height}}></Animated.View>;
+    return <Spacer height={25} />;
   }
 }
 
@@ -66,10 +53,10 @@ export function PassEmptyError({
 }>) {
   return (
     <>
-      {pass === '' && formKey ? (
+      {pass.trim() === '' && formKey ? (
         <Text style={style.error}>{STRINGS.PasswordCannotBeEmpty}</Text>
       ) : (
-        <Sapcer height={25} />
+        <Spacer height={25} />
       )}
     </>
   );
@@ -87,7 +74,7 @@ export function EmailValError({
   } else if (email === '' && formKey) {
     return <Text style={style.error}>{STRINGS.EmailCannotBeEmpty}</Text>;
   } else {
-    return <Sapcer height={25} />;
+    return <Spacer height={25} />;
   }
 }
 export function EmailEmptyError({
@@ -102,7 +89,7 @@ export function EmailEmptyError({
       {email === '' && formKey ? (
         <Text style={style.error}>{STRINGS.EmailCannotBeEmpty}</Text>
       ) : (
-        <Sapcer height={25} />
+        <Spacer height={25} />
       )}
     </>
   );
@@ -120,7 +107,7 @@ export function NameValError({
   } else if (name === '' && formKey) {
     return <Text style={style.error}>{STRINGS.NameCannotBeEmpty}</Text>;
   } else {
-    return <Sapcer height={25} />;
+    return <Spacer height={25} />;
   }
 }
 export function CompundEmptyError({
@@ -145,7 +132,7 @@ export function CompundEmptyError({
           {errorText}
         </Text>
       ) : (
-        <Sapcer height={24} />
+        <Spacer height={24} />
       )}
     </>
   );
@@ -170,7 +157,88 @@ export function EmptyError({
           {errorText}
         </Text>
       ) : (
-        <Sapcer height={24} />
+        <Spacer height={24} />
+      )}
+    </>
+  );
+}
+export function EmptyZeroError({
+  value,
+  formKey,
+  errorText,
+  color = 'rgb(255,51,51)',
+  size = 12,
+}: Readonly<{
+  value: string;
+  formKey: boolean;
+  errorText: string;
+  color?: string;
+  size?: number;
+}>) {
+  const height = useSharedValue(0);
+  useEffect(() => {
+    if (
+      (value === '' || Number(value) <= 0 || value.trim() === '.') &&
+      formKey
+    ) {
+      height.value = withTiming(24);
+    } else {
+      height.value = withTiming(0);
+    }
+  }, [value, formKey]);
+  return (
+    <>
+      {(value === '' || Number(value) <= 0 || value.trim() === '.') &&
+      formKey ? (
+        <Animated.Text
+          style={[
+            style.error,
+            {
+              color: color,
+              fontSize: size,
+              height,
+              marginTop: -20,
+              marginBottom: 10,
+            },
+          ]}>
+          {errorText}
+        </Animated.Text>
+      ) : (
+        <Animated.View style={{height: height}} />
+      )}
+    </>
+  );
+}
+export function AnimatedEmptyError({
+  value,
+  formKey,
+  errorText,
+  color = 'rgb(255,51,51)',
+  size = 12,
+}: Readonly<{
+  value: string;
+  formKey: boolean;
+  errorText: string;
+  color?: string;
+  size?: number;
+}>) {
+  const height = useSharedValue(10);
+  useEffect(() => {
+    if (value === '' && formKey) {
+      height.value = withTiming(24);
+    } else {
+      height.value = withTiming(10);
+    }
+  }, [value, formKey]);
+  return (
+    <>
+      {value === '' && formKey ? (
+        <Animated.Text
+          style={[style.error, {color: color, fontSize: size, height}]}>
+          {errorText}
+        </Animated.Text>
+      ) : (
+        <Animated.View style={{height}} />
       )}
     </>
   );

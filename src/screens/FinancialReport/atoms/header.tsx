@@ -24,11 +24,15 @@ function FinancialReportHeader({
   return (
     <View style={styles.monthRow}>
       <Dropdown
+        autoScroll={false}
         style={styles.dropdown}
-
         renderLeftIcon={() => (
           <View style={{marginRight: 10}}>
-            {ICONS.ArrowDown({width: 15, height: 15})}
+            {ICONS.ArrowDown({
+              width: 15,
+              height: 15,
+              borderColor: COLOR.VIOLET[100],
+            })}
           </View>
         )}
         renderRightIcon={() => <></>}
@@ -40,8 +44,8 @@ function FinancialReportHeader({
         onChange={({value}) => {
           setMonth(value - 1);
         }}
-        itemTextStyle={{color: COLOR.DARK[100],}}
-        containerStyle={{backgroundColor: COLOR.LIGHT[100],}}
+        itemTextStyle={{color: COLOR.DARK[100]}}
+        containerStyle={{backgroundColor: COLOR.LIGHT[100]}}
         activeColor={COLOR.LIGHT[100]}
         selectedTextStyle={{color: COLOR.DARK[100]}}
       />

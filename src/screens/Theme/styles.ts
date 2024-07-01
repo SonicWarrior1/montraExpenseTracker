@@ -1,6 +1,6 @@
-import { StyleSheet } from "react-native";
-import { COLORS } from "../../constants/commonStyles";
-import { RFValue } from "react-native-responsive-fontsize";
+import { StyleSheet } from 'react-native';
+import { COLORS } from '../../constants/commonStyles';
+import { RFValue } from 'react-native-responsive-fontsize';
 
 const styles = (COLOR: typeof COLORS) => StyleSheet.create({
     row: {
@@ -11,7 +11,7 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
         alignItems: 'center',
     },
     text: { fontSize: RFValue(14), fontWeight: '500', color: COLOR.DARK[100] },
-    safeView: { flex: 1, backgroundColor: COLOR.LIGHT[100] }
-})
+    safeView: { flex: 1, backgroundColor: COLOR.LIGHT[100] },
+});
 
-export default styles
+export default styles;

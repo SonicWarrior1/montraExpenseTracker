@@ -4,7 +4,8 @@ import {
   TextInputFocusEventData,
 } from 'react-native';
 import styles from './styles';
-import {COLORS} from '../../constants/commonStyles';
+import {COLORS, PlaceholderTextColor} from '../../constants/commonStyles';
+import React, {useMemo} from 'react';
 
 function CustomInput({
   value,
@@ -20,7 +21,7 @@ function CustomInput({
 }: Readonly<{
   value: string;
   onChangeText: (str: string) => void;
-  type: 'email' | 'name';
+  type: 'email' | 'name' | 'sentence';
   placeholderText: string;
   maxLength?: number;
   inputColor?: string;
@@ -29,6 +30,16 @@ function CustomInput({
   editable?: boolean;
   onPress?: () => void;
 }>) {
+  const autoCapitalize = useMemo(() => {
+    if (type === 'name') {
+      return 'words';
+    } else if (type === 'sentence') {
+      return 'sentences';
+    } else {
+      return 'none';
+    }
+  }, [type]);
+
   return (
     <TextInput
       style={[styles.input, {color: inputColor, flex: flex}]}
@@ -36,8 +47,8 @@ function CustomInput({
       keyboardType={type === 'name' ? 'default' : 'email-address'}
       value={value}
       onChangeText={onChangeText}
-      placeholderTextColor={COLORS.DARK[25]}
-      autoCapitalize={type === 'name' ? 'words' : 'none'}
+      placeholderTextColor={PlaceholderTextColor}
+      autoCapitalize={autoCapitalize}
       autoCorrect={false}
       maxLength={maxLength}
       onBlur={onBlur}
@@ -46,4 +57,4 @@ function CustomInput({
     />
   );
 }
-export default CustomInput;
+export default React.memo(CustomInput);

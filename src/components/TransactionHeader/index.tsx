@@ -28,8 +28,15 @@ function TransactionHeader({
       <Dropdown
         style={styles.dropdown}
         renderLeftIcon={() => (
-          <View>{ICONS.ArrowDown({width: 15, height: 15})}</View>
+          <View>
+            {ICONS.ArrowDown({
+              width: 15,
+              height: 15,
+              borderColor: COLOR.VIOLET[100],
+            })}
+          </View>
         )}
+        autoScroll={false}
         renderRightIcon={() => <></>}
         placeholder={STRINGS.Month}
         value={monthData[month]}
@@ -56,11 +63,13 @@ function TransactionHeader({
           borderColor: COLOR.DARK[100],
         })}
         {(filters.filter !== 'none' ? 1 : 0) +
+          (filters.sort !== 'none' ? 1 : 0) +
           (filters.cat.length > 0 ? filters.cat.length : 0) !==
           0 && (
           <View style={styles.notifCount}>
             <Text style={{color: COLORS.LIGHT[100]}}>
               {(filters.filter !== 'none' ? 1 : 0) +
+                (filters.sort !== 'none' ? 1 : 0) +
                 (filters.cat.length > 0 ? filters.cat.length : 0)}
             </Text>
           </View>

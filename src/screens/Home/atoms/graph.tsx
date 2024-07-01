@@ -1,24 +1,31 @@
-import React, {useState} from 'react';
-import {Dimensions, Pressable, Text, View} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {Dimensions, Pressable, Text, useColorScheme, View} from 'react-native';
 import {LineChart} from 'react-native-gifted-charts';
 import {COLORS} from '../../../constants/commonStyles';
-import {transactionType} from '../../../defs/transaction';
 import style from '../styles';
 import {STRINGS} from '../../../constants/strings';
 import {useAppTheme} from '../../../hooks/themeHook';
+import {useAppSelector} from '../../../redux/store';
+import {Timestamp} from '@react-native-firebase/firestore';
+import LinegraphLabel from '../../../components/LinegraphLabel';
+import {OnlineTransactionModel} from '../../../DbModels/OnlineTransactionModel';
+import {OfflineTransactionModel} from '../../../DbModels/OfflineTransactionModel';
 
 function Graph({
   data,
   month,
 }: Readonly<{
-  data: {
-    [key: string]: transactionType;
-  };
+  data: (OnlineTransactionModel | OfflineTransactionModel)[];
   month: number;
 }>) {
+  const currency = useAppSelector(state => state.user.currentUser?.currency);
+  const conversion = useAppSelector(state => state.transaction.conversion);
+  const theme = useAppSelector(state => state.user.currentUser?.theme);
   const COLOR = useAppTheme();
   const styles = style(COLOR);
-  const [graphDay, setGraphDay] = useState(0);
+  const scheme = useColorScheme();
+  const finalTheme = theme === 'device' ? scheme : theme;
+  const [graphDay, setGraphDay] = useState<number>(0);
   const startOfToday = new Date().setHours(0, 0, 0, 0) / 1000;
   const startOfWeek = Math.floor(
     (new Date().setHours(0, 0, 0, 0) - new Date().getDay() * 86400000) / 1000,
@@ -26,7 +33,7 @@ function Graph({
   const startOfYear = Math.floor(
     new Date(new Date().setMonth(0, 1)).setHours(0, 0, 0, 0) / 1000,
   );
-  const graphData = Object.values(data)
+  const graphData = data
     .filter(item => {
       if (graphDay === 0) {
         return (
@@ -36,8 +43,9 @@ function Graph({
         return item.timeStamp.seconds >= startOfWeek && item.type === 'expense';
       } else if (graphDay === 2) {
         return (
-          item.timeStamp.toDate().getMonth() === month &&
-          item.type === 'expense'
+          Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+            .toDate()
+            .getMonth() === month && item.type === 'expense'
         );
       } else {
         return item.timeStamp.seconds >= startOfYear && item.type === 'expense';
@@ -45,8 +53,42 @@ function Graph({
     })
     .sort((a, b) => a.timeStamp.seconds - b.timeStamp.seconds)
     .map(item => {
-      return {value: item.amount};
+      return {
+        value: item.amount,
+        date:
+          graphDay === 0
+            ? Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+                .toDate()
+                .getHours() +
+              ':' +
+              (Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+                .toDate()
+                .getMinutes() < 10
+                ? '0' +
+                  Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+                    .toDate()
+                    .getMinutes()
+                : Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+                    .toDate()
+                    .getMinutes())
+            : Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+                .toDate()
+                .getDay() +
+              '/' +
+              Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+                .toDate()
+                .getMonth() +
+              '/' +
+              Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+                .toDate()
+                .getFullYear(),
+      };
     });
+  useEffect(() => {
+    if (month !== new Date().getMonth()) {
+      setGraphDay(2);
+    }
+  }, [month]);
   return (
     <>
       {graphData.length <= 1 ? (
@@ -54,7 +96,7 @@ function Graph({
           <Text style={styles.emptyText}>{STRINGS.NotEnoughData}</Text>
         </View>
       ) : (
-        <View style={{transform: [{translateX: -10}]}}>
+        <View style={{transform: [{translateX: -28}]}}>
           <LineChart
             height={180}
             data={graphData}
@@ -63,8 +105,8 @@ function Graph({
             startFillColor1={COLORS.VIOLET[40]}
             endFillColor1={COLOR.LIGHT[100]}
             isAnimated={true}
-            initialSpacing={0}
-            width={Dimensions.get('screen').width}
+            // initialSpacing={0}
+            width={Dimensions.get('screen').width * 1.04}
             hideDataPoints
             thickness={12}
             hideRules
@@ -75,60 +117,107 @@ function Graph({
             curved={true}
             overflowBottom={-1}
             onlyPositive
+            disableScroll
+            yAxisExtraHeight={30}
+            pointerConfig={{
+              stripOverPointer: true,
+              pointerStripHeight: 190,
+              pointerStripColor: 'lightgray',
+              pointerStripWidth: 2,
+              pointerColor: 'lightgray',
+              pointerLabelWidth: 100,
+              activatePointersOnLongPress: true,
+              autoAdjustPointerLabelPosition: true,
+              pointerLabelComponent: (items: {date: string; value: number}[]) =>
+                LinegraphLabel({
+                  items: items,
+                  currency: currency,
+                  conversion: conversion,
+                  COLOR: COLOR,
+                }),
+            }}
           />
         </View>
       )}
       <View style={styles.dayRow}>
-        <Pressable
-          style={[
-            styles.filterBtn,
-            {
-              backgroundColor:
-                graphDay === 0 ? COLOR.YELLOW[20] : COLOR.LIGHT[100],
-            },
-          ]}
-          onPress={() => {
-            setGraphDay(0);
-          }}>
-          <Text
+        {month === new Date().getMonth() && (
+          <Pressable
             style={[
-              styles.filterBtnText,
+              styles.filterBtn,
               {
-                color: graphDay === 0 ? COLORS.YELLOW[100] : COLORS.DARK[25],
-                fontWeight: graphDay === 0 ? '700' : '500',
+                backgroundColor:
+                  graphDay === 0
+                    ? COLOR.YELLOW[20]
+                    : finalTheme === 'light'
+                    ? COLOR.LIGHT[100]
+                    : COLOR.LIGHT[40],
+                width:
+                  month === new Date().getMonth()
+                    ? Dimensions.get('screen').width / 4.2
+                    : Dimensions.get('screen').width / 2.2,
               },
-            ]}>
-            {STRINGS.Today}
-          </Text>
-        </Pressable>
-        <Pressable
-          style={[
-            styles.filterBtn,
-            {
-              backgroundColor:
-                graphDay === 1 ? COLOR.YELLOW[20] : COLOR.LIGHT[100],
-            },
-          ]}
-          onPress={() => {
-            setGraphDay(1);
-          }}>
-          <Text
+            ]}
+            onPress={() => {
+              setGraphDay(0);
+            }}>
+            <Text
+              style={[
+                styles.filterBtnText,
+                {
+                  color: graphDay === 0 ? COLORS.YELLOW[100] : COLORS.DARK[25],
+                  fontWeight: graphDay === 0 ? '700' : '500',
+                },
+              ]}>
+              {STRINGS.Today}
+            </Text>
+          </Pressable>
+        )}
+        {month === new Date().getMonth() && (
+          <Pressable
             style={[
-              styles.filterBtnText,
+              styles.filterBtn,
               {
-                color: graphDay === 1 ? COLORS.YELLOW[100] : COLORS.DARK[25],
-                fontWeight: graphDay === 1 ? '700' : '500',
+                backgroundColor:
+                  graphDay === 1
+                    ? COLOR.YELLOW[20]
+                    : finalTheme === 'light'
+                    ? COLOR.LIGHT[100]
+                    : COLOR.LIGHT[40],
+                width:
+                  month === new Date().getMonth()
+                    ? Dimensions.get('screen').width / 4.2
+                    : Dimensions.get('screen').width / 2.2,
               },
-            ]}>
-            {STRINGS.Week}
-          </Text>
-        </Pressable>
+            ]}
+            onPress={() => {
+              setGraphDay(1);
+            }}>
+            <Text
+              style={[
+                styles.filterBtnText,
+                {
+                  color: graphDay === 1 ? COLORS.YELLOW[100] : COLORS.DARK[25],
+                  fontWeight: graphDay === 1 ? '700' : '500',
+                },
+              ]}>
+              {STRINGS.Week}
+            </Text>
+          </Pressable>
+        )}
         <Pressable
           style={[
             styles.filterBtn,
             {
               backgroundColor:
-                graphDay === 2 ? COLOR.YELLOW[20] : COLOR.LIGHT[100],
+                graphDay === 2
+                  ? COLOR.YELLOW[20]
+                  : finalTheme === 'light'
+                  ? COLOR.LIGHT[100]
+                  : COLOR.LIGHT[40],
+              width:
+                month === new Date().getMonth()
+                  ? Dimensions.get('screen').width / 4.2
+                  : Dimensions.get('screen').width / 2.2,
             },
           ]}
           onPress={() => {
@@ -150,7 +239,15 @@ function Graph({
             styles.filterBtn,
             {
               backgroundColor:
-                graphDay === 3 ? COLOR.YELLOW[20] : COLOR.LIGHT[100],
+                graphDay === 3
+                  ? COLOR.YELLOW[20]
+                  : finalTheme === 'light'
+                  ? COLOR.LIGHT[100]
+                  : COLOR.LIGHT[40],
+              width:
+                month === new Date().getMonth()
+                  ? Dimensions.get('screen').width / 4.2
+                  : Dimensions.get('screen').width / 2.2,
             },
           ]}
           onPress={() => {

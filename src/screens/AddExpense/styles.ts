@@ -1,8 +1,8 @@
 import { StyleSheet } from 'react-native';
-import { COLORS } from '../../constants/commonStyles';
+import { COLORS, InputBorderColor } from '../../constants/commonStyles';
 import { RFValue } from 'react-native-responsive-fontsize';
 const styles = (COLOR: typeof COLORS) => StyleSheet.create({
-    safeView: { flex: 1, backgroundColor: COLOR.PRIMARY.RED },
+    safeView: {  backgroundColor: COLOR.PRIMARY.RED },
     mainView: {
         justifyContent: 'flex-end',
     },
@@ -117,7 +117,7 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
         borderRadius: 30,
         position: 'absolute',
         left: '44%',
-        borderColor: COLOR.LIGHT[20],
+        borderColor: InputBorderColor,
     },
     flex: { flex: 1 },
 });

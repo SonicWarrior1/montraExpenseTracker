@@ -1,6 +1,14 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import {FlatList, Pressable, SafeAreaView, Text, View} from 'react-native';
-import {useAppSelector} from '../../redux/store';
+import {
+  Alert,
+  FlatList,
+  Pressable,
+  SafeAreaView,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import {useAppDispatch, useAppSelector} from '../../redux/store';
 import {NotificationScreenProps} from '../../defs/navigation';
 import {ICONS} from '../../constants/icons';
 import firestore, {Timestamp} from '@react-native-firebase/firestore';
@@ -9,6 +17,12 @@ import {encrypt} from '../../utils/encryption';
 import {STRINGS} from '../../constants/strings';
 import {useAppTheme} from '../../hooks/themeHook';
 import {Swipeable} from 'react-native-gesture-handler';
+import Spacer from '../../components/Spacer';
+import {useNetInfo} from '@react-native-community/netinfo';
+import {useRealm} from '@realm/react';
+import {UpdateMode} from 'realm';
+import {updateNotification} from '../../redux/reducers/userSlice';
+import NotificationListItem from './atoms/NotificationListItem';
 
 function NotificationScreen({navigation}: Readonly<NotificationScreenProps>) {
   // redux
@@ -16,52 +30,104 @@ function NotificationScreen({navigation}: Readonly<NotificationScreenProps>) {
     state => state.user.currentUser?.notification,
   );
   const uid = useAppSelector(state => state.user.currentUser?.uid);
+  const dispatch = useAppDispatch();
   // constants
   const COLOR = useAppTheme();
   const styles = style(COLOR);
   const userDoc = firestore().collection('users').doc(uid);
+  const {isConnected} = useNetInfo();
+  const realm = useRealm();
+
   // state
-  const [menu, setMenu] = useState(false);
+  const [menu, setMenu] = useState<boolean>(false);
   // functions
   const handleMarkRead = useCallback(async () => {
     try {
-      const readNotifications = Object.values(notifications!).reduce(
-        (
-          acc: {
-            [key: string]: {
-              category: string;
-              type: string;
-              id: string;
-              time: Timestamp;
-              read: boolean;
+      if (!isConnected) {
+        for (const item of Object.values(notifications!)) {
+          dispatch(updateNotification({type: 'read', id: item.id}));
+          realm.write(() => {
+            realm.create(
+              'notification',
+              {
+                ...item,
+                read: true,
+              },
+              UpdateMode.All,
+            );
+          });
+        }
+      } else {
+        const readNotifications = Object.values(notifications!).reduce(
+          (
+            acc: {
+              [key: string]: {
+                category: string;
+                type: string;
+                id: string;
+                time: Timestamp;
+                read: boolean;
+              };
+            },
+            val,
+          ) => {
+            acc[val.id] = {
+              ...val,
+              category: encrypt(val.category, uid!),
+              type: encrypt(val.type, uid!),
+              read: true,
             };
+            return acc;
           },
-          val,
-        ) => {
-          acc[val.id] = {
-            ...val,
-            category: encrypt(val.category, uid!),
-            type: encrypt(val.type, uid!),
-            read: true,
-          };
-          return acc;
+          {},
+        );
+        await userDoc.update({notification: readNotifications});
+      }
+      setMenu(false);
+    } catch (e) {}
+  }, [notifications, uid, isConnected, userDoc]);
+  const handleDelete = useCallback(() => {
+    Alert.alert(STRINGS.AreYouSure, STRINGS.AreYouSureDelete, [
+      {
+        text: STRINGS.No,
+        onPress: () => {
+          (async () => {
+            setMenu(false);
+            console.log('OK Pressed');
+          })();
         },
-        {},
-      );
-      await userDoc.update({notification: readNotifications});
-      setMenu(false);
-    } catch (e) {
-      console.log(e);
-    }
-  }, [notifications, uid]);
-  const handleDelete = useCallback(async () => {
-    try {
-      await userDoc.update({notification: {}});
-      setMenu(false);
-    } catch (e) {
-      console.log(e);
-    }
-  }, [uid]);
+      },
+      {
+        text: STRINGS.Yes,
+        onPress: () => {
+          (async () => {
+            try {
+              setMenu(false);
+              if (!isConnected) {
+                for (const item of Object.values(notifications!)) {
+                  dispatch(updateNotification({type: 'delete', id: item.id}));
+                  realm.write(() => {
+                    realm.create(
+                      'notification',
+                      {
+                        ...item,
+                        deleted: true,
+                      },
+                      UpdateMode.All,
+                    );
+                  });
+                }
+              } else {
+                await userDoc.update({notification: {}});
+              }
+            } catch (e) {
+              console.log(e);
+            }
+          })();
+        },
+      },
+    ]);
+  }, [uid, isConnected, notifications, userDoc]);
   const handleSingleDelete = useCallback(
     (item: {
         category: string;
@@ -72,39 +138,53 @@ function NotificationScreen({navigation}: Readonly<NotificationScreenProps>) {
       }) =>
       async () => {
         try {
-          const deletedNotifications = Object.values(notifications!).reduce(
-            (
-              acc: {
-                [key: string]: {
-                  category: string;
-                  type: string;
-                  id: string;
-                  time: Timestamp;
-                  read: boolean;
-                };
+          if (!isConnected) {
+            dispatch(updateNotification({type: 'delete', id: item.id}));
+            realm.write(() => {
+              realm.create(
+                'notification',
+                {
+                  ...item,
+                  deleted: true,
+                },
+                UpdateMode.All,
+              );
+            });
+          } else {
+            const deletedNotifications = Object.values(notifications!).reduce(
+              (
+                acc: {
+                  [key: string]: {
+                    category: string;
+                    type: string;
+                    id: string;
+                    time: Timestamp;
+                    read: boolean;
+                  };
+                },
+                val,
+              ) => {
+                if (val.id !== item.id) {
+                  acc[val.id] = {
+                    ...val,
+                    category: encrypt(val.category, uid!),
+                    type: encrypt(val.type, uid!),
+                    read: true,
+                  };
+                }
+                return acc;
               },
-              val,
-            ) => {
-              if (val.id !== item.id) {
-                acc[val.id] = {
-                  ...val,
-                  category: encrypt(val.category, uid!),
-                  type: encrypt(val.type, uid!),
-                  read: true,
-                };
-              }
-              return acc;
-            },
-            {},
-          );
-          await userDoc.update({
-            notification: deletedNotifications,
-          });
+              {},
+            );
+            await userDoc.update({
+              notification: deletedNotifications,
+            });
+          }
         } catch (e) {
           console.log(e);
         }
       },
-    [notifications],
+    [notifications, isConnected, userDoc, uid],
   );
   useEffect(() => {
     if (
@@ -113,15 +193,20 @@ function NotificationScreen({navigation}: Readonly<NotificationScreenProps>) {
     ) {
       handleMarkRead();
     }
-  });
+  }, [notifications]);
   return (
     <SafeAreaView style={styles.safeView}>
-      <View style={styles.header}>
+      <Pressable
+        onPress={() => {
+          if (menu) {
+            setMenu(false);
+          }
+        }}
+        style={styles.header}>
         <Pressable
           onPress={() => {
             navigation.goBack();
-          }}
-          style={{marginLeft: 15}}>
+          }}>
           {ICONS.ArrowLeft({
             height: 25,
             width: 25,
@@ -130,14 +215,17 @@ function NotificationScreen({navigation}: Readonly<NotificationScreenProps>) {
           })}
         </Pressable>
         <Text style={styles.headerTitle}>{STRINGS.Notifications}</Text>
-        <Pressable
-          style={{marginRight: 15}}
-          onPress={() => {
-            setMenu(menu => !menu);
-          }}>
-          {ICONS.More({height: 20, width: 20, color: COLOR.DARK[100]})}
-        </Pressable>
-      </View>
+        {Object.values(notifications!).length === 0 ? (
+          <Spacer width={25} />
+        ) : (
+          <Pressable
+            onPress={() => {
+              setMenu(menu => !menu);
+            }}>
+            {ICONS.More({height: 20, width: 20, color: COLOR.DARK[100]})}
+          </Pressable>
+        )}
+      </Pressable>
       {notifications === undefined ||
       Object.values(notifications).length === 0 ? (
         <View style={styles.center}>
@@ -148,54 +236,26 @@ function NotificationScreen({navigation}: Readonly<NotificationScreenProps>) {
           data={Object.values(notifications).sort(
             (a, b) => b.time.seconds - a.time.seconds,
           )}
-          renderItem={({item}) => {
-            return (
-              <Swipeable
-                renderRightActions={() => {
-                  return (
-                    <Pressable
-                      style={styles.delete}
-                      onPress={handleSingleDelete(item)}>
-                      {ICONS.Trash({
-                        height: 30,
-                        width: 30,
-                        color: COLOR.LIGHT[100],
-                      })}
-                    </Pressable>
-                  );
-                }}>
-                <View style={styles.ctr}>
-                  <View style={{maxWidth: '85%'}}>
-                    <Text style={styles.text1} numberOfLines={1}>
-                      {item.category[0].toUpperCase() + item.category.slice(1)}{' '}
-                      {STRINGS.BudgetExceed}
-                    </Text>
-                    <Text style={styles.text2} numberOfLines={1}>
-                      Your{' '}
-                      {item.category[0].toUpperCase() + item.category.slice(1)}{' '}
-                      {STRINGS.BudgetExceed}
-                    </Text>
-                  </View>
-                  <Text style={styles.text2}>
-                    {item.time.toDate().getHours()}.
-                    {item.time.toDate().getMinutes() < 10
-                      ? '0' + item.time.toDate().getMinutes()
-                      : item.time.toDate().getMinutes()}
-                  </Text>
-                </View>
-              </Swipeable>
-            );
-          }}
+          renderItem={({item}) => (
+            <Pressable
+              onPress={() => {
+                if (menu) {
+                  setMenu(false);
+                }
+              }}>
+              <NotificationListItem
+                handleSingleDelete={handleSingleDelete}
+                item={item}
+              />
+            </Pressable>
+          )}
         />
       )}
       {menu && (
         <View style={styles.menu}>
-          <Pressable onPress={handleMarkRead}>
-            <Text style={styles.menuText}>{STRINGS.MarkAllRead}</Text>
-          </Pressable>
-          <Pressable onPress={handleDelete}>
+          <TouchableOpacity onPress={handleDelete}>
             <Text style={styles.menuText}>{STRINGS.RemoveAll}</Text>
-          </Pressable>
+          </TouchableOpacity>
         </View>
       )}
     </SafeAreaView>

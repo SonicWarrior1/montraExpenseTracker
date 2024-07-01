@@ -6,9 +6,9 @@ const styles = (COLOR:typeof COLORS) => StyleSheet.create({
         borderWidth: 1,
         borderRadius: 20,
         height: 40,
-        paddingHorizontal: 20,
+        paddingHorizontal: 12,
+        width:140,
         borderColor: COLOR.LIGHT[20],
-        minWidth: 120,
     }, ctr: {
         width: '100%',
         flexDirection: 'row',
