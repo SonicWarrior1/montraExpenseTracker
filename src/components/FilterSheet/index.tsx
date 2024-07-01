@@ -33,8 +33,8 @@ function FilterSheet() {
   const isOpen = useAppSelector(state => state.transaction.isFilterOpen);
   const selectedCats = useAppSelector(state => state.transaction.filters.cat);
   // state
-  const [filter, setFilter] = useState(-1);
-  const [sort, setSort] = useState(-1);
+  const [filter, setFilter] = useState<number>(-1);
+  const [sort, setSort] = useState<number>(-1);
   useEffect(() => {
     if (isOpen === true) {
       ref.current?.present();

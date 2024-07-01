@@ -16,7 +16,7 @@ function CustomDropdown({
   catColors,
   disable,
 }: Readonly<{
-  data: Array<any>;
+  data: Array<{label: number | string; value: number | string}>;
   onChange: (item: any) => void;
   value: any;
   placeholder: string;

@@ -16,11 +16,11 @@ import {TransactionScreenProps} from '../../defs/navigation';
 import {NAVIGATION, STRINGS} from '../../constants/strings';
 import {useAppTheme} from '../../hooks/themeHook';
 import {Timestamp} from '@react-native-firebase/firestore';
-import TransactionItem from './atoms/TransactionItem';
 import TabBackdrop from '../../components/TabBackdrop';
 import {useQuery} from '@realm/react';
 import {OnlineTransactionModel} from '../../DbModels/OnlineTransactionModel';
 import {OfflineTransactionModel} from '../../DbModels/OfflineTransactionModel';
+import TransactionItem from '../../components/TransactionListItem/TransactionItem';
 function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
   // constants
   const COLOR = useAppTheme();
@@ -29,18 +29,16 @@ function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
   // redux
   const onlineData = useQuery(OnlineTransactionModel);
   const offlineData = useQuery(OfflineTransactionModel);
-  // console.log('dsjfndsijfn', onlineData, offlineData);
   const transaction = [
     ...onlineData.filter(item => item.changed !== true),
     ...offlineData.filter(item => item.operation !== 'delete'),
   ];
 
-  // console.log('ONLINE', onlineData, 'OFFLINE', offlineData);
   const [offset, setOffset] = useState<number>(0);
   const limit = 10;
   const filters = useAppSelector(state => state.transaction.filters);
   // state
-  const [month, setMonth] = useState(new Date().getMonth());
+  const [month, setMonth] = useState<number>(new Date().getMonth());
   // functions
   function filterDataByDate(
     data: (OnlineTransactionModel | OfflineTransactionModel)[],

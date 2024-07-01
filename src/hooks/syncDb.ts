@@ -124,7 +124,7 @@ export const syncDb = async ({
                         if (item.attachementType !== 'none') {
                             if (item.attachement !== '') {
                                 if (!item.attachement?.startsWith('https://firebasestorage.googleapis.com')) {
-                                    console.log(item.attachement);
+                                    // console.log(item.attachement);
                                     await storage().ref(`users/${uid}/${item.id}`).putString(item.attachement!, firebase.storage.StringFormat.BASE64);
                                     url = await storage().ref(`users/${uid}/${item.id}`).getDownloadURL();
                                 } else {

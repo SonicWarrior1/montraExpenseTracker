@@ -23,8 +23,8 @@ function ForgotPassword({navigation}: Readonly<ForgotScreenProps>) {
   const styles = style(COLOR);
   const dispatch = useAppDispatch();
   // state
-  const [email, setEmail] = useState('');
-  const [form, setForm] = useState(false);
+  const [email, setEmail] = useState<string>('');
+  const [form, setForm] = useState<boolean>(false);
   // functions
   function onChangeEmail(str: string) {
     setEmail(str);
@@ -33,9 +33,7 @@ function ForgotPassword({navigation}: Readonly<ForgotScreenProps>) {
     try {
       const snapshot = await firestore().collection('users').get();
       const res = snapshot.docs.filter(doc => {
-        return (
-          (decrypt(doc.data().email, doc.data().uid) ?? '') === email
-        );
+        return (decrypt(doc.data().email, doc.data().uid) ?? '') === email;
       });
       return res.length !== 0;
     } catch (e) {

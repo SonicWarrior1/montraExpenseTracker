@@ -15,6 +15,7 @@ import { UpdateMode } from 'realm';
 import { setExpense, setIncome, userLoggedIn } from '../redux/reducers/userSlice';
 import { TransFromJson } from './transFuncs';
 import Realm from '@realm/react';
+type transType = 'income' | 'transfer' | 'expense';
 export function createTransaction({
     id,
     url,
@@ -48,7 +49,7 @@ export function createTransaction({
     repeatData: repeatDataType | RepeatDataModel,
     isEdit: boolean,
     transaction: transactionType | OnlineTransactionModel | OfflineTransactionModel,
-    pageType: 'income' | 'expense' | 'transfer',
+    pageType: transType,
     uid: string,
     from: string,
     to: string
@@ -458,7 +459,7 @@ export function formatAMPM(date: Date) {
     return hours + ':' + (minutes < 10 ? '0' + minutes : minutes) + ' ' + ampm;
 }
 
-type transType = 'income' | 'transfer' | 'expense';
+
 
 export const handleOnline = async ({
     id,
@@ -620,7 +621,6 @@ export const handleOffline = async ({
     TransOnline: OnlineTransactionModel | null
 }) => {
     console.log('offline');
-    // const gg = new Date.now();
     let trans = TransFromJson(
         createTransaction({
             id: id,
@@ -651,151 +651,47 @@ export const handleOffline = async ({
         ).toDate();
     }
     if (pageType === 'income') {
-        if (isEdit) {
-            dispatch(setIncome({
-                month: month, category: category, amount: user?.income[month][category!]! -
-                    prevTransaction?.amount! +
-                    (Number(amount.replace(/,/g, '')) /
-                        (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1)),
-            }));
-            realm.write(() => {
-                realm.create(
-                    'amount',
-                    {
-                        id: month + '_' + category + '_' + pageType,
-                        amount: user?.income[month][category!]! -
-                            prevTransaction?.amount! +
-                            (Number(amount.replace(/,/g, '')) /
-                                (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1)),
-                    },
-                    UpdateMode.All,
-                );
-                console.log('done');
-            });
-        } else {
-            dispatch(setIncome({
-                month: month, category: category, amount: (user?.income?.[month]?.[category!] ?? 0) +
-                    (Number(amount.replace(/,/g, '')) /
-                        (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1)),
-            }));
-            realm.write(() => {
-                realm.create(
-                    'amount',
-                    {
-                        id: month + '_' + category + '_' + pageType,
-                        amount: (user?.income?.[month]?.[category!] ?? 0) +
-                            (Number(amount.replace(/,/g, '')) /
-                                (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1)),
-                    },
-                    UpdateMode.All,
-                );
-                console.log('done');
-            });
-        }
+        handleOfflineIncome({
+            amount: amount,
+            category: category,
+            conversion: conversion,
+            currency: currency,
+            dispatch: dispatch,
+            isEdit: isEdit,
+            month: month,
+            pageType: pageType,
+            prevTransaction: prevTransaction,
+            realm: realm,
+            user: user
+        })
     } else if (pageType === 'expense') {
-        if (isEdit) {
-            dispatch(setExpense({
-                month: month, category: category, amount: (user?.spend?.[month]?.[category!] ?? 0) -
-                    prevTransaction?.amount! +
-                    (Number(amount.replace(/,/g, '')) /
-                        (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1)),
-            }));
-            realm.write(() => {
-                realm.create(
-                    'amount',
-                    {
-                        id:
-                            month +
-                            '_' +
-                            category +
-                            '_' +
-                            pageType,
-                        amount: (user?.spend?.[month]?.[category!] ?? 0) -
-                            prevTransaction?.amount! +
-                            (Number(amount.replace(/,/g, '')) /
-                                (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1)),
-                    },
-                    UpdateMode.All,
-                );
-                console.log('done');
-            });
-        } else {
-            dispatch(setExpense({
-                month: month, category: category, amount: (user?.spend?.[month]?.[category!] ?? 0) +
-                    (Number(amount.replace(/,/g, '')) /
-                        (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1)),
-            }));
-            realm.write(() => {
-                realm.create(
-                    'amount',
-                    {
-                        id:
-                            month +
-                            '_' +
-                            category +
-                            '_' +
-                            pageType,
-                        amount: (user?.spend?.[month]?.[category!] ?? 0) +
-                            (Number(amount.replace(/,/g, '')) /
-                                (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1)),
-                    },
-                    UpdateMode.All,
-                );
-                console.log('done');
-            });
-        }
+        handleOfflineExpenseTransfer({
+            amount: amount,
+            category: category,
+            conversion: conversion,
+            currency: currency,
+            dispatch: dispatch,
+            isEdit: isEdit,
+            month: month,
+            pageType: pageType,
+            prevTransaction: prevTransaction,
+            realm: realm,
+            user: user
+        })
     } else {
-        if (isEdit) {
-            dispatch(setExpense({
-                month: month, category: 'transfer', amount: (user?.spend?.[month]?.transfer ?? 0) -
-                    prevTransaction?.amount! +
-                    (Number(amount.replace(/,/g, '')) /
-                        (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1)),
-            }));
-            realm.write(() => {
-                realm.create(
-                    'amount',
-                    {
-                        id:
-                            month +
-                            '_' +
-                            'transfer' +
-                            '_' +
-                            pageType,
-                        amount: (user?.spend?.[month]?.transfer ?? 0) -
-                            prevTransaction?.amount! +
-                            (Number(amount.replace(/,/g, '')) /
-                                (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1)),
-                    },
-                    UpdateMode.All,
-                );
-                console.log('done');
-            });
-        } else {
-            dispatch(setExpense({
-                month: month, category: 'transfer', amount: (user?.spend?.[month]?.transfer ?? 0) +
-                    (Number(amount.replace(/,/g, '')) /
-                        (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1)),
-            }));
-            realm.write(() => {
-                realm.create(
-                    'amount',
-                    {
-                        id:
-                            month +
-                            '_' +
-                            'transfer' +
-                            '_' +
-                            pageType,
-                        amount: (user?.spend?.[month]?.transfer ?? 0) +
-                            (Number(amount.replace(/,/g, '')) /
-                                (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1)),
-                    },
-                    UpdateMode.All,
-                );
-                console.log('done');
-            });
-        }
+        handleOfflineExpenseTransfer({
+            amount: amount,
+            category: 'transfer',
+            conversion: conversion,
+            currency: currency,
+            dispatch: dispatch,
+            isEdit: isEdit,
+            month: month,
+            pageType: pageType,
+            prevTransaction: prevTransaction,
+            realm: realm,
+            user: user
+        })
     }
     if (pageType !== 'transfer') {
         const totalBudget = user?.budget?.[month]?.[category!];
@@ -812,7 +708,7 @@ export const handleOffline = async ({
     if (trans.freq) {
         trans.freq.date = Timestamp.fromDate(trans.freq?.date as Date);
     }
-    // console.log('hsdbfshdbfjshdbfshdn');
+    console.log('hsdbfshdbfjshdbfshdn');
     realm.write(() => {
         if (isEdit && TransOnline) {
             realm.create(
@@ -827,10 +723,158 @@ export const handleOffline = async ({
             UpdateMode.All,
         );
     });
-    const yy = new Date.now();
-    console.log(yy - gg);
-    // console.log('dsjfnsdkj nfsejkb fuizh difzhd luk');
+    console.log('dsjfnsdkj nfsejkb fuizh difzhd luk');
 };
+function handleOfflineExpenseTransfer({
+    isEdit,
+    dispatch,
+    realm,
+    month,
+    category,
+    user,
+    prevTransaction,
+    amount,
+    conversion,
+    currency,
+    pageType }: {
+        amount: string,
+        pageType: 'income' | 'transfer' | 'expense',
+        conversion: {
+            [key: string]: {
+                [key: string]: number;
+            };
+        },
+        currency: string | undefined,
+        category: string | undefined,
+        isEdit: boolean,
+        prevTransaction: transactionType | OnlineTransactionModel | OfflineTransactionModel | undefined,
+        month: number,
+        dispatch,
+        user: UserType | undefined,
+        realm: Realm,
+    }) {
+    if (isEdit) {
+        dispatch(setExpense({
+            month: month, category: category, amount: (user?.spend?.[month]?.[category!] ?? 0) -
+                prevTransaction?.amount! +
+                (Number(amount.replace(/,/g, '')) /
+                    (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1)),
+        }));
+        realm.write(() => {
+            realm.create(
+                'amount',
+                {
+                    id:
+                        month +
+                        '_' +
+                        category +
+                        '_' +
+                        pageType,
+                    amount: (user?.spend?.[month]?.[category!] ?? 0) -
+                        prevTransaction?.amount! +
+                        (Number(amount.replace(/,/g, '')) /
+                            (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1)),
+                },
+                UpdateMode.All,
+            );
+            console.log('done');
+        });
+    } else {
+        dispatch(setExpense({
+            month: month, category: category, amount: (user?.spend?.[month]?.[category!] ?? 0) +
+                (Number(amount.replace(/,/g, '')) /
+                    (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1)),
+        }));
+        realm.write(() => {
+            realm.create(
+                'amount',
+                {
+                    id:
+                        month +
+                        '_' +
+                        category +
+                        '_' +
+                        pageType,
+                    amount: (user?.spend?.[month]?.[category!] ?? 0) +
+                        (Number(amount.replace(/,/g, '')) /
+                            (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1)),
+                },
+                UpdateMode.All,
+            );
+            console.log('done');
+        });
+    }
+}
+function handleOfflineIncome({
+    isEdit,
+    dispatch,
+    realm,
+    month,
+    category,
+    user,
+    prevTransaction,
+    amount,
+    conversion,
+    currency,
+    pageType }: {
+        amount: string,
+        pageType: 'income' | 'transfer' | 'expense',
+        conversion: {
+            [key: string]: {
+                [key: string]: number;
+            };
+        },
+        currency: string | undefined,
+        category: string | undefined,
+        isEdit: boolean,
+        prevTransaction: transactionType | OnlineTransactionModel | OfflineTransactionModel | undefined,
+        month: number,
+        dispatch,
+        user: UserType | undefined,
+        realm: Realm,
+    }) {
+    if (isEdit) {
+        dispatch(setIncome({
+            month: month, category: category, amount: user?.income[month][category!]! -
+                prevTransaction?.amount! +
+                (Number(amount.replace(/,/g, '')) /
+                    (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1)),
+        }));
+        realm.write(() => {
+            realm.create(
+                'amount',
+                {
+                    id: month + '_' + category + '_' + pageType,
+                    amount: user?.income[month][category!]! -
+                        prevTransaction?.amount! +
+                        (Number(amount.replace(/,/g, '')) /
+                            (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1)),
+                },
+                UpdateMode.All,
+            );
+            console.log('done');
+        });
+    } else {
+        dispatch(setIncome({
+            month: month, category: category, amount: (user?.income?.[month]?.[category!] ?? 0) +
+                (Number(amount.replace(/,/g, '')) /
+                    (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1)),
+        }));
+        realm.write(() => {
+            realm.create(
+                'amount',
+                {
+                    id: month + '_' + category + '_' + pageType,
+                    amount: (user?.income?.[month]?.[category!] ?? 0) +
+                        (Number(amount.replace(/,/g, '')) /
+                            (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1)),
+                },
+                UpdateMode.All,
+            );
+            console.log('done');
+        });
+    }
+}
 export async function handleOfflineNotification({ totalBudget, totalSpent, realm, category, dispatch, user }:
     {
         totalBudget: {

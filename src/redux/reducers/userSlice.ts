@@ -25,6 +25,7 @@ const UserSlice = createSlice({
             delete state.currentUser!.budget[action.payload.month][action.payload.cat];
         },
         setLoading(state, action) {
+            console.log('actionactionaction loading',action)
             state.loading = action.payload;
         },
         addExpenseCategory(state, action: PayloadAction<string>) {

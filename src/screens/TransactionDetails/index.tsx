@@ -62,8 +62,8 @@ function TransactionDetails({
   // ref
   const bottomSheetModalRef = useRef<BottomSheetModalMethods>(null);
   // state
-  const [showImage, setShowImage] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [showImage, setShowImage] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   // functions
   const headerRight = () => {
     return (
@@ -241,7 +241,7 @@ function TransactionDetails({
                               color: COLOR.RED[40],
                               marginTop: 20,
                             }}>
-                            No Internet Access
+                            {STRINGS.NoInternetAccess}
                           </Text>
                         ) : (
                           <Image

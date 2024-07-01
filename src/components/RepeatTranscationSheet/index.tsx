@@ -48,9 +48,9 @@ function RepeatTransactionSheet({
   const [freq, setFreq] = useState<freqType>(
     (repeatData?.freq as freqType) ?? undefined,
   );
-  const [month, setMonth] = useState(repeatData?.month ?? 1);
-  const [day, setDay] = useState(repeatData?.day ?? 1);
-  const [weekDay, setWeekDay] = useState(repeatData?.weekDay ?? 1);
+  const [month, setMonth] = useState<number>(repeatData?.month ?? 1);
+  const [day, setDay] = useState<number>(repeatData?.day ?? 1);
+  const [weekDay, setWeekDay] = useState<number>(repeatData?.weekDay ?? 1);
   const [end, setEnd] = useState<'date' | 'never'>(
     (repeatData?.end as 'date' | 'never') ?? undefined,
   );

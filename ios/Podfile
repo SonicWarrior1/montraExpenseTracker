@@ -24,6 +24,8 @@ target 'montraExpenseTracker' do
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
   pod 'react-native-blob-util', :path => '../node_modules/react-native-blob-util'
+  pod 'GoogleSignIn'
+  pod 'GoogleSignInSwiftSupport'
   target 'montraExpenseTrackerTests' do
     inherit! :complete
     # Pods for testing

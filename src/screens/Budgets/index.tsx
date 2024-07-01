@@ -5,25 +5,18 @@ import {ICONS} from '../../constants/icons';
 import CustomButton from '../../components/CustomButton';
 import Spacer from '../../components/Spacer';
 import {BudgetScreenProps} from '../../defs/navigation';
-import {
-  currencies,
-  monthData,
-  NAVIGATION,
-  STRINGS,
-} from '../../constants/strings';
+import {monthData, NAVIGATION, STRINGS} from '../../constants/strings';
 import {useAppSelector} from '../../redux/store';
-import {Bar} from 'react-native-progress';
-import {COLORS} from '../../constants/commonStyles';
 import {useAppTheme} from '../../hooks/themeHook';
 import TabBackdrop from '../../components/TabBackdrop';
-import {formatWithCommas, getMyColor} from '../../utils/commonFuncs';
+import BudgetItem from './atoms/BudgetItem';
 
 function BudgetScreen({navigation}: Readonly<BudgetScreenProps>) {
   // constants
   const COLOR = useAppTheme();
   const styles = style(COLOR);
   // state
-  const [month, setMonth] = useState(new Date().getMonth());
+  const [month, setMonth] = useState<number>(new Date().getMonth());
   // redux
   const budgets = useAppSelector(
     state => state.user.currentUser?.budget[month],
@@ -32,27 +25,8 @@ function BudgetScreen({navigation}: Readonly<BudgetScreenProps>) {
   const conversion = useAppSelector(state => state.transaction.conversion);
   const spend =
     useAppSelector(state => state.user.currentUser?.spend[month]) ?? {};
-  console.log(spend);
   // functions
-  const getValue = (
-    val: {
-      alert: boolean;
-      limit: number;
-      percentage: number;
-    },
-    key: string,
-  ) => {
-    if (val.limit - spend[key] < 0) {
-      return '0';
-    } else if (spend[key] === undefined) {
-      return (conversion.usd[currency!.toLowerCase()] * val.limit).toFixed(1);
-    } else {
-      return (
-        conversion.usd[currency!.toLowerCase()] *
-        (val.limit - (spend[key] ?? 0))
-      ).toFixed(1);
-    }
-  };
+
   const onPress = useCallback(() => {
     setMonth(month => {
       if (month < new Date().getMonth()) {
@@ -115,73 +89,18 @@ function BudgetScreen({navigation}: Readonly<BudgetScreenProps>) {
               data={Object.entries(budgets)}
               style={{marginTop: 15, width: '100%'}}
               showsVerticalScrollIndicator={false}
-              renderItem={({item}) => {
-                const key = item[0];
-                const val = item[1];
-                const color = getMyColor();
-                return (
-                  <Pressable
-                    key={key}
-                    style={styles.listItemCtr}
-                    onPress={() => {
-                      navigation.push(NAVIGATION.DetailBudget, {
-                        category: key,
-                        month: month,
-                      });
-                    }}>
-                    <View style={styles.catRow}>
-                      <View style={styles.catCtr}>
-                        <View
-                          style={[styles.colorBox, {backgroundColor: color}]}
-                        />
-                        <Text style={styles.catText}>
-                          {key[0].toUpperCase() + key.slice(1)}
-                        </Text>
-                      </View>
-                      {(spend[key] ?? 0) >= val.limit &&
-                        ICONS.Alert({
-                          height: 25,
-                          width: 25,
-                          color: COLORS.PRIMARY.RED,
-                        })}
-                    </View>
-                    <Text style={styles.text1}>
-                      Remaining {currencies[currency!].symbol}
-                      {formatWithCommas(Number(getValue(val, key)).toString())}
-                    </Text>
-                    <Bar
-                      progress={(spend[key] ?? 0) / val.limit}
-                      height={8}
-                      width={null}
-                      color={color}
-                    />
-                    <Text style={styles.text2}>
-                      {currencies[currency!].symbol}
-                      {formatWithCommas(
-                        Number(
-                          (
-                            conversion.usd[currency!.toLowerCase()] *
-                            (spend[key] ?? 0)
-                          ).toFixed(1),
-                        ).toString(),
-                      )}{' '}
-                      of {currencies[currency!].symbol}
-                      {formatWithCommas(
-                        Number(
-                          (
-                            conversion.usd[currency!.toLowerCase()] * val.limit
-                          ).toFixed(1),
-                        ).toString(),
-                      )}
-                    </Text>
-                    {(spend[key] ?? 0) >= val.limit && (
-                      <Text style={styles.limitText}>
-                        {STRINGS.LimitExceeded}
-                      </Text>
-                    )}
-                  </Pressable>
-                );
-              }}
+              renderItem={({item}) => (
+                <BudgetItem
+                  item={item}
+                  conversion={conversion}
+                  currency={currency}
+                  month={month}
+                  navigation={navigation}
+                  spend={spend}
+                  styles={styles}
+                  key={item[0]}
+                />
+              )}
             />
           )}
           {month === new Date().getMonth() && (

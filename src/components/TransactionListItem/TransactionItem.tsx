@@ -1,20 +1,20 @@
 import {Timestamp} from '@react-native-firebase/firestore';
-import {ColorSchemeName, Pressable, Text, View} from 'react-native';
-import style from '../styles';
-import {currencies, monthData, NAVIGATION} from '../../../constants/strings';
-import {COLORS} from '../../../constants/commonStyles';
-import {catIcons, ICONS} from '../../../constants/icons';
-import {useAppTheme} from '../../../hooks/themeHook';
-import {BottomParamList, RootStackParamList} from '../../../defs/navigation';
 import {BottomTabNavigationProp} from '@react-navigation/bottom-tabs';
 import {CompositeNavigationProp} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
-import {useAppSelector} from '../../../redux/store';
 import React from 'react';
-import {OnlineTransactionModel} from '../../../DbModels/OnlineTransactionModel';
-import {OfflineTransactionModel} from '../../../DbModels/OfflineTransactionModel';
-import {formatAMPM} from '../../../utils/firebase';
-import {formatWithCommas} from '../../../utils/commonFuncs';
+import {ColorSchemeName, Pressable, View, Text} from 'react-native';
+import {COLORS} from '../../constants/commonStyles';
+import {catIcons, ICONS} from '../../constants/icons';
+import {NAVIGATION, currencies, monthData} from '../../constants/strings';
+import {OfflineTransactionModel} from '../../DbModels/OfflineTransactionModel';
+import {OnlineTransactionModel} from '../../DbModels/OnlineTransactionModel';
+import {RootStackParamList, BottomParamList} from '../../defs/navigation';
+import {useAppTheme} from '../../hooks/themeHook';
+import {useAppSelector} from '../../redux/store';
+import {formatWithCommas} from '../../utils/commonFuncs';
+import {formatAMPM} from '../../utils/firebase';
+import style from './styles';
 
 const TransactionItem = ({
   item,
@@ -22,15 +22,27 @@ const TransactionItem = ({
   scheme,
   navigation,
   dateShow,
+  disabled,
 }: {
   item: OnlineTransactionModel | OfflineTransactionModel;
   theme: 'light' | 'device' | 'dark' | undefined;
   scheme: ColorSchemeName;
-  navigation: CompositeNavigationProp<
-    BottomTabNavigationProp<BottomParamList, 'Transaction', undefined>,
-    StackNavigationProp<RootStackParamList, keyof RootStackParamList, undefined>
-  >;
+  navigation:
+    | StackNavigationProp<RootStackParamList, 'FinancialReport', undefined>
+    | CompositeNavigationProp<
+        BottomTabNavigationProp<
+          BottomParamList,
+          'Transaction' | 'Home',
+          undefined
+        >,
+        StackNavigationProp<
+          RootStackParamList,
+          keyof RootStackParamList,
+          undefined
+        >
+      >;
   dateShow?: boolean;
+  disabled?: boolean;
 }) => {
   // constants
   const COLOR = useAppTheme();
@@ -71,6 +83,7 @@ const TransactionItem = ({
             finaltheme === 'light' ? COLORS.LIGHT[80] : COLORS.DARK[100],
         },
       ]}
+      disabled={disabled}
       onPress={() => {
         navigation.push(NAVIGATION.TransactionDetail, {
           transaction: item,
@@ -146,4 +159,4 @@ const TransactionItem = ({
   );
 };
 
-export default TransactionItem;
+export default React.memo(TransactionItem);

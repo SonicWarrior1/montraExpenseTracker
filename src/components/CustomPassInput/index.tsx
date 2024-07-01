@@ -25,7 +25,7 @@ function CustomPassInput({
   eyeColor?: string;
   inputColor?: string;
 }>) {
-  const [showPass, setShowPass] = useState(true);
+  const [showPass, setShowPass] = useState<boolean>(true);
   const COLOR = useAppTheme();
   return (
     <View style={styles.passInputContainer}>

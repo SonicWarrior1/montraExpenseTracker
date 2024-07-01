@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { COLORS } from '../../constants/commonStyles';
+import { COLORS, InputBorderColor } from '../../constants/commonStyles';
 import { RFValue } from 'react-native-responsive-fontsize';
 const styles = (COLOR: typeof COLORS) => StyleSheet.create({
     safeView: {  backgroundColor: COLOR.PRIMARY.RED },
@@ -117,7 +117,7 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
         borderRadius: 30,
         position: 'absolute',
         left: '44%',
-        borderColor: "#F1F1FA",
+        borderColor: InputBorderColor,
     },
     flex: { flex: 1 },
 });

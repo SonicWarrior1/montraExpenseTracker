@@ -20,10 +20,6 @@ import {CategoryModel} from './DbModels/CategoryModel';
 import {AmountModel} from './DbModels/AmountModel';
 import {NotificationModel} from './DbModels/NotificationModel';
 
-// GoogleSignin.configure({
-//   webClientId:
-//     '426728684733-08hbgavcdljaclium152ea992drr4ev3.apps.googleusercontent.com',
-// });
 firestore().settings({persistence: false});
 function App(): React.JSX.Element {
   return (

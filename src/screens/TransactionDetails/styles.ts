@@ -39,7 +39,10 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
         flexDirection: 'row',
         backgroundColor: COLOR.LIGHT[100],
         paddingVertical: 15,
-        justifyContent: 'space-between',
+        justifyContent: 'space-around',
+        // columnGap:25,
+        
+        // width:100,
         paddingHorizontal: 25,
         borderRadius: 12,
         borderWidth: 1,

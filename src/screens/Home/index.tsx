@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import style from './styles';
 import {useAppSelector} from '../../redux/store';
-import {catIcons, ICONS} from '../../constants/icons';
+import {ICONS} from '../../constants/icons';
 import {currencies, NAVIGATION, STRINGS} from '../../constants/strings';
 import {COLORS} from '../../constants/commonStyles';
 import {HomeScreenProps} from '../../defs/navigation';
@@ -24,12 +24,12 @@ import TabBackdrop from '../../components/TabBackdrop';
 import {useQuery} from '@realm/react';
 import {OnlineTransactionModel} from '../../DbModels/OnlineTransactionModel';
 import {OfflineTransactionModel} from '../../DbModels/OfflineTransactionModel';
-import {formatAMPM} from '../../utils/firebase';
 import {formatWithCommas} from '../../utils/commonFuncs';
+import TransactionItem from '../../components/TransactionListItem/TransactionItem';
 
 function Home({navigation, route}: Readonly<HomeScreenProps>) {
   // state
-  const [month, setMonth] = useState(new Date().getMonth());
+  const [month, setMonth] = useState<number>(new Date().getMonth());
   // redux
   const conversion = useAppSelector(state => state.transaction.conversion);
   const currency =
@@ -66,28 +66,6 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
   const styles = style(COLOR);
   const scheme = useColorScheme();
   const finalTheme = theme === 'device' ? scheme : theme;
-  const getAmtColor = (
-    item: OnlineTransactionModel | OfflineTransactionModel,
-  ) => {
-    if (item.type === 'expense') {
-      return COLORS.PRIMARY.RED;
-    } else if (item.type === 'income') {
-      return COLORS.PRIMARY.GREEN;
-    } else {
-      return COLORS.PRIMARY.BLUE;
-    }
-  };
-  const getAmtSymbol = (
-    item: OnlineTransactionModel | OfflineTransactionModel,
-  ) => {
-    if (item.type === 'expense') {
-      return '-';
-    } else if (item.type === 'income') {
-      return '+';
-    } else {
-      return '';
-    }
-  };
 
   return (
     <>
@@ -231,81 +209,14 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
             ListEmptyComponent={ListEmptyComponent}
             data={listData}
             scrollEnabled={false}
-            renderItem={({item}) => {
-              return (
-                <Pressable
-                  style={styles.listItemCtr}
-                  onPress={() => {
-                    navigation.push('TransactionDetail', {
-                      transaction: {
-                        ...item,
-                        amount: Number(
-                          (
-                            conversion.usd[currency.toLowerCase()] * item.amount
-                          ).toFixed(1),
-                        ),
-                      } as OnlineTransactionModel,
-                    });
-                  }}>
-                  <View
-                    style={[
-                      styles.icon,
-                      {
-                        backgroundColor:
-                          item.type === 'transfer'
-                            ? COLORS.BLUE[80]
-                            : catIcons[item.category]?.color ??
-                              COLORS.LIGHT[20],
-                      },
-                    ]}>
-                    {item.type === 'transfer'
-                      ? ICONS.Transfer({height: 30, width: 30})
-                      : catIcons[item.category]?.icon({
-                          height: 30,
-                          width: 30,
-                        }) ?? ICONS.Money({height: 30, width: 30})}
-                  </View>
-                  <View style={styles.catCtr}>
-                    <Text style={styles.listtext1} numberOfLines={1}>
-                      {item.type === 'transfer'
-                        ? item.from + ' - ' + item.to
-                        : item.category[0].toLocaleUpperCase() +
-                          item.category.slice(1)}
-                    </Text>
-                    <Text style={styles.listtext2} numberOfLines={1}>
-                      {item.desc}
-                    </Text>
-                  </View>
-                  <View style={styles.column}>
-                    <Text
-                      style={[
-                        styles.listtext1,
-                        {
-                          fontWeight: '600',
-                          color: getAmtColor(item),
-                        },
-                      ]}>
-                      {getAmtSymbol(item)} {currencies[currency].symbol}
-                      {formatWithCommas(
-                        Number(
-                          (
-                            (conversion?.usd?.[currency.toLowerCase()] ?? 1) *
-                            item.amount
-                          ).toFixed(1),
-                        ).toString(),
-                      )}
-                    </Text>
-                    <Text style={styles.listtext2}>
-                      {formatAMPM(
-                        Timestamp.fromMillis(
-                          item.timeStamp.seconds * 1000,
-                        ).toDate(),
-                      )}
-                    </Text>
-                  </View>
-                </Pressable>
-              );
-            }}
+            renderItem={({item}) => (
+              <TransactionItem
+                item={item}
+                navigation={navigation}
+                scheme={scheme}
+                theme={theme}
+              />
+            )}
           />
         </View>
       </ScrollView>

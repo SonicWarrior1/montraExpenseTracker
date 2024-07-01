@@ -52,8 +52,8 @@ function AddCategorySheet({
   const {isConnected} = useNetInfo();
   const realm = useRealm();
   // state
-  const [category, setCategory] = useState('');
-  const [formKey, setFormKey] = useState(false);
+  const [category, setCategory] = useState<string>('');
+  const [formKey, setFormKey] = useState<boolean>(false);
   // functions
   const handleOffline = useCallback(async () => {
     if (type === 'expense') {

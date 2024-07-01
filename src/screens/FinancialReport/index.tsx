@@ -30,14 +30,14 @@ import {getMyColor} from '../../utils/commonFuncs';
 
 function FinancialReport({navigation}: Readonly<FinancialReportScreenProps>) {
   // state
-  const [month, setMonth] = useState(new Date().getMonth());
-  const [graph, setGraph] = useState(0);
+  const [month, setMonth] = useState<number>(new Date().getMonth());
+  const [graph, setGraph] = useState<number>(0);
   const [transType, setTransType] = useState<'expense' | 'income'>('expense');
   const [type, setType] = useState<'transaction' | 'category'>('transaction');
   const [catColors, setCatColors] = useState<{[key: string]: string}>();
-  const [sort, setSort] = useState(false);
-  const [incomeOffset, setIncomeOffset] = useState(0);
-  const [expenseOffset, setExpenseOffset] = useState(0);
+  const [sort, setSort] = useState<boolean>(false);
+  const [incomeOffset, setIncomeOffset] = useState<number>(0);
+  const [expenseOffset, setExpenseOffset] = useState<number>(0);
   // redux
   const spends =
     useAppSelector(state => state.user.currentUser?.spend?.[month]) ?? [];
@@ -276,6 +276,9 @@ function FinancialReport({navigation}: Readonly<FinancialReportScreenProps>) {
             limit={limit}
             incomeOffset={incomeOffset}
             expenseOffset={expenseOffset}
+            scheme={scheme}
+            theme={theme}
+            navigation={navigation}
           />
         ) : (
           <CategoryList

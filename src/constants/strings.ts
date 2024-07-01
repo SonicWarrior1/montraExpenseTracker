@@ -49,6 +49,7 @@ export const NAVIGATION: {
 };
 
 export const STRINGS = {
+  Cancel:'Cancel',
   NoDataToExport: 'There is no data to be exported',
   Verify: 'Verify',
   LOGIN: 'Login',

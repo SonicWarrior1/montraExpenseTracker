@@ -58,7 +58,6 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
   if (isEdit) {
     prevTransaction = route.params.transaction;
   }
-  console.log(prevTransaction);
   const TransOnline = useObject(
     OnlineTransactionModel,
     prevTransaction?.id ?? '',
@@ -93,8 +92,8 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
   const conversion = useAppSelector(state => state.transaction.conversion);
   const user = useAppSelector(state => state.user.currentUser);
   // state
-  const [firstTime, setFirstTime] = useState(true);
-  const [image, setImage] = useState(
+  const [firstTime, setFirstTime] = useState<boolean>(true);
+  const [image, setImage] = useState<string | undefined>(
     prevTransaction && prevTransaction.attachementType === 'image'
       ? prevTransaction.attachement
       : '',
@@ -107,9 +106,11 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
   const [repeatData, setRepeatData] = useState<
     repeatDataType | RepeatDataModel | undefined
   >(prevTransaction ? prevTransaction.freq! : undefined);
-  const [desc, setDesc] = useState(prevTransaction ? prevTransaction.desc : '');
-  const [zindex, setZindex] = useState(1);
-  const [amount, setAmount] = useState(
+  const [desc, setDesc] = useState<string>(
+    prevTransaction ? prevTransaction.desc : '',
+  );
+  const [zindex, setZindex] = useState<number>(1);
+  const [amount, setAmount] = useState<string>(
     prevTransaction
       ? formatWithCommas(
           Number(
@@ -124,27 +125,29 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
   const [category, setCategory] = useState<string | undefined>(
     prevTransaction ? prevTransaction.category : '',
   );
-  const [wallet, setWallet] = useState(
+  const [wallet, setWallet] = useState<string>(
     prevTransaction ? prevTransaction.wallet : '',
   );
-  const [from, setFrom] = useState(prevTransaction ? prevTransaction.from : '');
-  const [to, setTo] = useState(prevTransaction ? prevTransaction.to : '');
-  const [formKey, setFormKey] = useState(false);
+  const [from, setFrom] = useState<string>(
+    prevTransaction ? prevTransaction.from : '',
+  );
+  const [to, setTo] = useState<string>(
+    prevTransaction ? prevTransaction.to : '',
+  );
+  const [formKey, setFormKey] = useState<boolean>(false);
   const [catColors, setCatColors] = useState<{[key: string]: string}>();
-  const [isSwitchOn, setIsSwitchOn] = useState(
+  const [isSwitchOn, setIsSwitchOn] = useState<boolean>(
     repeatData !== undefined ? repeatData !== null : repeatData !== undefined,
   );
   // refs
   const filePickSheetRef = useRef<BottomSheetModal>(null);
   const repeatSheetRef = useRef<BottomSheetModal>(null);
   const addCategorySheetRef = useRef<BottomSheetModal>(null);
-
   // functions
   const getAttachmentAndType = useCallback(() => {
     let attachement = '';
     let attachementType: transactionType['attachementType'] = 'none';
     if (image !== '') {
-      console.log('IMAGE', image);
       attachement = image!;
       attachementType = 'image';
     } else if (doc) {
@@ -176,35 +179,48 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
     ) {
       return;
     }
+    console.log('loading condition');
     dispatch(setLoading(true));
+
     const {attachement, attachementType} = getAttachmentAndType();
     try {
       const id = uuid.v4().toString();
       if (!isConnected) {
-        await handleOffline({
-          attachement: attachement,
-          attachementType: attachementType,
-          id: id,
-          amount: amount,
-          category: category,
-          conversion: conversion,
-          currency: user?.currency,
-          desc: desc,
-          dispatch: dispatch,
-          from: from,
-          isConnected: isConnected,
-          isEdit: isEdit,
-          month: month,
-          pageType: pageType,
-          prevTransaction: prevTransaction,
-          realm: realm,
-          repeatData: repeatData,
-          to: to,
-          uid: user?.uid!,
-          user: user,
-          wallet: wallet,
-          TransOnline: TransOnline,
-        });
+        setTimeout(async () => {
+          await handleOffline({
+            attachement: attachement,
+            attachementType: attachementType,
+            id: id,
+            amount: amount,
+            category: category,
+            conversion: conversion,
+            currency: user?.currency,
+            desc: desc,
+            dispatch: dispatch,
+            from: from,
+            isConnected: isConnected,
+            isEdit: isEdit,
+            month: month,
+            pageType: pageType,
+            prevTransaction: prevTransaction,
+            realm: realm,
+            repeatData: repeatData,
+            to: to,
+            uid: user?.uid!,
+            user: user,
+            wallet: wallet,
+            TransOnline: TransOnline,
+          });
+          Toast.show({
+            text1: `Transaction has been ${
+              isEdit ? 'Updated' : 'Added'
+            } Successfully`,
+            type: 'custom',
+            swipeable: false,
+          });
+          navigation.pop();
+          dispatch(setLoading(false));
+        }, 250);
       } else {
         await handleOnline({
           attachement: attachement,
@@ -225,16 +241,16 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
           uid: user?.uid!,
           wallet: wallet,
         });
+        Toast.show({
+          text1: `Transaction has been ${
+            isEdit ? 'Updated' : 'Added'
+          } Successfully`,
+          type: 'custom',
+          swipeable: false,
+        });
+        navigation.pop();
+        dispatch(setLoading(false));
       }
-      Toast.show({
-        text1: `Transaction has been ${
-          isEdit ? 'Updated' : 'Added'
-        } Successfully`,
-        type: 'custom',
-        swipeable: false,
-      });
-      navigation.pop();
-      dispatch(setLoading(false));
     } catch (e) {
       dispatch(setLoading(false));
     }

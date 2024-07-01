@@ -66,20 +66,24 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
   const user = useAppSelector(state => state.user.currentUser);
   const realm = useRealm();
   // state
-  const [amount, setAmount] = useState(
+  const [amount, setAmount] = useState<string>(
     isEdit
       ? (conversion.usd[currency!.toLowerCase()] * oldBudget?.limit!)
           .toFixed(1)
           .toString()
       : '0',
   );
-  const [category, setCategory] = useState(isEdit ? selectedCategory : '');
-  const [alert, setAlert] = useState(isEdit ? oldBudget?.alert : false);
-  const [sliderVal, setSliderVal] = useState(
+  const [category, setCategory] = useState<string | undefined>(
+    isEdit ? selectedCategory : '',
+  );
+  const [alert, setAlert] = useState<boolean|undefined>(
+    isEdit ? oldBudget?.alert : false,
+  );
+  const [sliderVal, setSliderVal] = useState<number|undefined>(
     isEdit ? oldBudget?.percentage : 0,
   );
   const [catColors, setCatColors] = useState<{[key: string]: string}>();
-  const [form, setForm] = useState(false);
+  const [form, setForm] = useState<boolean>(false);
 
   // ref
   const addCategorySheetRef = useRef<BottomSheetModal>(null);

@@ -16,7 +16,7 @@ function Onboarding({navigation}: Readonly<OnboardingScreenProps>) {
   // constants
   const styles = style(useAppTheme());
   // state
-  const [index, setIndex] = useState(0);
+  const [index, setIndex] = useState<number>(0);
   // functions
   const handleSignup = useCallback(function handleSignup() {
     navigation.navigate(NAVIGATION.SIGNUP);

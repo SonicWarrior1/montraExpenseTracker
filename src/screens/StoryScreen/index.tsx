@@ -33,14 +33,14 @@ export default function StoryScreen({navigation}: Readonly<StoryScreenProps>) {
           .sort((a, b) => b[1] - a[1])
           .filter(([, value], index, array) => value === array[0][1])
       : [['', 0]];
-  console.log(biggestSpend);
+  // console.log(biggestSpend);
   const biggestIncome: [string, number][] =
     user?.income[new Date().getMonth()] !== undefined
       ? Object.entries(user?.income[new Date().getMonth()])
           .sort((a, b) => b[1] - a[1])
           .filter(([, value], index, array) => value === array[0][1])
       : [['', 0]];
-  console.log(biggestIncome);
+  // console.log(biggestIncome);
   const budgetExceed =
     user?.budget[new Date().getMonth()] !== undefined &&
     user?.spend[new Date().getMonth()] !== undefined
@@ -54,7 +54,7 @@ export default function StoryScreen({navigation}: Readonly<StoryScreenProps>) {
       ? Object.entries(user?.budget[new Date().getMonth()])
       : undefined;
   // state
-  const [index, setIndex] = useState(0);
+  const [index, setIndex] = useState<number>(0);
 
   const getBackgroundColor = () => {
     if (index === 0) {

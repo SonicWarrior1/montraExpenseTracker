@@ -90,7 +90,7 @@ function FilePickerSheet({
       if (!isConnected) {
         const filePath = Platform.OS === 'ios' ? res.uri.slice(7) : res.uri;
         uri = await RNBlobUtil.fs.readFile(filePath, 'base64');
-        console.log('Base64:', uri);
+        // console.log('Base64:', uri);
       }
       if (res) {
         setDoc({uri: uri, name: res.name!});

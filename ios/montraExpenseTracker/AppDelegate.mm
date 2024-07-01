@@ -2,6 +2,7 @@
 #import "RNBootSplash.h"
 #import <Firebase.h>
 #import <React/RCTBundleURLProvider.h>
+#import <GoogleSignIn/GoogleSignIn.h>
 
 @implementation AppDelegate
 
@@ -12,6 +13,9 @@
   // They will be passed down to the ViewController used by React Native.
   self.initialProps = @{};
   [FIRApp configure];
+  NSString *clientID = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"GIDClientID"];
+  GIDConfiguration *config = [[GIDConfiguration alloc] initWithClientID:clientID];
+  [GIDSignIn sharedInstance].configuration = config;
   return [super application:application didFinishLaunchingWithOptions:launchOptions];
 }
 
@@ -30,5 +34,8 @@
 }
 - (void)customizeRootView:(RCTRootView *)rootView {
   [RNBootSplash initWithStoryboard:@"BootSplash" rootView:rootView];
+}
+- (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary<UIApplicationOpenURLOptionsKey, id> *)options {
+  return [[GIDSignIn sharedInstance] handleURL:url];
 }
 @end

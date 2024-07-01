@@ -3,6 +3,7 @@ import {
   Alert,
   BackHandler,
   NativeModules,
+  Platform,
   Pressable,
   SafeAreaView,
   Text,
@@ -34,9 +35,8 @@ function Pin({route, navigation}: Readonly<PinSentScreenProps>) {
   // dispatch(setLoading(false))
   // state
   const [pin, setPin] = useState<number[]>([]);
-  const [menu, setMenu] = useState(false);
-  const [showModal, setShowModal] = useState(false);
-  // const [reset, setReset] = useState(true);
+  const [menu, setMenu] = useState<boolean>(false);
+  const [showModal, setShowModal] = useState<boolean>(false);
   //functions
   const handlePin = useCallback(
     (value: number) => {
@@ -108,20 +108,21 @@ function Pin({route, navigation}: Readonly<PinSentScreenProps>) {
         '',
         [
           {
-            text: 'Cancel',
+            text: STRINGS.Cancel,
             onPress: () => null,
             style: 'cancel',
           },
           {
-            text: 'YES',
+            text: STRINGS.Yes,
             onPress: () => {
               (async () => {
                 dispatch(setLoading(true));
-                if (await GoogleSignin.isSignedIn()) {
-                  GoogleSignin.signOut();
+                if (Platform.OS === 'ios') {
+                  await NativeModules.GoogleSigninModule.googleSignOut();
                 } else {
-                  await auth().signOut();
+                  await NativeModules.GoogleSignInHandler.signOut();
                 }
+                await auth().signOut();
                 dispatch(userLoggedIn(undefined));
                 setTimeout(() => {
                   navigation.reset({
@@ -145,10 +146,11 @@ function Pin({route, navigation}: Readonly<PinSentScreenProps>) {
   }, [isSetup, oldPin]);
   const handleLogout = useCallback(async () => {
     dispatch(setLoading(true));
-    // if (await GoogleSignin.isSignedIn()) {
-    // GoogleSignin.signOut();
-    // } else {
-    await NativeModules.GoogleSignInHandler.signOut();
+    if (Platform.OS === 'ios') {
+      await NativeModules.GoogleSigninModule.googleSignOut();
+    } else {
+      await NativeModules.GoogleSignInHandler.signOut();
+    }
     await auth().signOut();
     // }
     dispatch(userLoggedIn(undefined));
@@ -167,13 +169,6 @@ function Pin({route, navigation}: Readonly<PinSentScreenProps>) {
     );
     return () => backHandler.remove();
   }, []);
-  // useEffect(() => {
-  //   (async () => {
-  //     if (await GoogleSignin.isSignedIn()) {
-  //       setReset(false);
-  //     }
-  //   })();
-  // }, []);
   return (
     <SafeAreaView style={styles.safeView}>
       <VerifyPassModal

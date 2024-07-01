@@ -1,12 +1,13 @@
 import {Text, View} from 'react-native';
 import style from './styles';
 import {currencies} from '../../constants/strings';
-import {useAppTheme} from '../../hooks/themeHook';
+import { COLORS } from '../../constants/commonStyles';
 
 function LinegraphLabel({
   items,
   currency,
   conversion,
+  COLOR
 }: Readonly<{
   items: {date: string; value: number}[];
   currency: string | undefined;
@@ -15,8 +16,9 @@ function LinegraphLabel({
       [key: string]: number;
     };
   };
+  COLOR:typeof COLORS
 }>) {
-  const COLOR = useAppTheme();
+
   const styles = style(COLOR);
   return (
     <View style={styles.ctr}>

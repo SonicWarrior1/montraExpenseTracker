@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import {
   Alert,
   NativeModules,
+  Platform,
   Pressable,
   SafeAreaView,
   Text,
@@ -40,9 +41,9 @@ function Login({navigation}: Readonly<LoginScreenProps>) {
   const styles = style(COLOR);
   const userCollection = firestore().collection('users');
   // state
-  const [email, setEmail] = useState('');
-  const [pass, setPass] = useState('');
-  const [form, setForm] = useState({
+  const [email, setEmail] = useState<string>('');
+  const [pass, setPass] = useState<string>('');
+  const [form, setForm] = useState<{email: boolean; pass: boolean}>({
     email: false,
     pass: false,
   });
@@ -114,7 +115,12 @@ function Login({navigation}: Readonly<LoginScreenProps>) {
 
       // // Get the users ID token
       // const {idToken} = await GoogleSignin.signIn()
-      const idToken = await NativeModules.GoogleSignInHandler.signIn();
+      let idToken;
+      if (Platform.OS === 'ios') {
+        idToken = await NativeModules.GoogleSigninModule.googleSignin();
+      } else if (Platform.OS === 'android') {
+        idToken = await NativeModules.GoogleSignInHandler.signIn();
+      }
       // Create a Google credential with the token
       const googleCredential = auth.GoogleAuthProvider.credential(idToken);
 

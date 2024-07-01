@@ -4,7 +4,6 @@ import {View} from 'react-native';
 import {COLORS} from '../../../constants/commonStyles';
 
 function ProgressDot({i, pin}: Readonly<{i: number; pin: number[]}>) {
-    console.log("djbjk")
   return (
     <View
       key={i}

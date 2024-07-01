@@ -39,7 +39,7 @@ function NotificationScreen({navigation}: Readonly<NotificationScreenProps>) {
   const realm = useRealm();
 
   // state
-  const [menu, setMenu] = useState(false);
+  const [menu, setMenu] = useState<boolean>(false);
   // functions
   const handleMarkRead = useCallback(async () => {
     try {
@@ -196,7 +196,13 @@ function NotificationScreen({navigation}: Readonly<NotificationScreenProps>) {
   }, [notifications]);
   return (
     <SafeAreaView style={styles.safeView}>
-      <View style={styles.header}>
+      <Pressable
+        onPress={() => {
+          if (menu) {
+            setMenu(false);
+          }
+        }}
+        style={styles.header}>
         <Pressable
           onPress={() => {
             navigation.goBack();
@@ -219,38 +225,34 @@ function NotificationScreen({navigation}: Readonly<NotificationScreenProps>) {
             {ICONS.More({height: 20, width: 20, color: COLOR.DARK[100]})}
           </Pressable>
         )}
-      </View>
+      </Pressable>
       {notifications === undefined ||
       Object.values(notifications).length === 0 ? (
         <View style={styles.center}>
           <Text style={styles.NoNotifText}>{STRINGS.NoNotification}</Text>
         </View>
       ) : (
-        <Pressable
-          onPress={() => {
-            if (menu) {
-              setMenu(false);
-            }
-          }}
-          style={styles.flex}>
-          <FlatList
-            data={Object.values(notifications).sort(
-              (a, b) => b.time.seconds - a.time.seconds,
-            )}
-            renderItem={({item}) => (
+        <FlatList
+          data={Object.values(notifications).sort(
+            (a, b) => b.time.seconds - a.time.seconds,
+          )}
+          renderItem={({item}) => (
+            <Pressable
+              onPress={() => {
+                if (menu) {
+                  setMenu(false);
+                }
+              }}>
               <NotificationListItem
                 handleSingleDelete={handleSingleDelete}
                 item={item}
               />
-            )}
-          />
-        </Pressable>
+            </Pressable>
+          )}
+        />
       )}
       {menu && (
         <View style={styles.menu}>
-          {/* <Pressable onPress={handleMarkRead}>
-            <Text style={styles.menuText}>{STRINGS.MarkAllRead}</Text>
-          </Pressable> */}
           <TouchableOpacity onPress={handleDelete}>
             <Text style={styles.menuText}>{STRINGS.RemoveAll}</Text>
           </TouchableOpacity>

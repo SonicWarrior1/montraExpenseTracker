@@ -126,6 +126,7 @@ function Linegraph({
                   items: items,
                   currency: currency,
                   conversion: conversion,
+                  COLOR:COLOR
                 }),
             }}
           />

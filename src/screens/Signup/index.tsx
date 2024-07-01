@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import {
   NativeModules,
+  Platform,
   Pressable,
   SafeAreaView,
   Text,
@@ -52,12 +53,18 @@ function Signup({navigation}: Readonly<SignupScreenProps>) {
   const styles = style(COLOR);
   const userCollection = firestore().collection('users');
   // state
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [pass, setPass] = useState('');
-  const [confirmPass, setConfirmPass] = useState('');
-  const [checked, setChecked] = useState(false);
-  const [form, setForm] = useState({
+  const [name, setName] = useState<string>('');
+  const [email, setEmail] = useState<string>('');
+  const [pass, setPass] = useState<string>('');
+  const [confirmPass, setConfirmPass] = useState<string>('');
+  const [checked, setChecked] = useState<boolean>(false);
+  const [form, setForm] = useState<{
+    name: boolean;
+    email: boolean;
+    pass: boolean;
+    confirmPass: boolean;
+    terms: boolean;
+  }>({
     name: false,
     email: false,
     pass: false,
@@ -119,7 +126,12 @@ function Signup({navigation}: Readonly<SignupScreenProps>) {
   async function onGoogleButtonPress() {
     try {
       dispatch(setLoading(true));
-      const idToken = await NativeModules.GoogleSignInHandler.signIn();
+      let idToken;
+      if (Platform.OS === 'ios') {
+        idToken = await NativeModules.GoogleSigninModule.googleSignin();
+      } else if (Platform.OS === 'android') {
+        idToken = await NativeModules.GoogleSignInHandler.signIn();
+      }
       const googleCredential = auth.GoogleAuthProvider.credential(idToken);
       const creds = await auth().signInWithCredential(googleCredential);
       if (creds) {

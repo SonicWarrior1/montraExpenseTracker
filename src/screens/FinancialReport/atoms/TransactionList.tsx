@@ -1,15 +1,14 @@
 import {Timestamp} from '@react-native-firebase/firestore';
 import React from 'react';
-import {FlatList, Pressable, Text, View} from 'react-native';
+import {ColorSchemeName, FlatList, Text, View} from 'react-native';
 import style from '../styles';
-import {currencies, STRINGS} from '../../../constants/strings';
-import {COLORS} from '../../../constants/commonStyles';
-import {catIcons, ICONS} from '../../../constants/icons';
 import {useAppTheme} from '../../../hooks/themeHook';
 import {OnlineTransactionModel} from '../../../DbModels/OnlineTransactionModel';
 import {OfflineTransactionModel} from '../../../DbModels/OfflineTransactionModel';
-import {formatAMPM} from '../../../utils/firebase';
-import {formatWithCommas} from '../../../utils/commonFuncs';
+import {StackNavigationProp} from '@react-navigation/stack';
+import {RootStackParamList} from '../../../defs/navigation';
+import {STRINGS} from '../../../constants/strings';
+import TransactionItem from '../../../components/TransactionListItem/TransactionItem';
 
 function TransactionList({
   data,
@@ -21,6 +20,9 @@ function TransactionList({
   expenseOffset,
   incomeOffset,
   limit,
+  scheme,
+  theme,
+  navigation,
 }: Readonly<{
   data: (OnlineTransactionModel | OfflineTransactionModel)[];
   transType: 'income' | 'expense';
@@ -35,9 +37,14 @@ function TransactionList({
   expenseOffset: number;
   incomeOffset: number;
   limit: number;
+  scheme: ColorSchemeName;
+  theme: 'light' | 'dark' | 'device' | undefined;
+  navigation: StackNavigationProp<
+    RootStackParamList,
+    'FinancialReport',
+    undefined
+  >;
 }>) {
-  const COLOR = useAppTheme();
-  const styles = style(COLOR);
   const listData = data
     .filter(
       item =>
@@ -61,62 +68,16 @@ function TransactionList({
       scrollEnabled={false}
       showsVerticalScrollIndicator={false}
       ListEmptyComponent={ListEmptyComponent}
-      renderItem={({item}) => {
-        return (
-          <Pressable style={styles.listItemCtr}>
-            <View
-              style={[
-                styles.icon,
-                {
-                  backgroundColor:
-                    catIcons[item.category]?.color ?? COLORS.LIGHT[20],
-                },
-              ]}>
-              {catIcons[item.category]?.icon({height: 30, width: 30}) ??
-                ICONS.Money({height: 30, width: 30})}
-            </View>
-            <View style={styles.catCtr}>
-              <Text style={styles.text1} numberOfLines={1}>
-                {item.category[0].toLocaleUpperCase() + item.category.slice(1)}
-              </Text>
-              <Text style={styles.text2} numberOfLines={1}>
-                {item.desc}
-              </Text>
-            </View>
-            <View style={{alignItems: 'flex-end', rowGap: 5}}>
-              <Text
-                style={[
-                  styles.text1,
-                  {
-                    fontWeight: '600',
-                    color:
-                      item.type === 'expense'
-                        ? COLORS.PRIMARY.RED
-                        : COLORS.PRIMARY.GREEN,
-                  },
-                ]}>
-                {item.type === 'expense' ? '-' : '+'}{' '}
-                {currencies[currency!].symbol}{' '}
-                {formatWithCommas(
-                  Number(
-                    (
-                      conversion.usd[currency!.toLowerCase()] * item.amount
-                    ).toFixed(1),
-                  ).toString(),
-                )}
-              </Text>
-              <Text style={styles.text2}>
-                {Timestamp.fromMillis(item.timeStamp.seconds * 1000)
-                  .toDate()
-                  .toLocaleDateString()}{' '}
-                {formatAMPM(
-                  Timestamp.fromMillis(item.timeStamp.seconds * 1000).toDate(),
-                )}
-              </Text>
-            </View>
-          </Pressable>
-        );
-      }}
+      renderItem={({item}) => (
+        <TransactionItem
+          item={item}
+          navigation={navigation}
+          scheme={scheme}
+          theme={theme}
+          dateShow={true}
+          disabled={true}
+        />
+      )}
     />
   );
 }

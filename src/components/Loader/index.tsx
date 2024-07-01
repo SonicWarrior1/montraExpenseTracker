@@ -6,7 +6,9 @@ import { COLORS } from '../../constants/commonStyles';
 
 function Loader({children}: Readonly<{children: React.JSX.Element}>) {
   // redux
+  console.log('isLoading under component')
   const isLoading = useAppSelector(state => state.user.loading);
+  console.log(isLoading,'isLoading under component')
   return isLoading ? (
     <>
       {children}

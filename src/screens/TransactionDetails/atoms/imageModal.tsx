@@ -14,7 +14,7 @@ function ImageModal({
   setShowImage: React.Dispatch<React.SetStateAction<boolean>>;
   url:string
 }>) {
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const COLOR = useAppTheme();
   const styles = style(COLOR);
   return (

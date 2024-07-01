@@ -25,7 +25,7 @@ function Graph({
   const styles = style(COLOR);
   const scheme = useColorScheme();
   const finalTheme = theme === 'device' ? scheme : theme;
-  const [graphDay, setGraphDay] = useState(0);
+  const [graphDay, setGraphDay] = useState<number>(0);
   const startOfToday = new Date().setHours(0, 0, 0, 0) / 1000;
   const startOfWeek = Math.floor(
     (new Date().setHours(0, 0, 0, 0) - new Date().getDay() * 86400000) / 1000,
@@ -133,6 +133,7 @@ function Graph({
                   items: items,
                   currency: currency,
                   conversion: conversion,
+                  COLOR: COLOR,
                 }),
             }}
           />
