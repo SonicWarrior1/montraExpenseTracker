@@ -16,7 +16,6 @@ import style from './styles';
 import {encrypt} from '../../utils/encryption';
 import {STRINGS} from '../../constants/strings';
 import {useAppTheme} from '../../hooks/themeHook';
-import {Swipeable} from 'react-native-gesture-handler';
 import Spacer from '../../components/Spacer';
 import {useNetInfo} from '@react-native-community/netinfo';
 import {useRealm} from '@realm/react';

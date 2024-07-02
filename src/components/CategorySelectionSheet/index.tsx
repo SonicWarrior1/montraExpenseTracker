@@ -63,76 +63,49 @@ function CategorySelectionSheet() {
         handleIndicatorStyle={{backgroundColor: COLOR.VIOLET[40]}}>
         <BottomSheetView style={styles.sheet}>
           <ScrollView style={styles.scrollview}>
-            <Text style={styles.text1}>{STRINGS.Expense}</Text>
-            <View style={styles.row}>
-              {expenseCats?.slice(1)?.map(item => (
-                <Pressable
-                  key={item}
-                  style={[
-                    styles.filterBtn,
-                    {
-                      backgroundColor: category.includes(item)
-                        ? COLOR.VIOLET[20]
-                        : COLOR.LIGHT[100],
-                    },
-                  ]}
-                  onPress={() => {
-                    setCategory(cat => {
-                      if (cat.includes(item)) {
-                        return cat.filter(i => i !== item);
-                      }
-                      return [...cat, item];
-                    });
-                  }}>
-                  <Text
-                    style={[
-                      styles.filterBtnText,
-                      {
-                        color: category.includes(item)
-                          ? COLOR.VIOLET[100]
-                          : COLOR.DARK[100],
-                      },
-                    ]}>
-                    {item[0].toUpperCase() + item.slice(1)}
-                  </Text>
-                </Pressable>
-              ))}
-            </View>
-            <Text style={styles.text1}>{STRINGS.Income}</Text>
-            <View style={styles.row}>
-              {incomeCats?.slice(1)?.map(item => (
-                <Pressable
-                  key={item}
-                  style={[
-                    styles.filterBtn,
-                    {
-                      backgroundColor: category.includes(item)
-                        ? COLOR.VIOLET[20]
-                        : COLOR.LIGHT[100],
-                    },
-                  ]}
-                  onPress={() => {
-                    setCategory(cat => {
-                      if (cat.includes(item)) {
-                        return cat.filter(i => i !== item);
-                      }
-                      return [...cat, item];
-                    });
-                  }}>
-                  <Text
-                    style={[
-                      styles.filterBtnText,
-                      {
-                        color: category.includes(item)
-                          ? COLOR.VIOLET[100]
-                          : COLOR.DARK[100],
-                      },
-                    ]}>
-                    {item[0].toUpperCase() + item.slice(1)}
-                  </Text>
-                </Pressable>
-              ))}
-            </View>
+            {['expense', 'income'].map(catTypes => (
+              <View key={catTypes}>
+                <Text style={styles.text1}>
+                  {catTypes[0].toUpperCase() + catTypes.slice(1)}
+                </Text>
+                <View style={styles.row}>
+                  {(catTypes === 'income' ? incomeCats : expenseCats)
+                    ?.slice(1)
+                    ?.map(item => (
+                      <Pressable
+                        key={item}
+                        style={[
+                          styles.filterBtn,
+                          {
+                            backgroundColor: category.includes(item)
+                              ? COLOR.VIOLET[20]
+                              : COLOR.LIGHT[100],
+                          },
+                        ]}
+                        onPress={() => {
+                          setCategory(cat => {
+                            if (cat.includes(item)) {
+                              return cat.filter(i => i !== item);
+                            }
+                            return [...cat, item];
+                          });
+                        }}>
+                        <Text
+                          style={[
+                            styles.filterBtnText,
+                            {
+                              color: category.includes(item)
+                                ? COLOR.VIOLET[100]
+                                : COLOR.DARK[100],
+                            },
+                          ]}>
+                          {item[0].toUpperCase() + item.slice(1)}
+                        </Text>
+                      </Pressable>
+                    ))}
+                </View>
+              </View>
+            ))}
           </ScrollView>
           <CustomButton
             title={STRINGS.Continue}

@@ -1,6 +1,6 @@
 import React from 'react';
 import {FlatList, Pressable, SafeAreaView, Text} from 'react-native';
-import {currencies} from '../../constants/strings';
+import {currencies, STRINGS} from '../../constants/strings';
 import BouncyCheckbox from 'react-native-bouncy-checkbox/build/dist/BouncyCheckbox';
 import {useAppSelector} from '../../redux/store';
 import firestore from '@react-native-firebase/firestore';
@@ -24,7 +24,7 @@ function CurrencyScreen({navigation}: Readonly<CurrencyScreenProps>) {
       <CustomHeader
         backgroundColor={COLORS.LIGHT[100]}
         navigation={navigation}
-        title="Currency"
+        title={STRINGS.Currency}
         color={COLORS.DARK[100]}
         bottomBorder={true}
       />

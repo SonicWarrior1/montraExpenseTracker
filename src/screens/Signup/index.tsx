@@ -171,7 +171,7 @@ function Signup({navigation}: Readonly<SignupScreenProps>) {
         keyboardShouldPersistTaps="handled">
         <CustomHeader
           backgroundColor={COLOR.LIGHT[100]}
-          title="Sign Up"
+          title={STRINGS.SIGNUP}
           color={COLOR.DARK[100]}
           navigation={navigation}
         />

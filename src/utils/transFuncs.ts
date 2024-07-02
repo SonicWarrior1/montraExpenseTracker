@@ -38,7 +38,7 @@ export function debounce(fn: (...args) => void, delay = 300) {
     };
 }
 
-export function throttle(func: (...args) => void, delay: number) {
+export function throttle(func: (...args) => Promise<void>, delay: number) {
     let timeout = null;
     return (...args) => {
         if (!timeout) {

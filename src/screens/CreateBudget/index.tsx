@@ -29,7 +29,7 @@ import {useRealm} from '@realm/react';
 import {UpdateMode} from 'realm';
 import {Switch} from 'react-native-switch';
 import CustomHeader from '../../components/CustomHeader';
-import {formatWithCommas, getMyColor} from '../../utils/commonFuncs';
+import {AmountInputSetter, getMyColor} from '../../utils/commonFuncs';
 import Toast from 'react-native-toast-message';
 import {
   handleOfflineNotification,
@@ -76,10 +76,10 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
   const [category, setCategory] = useState<string | undefined>(
     isEdit ? selectedCategory : '',
   );
-  const [alert, setAlert] = useState<boolean|undefined>(
+  const [alert, setAlert] = useState<boolean | undefined>(
     isEdit ? oldBudget?.alert : false,
   );
-  const [sliderVal, setSliderVal] = useState<number|undefined>(
+  const [sliderVal, setSliderVal] = useState<number | undefined>(
     isEdit ? oldBudget?.percentage : 0,
   );
   const [catColors, setCatColors] = useState<{[key: string]: string}>();
@@ -232,30 +232,31 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
       setCatColors(undefined);
     };
   }, [expenseCat]);
+  const backAction = () => {
+    if (
+      ((amount.replace(/,/g, '').trim() !== '' ||
+        amount.replace(/,/g, '').trim() !== '0') &&
+        amount.replace(/,/g, '').trim() === '.') ||
+      Number(amount.replace(/,/g, '')) > 0 ||
+      category !== ''
+    ) {
+      Alert.alert(
+        STRINGS.DiscardChanges,
+        STRINGS.UnsavedChanges,
+        [
+          {
+            text: 'No',
+          },
+          {text: 'Yes', onPress: () => [navigation.goBack()]},
+        ],
+      );
+    } else {
+      navigation.goBack();
+    }
+    return true;
+  };
   useEffect(() => {
-    const back = BackHandler.addEventListener('hardwareBackPress', () => {
-      if (
-        ((amount.replace(/,/g, '').trim() !== '' ||
-          amount.replace(/,/g, '').trim() !== '0') &&
-          amount.replace(/,/g, '').trim() === '.') ||
-        Number(amount.replace(/,/g, '')) > 0 ||
-        category !== ''
-      ) {
-        Alert.alert(
-          'Discard changes?',
-          'You have unsaved changes. Are you sure you want to discard them and leave the screen?',
-          [
-            {
-              text: 'No',
-            },
-            {text: 'Yes', onPress: () => [navigation.goBack()]},
-          ],
-        );
-      } else {
-        navigation.goBack();
-      }
-      return true;
-    });
+    const back = BackHandler.addEventListener('hardwareBackPress', backAction);
     return () => back.remove();
   });
   return (
@@ -267,30 +268,9 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
         <SafeAreaView style={styles.safeView}>
           <CustomHeader
             backgroundColor={COLOR.VIOLET[100]}
-            title="Create Budget"
+            title={STRINGS.CreateBudget}
             navigation={navigation}
-            onPress={() => {
-              if (
-                ((amount.replace(/,/g, '').trim() !== '' ||
-                  amount.replace(/,/g, '').trim() !== '0') &&
-                  amount.replace(/,/g, '').trim() === '.') ||
-                Number(amount.replace(/,/g, '')) > 0 ||
-                category !== ''
-              ) {
-                Alert.alert(
-                  'Discard changes?',
-                  'You have unsaved changes. Are you sure you want to discard them and leave the screen?',
-                  [
-                    {
-                      text: 'No',
-                    },
-                    {text: 'Yes', onPress: () => [navigation.goBack()]},
-                  ],
-                );
-              } else {
-                navigation.goBack();
-              }
-            }}
+            onPress={backAction}
           />
           <View style={styles.mainView}>
             <Text style={styles.text1}>{STRINGS.HowMuchDoSpent}</Text>
@@ -304,44 +284,7 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
                     setAmount('');
                   }
                 }}
-                onChangeText={(str: string) => {
-                  let numericValue = str.replace(/[^0-9.]+/g, '');
-                  const decimalCount = numericValue.split('.').length - 1;
-
-                  if (decimalCount > 1) {
-                    const parts = numericValue.split('.');
-                    numericValue = parts[0] + '.' + parts.slice(1).join('');
-                  }
-
-                  if (
-                    numericValue.length > 0 &&
-                    numericValue[numericValue.length - 1] === '.'
-                  ) {
-                    // Allow only if it is not the only character
-                    if (
-                      numericValue.length === 1 ||
-                      numericValue[numericValue.length - 2] === '.'
-                    ) {
-                      numericValue = numericValue.slice(0, -1);
-                    }
-                  }
-
-                  // Limit to 1 digit after decimal point
-                  if (decimalCount === 1) {
-                    const parts = numericValue.split('.');
-                    if (parts[1].length > 1) {
-                      numericValue = parts[0] + '.' + parts[1].slice(0, 1);
-                    }
-                  }
-
-                  if (decimalCount === 1 && numericValue.length > 8) {
-                    numericValue = numericValue.slice(0, 8);
-                  } else if (decimalCount === 0 && numericValue.length > 7) {
-                    numericValue = numericValue.slice(0, 7);
-                  }
-
-                  setAmount(formatWithCommas(numericValue));
-                }}
+                onChangeText={(str: string) => AmountInputSetter(str,setAmount)}
                 value={amount}
                 keyboardType="numeric"
                 onBlur={() => {
@@ -433,7 +376,7 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
           <EmptyZeroError
             formKey={alert! && form}
             value={String(sliderVal)}
-            errorText="Value cannot be zero. Please adjust the slider"
+            errorText={STRINGS.SliderError}
           />
           <Spacer height={10} />
           <CustomButton title={STRINGS.Continue} onPress={handleCreate} />

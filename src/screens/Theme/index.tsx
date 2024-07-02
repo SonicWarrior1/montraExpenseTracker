@@ -6,9 +6,9 @@ import firestore from '@react-native-firebase/firestore';
 import {encrypt} from '../../utils/encryption';
 import style from './styles';
 import {useAppTheme} from '../../hooks/themeHook';
-import {STRINGS} from '../../constants/strings';
 import CustomHeader from '../../components/CustomHeader';
 import {ThemeScreenProps} from '../../defs/navigation';
+import { STRINGS } from '../../constants/strings';
 
 function ThemeScreen({navigation}: Readonly<ThemeScreenProps>) {
   // redux
@@ -23,67 +23,33 @@ function ThemeScreen({navigation}: Readonly<ThemeScreenProps>) {
       <CustomHeader
         backgroundColor={COLORS.LIGHT[100]}
         navigation={navigation}
-        title="Theme"
+        title={STRINGS.Theme}
         color={COLORS.DARK[100]}
         bottomBorder={true}
       />
-      <Pressable
-        style={styles.row}
-        onPress={async () => {
-          if (theme !== 'light') {
-            await userDoc.update({theme: encrypt('light', uid!)});
-          }
-        }}>
-        <Text style={styles.text}>{STRINGS.Light}</Text>
-
-        <BouncyCheckbox
-          disabled
-          style={{width: 28}}
-          disableText={false}
-          fillColor={'#5233FF'}
-          isChecked={theme === 'light'}
-          iconStyle={{height: 24, width: 24}}
-          iconImageStyle={{height: 12.5, width: 12.5}}
-        />
-      </Pressable>
-      <Pressable
-        style={styles.row}
-        onPress={async () => {
-          if (theme !== 'dark') {
-            await userDoc.update({theme: encrypt('dark', uid!)});
-          }
-        }}>
-        <Text style={styles.text}>{STRINGS.Dark}</Text>
-
-        <BouncyCheckbox
-          disabled
-          style={{width: 28}}
-          disableText={false}
-          fillColor={'#5233FF'}
-          isChecked={theme === 'dark'}
-          iconStyle={{height: 24, width: 24}}
-          iconImageStyle={{height: 12.5, width: 12.5}}
-        />
-      </Pressable>
-      <Pressable
-        style={styles.row}
-        onPress={async () => {
-          if (theme !== 'device') {
-            await userDoc.update({theme: encrypt('device', uid!)});
-          }
-        }}>
-        <Text style={styles.text}>{STRINGS.UseDeviceTheme}</Text>
-
-        <BouncyCheckbox
-          disabled
-          style={{width: 28}}
-          disableText={false}
-          fillColor={'#5233FF'}
-          isChecked={theme === 'device'}
-          iconStyle={{height: 24, width: 24}}
-          iconImageStyle={{height: 12.5, width: 12.5}}
-        />
-      </Pressable>
+      {['light', 'dark', 'device'].map(item => (
+        <Pressable
+          key={item}
+          style={styles.row}
+          onPress={async () => {
+            if (theme !== item) {
+              await userDoc.update({theme: encrypt(item, uid!)});
+            }
+          }}>
+          <Text style={styles.text}>
+            {item[0].toUpperCase() + item.slice(1)}
+          </Text>
+          <BouncyCheckbox
+            disabled
+            style={{width: 28}}
+            disableText={false}
+            fillColor={'#5233FF'}
+            isChecked={theme === item}
+            iconStyle={{height: 24, width: 24}}
+            iconImageStyle={{height: 12.5, width: 12.5}}
+          />
+        </Pressable>
+      ))}
     </SafeAreaView>
   );
 }

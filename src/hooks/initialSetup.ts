@@ -11,7 +11,7 @@ import { useNetInfo } from '@react-native-community/netinfo';
 import { syncDb } from './syncDb';
 import { OfflineTransactionModel } from '../DbModels/OfflineTransactionModel';
 import { BudgetModel } from '../DbModels/BudgetModel';
-import { UpdateMode } from 'realm';
+import Realm, { UpdateMode } from 'realm';
 import { CategoryModel } from '../DbModels/CategoryModel';
 import { AmountModel } from '../DbModels/AmountModel';
 import { NotificationModel } from '../DbModels/NotificationModel';
@@ -62,29 +62,33 @@ export function useInitialSetup() {
                 .doc(user.uid)
                 .collection('transactions')
                 .orderBy('timeStamp', 'desc')
-                .onSnapshot(async (snapshot) => {
-                    const data: transactionType[] = snapshot.docs.map(
-                        doc => (TransFromJson(doc.data(), user.uid)),
-                    );
-                    for (const item of data) {
-                        if (item.deleted) {
-                            firestore().collection('users').doc(user.uid).collection('transactions').doc(item.id).delete();
-                            setTimeout(() => realm.write(() => {
-                                const transaction = realm.objectForPrimaryKey('OnlineTransaction', item.id);
-                                if (transaction !== undefined || transaction !== null) {
-                                    realm.delete(transaction);
-                                }
-                            }), 1000);
-                            break;
-                        }
-                        realm.write(() => {
-                            // realm.delete(item)
-                            realm.create('OnlineTransaction', { ...item, changed: false }, UpdateMode.All);
-                        });
-                    }
+                .onSnapshot((snapshot) => {
+                    (async () => {
+                        const data: transactionType[] = snapshot.docs.map(
+                            doc => (TransFromJson(doc.data(), user.uid)),
+                        );
+                        await handleDelete(data, realm, user);
+                    })()
                 });
             return () => unsubscribe();
         }
     }, [isConnected]);
-
+}
+async function handleDelete(data: transactionType[], realm: Realm, user: UserType) {
+    for (const item of data) {
+        if (item.deleted) {
+            await firestore().collection('users').doc(user.uid).collection('transactions').doc(item.id).delete();
+            setTimeout(() => realm.write(() => {
+                const transaction = realm.objectForPrimaryKey('OnlineTransaction', item.id);
+                if (transaction !== undefined || transaction !== null) {
+                    realm.delete(transaction);
+                }
+            }), 1000);
+            break;
+        }
+        realm.write(() => {
+            // realm.delete(item)
+            realm.create('OnlineTransaction', { ...item, changed: false }, UpdateMode.All);
+        });
+    }
 }

@@ -18,7 +18,7 @@ function SettingsScreen({navigation}: Readonly<SettingsScreenProps>) {
       <CustomHeader
         backgroundColor={COLORS.LIGHT[100]}
         navigation={navigation}
-        title="Settings"
+        title={STRINGS.Settings}
         color={COLORS.DARK[100]}
         bottomBorder={true}
       />

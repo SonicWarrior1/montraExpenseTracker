@@ -33,14 +33,12 @@ export default function StoryScreen({navigation}: Readonly<StoryScreenProps>) {
           .sort((a, b) => b[1] - a[1])
           .filter(([, value], index, array) => value === array[0][1])
       : [['', 0]];
-  // console.log(biggestSpend);
   const biggestIncome: [string, number][] =
     user?.income[new Date().getMonth()] !== undefined
       ? Object.entries(user?.income[new Date().getMonth()])
           .sort((a, b) => b[1] - a[1])
           .filter(([, value], index, array) => value === array[0][1])
       : [['', 0]];
-  // console.log(biggestIncome);
   const budgetExceed =
     user?.budget[new Date().getMonth()] !== undefined &&
     user?.spend[new Date().getMonth()] !== undefined

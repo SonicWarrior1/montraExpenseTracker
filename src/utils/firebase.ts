@@ -1,21 +1,25 @@
-import firestore, { FirebaseFirestoreTypes, Timestamp } from '@react-native-firebase/firestore';
 import { repeatDataType, transactionType } from '../defs/transaction';
 import { UserFromJson, UserToJson } from './userFuncs';
 import { UserType } from '../defs/user';
-import storage from '@react-native-firebase/storage';
-import notifee from '@notifee/react-native';
-import uuid from 'react-native-uuid';
 import { encrypt } from './encryption';
-import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
-import Toast from 'react-native-toast-message';
 import { OnlineTransactionModel } from '../DbModels/OnlineTransactionModel';
 import { OfflineTransactionModel } from '../DbModels/OfflineTransactionModel';
 import { RepeatDataModel } from '../DbModels/RepeatDataModel';
-import { UpdateMode } from 'realm';
 import { setExpense, setIncome, userLoggedIn } from '../redux/reducers/userSlice';
 import { TransFromJson } from './transFuncs';
-import Realm from '@realm/react';
+import { STRINGS } from '../constants/strings';
+// Third Party Libraries
+import storage from '@react-native-firebase/storage';
+import notifee from '@notifee/react-native';
+import Toast from 'react-native-toast-message';
+import Realm, { UpdateMode } from 'realm';
+import uuid from 'react-native-uuid';
+import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
+import firestore, { FirebaseFirestoreTypes, Timestamp } from '@react-native-firebase/firestore';
+
 type transType = 'income' | 'transfer' | 'expense';
+type AllTransType = transactionType | OnlineTransactionModel | OfflineTransactionModel | undefined;
+
 export function createTransaction({
     id,
     url,
@@ -54,7 +58,6 @@ export function createTransaction({
     from: string,
     to: string
 }) {
-    // console.log("dsfdsfsdfdsc Amount:", Number(amount), conversion.usd[currency.toLowerCase()], (Number(amount) / conversion.usd[currency.toLowerCase()]).toFixed(10))
     return {
         amount: encrypt(String((Number(amount) / conversion.usd[currency.toLowerCase()]).toFixed(10)), uid),
         category: encrypt(category, uid),
@@ -441,13 +444,13 @@ export async function singupUser({ name, email, pass }: { name: string, email: s
 
 export function FirebaseAuthErrorHandler(code: string) {
     if (code === 'auth/email-already-in-use') {
-        return 'The email address is already in use by another account.';
+        return STRINGS.EmailAdressAlreadyUsed;
     } else if (code === 'auth/invalid-credential') {
-        return 'The supplied auth credential is malformed or has expired.';
+        return STRINGS.CredentialMalformed;
     } else if (code === 'auth/network-request-failed') {
-        return 'A network error (such as timeout, interrupted connection or unreachable host) has occurred.';
+        return STRINGS.NetworkError;
     }
-    return 'An unknown error occurred. Please try again later.';
+    return STRINGS.UnknownError;
 }
 
 export function formatAMPM(date: Date) {
@@ -458,8 +461,6 @@ export function formatAMPM(date: Date) {
     hours = hours || 12; // the hour '0' should be '12'
     return hours + ':' + (minutes < 10 ? '0' + minutes : minutes) + ' ' + ampm;
 }
-
-
 
 export const handleOnline = async ({
     id,
@@ -484,7 +485,7 @@ export const handleOnline = async ({
     desc: string,
     isEdit: boolean,
     repeatData: RepeatDataModel | repeatDataType | undefined,
-    prevTransaction: transactionType | OnlineTransactionModel | OfflineTransactionModel | undefined,
+    prevTransaction: AllTransType,
     wallet: string,
     from: string,
     to: string,
@@ -515,11 +516,11 @@ export const handleOnline = async ({
     });
     const curr = await firestore().collection('users').doc(uid).get();
     if (isEdit) {
-        if (pageType === 'expense' || pageType === 'transfer') {
-            handleExpenseUpdate({
+        if (pageType === 'expense') {
+            await handleExpenseUpdate({
                 curr: curr,
                 amount: Number(amount.replace(/,/g, '')),
-                category: pageType === 'transfer' ? 'transfer' : category!,
+                category: category!,
                 conversion: conversion,
                 currency: currency!,
                 month: month,
@@ -527,10 +528,21 @@ export const handleOnline = async ({
                 uid: uid,
             });
         } else if (pageType === 'income') {
-            handleIncomeUpdate({
+            await handleIncomeUpdate({
                 curr: curr,
                 amount: Number(amount.replace(/,/g, '')),
                 category: category!,
+                conversion: conversion,
+                currency: currency!,
+                month: month,
+                transaction: (prevTransaction! as transactionType),
+                uid: uid,
+            });
+        } else {
+            await handleExpenseUpdate({
+                curr: curr,
+                amount: Number(amount.replace(/,/g, '')),
+                category: 'transfer',
                 conversion: conversion,
                 currency: currency!,
                 month: month,
@@ -544,21 +556,31 @@ export const handleOnline = async ({
             uid: uid,
         });
     } else {
-        if (pageType === 'expense' || pageType === 'transfer') {
-            handleNewExpense({
+        if (pageType === 'expense') {
+            await handleNewExpense({
                 curr: curr,
                 amount: Number(amount.replace(/,/g, '')),
-                category: pageType === 'transfer' ? 'transfer' : category!,
+                category: category!,
                 conversion: conversion,
                 currency: currency!,
                 month: month,
                 uid: uid,
             });
         } else if (pageType === 'income') {
-            handleNewIncome({
+            await handleNewIncome({
                 curr: curr,
                 amount: Number(amount.replace(/,/g, '')),
                 category: category!,
+                conversion: conversion,
+                currency: currency!,
+                month: month,
+                uid: uid,
+            });
+        } else {
+            await handleNewExpense({
+                curr: curr,
+                amount: Number(amount.replace(/,/g, '')),
+                category: 'transfer',
                 conversion: conversion,
                 currency: currency!,
                 month: month,
@@ -599,7 +621,7 @@ export const handleOffline = async ({
     attachementType: 'none' | 'image' | 'doc';
     uid: string
     amount: string,
-    pageType: 'income' | 'transfer' | 'expense',
+    pageType: transType,
     conversion: {
         [key: string]: {
             [key: string]: number;
@@ -610,7 +632,7 @@ export const handleOffline = async ({
     desc: string,
     isEdit: boolean,
     repeatData: RepeatDataModel | repeatDataType | undefined,
-    prevTransaction: transactionType | OnlineTransactionModel | OfflineTransactionModel | undefined,
+    prevTransaction: AllTransType,
     wallet: string,
     from: string,
     to: string,
@@ -708,7 +730,7 @@ export const handleOffline = async ({
     if (trans.freq) {
         trans.freq.date = Timestamp.fromDate(trans.freq?.date as Date);
     }
-    console.log('hsdbfshdbfjshdbfshdn');
+
     realm.write(() => {
         if (isEdit && TransOnline) {
             realm.create(
@@ -723,7 +745,7 @@ export const handleOffline = async ({
             UpdateMode.All,
         );
     });
-    console.log('dsjfnsdkj nfsejkb fuizh difzhd luk');
+
 };
 function handleOfflineExpenseTransfer({
     isEdit,
@@ -738,7 +760,7 @@ function handleOfflineExpenseTransfer({
     currency,
     pageType }: {
         amount: string,
-        pageType: 'income' | 'transfer' | 'expense',
+        pageType: transType,
         conversion: {
             [key: string]: {
                 [key: string]: number;
@@ -747,7 +769,7 @@ function handleOfflineExpenseTransfer({
         currency: string | undefined,
         category: string | undefined,
         isEdit: boolean,
-        prevTransaction: transactionType | OnlineTransactionModel | OfflineTransactionModel | undefined,
+        prevTransaction: AllTransType,
         month: number,
         dispatch,
         user: UserType | undefined,
@@ -805,6 +827,7 @@ function handleOfflineExpenseTransfer({
         });
     }
 }
+
 function handleOfflineIncome({
     isEdit,
     dispatch,
@@ -818,7 +841,7 @@ function handleOfflineIncome({
     currency,
     pageType }: {
         amount: string,
-        pageType: 'income' | 'transfer' | 'expense',
+        pageType: transType,
         conversion: {
             [key: string]: {
                 [key: string]: number;
@@ -827,7 +850,7 @@ function handleOfflineIncome({
         currency: string | undefined,
         category: string | undefined,
         isEdit: boolean,
-        prevTransaction: transactionType | OnlineTransactionModel | OfflineTransactionModel | undefined,
+        prevTransaction: AllTransType,
         month: number,
         dispatch,
         user: UserType | undefined,

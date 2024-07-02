@@ -1,13 +1,5 @@
 import React, {useMemo, useRef, useState} from 'react';
-import {
-  ActivityIndicator,
-  Dimensions,
-  Image,
-  Pressable,
-  SafeAreaView,
-  Text,
-  View,
-} from 'react-native';
+import {Dimensions, Pressable, SafeAreaView, Text, View} from 'react-native';
 import style from './styles';
 import {TransactionDetailScreenProps} from '../../defs/navigation';
 import {COLORS} from '../../constants/commonStyles';
@@ -22,7 +14,7 @@ import {
 import Spacer from '../../components/Spacer';
 import CustomButton from '../../components/CustomButton';
 import DeleteTransactionSheet from '../../components/DeleteTransSheet';
-import {useAppDispatch, useAppSelector} from '../../redux/store';
+import {useAppSelector} from '../../redux/store';
 import {useAppTheme} from '../../hooks/themeHook';
 // Third Party Libraries
 import {Timestamp} from '@react-native-firebase/firestore';
@@ -31,13 +23,9 @@ import ImageModal from './atoms/imageModal';
 import {OnlineTransactionModel} from '../../DbModels/OnlineTransactionModel';
 import {useObject} from '@realm/react';
 import {OfflineTransactionModel} from '../../DbModels/OfflineTransactionModel';
-import ReactNativeBlobUtil from 'react-native-blob-util';
-import FileViewer from 'react-native-file-viewer';
-import {setLoading} from '../../redux/reducers/userSlice';
-import {useNetInfo} from '@react-native-community/netinfo';
-import Toast from 'react-native-toast-message';
 import CustomHeader from '../../components/CustomHeader';
 import {formatWithCommas} from '../../utils/commonFuncs';
+import DescriptionContainer from './atoms/DescriptionContainer';
 
 function TransactionDetails({
   route,
@@ -47,7 +35,7 @@ function TransactionDetails({
   const COLOR = useAppTheme();
   const styles = style(COLOR);
   // redux
-  const dispatch = useAppDispatch();
+
   const currency = useAppSelector(state => state.user.currentUser?.currency);
   const conversion = useAppSelector(state => state.transaction.conversion);
   const online = useObject(OnlineTransactionModel, route.params.transaction.id);
@@ -57,13 +45,11 @@ function TransactionDetails({
   );
   // console.log('djsfskdfnl', online, offline)
   const trans = offline ?? online;
-  const {isConnected} = useNetInfo();
   // console.log(trans, route.params.transaction.id, online, offline)
   // ref
   const bottomSheetModalRef = useRef<BottomSheetModalMethods>(null);
   // state
   const [showImage, setShowImage] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   // functions
   const headerRight = () => {
     return (
@@ -111,7 +97,7 @@ function TransactionDetails({
           ]}>
           <CustomHeader
             backgroundColor={getBackgroundColor!}
-            title="Detail Transaction"
+            title={STRINGS.DetailTransaction}
             navigation={navigation}
             HeaderRight={headerRight}
           />
@@ -161,7 +147,7 @@ function TransactionDetails({
           </Text>
         </SafeAreaView>
         <View style={styles.bottomView}>
-          <View style={styles.ctr}>
+          <View style={styles.card}>
             <View style={styles.ctrColumn}>
               <Text style={styles.text1}>{STRINGS.Type}</Text>
               <Text style={styles.text2}>
@@ -207,103 +193,7 @@ function TransactionDetails({
               </>
             )}
           </View>
-
-          <View style={styles.descCtr}>
-            {(trans.desc ?? '') !== '' && (
-              <Text style={styles.descTitle}>{STRINGS.Description}</Text>
-            )}
-            {(trans.desc ?? '') !== '' && (
-              <Text style={styles.descText}>{trans.desc}</Text>
-            )}
-            {trans.attachementType !== 'none' && (
-              <View>
-                <Text style={styles.descTitle}>{STRINGS.Attachement}</Text>
-                {trans.attachementType === 'image' ? (
-                  <>
-                    {isLoading && (
-                      <ActivityIndicator color={COLORS.VIOLET[40]} />
-                    )}
-                    <Pressable
-                      onPress={() => {
-                        if (isConnected) {
-                          setShowImage(true);
-                        }
-                      }}>
-                      {trans.attachement?.startsWith(
-                        'https://firebasestorage.googleapis.com',
-                      ) ? (
-                        !isConnected ? (
-                          <Text
-                            style={{
-                              alignSelf: 'center',
-                              fontSize: 16,
-                              fontWeight: '500',
-                              color: COLOR.RED[40],
-                              marginTop: 20,
-                            }}>
-                            {STRINGS.NoInternetAccess}
-                          </Text>
-                        ) : (
-                          <Image
-                            source={{uri: trans.attachement}}
-                            style={styles.img}
-                            onLoadStart={() => {
-                              setIsLoading(true);
-                            }}
-                            onLoadEnd={() => {
-                              setIsLoading(false);
-                            }}
-                          />
-                        )
-                      ) : (
-                        <Image
-                          source={{
-                            uri: 'data:image/png;base64,' + trans.attachement,
-                          }}
-                          style={styles.img}
-                          onLoadStart={() => {
-                            setIsLoading(true);
-                          }}
-                          onLoadEnd={() => {
-                            setIsLoading(false);
-                          }}
-                        />
-                      )}
-                    </Pressable>
-                  </>
-                ) : (
-                  <CustomButton
-                    title={STRINGS.ViewDocument}
-                    onPress={async () => {
-                      try {
-                        if (!isConnected) {
-                          Toast.show({
-                            text1: 'No Internet Access',
-                            type: 'error',
-                          });
-                          return;
-                        }
-                        dispatch(setLoading(true));
-                        const res = await ReactNativeBlobUtil.config({
-                          fileCache: true,
-                          appendExt: 'pdf',
-                        }).fetch('GET', trans.attachement ?? '');
-                        // console.log(res.path())
-                        dispatch(setLoading(false));
-                        FileViewer.open(res.path(), {showOpenWithDialog: true});
-                      } catch (e) {
-                        console.log(e);
-                        dispatch(setLoading(false));
-                      }
-                    }}
-                    backgroundColor={COLORS.VIOLET[20]}
-                    textColor={COLORS.VIOLET[100]}
-                  />
-                )}
-              </View>
-            )}
-          </View>
-
+          <DescriptionContainer setShowImage={setShowImage} trans={trans} />
           <View style={styles.btnView}>
             <CustomButton
               title={STRINGS.Edit}

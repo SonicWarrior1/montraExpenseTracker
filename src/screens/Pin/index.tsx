@@ -104,7 +104,7 @@ function Pin({route, navigation}: Readonly<PinSentScreenProps>) {
       navigation.goBack();
     } else if (isSetup && oldPin === '') {
       Alert.alert(
-        'Are you sure you want to leave without setting up your pin?',
+        STRINGS.LeaveWithoutSettingPin,
         '',
         [
           {

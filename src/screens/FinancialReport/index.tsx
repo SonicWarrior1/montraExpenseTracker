@@ -121,7 +121,7 @@ function FinancialReport({navigation}: Readonly<FinancialReportScreenProps>) {
       <SafeAreaView>
         <CustomHeader
           backgroundColor={COLOR.LIGHT[100]}
-          title="Financial Report"
+          title={STRINGS.FinancialReport}
           navigation={navigation}
           color={COLOR.DARK[100]}
         />

@@ -1,4 +1,4 @@
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useMemo, useState} from 'react';
 import {Platform, SafeAreaView, Text, View} from 'react-native';
 import style from './styles';
 import {useAppDispatch} from '../../redux/store';
@@ -36,51 +36,52 @@ function ExportData({navigation}: ExportScreenProps) {
   const [dataRange, setDataRange] = useState<7 | 15 | 30>(7);
   const [dataFormat, setDataFormat] = useState<'csv' | 'pdf'>('csv');
   // functions
-  const handleExport = useCallback(async () => {
-    dispatch(setLoading(true));
+  const formatExportData = useMemo(() => {
     const daysAgo = new Date();
     daysAgo.setDate(daysAgo.getDate() - dataRange);
-    const csvData = jsonToCSV(
-      Object.values(data)
-        .filter(
-          item =>
-            Timestamp.fromMillis(item.timeStamp.seconds * 1000).toDate() >
-              daysAgo && (dataType === 'all' ? true : dataType === item.type),
-        )
-        .map(val => {
-          if (val.type === 'transfer') {
-            return {
-              ...val,
-              timeStamp: Timestamp.fromMillis(
-                val.timeStamp.seconds * 1000,
-              ).toDate(),
-            };
-          }
-          let frequency = '';
-          if (val.freq?.freq === 'yearly') {
-            frequency = val.freq.day + monthData[val.freq.month].label;
-          } else if (val.freq?.freq === 'monthly') {
-            frequency = String(val.freq.day);
-          } else if (val.freq?.freq === 'weekly') {
-            frequency = weekData[val.freq.weekDay].label;
-          }
+    return Object.values(data)
+      .filter(
+        item =>
+          Timestamp.fromMillis(item.timeStamp.seconds * 1000).toDate() >
+            daysAgo && (dataType === 'all' ? true : dataType === item.type),
+      )
+      .map(val => {
+        if (val.type === 'transfer') {
           return {
             ...val,
             timeStamp: Timestamp.fromMillis(
               val.timeStamp.seconds * 1000,
             ).toDate(),
-            freq:
-              (val.freq?.freq ?? 'never') +
-              ' ' +
-              frequency +
-              ' ' +
-              (val.freq?.end !== undefined && val.freq.end === 'date'
-                ? ',end - ' +
-                  Timestamp.fromMillis(val.freq.date?.seconds! * 1000).toDate()
-                : ''),
           };
-        }),
-    );
+        }
+        let frequency = '';
+        if (val.freq?.freq === 'yearly') {
+          frequency = val.freq.day + monthData[val.freq.month].label;
+        } else if (val.freq?.freq === 'monthly') {
+          frequency = String(val.freq.day);
+        } else if (val.freq?.freq === 'weekly') {
+          frequency = weekData[val.freq.weekDay].label;
+        }
+        return {
+          ...val,
+          timeStamp: Timestamp.fromMillis(
+            val.timeStamp.seconds * 1000,
+          ).toDate(),
+          freq:
+            (val.freq?.freq ?? 'never') +
+            ' ' +
+            frequency +
+            ' ' +
+            (val.freq?.end !== undefined && val.freq.end === 'date'
+              ? ',end - ' +
+                Timestamp.fromMillis(val.freq.date?.seconds! * 1000).toDate()
+              : ''),
+        };
+      });
+  }, [data, dataType, dataRange]);
+  const handleExport = useCallback(async () => {
+    dispatch(setLoading(true));
+    const csvData = jsonToCSV(formatExportData);
     if (csvData === '') {
       Toast.show({text1: STRINGS.NoDataToExport, type: 'error'});
       dispatch(setLoading(false));
@@ -112,7 +113,7 @@ function ExportData({navigation}: ExportScreenProps) {
       <CustomHeader
         backgroundColor={COLOR.LIGHT[100]}
         navigation={navigation}
-        title="Theme"
+        title={STRINGS.Theme}
         color={COLOR.DARK[100]}
         bottomBorder={true}
       />

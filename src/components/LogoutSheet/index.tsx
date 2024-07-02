@@ -37,7 +37,7 @@ function LogoutSheet() {
     try {
       if (!isConnected) {
         ref.current?.dismiss();
-        Toast.show({text1: 'No Internet', type: 'error'});
+        Toast.show({text1: STRINGS.NoInternetAccess, type: 'error'});
         return;
       }
       if (Platform.OS === 'ios') {

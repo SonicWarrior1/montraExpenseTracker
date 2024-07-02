@@ -35,13 +35,13 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
         width: '100%',
         paddingHorizontal: 20,
     },
-    ctr: {
+    card: {
         flexDirection: 'row',
         backgroundColor: COLOR.LIGHT[100],
         paddingVertical: 15,
         justifyContent: 'space-around',
         // columnGap:25,
-        
+
         // width:100,
         paddingHorizontal: 25,
         borderRadius: 12,
@@ -60,6 +60,13 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
         alignItems: 'center',
         backgroundColor: 'rgba(0,0,0,0.5)',
     },
+    noInternetAccess: {
+        alignSelf: 'center',
+        fontSize: 16,
+        fontWeight: '500',
+        color: COLOR.RED[40],
+        marginTop: 20,
+    }
 });
 
 export default styles;

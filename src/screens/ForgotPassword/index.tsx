@@ -57,7 +57,7 @@ function ForgotPassword({navigation}: Readonly<ForgotScreenProps>) {
             ],
           });
         } else {
-          Toast.show({text1: 'This email is not registered', type: 'error'});
+          Toast.show({text1: STRINGS.EmailNotRegistered, type: 'error'});
         }
         dispatch(setLoading(false));
       } catch (e: any) {
@@ -74,7 +74,7 @@ function ForgotPassword({navigation}: Readonly<ForgotScreenProps>) {
       <ScrollView style={styles.flex} contentContainerStyle={styles.flex}>
         <CustomHeader
           backgroundColor={COLOR.LIGHT[100]}
-          title="Forgot Password"
+          title={STRINGS.ForgotPasswordTitle}
           color={COLOR.DARK[100]}
           navigation={navigation}
         />

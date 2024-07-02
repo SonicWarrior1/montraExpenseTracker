@@ -1,8 +1,4 @@
-import React, {useMemo} from 'react';
-import {Text, View} from 'react-native';
-import style from './styles';
-import {COLORS} from '../../constants/commonStyles';
-import CustomButton from '../CustomButton';
+import React from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux/store';
 import {RootStackParamList} from '../../defs/navigation';
 import {
@@ -11,9 +7,7 @@ import {
   setLoading,
 } from '../../redux/reducers/userSlice';
 import {transactionType} from '../../defs/transaction';
-import SheetBackdrop from '../SheetBackDrop';
 import {STRINGS} from '../../constants/strings';
-import {useAppTheme} from '../../hooks/themeHook';
 import {OnlineTransactionModel} from '../../DbModels/OnlineTransactionModel';
 import {OfflineTransactionModel} from '../../DbModels/OfflineTransactionModel';
 import {encrypt} from '../../utils/encryption';
@@ -26,12 +20,8 @@ import {useObject, useRealm} from '@realm/react';
 import {useNetInfo} from '@react-native-community/netinfo';
 import {UpdateMode} from 'realm';
 import storage from '@react-native-firebase/storage';
-import {
-  BottomSheetModal,
-  BottomSheetModalProvider,
-  BottomSheetView,
-} from '@gorhom/bottom-sheet';
 import {BottomSheetModalMethods} from '@gorhom/bottom-sheet/lib/typescript/types';
+import DeleteSheet from '../DeleteSheet';
 
 function DeleteTransactionSheet({
   bottomSheetModalRef,
@@ -59,10 +49,7 @@ function DeleteTransactionSheet({
   const uid = useAppSelector(state => state.user.currentUser?.uid);
   // constants
   const dispatch = useAppDispatch();
-  const snapPoints = useMemo(() => ['30%'], []);
   const month = new Date().getMonth();
-  const COLOR = useAppTheme();
-  const styles = style(COLOR);
   const {isConnected} = useNetInfo();
   const realm = useRealm();
   const online = useObject(OnlineTransactionModel, id);
@@ -204,37 +191,12 @@ function DeleteTransactionSheet({
     }
   };
   return (
-    <BottomSheetModalProvider>
-      <BottomSheetModal
-        enablePanDownToClose
-        ref={bottomSheetModalRef}
-        index={0}
-        snapPoints={snapPoints}
-        backdropComponent={SheetBackdrop}
-        backgroundStyle={styles.sheetBack}
-        handleIndicatorStyle={{backgroundColor: COLOR.VIOLET[40]}}>
-        <BottomSheetView style={styles.sheetView}>
-          <Text style={styles.text1}>{STRINGS.RemovethisTransaction}</Text>
-          <Text style={styles.text2}>{STRINGS.sureRemoveTransaction}</Text>
-          <View style={styles.BtnRow}>
-            <View style={styles.flex}>
-              <CustomButton
-                title={STRINGS.No}
-                onPress={() => {
-                  bottomSheetModalRef.current?.dismiss();
-                }}
-                backgroundColor={COLORS.VIOLET[20]}
-                textColor={COLORS.VIOLET[100]}
-              />
-            </View>
-            <View style={styles.flex}>
-              <CustomButton title={STRINGS.Yes} onPress={handleDelete} />
-            </View>
-          </View>
-        </BottomSheetView>
-      </BottomSheetModal>
-    </BottomSheetModalProvider>
+    <DeleteSheet
+      handleDelete={handleDelete}
+      bottomSheetModalRef={bottomSheetModalRef}
+      text1={STRINGS.RemovethisTransaction}
+      text2={STRINGS.sureRemoveTransaction}
+    />
   );
 }
-
 export default React.memo(DeleteTransactionSheet);

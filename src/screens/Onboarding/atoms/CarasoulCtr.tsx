@@ -1,6 +1,7 @@
 import {Image, View, Text, Dimensions} from 'react-native';
 import {useAppTheme} from '../../../hooks/themeHook';
 import style from '../styles';
+import { useMemo} from 'react';
 const CarasoulCtr = ({
   item,
   index,
@@ -15,16 +16,19 @@ const CarasoulCtr = ({
   const screenWidth = Dimensions.get('screen').width;
   const screenHeight = Dimensions.get('window').height;
   const styles = style(useAppTheme());
+  const getImage = useMemo(() => {
+    if (index === 0) {
+      return require('../../../assets/Images/onboarding1.png');
+    } else if (index == 1) {
+      return require('../../../assets/Images/onboarding2.png');
+    } else {
+      return require('../../../assets/Images/onboarding3.png');
+    }
+  }, [index]);
   return (
     <View style={styles.carouselCtr}>
       <Image
-        source={
-          index === 0
-            ? require('../../../assets/Images/onboarding1.png')
-            : index == 1
-            ? require('../../../assets/Images/onboarding2.png')
-            : require('../../../assets/Images/onboarding3.png')
-        }
+        source={getImage}
         style={{
           height: screenHeight * 0.4,
           width: screenWidth * 0.9,
@@ -40,4 +44,4 @@ const CarasoulCtr = ({
   );
 };
 
-export default CarasoulCtr
+export default CarasoulCtr;

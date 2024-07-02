@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {Dimensions, Pressable, Text, useColorScheme, View} from 'react-native';
 import {LineChart} from 'react-native-gifted-charts';
 import {COLORS} from '../../../constants/commonStyles';
@@ -33,6 +33,53 @@ function Graph({
   const startOfYear = Math.floor(
     new Date(new Date().setMonth(0, 1)).setHours(0, 0, 0, 0) / 1000,
   );
+  const screenWidth = Dimensions.get('screen').width;
+  const buttonColor = (i: number) => {
+    if (graphDay === i) {
+      return COLOR.YELLOW[20];
+    } else if (finalTheme === 'light') {
+      return COLOR.LIGHT[100];
+    } else {
+      return COLOR.LIGHT[40];
+    }
+  };
+  const formatDate = useCallback(
+    (item: OnlineTransactionModel | OfflineTransactionModel) => {
+      if (graphDay === 0) {
+        return (
+          Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+            .toDate()
+            .getHours() +
+          ':' +
+          (Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+            .toDate()
+            .getMinutes() < 10
+            ? '0' +
+              Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+                .toDate()
+                .getMinutes()
+            : Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+                .toDate()
+                .getMinutes())
+        );
+      } else {
+        return (
+          Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+            .toDate()
+            .getDay() +
+          '/' +
+          Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+            .toDate()
+            .getMonth() +
+          '/' +
+          Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+            .toDate()
+            .getFullYear()
+        );
+      }
+    },
+    [data],
+  );
   const graphData = data
     .filter(item => {
       if (graphDay === 0) {
@@ -55,33 +102,7 @@ function Graph({
     .map(item => {
       return {
         value: item.amount,
-        date:
-          graphDay === 0
-            ? Timestamp.fromMillis(item.timeStamp.seconds * 1000)
-                .toDate()
-                .getHours() +
-              ':' +
-              (Timestamp.fromMillis(item.timeStamp.seconds * 1000)
-                .toDate()
-                .getMinutes() < 10
-                ? '0' +
-                  Timestamp.fromMillis(item.timeStamp.seconds * 1000)
-                    .toDate()
-                    .getMinutes()
-                : Timestamp.fromMillis(item.timeStamp.seconds * 1000)
-                    .toDate()
-                    .getMinutes())
-            : Timestamp.fromMillis(item.timeStamp.seconds * 1000)
-                .toDate()
-                .getDay() +
-              '/' +
-              Timestamp.fromMillis(item.timeStamp.seconds * 1000)
-                .toDate()
-                .getMonth() +
-              '/' +
-              Timestamp.fromMillis(item.timeStamp.seconds * 1000)
-                .toDate()
-                .getFullYear(),
+        date: formatDate(item),
       };
     });
   useEffect(() => {
@@ -106,7 +127,7 @@ function Graph({
             endFillColor1={COLOR.LIGHT[100]}
             isAnimated={true}
             // initialSpacing={0}
-            width={Dimensions.get('screen').width * 1.04}
+            width={screenWidth * 1.04}
             hideDataPoints
             thickness={12}
             hideRules
@@ -145,16 +166,11 @@ function Graph({
             style={[
               styles.filterBtn,
               {
-                backgroundColor:
-                  graphDay === 0
-                    ? COLOR.YELLOW[20]
-                    : finalTheme === 'light'
-                    ? COLOR.LIGHT[100]
-                    : COLOR.LIGHT[40],
+                backgroundColor: buttonColor(0),
                 width:
                   month === new Date().getMonth()
-                    ? Dimensions.get('screen').width / 4.2
-                    : Dimensions.get('screen').width / 2.2,
+                    ? screenWidth / 4.2
+                    : screenWidth / 2.2,
               },
             ]}
             onPress={() => {
@@ -177,16 +193,11 @@ function Graph({
             style={[
               styles.filterBtn,
               {
-                backgroundColor:
-                  graphDay === 1
-                    ? COLOR.YELLOW[20]
-                    : finalTheme === 'light'
-                    ? COLOR.LIGHT[100]
-                    : COLOR.LIGHT[40],
+                backgroundColor: buttonColor(1),
                 width:
                   month === new Date().getMonth()
-                    ? Dimensions.get('screen').width / 4.2
-                    : Dimensions.get('screen').width / 2.2,
+                    ? screenWidth / 4.2
+                    : screenWidth / 2.2,
               },
             ]}
             onPress={() => {
@@ -208,16 +219,11 @@ function Graph({
           style={[
             styles.filterBtn,
             {
-              backgroundColor:
-                graphDay === 2
-                  ? COLOR.YELLOW[20]
-                  : finalTheme === 'light'
-                  ? COLOR.LIGHT[100]
-                  : COLOR.LIGHT[40],
+              backgroundColor: buttonColor(2),
               width:
                 month === new Date().getMonth()
-                  ? Dimensions.get('screen').width / 4.2
-                  : Dimensions.get('screen').width / 2.2,
+                  ? screenWidth / 4.2
+                  : screenWidth / 2.2,
             },
           ]}
           onPress={() => {
@@ -238,16 +244,11 @@ function Graph({
           style={[
             styles.filterBtn,
             {
-              backgroundColor:
-                graphDay === 3
-                  ? COLOR.YELLOW[20]
-                  : finalTheme === 'light'
-                  ? COLOR.LIGHT[100]
-                  : COLOR.LIGHT[40],
+              backgroundColor: buttonColor(3),
               width:
                 month === new Date().getMonth()
-                  ? Dimensions.get('screen').width / 4.2
-                  : Dimensions.get('screen').width / 2.2,
+                  ? screenWidth / 4.2
+                  : screenWidth / 2.2,
             },
           ]}
           onPress={() => {

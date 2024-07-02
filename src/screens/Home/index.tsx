@@ -211,6 +211,7 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
             scrollEnabled={false}
             renderItem={({item}) => (
               <TransactionItem
+                key={item.id}
                 item={item}
                 navigation={navigation}
                 scheme={scheme}
@@ -225,7 +226,7 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
   );
 }
 
-export default Home;
+export default React.memo(Home);
 
 function ListEmptyComponent() {
   const COLOR = useAppTheme();

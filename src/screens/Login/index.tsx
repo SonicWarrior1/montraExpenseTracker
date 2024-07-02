@@ -60,38 +60,36 @@ function Login({navigation}: Readonly<LoginScreenProps>) {
       try {
         dispatch(setLoading(true));
         const creds = await auth().signInWithEmailAndPassword(email, pass);
-        if (creds) {
-          if (creds.user.emailVerified) {
-            const data = await userCollection.doc(creds.user.uid).get();
-            const user = UserFromJson(data.data()!);
-            dispatch(userLoggedIn(user));
-            dispatch(setTheme(undefined));
-          } else {
-            Alert.alert(STRINGS.PleaseVerifyEmail, STRINGS.VerifyEmailSent, [
-              {
-                text: 'Resend',
-                onPress: () => {
-                  (async () => {
-                    try {
-                      await creds.user.sendEmailVerification();
-                      await auth().signOut();
-                    } catch (e) {
-                      console.log(e);
-                      await auth().signOut();
-                    }
-                  })();
-                },
-              },
-              {
-                text: 'OK',
-                onPress: () => {
-                  (async () => {
+        if (creds.user.emailVerified) {
+          const data = await userCollection.doc(creds.user.uid).get();
+          const user = UserFromJson(data.data()!);
+          dispatch(userLoggedIn(user));
+          dispatch(setTheme(undefined));
+        } else {
+          Alert.alert(STRINGS.PleaseVerifyEmail, STRINGS.VerifyEmailSent, [
+            {
+              text: 'Resend',
+              onPress: () => {
+                (async () => {
+                  try {
+                    await creds.user.sendEmailVerification();
                     await auth().signOut();
-                  })();
-                },
+                  } catch (e) {
+                    console.log(e);
+                    await auth().signOut();
+                  }
+                })();
               },
-            ]);
-          }
+            },
+            {
+              text: 'OK',
+              onPress: () => {
+                (async () => {
+                  await auth().signOut();
+                })();
+              },
+            },
+          ]);
         }
       } catch (e: any) {
         const error: FirebaseAuthTypes.NativeFirebaseAuthError = e;
@@ -107,14 +105,6 @@ function Login({navigation}: Readonly<LoginScreenProps>) {
   async function onGoogleButtonPress() {
     try {
       dispatch(setLoading(true));
-      // if (await GoogleSignin.isSignedIn()) {
-      //   await GoogleSignin.signOut();
-      // }
-      // Check if your device supports Google Play
-      // await GoogleSignin.hasPlayServices({showPlayServicesUpdateDialog: true});
-
-      // // Get the users ID token
-      // const {idToken} = await GoogleSignin.signIn()
       let idToken;
       if (Platform.OS === 'ios') {
         idToken = await NativeModules.GoogleSigninModule.googleSignin();

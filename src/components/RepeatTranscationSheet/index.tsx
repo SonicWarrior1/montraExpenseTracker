@@ -4,7 +4,13 @@ import style from './styles';
 import CustomDropdown from '../CustomDropDown';
 import CustomButton from '../CustomButton';
 import CustomInput from '../CustomInput';
-import {monthData, STRINGS, weekData} from '../../constants/strings';
+import {
+  EndDropdownData,
+  FreqDropdownData,
+  monthData,
+  STRINGS,
+  weekData,
+} from '../../constants/strings';
 import {repeatDataType} from '../../defs/transaction';
 import SheetBackdrop from '../SheetBackDrop';
 import {useAppTheme} from '../../hooks/themeHook';
@@ -88,10 +94,7 @@ function RepeatTransactionSheet({
     return daysInYear;
   }, [year]);
   useEffect(() => {
-    setFreq(
-      (repeatData?.freq as 'yearly' | 'monthly' | 'weekly' | 'daily') ??
-        undefined,
-    );
+    setFreq((repeatData?.freq as freqType) ?? undefined);
     setMonth(repeatData?.month ?? 1);
     setDay(repeatData?.day ?? 1);
     setWeekDay(repeatData?.weekDay ?? 1);
@@ -118,16 +121,11 @@ function RepeatTransactionSheet({
         <View style={styles.flexRow}>
           <View style={[styles.flex, {minWidth: 35}]}>
             <CustomDropdown
-              data={[
-                {label: 'Yearly', value: 'yearly'},
-                {label: 'Monthly', value: 'monthly'},
-                {label: 'Weekly', value: 'weekly'},
-                {label: 'Daily', value: 'daily'},
-              ]}
+              data={FreqDropdownData}
               onChange={val => {
                 setFreq(val.value);
               }}
-              placeholder="Frequency"
+              placeholder={STRINGS.Frequency}
               value={freq}
             />
           </View>
@@ -183,21 +181,18 @@ function RepeatTransactionSheet({
           )}
         </View>
         <AnimatedEmptyError
-          errorText="Please select an option"
+          errorText={STRINGS.PleaseSelectOption}
           value={freq ?? ''}
           formKey={formkey}
         />
         <View style={styles.flexRow}>
           <View style={styles.flex}>
             <CustomDropdown
-              data={[
-                {label: 'Never', value: 'never'},
-                {label: 'Date', value: 'date'},
-              ]}
+              data={EndDropdownData}
               onChange={val => {
                 setEnd(val.value);
               }}
-              placeholder="End After"
+              placeholder={STRINGS.EndAfter}
               value={end}
               disable={freq === undefined}
             />
@@ -238,7 +233,7 @@ function RepeatTransactionSheet({
           )}
         </View>
         <AnimatedEmptyError
-          errorText="Please select an option"
+          errorText={STRINGS.PleaseSelectOption}
           value={end ?? ''}
           formKey={formkey}
         />

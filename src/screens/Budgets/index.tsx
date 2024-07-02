@@ -105,7 +105,7 @@ function BudgetScreen({navigation}: Readonly<BudgetScreenProps>) {
           )}
           {month === new Date().getMonth() && (
             <CustomButton
-              title={STRINGS.CreateBudget}
+              title={STRINGS.CreateABudget}
               onPress={() => {
                 navigation.push(NAVIGATION.CreateBudget, {isEdit: false});
               }}

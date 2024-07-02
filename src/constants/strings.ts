@@ -49,7 +49,9 @@ export const NAVIGATION: {
 };
 
 export const STRINGS = {
-  Cancel:'Cancel',
+  PleaseFillBothFields: "Please fill both the fields.",
+  PleaseSelectOption: 'Please select an option',
+  Cancel: 'Cancel',
   NoDataToExport: 'There is no data to be exported',
   Verify: 'Verify',
   LOGIN: 'Login',
@@ -123,8 +125,10 @@ export const STRINGS = {
   NoBudget: "You don't have a budget.",
   CreateBudgetForThisMonth: "Let's make one so you are in control.",
   LimitExceeded: "You've exceeded the limit!",
-  CreateBudget: 'Create a Budget',
+  CreateABudget: 'Create a Budget',
+  CreateBudget: 'Create Budget',
   HowMuch: 'How much?',
+  SliderError: 'Value cannot be zero. Please adjust the slider',
   HowMuchDoSpent: 'How much do you want to spend?',
   RecieveAlert: 'Receive Alert',
   RecieveAlertWhen: 'Receive alert when it reaches',
@@ -133,6 +137,7 @@ export const STRINGS = {
   Edit: 'Edit',
   Whendaterange: 'When date range?',
   WhatFormat: 'What format do you want to export?',
+  DetailBudget: "Detail Budget",
   Export: 'Export',
   NoData: 'No Data',
   NotEnoughData: 'Not enough data',
@@ -140,6 +145,7 @@ export const STRINGS = {
   Week: 'Week',
   Year: 'Year',
   LoginGoogle: 'Log in with Google',
+  ForgotPasswordTitle: 'Forgot Password',
   ForgotPassword: 'Forgot Password ?',
   DontHaveAccount: "Don't have an account yet?",
   Notifications: 'Notifications',
@@ -157,6 +163,8 @@ export const STRINGS = {
   Logout: 'Logout',
   Currency: 'Currency',
   Theme: 'Theme',
+  DetailTransaction: "Detail Transaction",
+  FinancialReport: 'Financial Report',
   ThisMonth: 'This Month',
   YouSpend: 'You Spend',
   YouEarned: 'You Earned',
@@ -205,7 +213,15 @@ export const STRINGS = {
   VerifyEmailSent: 'A verification email has already been sent to your registered email address, so verify your email before login.',
   AreYouSure: 'Are you sure ?',
   AreYouSureDelete: 'Are you sure you want to delete all the notifications.',
-
+  DiscardChanges: 'Discard changes?',
+  UnsavedChanges: 'You have unsaved changes. Are you sure you want to discard them and leave the screen?',
+  EmailNotRegistered:'This email is not registered',
+  LeaveWithoutSettingPin:'Are you sure you want to leave without setting up your pin?',
+  EmailAdressAlreadyUsed:'The email address is already in use by another account.',
+  CredentialMalformed:'The supplied auth credential is malformed or has expired.',
+  NetworkError:'A network error (such as timeout, interrupted connection or unreachable host) has occurred.',
+  UnknownError:'An unknown error occurred. Please try again later.',
+  
 };
 export const OnboardData = [
   {
@@ -274,6 +290,15 @@ export const currencies: { [key: string]: { name: string, symbol: string, code: 
   'DKK': { name: 'Danish Krone', symbol: 'kr', code: 'DKK' },
   'KRW': { name: 'South Korean Won', symbol: '₩', code: 'KRW' },
 };
-
+export const FreqDropdownData = [
+  { label: 'Yearly', value: 'yearly' },
+  { label: 'Monthly', value: 'monthly' },
+  { label: 'Weekly', value: 'weekly' },
+  { label: 'Daily', value: 'daily' },
+]
+export const EndDropdownData = [
+  { label: 'Never', value: 'never' },
+  { label: 'Date', value: 'date' },
+]
 export const initialExpenseCategories = ['add', 'food', 'bill', 'shopping', 'subscription', 'transportation'];
 export const initialIncomeCategories = ['add', 'salary', 'passive income'];

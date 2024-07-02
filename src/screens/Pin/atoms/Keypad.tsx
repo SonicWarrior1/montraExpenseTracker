@@ -1,7 +1,6 @@
 import React from 'react';
 import {Text, TouchableOpacity, View} from 'react-native';
 import styles from '../styles';
-import uuid from 'react-native-uuid';
 import {ICONS} from '../../../constants/icons';
 import {COLORS} from '../../../constants/commonStyles';
 const matrix = [

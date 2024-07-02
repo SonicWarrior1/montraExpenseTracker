@@ -54,10 +54,8 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
     | transactionType
     | OnlineTransactionModel
     | OfflineTransactionModel
-    | undefined;
-  if (isEdit) {
-    prevTransaction = route.params.transaction;
-  }
+    | undefined = route.params.transaction;
+
   const TransOnline = useObject(
     OnlineTransactionModel,
     prevTransaction?.id ?? '',
@@ -179,47 +177,48 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
     ) {
       return;
     }
-    console.log('loading condition');
     dispatch(setLoading(true));
 
     const {attachement, attachementType} = getAttachmentAndType();
     try {
       const id = uuid.v4().toString();
       if (!isConnected) {
-        setTimeout(async () => {
-          await handleOffline({
-            attachement: attachement,
-            attachementType: attachementType,
-            id: id,
-            amount: amount,
-            category: category,
-            conversion: conversion,
-            currency: user?.currency,
-            desc: desc,
-            dispatch: dispatch,
-            from: from,
-            isConnected: isConnected,
-            isEdit: isEdit,
-            month: month,
-            pageType: pageType,
-            prevTransaction: prevTransaction,
-            realm: realm,
-            repeatData: repeatData,
-            to: to,
-            uid: user?.uid!,
-            user: user,
-            wallet: wallet,
-            TransOnline: TransOnline,
-          });
-          Toast.show({
-            text1: `Transaction has been ${
-              isEdit ? 'Updated' : 'Added'
-            } Successfully`,
-            type: 'custom',
-            swipeable: false,
-          });
-          navigation.pop();
-          dispatch(setLoading(false));
+        setTimeout(() => {
+          (async () => {
+            await handleOffline({
+              attachement: attachement,
+              attachementType: attachementType,
+              id: id,
+              amount: amount,
+              category: category,
+              conversion: conversion,
+              currency: user?.currency,
+              desc: desc,
+              dispatch: dispatch,
+              from: from,
+              isConnected: isConnected,
+              isEdit: isEdit,
+              month: month,
+              pageType: pageType,
+              prevTransaction: prevTransaction,
+              realm: realm,
+              repeatData: repeatData,
+              to: to,
+              uid: user?.uid!,
+              user: user,
+              wallet: wallet,
+              TransOnline: TransOnline,
+            });
+            Toast.show({
+              text1: `Transaction has been ${
+                isEdit ? 'Updated' : 'Added'
+              } Successfully`,
+              type: 'custom',
+              swipeable: false,
+            });
+            navigation.pop();
+            dispatch(setLoading(false));
+          })();
         }, 250);
       } else {
         await handleOnline({
@@ -273,13 +272,13 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
           wallet !== ''))
     ) {
       Alert.alert(
-        'Discard changes?',
-        'You have unsaved changes. Are you sure you want to discard them and leave the screen?',
+        STRINGS.DiscardChanges,
+        STRINGS.UnsavedChanges,
         [
           {
-            text: 'No',
+            text: STRINGS.No,
           },
-          {text: 'Yes', onPress: () => [navigation.goBack()]},
+          {text: STRINGS.Yes, onPress: () => [navigation.goBack()]},
         ],
       );
     } else {
@@ -395,7 +394,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
                 </View>
               </View>
               <CompundEmptyError
-                errorText="Please fill both the fields."
+                errorText={STRINGS.PleaseFillBothFields}
                 value1={to}
                 value2={from}
                 formKey={formKey}
