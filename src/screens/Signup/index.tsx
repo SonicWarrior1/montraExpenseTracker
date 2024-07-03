@@ -159,7 +159,16 @@ function Signup({navigation}: Readonly<SignupScreenProps>) {
       dispatch(setLoading(false));
     } catch (e: any) {
       const error: FirebaseAuthTypes.NativeFirebaseAuthError = e;
-      Toast.show({text1: FirebaseAuthErrorHandler(error.code), type: 'error'});
+      if (
+        error.message !==
+        'android.credentials.GetCredentialException.TYPE_USER_CANCELED'
+      ) {
+        Toast.show({
+          text1: FirebaseAuthErrorHandler(error.code),
+          type: 'error',
+        });
+      }
+
       console.log(e);
       dispatch(setLoading(false));
     }

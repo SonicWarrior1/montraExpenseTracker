@@ -24,18 +24,22 @@ class GoogleSignInHandler(reactContext: ReactApplicationContext) : ReactContextB
 
     @ReactMethod
     fun signIn(promise: Promise) {
+        val activity = currentActivity ?: run {
+            promise.reject("ERROR", "Activity context is required")
+            return
+        }
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val result = credentialManager.getCredential(
                     request = request,
-                    context = reactApplicationContext
+                    context = activity
                 )
                 val credential=result.credential
                 val googleIdTokenCredential=GoogleIdTokenCredential.createFrom(credential.data)
                 val idToken=googleIdTokenCredential.idToken
                 promise.resolve(idToken)
             } catch (e: GetCredentialException) {
-                promise.reject("ERROR", e)
+                promise.reject("ERROR", e.type)
             }
         }
     }
