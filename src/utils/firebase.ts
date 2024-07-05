@@ -338,79 +338,81 @@ export async function handleOnlineNotify({
     const totalBudget = (UserFromJson(curr.data() as UserType))?.budget?.[
         month
     ]?.[category];
-    if (
-        totalBudget &&
-        ((totalSpent >= totalBudget.limit) || (totalSpent >= totalBudget.limit * (totalBudget.percentage / 100)))
-    ) {
-        try {
-            const notificationId = uuid.v4();
-            await notifee.requestPermission();
-            const channelId = await notifee.createChannel({
-                id: 'default',
-                name: 'Default Channel',
-            });
-            if (totalSpent >= totalBudget.limit) {
-                await firestore()
-                    .collection('users')
-                    .doc(uid)
-                    .update({
-                        [`notification.${notificationId}`]: {
-                            type: encrypt('budget-limit', uid),
-                            category: encrypt(category, uid),
-                            id: notificationId,
-                            time: Timestamp.now(),
-                            read: false,
-                            percentage: totalBudget.percentage,
+    if (totalBudget.alert) {
+        if (
+            totalBudget &&
+            ((totalSpent >= totalBudget.limit) || (totalSpent >= totalBudget.limit * (totalBudget.percentage / 100)))
+        ) {
+            try {
+                const notificationId = uuid.v4();
+                await notifee.requestPermission();
+                const channelId = await notifee.createChannel({
+                    id: 'default',
+                    name: 'Default Channel',
+                });
+                if (totalSpent >= totalBudget.limit) {
+                    await firestore()
+                        .collection('users')
+                        .doc(uid)
+                        .update({
+                            [`notification.${notificationId}`]: {
+                                type: encrypt('budget-limit', uid),
+                                category: encrypt(category, uid),
+                                id: notificationId,
+                                time: Timestamp.now(),
+                                read: false,
+                                percentage: totalBudget.percentage,
+                            },
+                        });
+                    await notifee.displayNotification({
+                        title:
+                            category[0].toUpperCase() +
+                            category.slice(1) +
+                            ' Budget Limit Exceeded',
+                        body:
+                            'Your ' +
+                            category[0].toUpperCase() +
+                            category.slice(1) +
+                            ' budget has exceeded the limit',
+                        android: {
+                            channelId, pressAction: {
+                                id: 'default',
+                            },
                         },
                     });
-                await notifee.displayNotification({
-                    title:
-                        category[0].toUpperCase() +
-                        category.slice(1) +
-                        ' Budget Limit Exceeded',
-                    body:
-                        'Your ' +
-                        category[0].toUpperCase() +
-                        category.slice(1) +
-                        ' budget has exceeded the limit',
-                    android: {
-                        channelId, pressAction: {
-                            id: 'default',
-                        },
-                    },
-                });
-            } else if (totalSpent >= totalBudget.limit * (totalBudget.percentage / 100)) {
-                await firestore()
-                    .collection('users')
-                    .doc(uid)
-                    .update({
-                        [`notification.${notificationId}`]: {
-                            type: encrypt('budget-percent', uid),
-                            category: encrypt(category, uid),
-                            id: notificationId,
-                            time: Timestamp.now(),
-                            read: false,
-                            percentage: totalBudget.percentage,
+                } else if (totalSpent >= totalBudget.limit * (totalBudget.percentage / 100)) {
+                    await firestore()
+                        .collection('users')
+                        .doc(uid)
+                        .update({
+                            [`notification.${notificationId}`]: {
+                                type: encrypt('budget-percent', uid),
+                                category: encrypt(category, uid),
+                                id: notificationId,
+                                time: Timestamp.now(),
+                                read: false,
+                                percentage: totalBudget.percentage,
+                            },
+                        });
+                    await notifee.displayNotification({
+                        title:
+                            `Exceeded ${totalBudget.percentage}% of ${category[0].toUpperCase() +
+                            category.slice(1)
+                            } budget`,
+                        body:
+                            `You've exceeded ${totalBudget.percentage}% of your ${category[0].toUpperCase() +
+                            category.slice(1)} budget. Take action to stay on track.`,
+                        android: {
+                            channelId, pressAction: {
+                                id: 'default',
+                            },
                         },
                     });
-                await notifee.displayNotification({
-                    title:
-                        `Exceeded ${totalBudget.percentage}% of ${category[0].toUpperCase() +
-                        category.slice(1)
-                        } budget`,
-                    body:
-                        `You've exceeded ${totalBudget.percentage}% of your ${category[0].toUpperCase() +
-                        category.slice(1)} budget. Take action to stay on track.`,
-                    android: {
-                        channelId, pressAction: {
-                            id: 'default',
-                        },
-                    },
-                });
-            }
+                }
 
-        } catch (e) {
-            console.log(e);
+            } catch (e) {
+                console.log(e);
+            }
         }
     }
 }
@@ -471,7 +473,7 @@ export const handleOnline = async ({
 }: {
     id: string;
     attachement: string;
-    attachementType: 'none' | 'image' | 'doc';
+    attachementType: transactionType['attachementType'];
     uid: string
     amount: string,
     pageType: transType,
@@ -618,7 +620,7 @@ export const handleOffline = async ({
     isConnected: boolean | null,
     id: string;
     attachement: string;
-    attachementType: 'none' | 'image' | 'doc';
+    attachementType: transactionType['attachementType'];
     uid: string
     amount: string,
     pageType: transType,
@@ -912,116 +914,118 @@ export async function handleOfflineNotification({ totalBudget, totalSpent, realm
         user: UserType | undefined
     }
 ) {
-    if (
-        totalBudget &&
-        (totalSpent >= totalBudget.limit ||
-            totalSpent >= totalBudget.limit * (totalBudget.percentage / 100))
-    ) {
-        try {
-            const notificationId = uuid.v4();
-            await notifee.requestPermission();
-            const channelId = await notifee.createChannel({
-                id: 'default',
-                name: 'Default Channel',
-            });
-            if (totalSpent >= totalBudget.limit) {
-                realm.write(() => {
-                    realm.create(
-                        'notification',
-                        {
-                            type: 'budget-limit',
-                            category: category!,
-                            id: notificationId,
-                            time: Timestamp.now(),
-                            read: false,
-                            percentage: totalBudget.percentage,
-                            deleted: false,
-                        },
-                        UpdateMode.All,
-                    );
+    if (totalBudget?.alert) {
+        if (
+            totalBudget &&
+            (totalSpent >= totalBudget.limit ||
+                totalSpent >= totalBudget.limit * (totalBudget.percentage / 100))
+        ) {
+            try {
+                const notificationId = uuid.v4();
+                await notifee.requestPermission();
+                const channelId = await notifee.createChannel({
+                    id: 'default',
+                    name: 'Default Channel',
                 });
-                dispatch(
-                    userLoggedIn({
-                        ...user,
-                        notification: {
-                            ...user!.notification,
-                            [notificationId as string]: {
+                if (totalSpent >= totalBudget.limit) {
+                    realm.write(() => {
+                        realm.create(
+                            'notification',
+                            {
                                 type: 'budget-limit',
                                 category: category!,
                                 id: notificationId,
                                 time: Timestamp.now(),
                                 read: false,
                                 percentage: totalBudget.percentage,
+                                deleted: false,
+                            },
+                            UpdateMode.All,
+                        );
+                    });
+                    dispatch(
+                        userLoggedIn({
+                            ...user,
+                            notification: {
+                                ...user!.notification,
+                                [notificationId as string]: {
+                                    type: 'budget-limit',
+                                    category: category!,
+                                    id: notificationId,
+                                    time: Timestamp.now(),
+                                    read: false,
+                                    percentage: totalBudget.percentage,
+                                },
+                            },
+                        }),
+                    );
+                    await notifee.displayNotification({
+                        title:
+                            category![0].toUpperCase() +
+                            category!.slice(1) +
+                            ' Budget Limit Exceeded',
+                        body:
+                            'Your ' +
+                            category![0].toUpperCase() +
+                            category!.slice(1) +
+                            ' budget has exceeded the limit',
+                        android: {
+                            channelId,
+                            pressAction: {
+                                id: 'default',
                             },
                         },
-                    }),
-                );
-                await notifee.displayNotification({
-                    title:
-                        category![0].toUpperCase() +
-                        category!.slice(1) +
-                        ' Budget Limit Exceeded',
-                    body:
-                        'Your ' +
-                        category![0].toUpperCase() +
-                        category!.slice(1) +
-                        ' budget has exceeded the limit',
-                    android: {
-                        channelId,
-                        pressAction: {
-                            id: 'default',
-                        },
-                    },
-                });
-            } else if (
-                totalSpent >=
-                totalBudget.limit * (totalBudget.percentage / 100)
-            ) {
-                realm.write(() => {
-                    realm.create(
-                        'notification',
-                        {
-                            type: 'budget-percent',
-                            category: category!,
-                            id: notificationId,
-                            time: Timestamp.now(),
-                            read: false,
-                            percentage: totalBudget.percentage,
-                            deleted: false,
-                        },
-                        UpdateMode.All,
-                    );
-                });
-                dispatch(
-                    userLoggedIn({
-                        ...user,
-                        notification: {
-                            ...user!.notification,
-                            [notificationId as string]: {
+                    });
+                } else if (
+                    totalSpent >=
+                    totalBudget.limit * (totalBudget.percentage / 100)
+                ) {
+                    realm.write(() => {
+                        realm.create(
+                            'notification',
+                            {
                                 type: 'budget-percent',
                                 category: category!,
                                 id: notificationId,
                                 time: Timestamp.now(),
                                 read: false,
                                 percentage: totalBudget.percentage,
+                                deleted: false,
+                            },
+                            UpdateMode.All,
+                        );
+                    });
+                    dispatch(
+                        userLoggedIn({
+                            ...user,
+                            notification: {
+                                ...user!.notification,
+                                [notificationId as string]: {
+                                    type: 'budget-percent',
+                                    category: category!,
+                                    id: notificationId,
+                                    time: Timestamp.now(),
+                                    read: false,
+                                    percentage: totalBudget.percentage,
+                                },
+                            },
+                        }),
+                    );
+                    await notifee.displayNotification({
+                        title: `Exceeded ${totalBudget.percentage}% of ${category![0].toUpperCase() + category!.slice(1)
+                            } budget`,
+                        body: `You've exceeded ${totalBudget.percentage}% of your ${category![0].toUpperCase() + category!.slice(1)
+                            } budget. Take action to stay on track.`,
+                        android: {
+                            channelId, pressAction: {
+                                id: 'default',
                             },
                         },
-                    }),
-                );
-                await notifee.displayNotification({
-                    title: `Exceeded ${totalBudget.percentage}% of ${category![0].toUpperCase() + category!.slice(1)
-                        } budget`,
-                    body: `You've exceeded ${totalBudget.percentage}% of your ${category![0].toUpperCase() + category!.slice(1)
-                        } budget. Take action to stay on track.`,
-                    android: {
-                        channelId, pressAction: {
-                            id: 'default',
-                        },
-                    },
-                });
+                    });
+                }
+            } catch (e) {
+                console.log(e);
             }
-        } catch (e) {
-            console.log(e);
         }
     }
 }

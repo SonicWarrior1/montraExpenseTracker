@@ -32,6 +32,7 @@ function AttachementContainer({
       | {
           uri: string;
           name: string;
+          type: string;
         }
       | undefined
     >

@@ -12,9 +12,9 @@ export type transactionType = {
     freq: repeatDataType | null;
     timeStamp: Timestamp | TimestampModel,
     type: 'expense' | 'income' | 'transfer',
-    attachementType: 'image' | 'doc' | 'none',
-    from:string,
-    to:string
+    attachementType: 'image' | 'pdf' | 'doc' | 'docx' | 'csv' | 'xls' | 'xlsx' | 'txt' | 'none',
+    from: string,
+    to: string
 }
 export type repeatDataType = {
     freq: 'yearly' | 'monthly' | 'weekly' | 'daily';

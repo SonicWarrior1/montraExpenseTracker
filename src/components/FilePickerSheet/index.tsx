@@ -15,10 +15,12 @@ import SheetButtons from '../SheetButton';
 // Third Party Libraries
 import RNBlobUtil from 'react-native-blob-util';
 import {BottomSheetModalMethods} from '@gorhom/bottom-sheet/lib/typescript/types';
-import {pickSingle} from 'react-native-document-picker';
+import {pickSingle, types} from 'react-native-document-picker';
 import {useNetInfo} from '@react-native-community/netinfo';
 import {Platform} from 'react-native';
-import { throttle } from '../../utils/transFuncs';
+import {throttle} from '../../utils/transFuncs';
+import Toast from 'react-native-toast-message';
+import {MimeToExtension} from '../../utils/commonFuncs';
 
 function FilePickerSheet({
   bottomSheetModalRef,
@@ -33,6 +35,7 @@ function FilePickerSheet({
       | {
           uri: string;
           name: string;
+          type: string;
         }
       | undefined
     >
@@ -85,17 +88,31 @@ function FilePickerSheet({
       let res = await pickSingle({
         copyTo: 'cachesDirectory',
         allowMultiSelection: false,
+        type: [
+          types.pdf,
+          types.doc,
+          types.docx,
+          types.plainText,
+          types.csv,
+          types.xls,
+          types.xlsx,
+        ],
       });
-      let uri = res.fileCopyUri ?? res.uri;
-      if (!isConnected) {
-        const filePath = Platform.OS === 'ios' ? res.uri.slice(7) : res.uri;
-        uri = await RNBlobUtil.fs.readFile(filePath, 'base64');
-      }
-      if (res) {
-        setDoc({uri: uri, name: res.name!});
-        bottomSheetModalRef.current?.close();
+      if (res.size! < 10485760) {
+        let uri = res.fileCopyUri ?? res.uri;
+        if (!isConnected) {
+          const filePath = Platform.OS === 'ios' ? res.uri.slice(7) : res.uri;
+          uri = await RNBlobUtil.fs.readFile(filePath, 'base64');
+        }
+        if (res) {
+          setDoc({uri: uri, name: res.name!, type: MimeToExtension[res.type!]});
+          bottomSheetModalRef.current?.close();
+        } else {
+          console.log('User cancelled doc picker');
+        }
       } else {
-        console.log('User cancelled doc picker');
+        Toast.show({text1: STRINGS.FileError, type: 'error'});
+        bottomSheetModalRef.current?.close();
       }
     } catch (e) {
       console.log(e);
@@ -116,17 +133,17 @@ function FilePickerSheet({
         <SheetButtons
           title={STRINGS.Camera}
           icon={ICONS.Camera}
-          onPress={throttle(openCamera,1000)}
+          onPress={throttle(openCamera, 1000)}
         />
         <SheetButtons
           title={STRINGS.Image}
           icon={ICONS.Gallery}
-          onPress={throttle(openImagePicker,1000)}
+          onPress={throttle(openImagePicker, 1000)}
         />
         <SheetButtons
           title={STRINGS.Document}
           icon={ICONS.Document}
-          onPress={throttle(docPicker,1000)}
+          onPress={throttle(docPicker, 1000)}
         />
       </BottomSheetView>
     </BottomSheetModal>

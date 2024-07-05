@@ -49,7 +49,8 @@ export const NAVIGATION: {
 };
 
 export const STRINGS = {
-  PleaseFillBothFields: "Please fill both the fields.",
+  FileError: 'File should be less than 10 Mb',
+  PleaseFillBothFields: 'Please fill both the fields.',
   PleaseSelectOption: 'Please select an option',
   Cancel: 'Cancel',
   NoDataToExport: 'There is no data to be exported',
@@ -137,7 +138,7 @@ export const STRINGS = {
   Edit: 'Edit',
   Whendaterange: 'When date range?',
   WhatFormat: 'What format do you want to export?',
-  DetailBudget: "Detail Budget",
+  DetailBudget: 'Detail Budget',
   Export: 'Export',
   NoData: 'No Data',
   NotEnoughData: 'Not enough data',
@@ -163,7 +164,7 @@ export const STRINGS = {
   Logout: 'Logout',
   Currency: 'Currency',
   Theme: 'Theme',
-  DetailTransaction: "Detail Transaction",
+  DetailTransaction: 'Detail Transaction',
   FinancialReport: 'Financial Report',
   ThisMonth: 'This Month',
   YouSpend: 'You Spend',
@@ -215,13 +216,13 @@ export const STRINGS = {
   AreYouSureDelete: 'Are you sure you want to delete all the notifications.',
   DiscardChanges: 'Discard changes?',
   UnsavedChanges: 'You have unsaved changes. Are you sure you want to discard them and leave the screen?',
-  EmailNotRegistered:'This email is not registered',
-  LeaveWithoutSettingPin:'Are you sure you want to leave without setting up your pin?',
-  EmailAdressAlreadyUsed:'The email address is already in use by another account.',
-  CredentialMalformed:'The supplied auth credential is malformed or has expired.',
-  NetworkError:'A network error (such as timeout, interrupted connection or unreachable host) has occurred.',
-  UnknownError:'An unknown error occurred. Please try again later.',
-  
+  EmailNotRegistered: 'This email is not registered',
+  LeaveWithoutSettingPin: 'Are you sure you want to leave without setting up your pin?',
+  EmailAdressAlreadyUsed: 'The email address is already in use by another account.',
+  CredentialMalformed: 'The supplied auth credential is malformed or has expired.',
+  NetworkError: 'A network error (such as timeout, interrupted connection or unreachable host) has occurred.',
+  UnknownError: 'An unknown error occurred. Please try again later.',
+
 };
 export const OnboardData = [
   {
@@ -295,10 +296,10 @@ export const FreqDropdownData = [
   { label: 'Monthly', value: 'monthly' },
   { label: 'Weekly', value: 'weekly' },
   { label: 'Daily', value: 'daily' },
-]
+];
 export const EndDropdownData = [
   { label: 'Never', value: 'never' },
   { label: 'Date', value: 'date' },
-]
+];
 export const initialExpenseCategories = ['add', 'food', 'bill', 'shopping', 'subscription', 'transportation'];
 export const initialIncomeCategories = ['add', 'salary', 'passive income'];

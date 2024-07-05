@@ -96,9 +96,17 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
       ? prevTransaction.attachement
       : '',
   );
-  const [doc, setDoc] = useState<{uri: string; name: string} | undefined>(
-    prevTransaction && prevTransaction.attachementType === 'doc'
-      ? {uri: prevTransaction.attachement!, name: 'Document'}
+  const [doc, setDoc] = useState<
+    {uri: string; name: string; type: string} | undefined
+  >(
+    prevTransaction &&
+      prevTransaction.attachementType !== 'none' &&
+      prevTransaction.attachementType !== 'image'
+      ? {
+          uri: prevTransaction.attachement!,
+          name: 'Document',
+          type: prevTransaction.attachementType,
+        }
       : undefined,
   );
   const [repeatData, setRepeatData] = useState<
@@ -150,7 +158,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
       attachementType = 'image';
     } else if (doc) {
       attachement = doc.uri;
-      attachementType = 'doc';
+      attachementType = doc.type as transactionType['attachementType'];
     }
     return {attachement, attachementType};
   }, [image, doc]);
@@ -271,16 +279,12 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
           category !== '' ||
           wallet !== ''))
     ) {
-      Alert.alert(
-        STRINGS.DiscardChanges,
-        STRINGS.UnsavedChanges,
-        [
-          {
-            text: STRINGS.No,
-          },
-          {text: STRINGS.Yes, onPress: () => [navigation.goBack()]},
-        ],
-      );
+      Alert.alert(STRINGS.DiscardChanges, STRINGS.UnsavedChanges, [
+        {
+          text: STRINGS.No,
+        },
+        {text: STRINGS.Yes, onPress: () => [navigation.goBack()]},
+      ]);
     } else {
       navigation.goBack();
     }
