@@ -131,7 +131,7 @@ const TransactionItem = ({
               (
                 conversion.usd[(user?.currency ?? 'USD').toLowerCase()] *
                 item.amount
-              ).toFixed(1),
+              ).toFixed(2),
             ).toString(),
           )}
         </Text>

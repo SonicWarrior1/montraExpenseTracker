@@ -43,7 +43,7 @@ function Linegraph({
             (
               conversion.usd?.[currency!.toLowerCase()] *
               Number(transType === 'expense' ? totalSpend : totalIncome)
-            ).toFixed(1),
+            ).toFixed(2),
           ).toString(),
         )}
       </Text>
@@ -126,7 +126,7 @@ function Linegraph({
                   items: items,
                   currency: currency,
                   conversion: conversion,
-                  COLOR:COLOR
+                  COLOR:COLOR,
                 }),
             }}
           />

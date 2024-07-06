@@ -69,7 +69,7 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
   const [amount, setAmount] = useState<string>(
     isEdit
       ? (conversion.usd[currency!.toLowerCase()] * oldBudget?.limit!)
-          .toFixed(1)
+          .toFixed(2)
           .toString()
       : '0',
   );
@@ -240,16 +240,12 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
       Number(amount.replace(/,/g, '')) > 0 ||
       category !== ''
     ) {
-      Alert.alert(
-        STRINGS.DiscardChanges,
-        STRINGS.UnsavedChanges,
-        [
-          {
-            text: 'No',
-          },
-          {text: 'Yes', onPress: () => [navigation.goBack()]},
-        ],
-      );
+      Alert.alert(STRINGS.DiscardChanges, STRINGS.UnsavedChanges, [
+        {
+          text: 'No',
+        },
+        {text: 'Yes', onPress: () => [navigation.goBack()]},
+      ]);
     } else {
       navigation.goBack();
     }
@@ -279,12 +275,15 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
               <TextInput
                 style={styles.input}
                 maxLength={10}
+                numberOfLines={1}
                 onPress={() => {
                   if (amount === '0') {
                     setAmount('');
                   }
                 }}
-                onChangeText={(str: string) => AmountInputSetter(str,setAmount)}
+                onChangeText={(str: string) =>
+                  AmountInputSetter(str, setAmount)
+                }
                 value={amount}
                 keyboardType="numeric"
                 onBlur={() => {

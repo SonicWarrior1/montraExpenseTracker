@@ -123,7 +123,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
             (
               conversion.usd[(user?.currency ?? 'USD').toLowerCase()] *
               prevTransaction.amount
-            ).toFixed(1),
+            ).toFixed( 2),
           ).toString(),
         )
       : '0',

@@ -7,7 +7,7 @@ function LinegraphLabel({
   items,
   currency,
   conversion,
-  COLOR
+  COLOR,
 }: Readonly<{
   items: {date: string; value: number}[];
   currency: string | undefined;
@@ -27,7 +27,7 @@ function LinegraphLabel({
         <Text style={styles.amt} numberOfLines={1}>
           {currencies[currency!].symbol}{' '}
           {(conversion.usd?.[currency!.toLowerCase()] * Number(items[0].value))
-            .toFixed(1)
+            .toFixed(2)
             .toString()}
         </Text>
       </View>

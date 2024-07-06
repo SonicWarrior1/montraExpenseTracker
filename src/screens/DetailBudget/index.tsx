@@ -87,7 +87,7 @@ function DetailBudget({navigation, route}: Readonly<DetailBudgetScreenProps>) {
                       (
                         conversion.usd[currency!.toLowerCase()] *
                         (Number(budget.limit) - Number(spend))
-                      ).toFixed(1),
+                      ).toFixed(2),
                     ).toString(),
                   )}
             </Text>

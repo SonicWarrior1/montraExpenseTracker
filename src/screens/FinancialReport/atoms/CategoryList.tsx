@@ -68,7 +68,7 @@ function CategoryList({
                   style={[
                     styles.colorBox,
                     {backgroundColor: catColors![item[0]]},
-                  ]}></View>
+                  ]} />
                 <Text style={styles.catText} numberOfLines={1}>
                   {item[0][0].toUpperCase() + item[0].slice(1)}
                 </Text>
@@ -88,8 +88,8 @@ function CategoryList({
                 {formatWithCommas(
                   Number(
                     (
-                      conversion['usd']?.[currency!.toLowerCase()] * item[1]
-                    ).toFixed(1),
+                      conversion.usd?.[currency!.toLowerCase()] * item[1]
+                    ).toFixed(2),
                   ).toString(),
                 )}
               </Text>

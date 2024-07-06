@@ -37,6 +37,7 @@ function MoneyInput({
         <TextInput
           style={styles.input}
           maxLength={10}
+          numberOfLines={1}
           onPress={() => {
             if (amount === '0') {
               setAmount('');

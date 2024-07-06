@@ -102,12 +102,12 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
                 Number(
                   (
                     conversion.usd?.[(currency ?? 'USD').toLowerCase()] * 9400
-                  ).toFixed(1),
+                  ).toFixed(2),
                 ),
               )
                 ? 0
                 : (conversion.usd?.[(currency ?? 'USD').toLowerCase()] * 9400)
-                    .toFixed(1)
+                    .toFixed(2)
                     .toString()}
             </Text>
             <View style={styles.transRow}>
@@ -129,7 +129,7 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
                         (
                           conversion.usd?.[currency.toLowerCase()] *
                           Number(totalIncome)
-                        ).toFixed(1),
+                        ).toFixed(2),
                       ),
                     )
                       ? 0
@@ -138,7 +138,7 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
                             (
                               conversion.usd?.[currency.toLowerCase()] *
                               Number(totalIncome)
-                            ).toFixed(1),
+                            ).toFixed(2),
                           ).toString(),
                         )}
                   </Text>
@@ -162,7 +162,7 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
                         (
                           conversion.usd?.[currency.toLowerCase()] *
                           Number(totalSpend)
-                        ).toFixed(1),
+                        ).toFixed(2),
                       ),
                     )
                       ? 0
@@ -171,7 +171,7 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
                             (
                               conversion.usd?.[currency.toLowerCase()] *
                               Number(totalSpend)
-                            ).toFixed(1),
+                            ).toFixed(2),
                           ).toString(),
                         )}
                   </Text>

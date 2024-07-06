@@ -60,12 +60,12 @@ function BudgetItem({
     if (val.limit - spend[key] < 0) {
       return '0';
     } else if (spend[key] === undefined) {
-      return (conversion.usd[currency!.toLowerCase()] * val.limit).toFixed(1);
+      return (conversion.usd[currency!.toLowerCase()] * val.limit).toFixed(2);
     } else {
       return (
         conversion.usd[currency!.toLowerCase()] *
         (val.limit - (spend[key] ?? 0))
-      ).toFixed(1);
+      ).toFixed(2);
     }
   };
   return (
@@ -108,13 +108,13 @@ function BudgetItem({
           Number(
             (
               conversion.usd[currency!.toLowerCase()] * (spend[key] ?? 0)
-            ).toFixed(1),
+            ).toFixed(2),
           ).toString(),
         )}{' '}
         of {currencies[currency!].symbol}
         {formatWithCommas(
           Number(
-            (conversion.usd[currency!.toLowerCase()] * val.limit).toFixed(1),
+            (conversion.usd[currency!.toLowerCase()] * val.limit).toFixed(2),
           ).toString(),
         )}
       </Text>

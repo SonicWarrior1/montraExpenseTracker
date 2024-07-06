@@ -188,7 +188,7 @@ export default function StoryScreen({navigation}: Readonly<StoryScreenProps>) {
                         Object.values(
                           user?.spend[new Date().getMonth()] ?? [],
                         ).reduce((acc, curr) => acc + curr, 0)
-                      ).toFixed(1),
+                      ).toFixed(2),
                     ).toString(),
                   )
                 : formatWithCommas(
@@ -198,7 +198,7 @@ export default function StoryScreen({navigation}: Readonly<StoryScreenProps>) {
                         Object.values(
                           user?.income[new Date().getMonth()] ?? [],
                         ).reduce((acc, curr) => acc + curr, 0)
-                      ).toFixed(1),
+                      ).toFixed( 2),
                     ).toString(),
                   )}
             </Text>
@@ -250,7 +250,7 @@ export default function StoryScreen({navigation}: Readonly<StoryScreenProps>) {
                       (
                         conversion.usd[currency!.toLowerCase()] *
                         biggestSpend[0][1]
-                      ).toFixed(1),
+                      ).toFixed(2),
                     ).toString(),
                   )
                 : formatWithCommas(
@@ -258,7 +258,7 @@ export default function StoryScreen({navigation}: Readonly<StoryScreenProps>) {
                       (
                         conversion.usd[currency!.toLowerCase()] *
                         biggestIncome[0][1]
-                      ).toFixed(1),
+                      ).toFixed( 2),
                     ).toString(),
                   )}
             </Text>

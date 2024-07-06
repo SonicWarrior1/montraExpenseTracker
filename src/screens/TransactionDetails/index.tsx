@@ -109,7 +109,7 @@ function TransactionDetails({
                 (
                   conversion.usd[(currency ?? 'USD').toLowerCase()] *
                   trans.amount
-                ).toFixed(1),
+                ).toFixed(2),
               ).toString(),
             )}
           </Text>
