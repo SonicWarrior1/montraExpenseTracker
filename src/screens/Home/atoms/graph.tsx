@@ -135,7 +135,7 @@ function Graph({
             hideAxesAndRules
             color={COLORS.VIOLET[100]}
             curveType={1}
-            curved={true}
+            curved={graphData.length === 2 ? false : true}
             overflowBottom={-1}
             onlyPositive
             disableScroll

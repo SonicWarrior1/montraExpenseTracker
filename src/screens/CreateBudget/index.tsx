@@ -36,6 +36,7 @@ import {
   handleOnlineNotify,
 } from '../../utils/firebase';
 import CategoryDropdownIcon from '../../components/CategoryColorIcon';
+import {RFValue} from 'react-native-responsive-fontsize';
 function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
   // constants
   const COLOR = useAppTheme();
@@ -68,9 +69,11 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
   // state
   const [amount, setAmount] = useState<string>(
     isEdit
-      ? (conversion.usd[currency!.toLowerCase()] * oldBudget?.limit!)
-          .toFixed(2)
-          .toString()
+      ? Number(
+          (conversion.usd[currency!.toLowerCase()] * oldBudget?.limit!).toFixed(
+            2,
+          ),
+        ).toString()
       : '0',
   );
   const [category, setCategory] = useState<string | undefined>(
@@ -273,7 +276,12 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
             <View style={styles.moneyCtr}>
               <Text style={styles.text2}>{currencies[currency!].symbol}</Text>
               <TextInput
-                style={styles.input}
+                style={[
+                  styles.input,
+                  {
+                    fontSize: RFValue(64 - (amount.length > 7 ? 15 : 0)),
+                  },
+                ]}
                 maxLength={10}
                 numberOfLines={1}
                 onPress={() => {

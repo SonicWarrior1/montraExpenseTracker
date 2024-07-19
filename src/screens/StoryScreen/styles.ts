@@ -63,7 +63,7 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
     },
     catRow: { flexDirection: 'row', columnGap: 15, marginTop: 30, flexWrap: "wrap", justifyContent: "center" },
     amt: {
-        fontSize: RFValue(64),
+        fontSize: RFValue(48),
         fontWeight: '700',
         color: COLOR.LIGHT[100],
 

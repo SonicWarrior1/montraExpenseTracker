@@ -158,7 +158,7 @@ export default function StoryScreen({navigation}: Readonly<StoryScreenProps>) {
           {index === 2 && (
             <View style={styles.catRow}>
               {budgetExceed?.map(item => (
-                <View style={styles.catCtr} key={item?.[0]?.[0] ?? ''}>
+                <View style={styles.catCtr} key={item?.[0] ?? ''}>
                   <View
                     style={[
                       styles.colorBox,

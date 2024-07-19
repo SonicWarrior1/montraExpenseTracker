@@ -49,6 +49,7 @@ export const NAVIGATION: {
 };
 
 export const STRINGS = {
+  AccountBalance:'Account Balance',
   FileError: 'File should be less than 10 Mb',
   PleaseFillBothFields: 'Please fill both the fields.',
   PleaseSelectOption: 'Please select an option',
@@ -169,7 +170,7 @@ export const STRINGS = {
   ThisMonth: 'This Month',
   YouSpend: 'You Spend',
   YouEarned: 'You Earned',
-  BudgetLimitExceed: ' Budget exceeds the limit',
+  BudgetLimitExceed: ' Budgets exceeds the limit',
   Quote: '“Financial freedom is freedom from fear.”',
   QuoteAuthor: '-Robert Kiyosaki',
   BiggestSpending: 'and your biggest spending is from',

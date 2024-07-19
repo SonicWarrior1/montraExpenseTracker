@@ -24,7 +24,7 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
         color: COLOR.LIGHT[100],
     },
     text2: {
-        fontSize: RFValue(18),
+        fontSize: RFValue(16),
         fontWeight: '600',
         color: COLOR.LIGHT[100],
         maxWidth: 100,

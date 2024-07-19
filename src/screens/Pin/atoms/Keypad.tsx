@@ -29,7 +29,9 @@ function Keypad({
                 color: COLORS.VIOLET[100],
               })
             ) : (
-              <Text style={styles.number}>{value === -1 ? 'DEL' : value}</Text>
+              <Text style={[styles.number, {fontSize: value === -1 ? 36 : 48}]}>
+                {value === -1 ? 'DEL' : value}
+              </Text>
             )}
           </TouchableOpacity>
         );

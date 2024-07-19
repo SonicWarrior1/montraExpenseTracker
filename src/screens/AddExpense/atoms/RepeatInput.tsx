@@ -162,7 +162,7 @@ function RepeatInput({
             onPress={() => {
               repeatSheetRef.current?.present();
             }}>
-            <Text style={styles.editBtnText}>Edit</Text>
+            <Text style={styles.editBtnText}>{STRINGS.Edit}</Text>
           </Pressable>
         </View>
       )}

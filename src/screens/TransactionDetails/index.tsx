@@ -215,6 +215,7 @@ function TransactionDetails({
           category={trans.category}
           amt={trans.amount}
           url={trans.attachement ?? ''}
+          timeStamp={trans.timeStamp}
         />
       </View>
     )

@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import {
+  Linking,
   NativeModules,
   Platform,
   Pressable,
@@ -257,7 +258,22 @@ function Signup({navigation}: Readonly<SignupScreenProps>) {
               <View style={{flex: 1, marginLeft: 16}}>
                 <Text style={{color: COLOR.DARK[100]}}>
                   {STRINGS.BySigningUp}{' '}
-                  <Text style={{color: COLORS.PRIMARY.VIOLET}}>
+                  <Text
+                    style={{color: COLORS.PRIMARY.VIOLET}}
+                    onPress={() => {
+                      Linking.canOpenURL(
+                        'https://montra-e9c39.web.app/terms',
+                      ).then(supported => {
+                        if (supported) {
+                          Linking.openURL('https://montra-e9c39.web.app/terms');
+                        } else {
+                          console.log(
+                            "Don't know how to open URI: " +
+                              'https://montra-e9c39.web.app/terms',
+                          );
+                        }
+                      });
+                    }}>
                     {STRINGS.Terms}
                   </Text>
                 </Text>
@@ -268,7 +284,7 @@ function Signup({navigation}: Readonly<SignupScreenProps>) {
           <Spacer height={20} />
           <CustomButton title={STRINGS.SIGNUP} onPress={handleSignup} />
           <Spacer height={10} />
-          <Text style={styles.orText}>{STRINGS.OrWith}</Text>
+          <Text style={styles.orText}>{STRINGS.Or}</Text>
           <Spacer height={10} />
           <TouchableOpacity onPress={onGoogleButtonPress} style={[styles.btn]}>
             <View style={styles.googleBtn}>

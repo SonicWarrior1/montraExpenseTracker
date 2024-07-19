@@ -95,7 +95,7 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
               setMonth={setMonth}
               month={month}
             />
-            <Text style={styles.actText}>Account Balance</Text>
+            <Text style={styles.actText}>{STRINGS.AccountBalance}</Text>
             <Text style={styles.amt}>
               {currencies[currency ?? 'USD'].symbol}
               {isNaN(
@@ -121,7 +121,7 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
                   })}
                 </View>
                 <View>
-                  <Text style={styles.text1}>Income</Text>
+                  <Text style={styles.text1}>{STRINGS.Income}</Text>
                   <Text style={styles.text2} numberOfLines={1}>
                     {currencies[currency].symbol}
                     {isNaN(
@@ -154,7 +154,7 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
                   })}
                 </View>
                 <View>
-                  <Text style={styles.text1}>Expense</Text>
+                  <Text style={styles.text1}>{STRINGS.Expense}</Text>
                   <Text style={styles.text2} numberOfLines={1}>
                     {currencies[currency].symbol}
                     {isNaN(

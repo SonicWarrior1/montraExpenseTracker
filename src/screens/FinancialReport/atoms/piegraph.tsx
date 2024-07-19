@@ -45,7 +45,7 @@ function Piegraph({
   const styles = style(COLOR);
   function labelComponent() {
     return (
-      <Text style={styles.pieCenterText}>
+      <Text style={styles.pieCenterText} numberOfLines={1}>
         {currencies[currency!].symbol}
         {formatWithCommas(
           Number(

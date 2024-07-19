@@ -5,6 +5,7 @@ import {currencies, STRINGS} from '../../../constants/strings';
 import {useAppTheme} from '../../../hooks/themeHook';
 import style from '../styles';
 import {AmountInputSetter} from '../../../utils/commonFuncs';
+import {RFValue} from 'react-native-responsive-fontsize';
 
 function MoneyInput({
   amount,
@@ -33,9 +34,20 @@ function MoneyInput({
       ]}>
       <Text style={styles.text1}>{STRINGS.HowMuch}</Text>
       <View style={styles.moneyCtr}>
-        <Text style={styles.text2}>{currencies[currency].symbol}</Text>
+        <Text
+          style={[
+            styles.text2,
+            {fontSize: RFValue(64 - (amount.length > 7 ? 15 : 0))},
+          ]}>
+          {currencies[currency].symbol}
+        </Text>
         <TextInput
-          style={styles.input}
+          style={[
+            styles.input,
+            {
+              fontSize: RFValue(64 - (amount.length > 7 ? 15 : 0)),
+            },
+          ]}
           maxLength={10}
           numberOfLines={1}
           onPress={() => {

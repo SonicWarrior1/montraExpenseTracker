@@ -37,7 +37,7 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
     remainText: {
         fontSize: RFValue(24), fontWeight: '600', color: COLOR.DARK[100]
     },
-    amtText: { fontSize: RFValue(64), fontWeight: '600', marginBottom: 15, color: COLOR.DARK[100], maxWidth: "90%" },
+    amtText: { fontSize: RFValue(50), fontWeight: '600', marginBottom: 20, color: COLOR.DARK[100], maxWidth: "90%" },
     limitCtr: {
         flexDirection: 'row',
         alignItems: 'center',

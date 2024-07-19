@@ -15,13 +15,14 @@ import {UserFromJson} from '../../utils/userFuncs';
 // Third Party Libraries
 import Toast from 'react-native-toast-message';
 import {StackNavigationProp} from '@react-navigation/stack';
-import firestore from '@react-native-firebase/firestore';
+import firestore, {Timestamp} from '@react-native-firebase/firestore';
 import {useObject, useRealm} from '@realm/react';
 import {useNetInfo} from '@react-native-community/netinfo';
 import {UpdateMode} from 'realm';
 import storage from '@react-native-firebase/storage';
 import {BottomSheetModalMethods} from '@gorhom/bottom-sheet/lib/typescript/types';
 import DeleteSheet from '../DeleteSheet';
+import {TimestampModel} from '../../DbModels/TimestampModel';
 
 function DeleteTransactionSheet({
   bottomSheetModalRef,
@@ -31,6 +32,7 @@ function DeleteTransactionSheet({
   type,
   amt,
   category,
+  timeStamp,
 }: Readonly<{
   bottomSheetModalRef: React.RefObject<BottomSheetModalMethods>;
   id: string;
@@ -43,13 +45,16 @@ function DeleteTransactionSheet({
   type: transactionType['type'];
   amt: number;
   category: string;
+  timeStamp: Timestamp | TimestampModel;
 }>) {
   // redux
   const user = useAppSelector(state => state.user.currentUser);
   const uid = useAppSelector(state => state.user.currentUser?.uid);
   // constants
   const dispatch = useAppDispatch();
-  const month = new Date().getMonth();
+  const month = Timestamp.fromMillis(timeStamp.seconds * 1000)
+    .toDate()
+    .getMonth();
   const {isConnected} = useNetInfo();
   const realm = useRealm();
   const online = useObject(OnlineTransactionModel, id);

@@ -169,7 +169,13 @@ function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
             };
           });
     if (filters.sort === 'oldest') {
-      return x.slice().reverse();
+      return x
+        .slice()
+        .map(item => ({
+          title: item.title,
+          data: item.data.slice().reverse(),
+        }))
+        .reverse();
     } else if (filters.sort === 'lowest') {
       return [
         {

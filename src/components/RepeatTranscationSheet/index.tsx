@@ -116,6 +116,12 @@ function RepeatTransactionSheet({
         if (repeatData === undefined) {
           setIsSwitchOn(false);
         }
+        setFreq((repeatData?.freq as freqType) ?? undefined);
+        setMonth(repeatData?.month ?? 1);
+        setDay(repeatData?.day ?? 1);
+        setWeekDay(repeatData?.weekDay ?? 1);
+        setEnd((repeatData?.end as 'date' | 'never') ?? undefined);
+        setDate(getDate());
       }}>
       <BottomSheetView style={styles.sheetView}>
         <View style={styles.flexRow}>

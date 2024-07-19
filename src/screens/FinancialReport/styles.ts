@@ -89,7 +89,7 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
         alignItems: 'center',
     },
     noDataCtr: { height: 230, justifyContent: 'center' },
-    pieCenterText: { fontSize: 32, fontWeight: '700', color: COLOR.DARK[100] },
+    pieCenterText: { fontSize: 28, fontWeight: '700', color: COLOR.DARK[100] },
     emptyText: { fontSize: 16, fontWeight: '500', color: COLOR.DARK[25] }
 });
 
