@@ -2,7 +2,7 @@ import {Pressable, Text, View} from 'react-native';
 import React from 'react';
 import {Swipeable} from 'react-native-gesture-handler';
 import {Timestamp} from '@react-native-firebase/firestore';
-import {STRINGS} from '../../../constants/strings';
+import {monthData, STRINGS} from '../../../constants/strings';
 import {ICONS} from '../../../constants/icons';
 import {useAppTheme} from '../../../hooks/themeHook';
 import style from '../styles';
@@ -73,22 +73,39 @@ export default function NotificationListItem({
                 STRINGS.BudgetExceed}
           </Text>
         </View>
-        <Text style={styles.text2}>
-          {Timestamp.fromMillis(item.time.seconds * 1000)
-            .toDate()
-            .getHours()}
-          .
-          {Timestamp.fromMillis(item.time.seconds * 1000)
-            .toDate()
-            .getMinutes() < 10
-            ? '0' +
+        <View style={styles.timeCtr}>
+          <Text style={styles.text2}>
+            {Timestamp.fromMillis(item.time.seconds * 1000)
+              .toDate()
+              .getHours()}
+            .
+            {Timestamp.fromMillis(item.time.seconds * 1000)
+              .toDate()
+              .getMinutes() < 10
+              ? '0' +
+                Timestamp.fromMillis(item.time.seconds * 1000)
+                  .toDate()
+                  .getMinutes()
+              : Timestamp.fromMillis(item.time.seconds * 1000)
+                  .toDate()
+                  .getMinutes()}
+          </Text>
+          <Text style={styles.text2}>
+            {Timestamp.fromMillis(item.time.seconds * 1000)
+              ?.toDate()
+              ?.getDate() +
+              ' ' +
+              monthData[
+                Timestamp.fromMillis(item.time.seconds * 1000)
+                  ?.toDate()
+                  ?.getMonth()
+              ].label +
+              ' ' +
               Timestamp.fromMillis(item.time.seconds * 1000)
-                .toDate()
-                .getMinutes()
-            : Timestamp.fromMillis(item.time.seconds * 1000)
-                .toDate()
-                .getMinutes()}
-        </Text>
+                ?.toDate()
+                ?.getFullYear()}
+          </Text>
+        </View>
       </View>
     </Swipeable>
   );

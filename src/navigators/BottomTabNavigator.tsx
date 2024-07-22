@@ -4,7 +4,6 @@ import {NAVIGATION} from '../constants/strings';
 import CustomTab from '../components/CustomTab';
 import TransactionScreen from '../screens/Transactions';
 import FilterSheet from '../components/FilterSheet';
-import CategorySelectionSheet from '../components/CategorySelectionSheet';
 import BudgetScreen from '../screens/Budgets';
 import {BottomParamList} from '../defs/navigation';
 import ProfileScreen from '../screens/Profile';
@@ -48,7 +47,6 @@ function BottomTabNavigator() {
         <Tab.Screen name={NAVIGATION.Profile} component={ProfileScreen} />
       </Tab.Navigator>
       <FilterSheet />
-      <CategorySelectionSheet />
       <LogoutSheet />
     </View>
   );

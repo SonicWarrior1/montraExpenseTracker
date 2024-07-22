@@ -74,7 +74,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
   const height = useMemo(() => {
     if (Platform.OS !== 'ios') {
       if (pageType !== 'transfer') {
-        return screenHeight / 3.13;
+        return screenHeight / 3;
       } else {
         return screenHeight / 2.06;
       }
@@ -123,7 +123,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
             (
               conversion.usd[(user?.currency ?? 'USD').toLowerCase()] *
               prevTransaction.amount
-            ).toFixed( 2),
+            ).toFixed(2),
           ).toString(),
         )
       : '0',
@@ -380,6 +380,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
                     type="name"
                     value={from}
                     inputColor={COLOR.DARK[100]}
+                    maxLength={20}
                   />
                 </View>
                 <View style={[styles.transferIcon, {zIndex: zindex}]}>
@@ -394,6 +395,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
                     type="name"
                     value={to}
                     inputColor={COLOR.DARK[100]}
+                    maxLength={20}
                   />
                 </View>
               </View>
