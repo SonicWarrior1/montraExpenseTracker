@@ -37,7 +37,7 @@ function TransactionDetails({
   // redux
 
   const currency = useAppSelector(state => state.user.currentUser?.currency);
-  const conversion = useAppSelector(state => state.transaction.conversion);
+  const conversion = useAppSelector(state => state.user.conversion);
   const online = useObject(OnlineTransactionModel, route.params.transaction.id);
   const offline = useObject(
     OfflineTransactionModel,

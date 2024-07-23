@@ -18,7 +18,7 @@ import {formatWithCommas} from '../../utils/commonFuncs';
 function DetailBudget({navigation, route}: Readonly<DetailBudgetScreenProps>) {
   const month = route.params.month;
   // redux
-  const conversion = useAppSelector(state => state.transaction.conversion);
+  const conversion = useAppSelector(state => state.user.conversion);
   const currency = useAppSelector(state => state.user.currentUser?.currency);
   const budgets = useAppSelector(
     state => state.user.currentUser?.budget[month],

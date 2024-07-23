@@ -19,7 +19,7 @@ function Graph({
   month: number;
 }>) {
   const currency = useAppSelector(state => state.user.currentUser?.currency);
-  const conversion = useAppSelector(state => state.transaction.conversion);
+  const conversion = useAppSelector(state => state.user.conversion);
   const theme = useAppSelector(state => state.user.currentUser?.theme);
   const COLOR = useAppTheme();
   const styles = style(COLOR);

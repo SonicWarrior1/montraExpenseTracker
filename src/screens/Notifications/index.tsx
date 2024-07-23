@@ -253,7 +253,7 @@ function NotificationScreen({navigation}: Readonly<NotificationScreenProps>) {
       {menu && (
         <View style={styles.menu}>
           <TouchableOpacity onPress={handleDelete}>
-            <Text style={styles.menuText}>{STRINGS.RemoveAll}</Text>
+            <Text style={styles.menuText}>{STRINGS.ClearAll}</Text>
           </TouchableOpacity>
         </View>
       )}

@@ -56,7 +56,7 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
   const dispatch = useAppDispatch();
   const {isConnected} = useNetInfo();
   // redux
-  const conversion = useAppSelector(state => state.transaction.conversion);
+  const conversion = useAppSelector(state => state.user.conversion);
   const currency = useAppSelector(state => state.user.currentUser?.currency);
   const budgets = useAppSelector(
     state => state.user.currentUser?.budget[month],
@@ -201,7 +201,12 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
             curr: curr,
           });
         }
-        Toast.show({text1: STRINGS.BudgetCreatedSuccesfully, type: 'custom'});
+        Toast.show({
+          text1: isEdit
+            ? STRINGS.BudgetUpdatedSuccesfully
+            : STRINGS.BudgetCreatedSuccesfully,
+          type: 'custom',
+        });
         dispatch(setLoading(false));
         navigation.pop();
       } catch (e) {
@@ -211,14 +216,17 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
     }
   }, [
     amount,
+    category,
     alert,
     sliderVal,
-    category,
-    month,
-    currency,
-    conversion,
-    user!.uid,
+    dispatch,
     isConnected,
+    isEdit,
+    navigation,
+    realm,
+    month,
+    conversion.usd,
+    currency,
     user,
   ]);
   useEffect(() => {

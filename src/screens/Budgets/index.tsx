@@ -22,7 +22,7 @@ function BudgetScreen({navigation}: Readonly<BudgetScreenProps>) {
     state => state.user.currentUser?.budget[month],
   );
   const currency = useAppSelector(state => state.user.currentUser?.currency);
-  const conversion = useAppSelector(state => state.transaction.conversion);
+  const conversion = useAppSelector(state => state.user.conversion);
   const spend =
     useAppSelector(state => state.user.currentUser?.spend[month]) ?? {};
   // functions

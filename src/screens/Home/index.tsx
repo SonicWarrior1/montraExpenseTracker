@@ -31,7 +31,7 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
   // state
   const [month, setMonth] = useState<number>(new Date().getMonth());
   // redux
-  const conversion = useAppSelector(state => state.transaction.conversion);
+  const conversion = useAppSelector(state => state.user.conversion);
   const currency =
     useAppSelector(state => state.user.currentUser?.currency) ?? 'USD';
   const spends = useAppSelector(
@@ -60,8 +60,12 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
 
   const theme = useAppSelector(state => state.user.currentUser?.theme);
   // constants
-  const totalSpend = Object.values(spends ?? []).reduce((a, b) => a + b, 0);
-  const totalIncome = Object.values(incomes ?? []).reduce((a, b) => a + b, 0);
+  const totalSpend = Object.values(spends ?? []).reduce((a, b) => {
+    return a + (b?.[currency?.toUpperCase() ?? 'USD'] ?? 0);
+  }, 0);
+  const totalIncome = Object.values(incomes ?? []).reduce((a, b) => {
+    return a + (b[currency?.toUpperCase() ?? 'USD'] ?? 0);
+  }, 0);
   const COLOR = useAppTheme();
   const styles = style(COLOR);
   const scheme = useColorScheme();

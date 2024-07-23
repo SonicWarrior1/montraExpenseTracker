@@ -6,6 +6,7 @@ import {monthData, STRINGS} from '../../../constants/strings';
 import {ICONS} from '../../../constants/icons';
 import {useAppTheme} from '../../../hooks/themeHook';
 import style from '../styles';
+import {formatAMPM} from '../../../utils/firebase';
 
 export default function NotificationListItem({
   item,
@@ -75,20 +76,9 @@ export default function NotificationListItem({
         </View>
         <View style={styles.timeCtr}>
           <Text style={styles.text2}>
-            {Timestamp.fromMillis(item.time.seconds * 1000)
-              .toDate()
-              .getHours()}
-            .
-            {Timestamp.fromMillis(item.time.seconds * 1000)
-              .toDate()
-              .getMinutes() < 10
-              ? '0' +
-                Timestamp.fromMillis(item.time.seconds * 1000)
-                  .toDate()
-                  .getMinutes()
-              : Timestamp.fromMillis(item.time.seconds * 1000)
-                  .toDate()
-                  .getMinutes()}
+            {formatAMPM(
+              Timestamp.fromMillis(item.time.seconds * 1000).toDate(),
+            )}
           </Text>
           <Text style={styles.text2}>
             {Timestamp.fromMillis(item.time.seconds * 1000)

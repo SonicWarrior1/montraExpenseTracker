@@ -50,7 +50,7 @@ const TransactionItem = ({
   const finaltheme = theme === 'device' ? scheme : theme;
   // redux
   const user = useAppSelector(state => state.user.currentUser);
-  const conversion = useAppSelector(state => state.transaction.conversion);
+  // const conversion = useAppSelector(state => state.user.conversion);
   // functions
   const getAmtSymbol = (
     item: OnlineTransactionModel | OfflineTransactionModel,
@@ -129,7 +129,7 @@ const TransactionItem = ({
           {formatWithCommas(
             Number(
               (
-                conversion.usd[(user?.currency ?? 'USD').toLowerCase()] *
+                item.conversion.usd[(user?.currency ?? 'USD').toLowerCase()] *
                 item.amount
               ).toFixed(2),
             ).toString(),

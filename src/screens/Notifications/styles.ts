@@ -83,6 +83,6 @@ const styles = (COLOR: typeof COLORS) =>
     },
     flex: {flex: 1},
     textCtr: {maxWidth: '80%'},
-    timeCtr: {textAlign: 'center', alignItems: 'center'},
+    timeCtr: {textAlign: 'center', alignItems: 'flex-end'},
   });
 export default styles;

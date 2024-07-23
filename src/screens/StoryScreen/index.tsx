@@ -20,7 +20,7 @@ import {formatWithCommas} from '../../utils/commonFuncs';
 export default function StoryScreen({navigation}: Readonly<StoryScreenProps>) {
   // redux
   const user = useAppSelector(state => state.user.currentUser);
-  const conversion = useAppSelector(state => state.transaction.conversion);
+  const conversion = useAppSelector(state => state.user.conversion);
   const currency = useAppSelector(state => state.user.currentUser?.currency);
   // constants
   const screenHeight = Dimensions.get('screen').height;

@@ -1,6 +1,7 @@
+import React, {useEffect} from 'react';
 import {RootStackParamList} from '../defs/navigation';
 import Onboarding from '../screens/Onboarding';
-import {NAVIGATION} from '../constants/strings';
+import {currencies, NAVIGATION} from '../constants/strings';
 import Signup from '../screens/Signup';
 import {ICONS} from '../constants/icons';
 import {Pressable} from 'react-native';
@@ -24,9 +25,8 @@ import ExportData from '../screens/ExportData';
 import ThemeScreen from '../screens/Theme';
 import {useAppTheme} from '../hooks/themeHook';
 import {useGetUsdConversionQuery} from '../redux/api/conversionApi';
-import {useEffect} from 'react';
-import {setConversionData} from '../redux/reducers/transactionSlice';
-import { createStackNavigator } from '@react-navigation/stack';
+import {createStackNavigator} from '@react-navigation/stack';
+import {setConversionData} from '../redux/reducers/userSlice';
 export const Stack = createStackNavigator<RootStackParamList>();
 
 function RootNavigator(): React.JSX.Element {
@@ -52,10 +52,22 @@ function RootNavigator(): React.JSX.Element {
   const {data: conversion, isSuccess} = useGetUsdConversionQuery({});
   useEffect(() => {
     if (isSuccess) {
-      dispatch(setConversionData(conversion));
-      console.log('Ok');
+      const myCurrencies: {[key: string]: number} = {};
+      Object.entries(conversion.usd as {[key: string]: number}).forEach(
+        ([key, val]) => {
+          if (currencies[key.toUpperCase()] !== undefined) {
+            myCurrencies[key] = val;
+          }
+        },
+      );
+      dispatch(
+        setConversionData({
+          date: conversion.date,
+          usd: myCurrencies,
+        }),
+      );
     }
-  }, [isSuccess]);
+  }, [conversion, dispatch, isSuccess]);
 
   return (
     <Stack.Navigator
@@ -100,35 +112,17 @@ function RootNavigator(): React.JSX.Element {
             name={NAVIGATION.FinancialReport}
             component={FinancialReport}
           />
-          <Stack.Screen
-            name={NAVIGATION.Settings}
-            component={SettingsScreen}
-          />
-          <Stack.Screen
-            name={NAVIGATION.Currency}
-            component={CurrencyScreen}
-          />
-          <Stack.Screen
-            name={NAVIGATION.Theme}
-            component={ThemeScreen}
-          />
-          <Stack.Screen
-            name={NAVIGATION.ExportData}
-            component={ExportData}
-          />
+          <Stack.Screen name={NAVIGATION.Settings} component={SettingsScreen} />
+          <Stack.Screen name={NAVIGATION.Currency} component={CurrencyScreen} />
+          <Stack.Screen name={NAVIGATION.Theme} component={ThemeScreen} />
+          <Stack.Screen name={NAVIGATION.ExportData} component={ExportData} />
           <Stack.Screen name={NAVIGATION.Story} component={StoryScreen} />
         </Stack.Group>
       ) : (
         <Stack.Group>
           <Stack.Screen name={NAVIGATION.ONBOARDING} component={Onboarding} />
-          <Stack.Screen
-            name={NAVIGATION.SIGNUP}
-            component={Signup}
-          />
-          <Stack.Screen
-            name={NAVIGATION.LOGIN}
-            component={Login}
-          />
+          <Stack.Screen name={NAVIGATION.SIGNUP} component={Signup} />
+          <Stack.Screen name={NAVIGATION.LOGIN} component={Login} />
           <Stack.Screen
             name={NAVIGATION.FORGOTPASSWORD}
             component={ForgotPassword}

@@ -19,6 +19,7 @@ import {BudgetModel} from './DbModels/BudgetModel';
 import {CategoryModel} from './DbModels/CategoryModel';
 import {AmountModel} from './DbModels/AmountModel';
 import {NotificationModel} from './DbModels/NotificationModel';
+import {ConversionModel} from './DbModels/ConversionModel';
 
 firestore().settings({persistence: false});
 function App(): React.JSX.Element {
@@ -34,6 +35,7 @@ function App(): React.JSX.Element {
           CategoryModel,
           AmountModel,
           NotificationModel,
+          ConversionModel,
         ]}>
         <Provider store={store}>
           <PersistGate persistor={persistor}>

@@ -87,7 +87,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
   const backgroundColor = getBackgroundColor;
   const dispatch = useAppDispatch();
   // redux
-  const conversion = useAppSelector(state => state.transaction.conversion);
+  const conversion = useAppSelector(state => state.user.conversion);
   const user = useAppSelector(state => state.user.currentUser);
   // state
   const [firstTime, setFirstTime] = useState<boolean>(true);

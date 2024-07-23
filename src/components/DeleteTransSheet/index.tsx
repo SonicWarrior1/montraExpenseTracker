@@ -10,8 +10,6 @@ import {transactionType} from '../../defs/transaction';
 import {STRINGS} from '../../constants/strings';
 import {OnlineTransactionModel} from '../../DbModels/OnlineTransactionModel';
 import {OfflineTransactionModel} from '../../DbModels/OfflineTransactionModel';
-import {encrypt} from '../../utils/encryption';
-import {UserFromJson} from '../../utils/userFuncs';
 // Third Party Libraries
 import Toast from 'react-native-toast-message';
 import {StackNavigationProp} from '@react-navigation/stack';
@@ -23,6 +21,7 @@ import storage from '@react-native-firebase/storage';
 import {BottomSheetModalMethods} from '@gorhom/bottom-sheet/lib/typescript/types';
 import DeleteSheet from '../DeleteSheet';
 import {TimestampModel} from '../../DbModels/TimestampModel';
+import {handleExpenseUpdate, handleIncomeUpdate} from '../../utils/firebase';
 
 function DeleteTransactionSheet({
   bottomSheetModalRef,
@@ -139,35 +138,27 @@ function DeleteTransactionSheet({
   };
   const handleOnline = async () => {
     const userDoc = firestore().collection('users').doc(uid);
-    const data = await firestore().collection('users').doc(uid).get();
+    const curr = await firestore().collection('users').doc(uid).get();
     if (type === 'expense' || type === 'transfer') {
-      await firestore()
-        .collection('users')
-        .doc(uid)
-        .update({
-          [`spend.${month}.${type === 'transfer' ? 'transfer' : category}`]:
-            encrypt(
-              String(
-                (UserFromJson(data.data()!)?.spend?.[month]?.[
-                  type === 'transfer' ? 'transfer' : category
-                ] ?? 0) - amt,
-              ),
-              uid!,
-            ),
-        });
+      await handleExpenseUpdate({
+        curr,
+        uid: uid!,
+        amount: 0,
+        category,
+        currency: user?.currency!,
+        month,
+        transaction: trans!,
+      });
     } else {
-      await firestore()
-        .collection('users')
-        .doc(uid)
-        .update({
-          [`income.${month}.${category}`]: encrypt(
-            String(
-              (UserFromJson(data.data()!)?.income?.[month]?.[category] ?? 0) -
-                amt,
-            ),
-            uid!,
-          ),
-        });
+      await handleIncomeUpdate({
+        curr,
+        uid: uid!,
+        amount: 0,
+        category,
+        currency: user?.currency!,
+        month,
+        transaction: trans!,
+      });
     }
     bottomSheetModalRef.current?.dismiss();
     navigation.pop();
