@@ -10,6 +10,8 @@ import {useAppSelector} from '../../redux/store';
 import {useAppTheme} from '../../hooks/themeHook';
 import TabBackdrop from '../../components/TabBackdrop';
 import BudgetItem from './atoms/BudgetItem';
+import {useQuery} from '@realm/react';
+import {BudgetModel} from '../../DbModels/BudgetModel';
 
 function BudgetScreen({navigation}: Readonly<BudgetScreenProps>) {
   // constants
@@ -22,7 +24,7 @@ function BudgetScreen({navigation}: Readonly<BudgetScreenProps>) {
     state => state.user.currentUser?.budget[month],
   );
   const currency = useAppSelector(state => state.user.currentUser?.currency);
-  const conversion = useAppSelector(state => state.user.conversion);
+  // const conversion = useAppSelector(state => state.user.conversion)
   const spend =
     useAppSelector(state => state.user.currentUser?.spend[month]) ?? {};
   // functions
@@ -92,7 +94,7 @@ function BudgetScreen({navigation}: Readonly<BudgetScreenProps>) {
               renderItem={({item}) => (
                 <BudgetItem
                   item={item}
-                  conversion={conversion}
+                  // conversion={conversion}
                   currency={currency}
                   month={month}
                   navigation={navigation}

@@ -19,6 +19,7 @@ import firestore, {
   FirebaseFirestoreTypes,
   Timestamp,
 } from '@react-native-firebase/firestore';
+import {Dispatch} from '@reduxjs/toolkit';
 
 type transType = 'income' | 'transfer' | 'expense';
 type AllTransType =
@@ -72,7 +73,12 @@ export function createTransaction({
   return {
     amount: encrypt(
       String(
-        (Number(amount) / conversion.usd[currency.toLowerCase()]).toFixed(10),
+        (
+          Number(amount) /
+          (isEdit ? transaction.conversion : conversion).usd[
+            currency.toLowerCase()
+          ]
+        ).toFixed(10),
       ),
       uid,
     ),
@@ -387,11 +393,10 @@ export async function handleOnlineNotify({
   const totalBudget = UserFromJson(curr.data() as UserType)?.budget?.[month]?.[
     category
   ];
-  if (totalBudget.alert) {
+  if (totalBudget && totalBudget.alert) {
     if (
-      totalBudget &&
-      (totalSpent >= totalBudget.limit ||
-        totalSpent >= totalBudget.limit * (totalBudget.percentage / 100))
+      totalSpent >= totalBudget.limit ||
+      totalSpent >= totalBudget.limit * (totalBudget.percentage / 100)
     ) {
       try {
         const notificationId = uuid.v4();
@@ -724,7 +729,7 @@ export const handleOffline = async ({
   from: string;
   to: string;
   month: number;
-  dispatch;
+  dispatch: Dispatch;
   user: UserType | undefined;
   realm: Realm;
   TransOnline: OnlineTransactionModel | null;
@@ -799,25 +804,25 @@ export const handleOffline = async ({
       user: user,
     });
   }
-  if (pageType !== 'transfer') {
-    const totalBudget = user?.budget?.[month]?.[category!];
-    const totalSpent = isEdit
-      ? user?.spend[month][category!]! -
-        prevTransaction?.amount! +
-        Number(amount.replace(/,/g, '')) /
-          (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1)
-      : (user?.spend?.[month]?.[category!] ?? 0) +
-        Number(amount.replace(/,/g, '')) /
-          (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1);
-    await handleOfflineNotification({
-      category: category,
-      dispatch: dispatch,
-      realm: realm,
-      totalBudget: totalBudget,
-      totalSpent: totalSpent,
-      user: user,
-    });
-  }
+  // if (pageType !== 'transfer') {
+  //   const totalBudget = user?.budget?.[month]?.[category!];
+  //   const totalSpent = isEdit
+  //     ? user?.spend[month][category!].USD! -
+  //       prevTransaction!.amount +
+  //       Number(amount.replace(/,/g, '')) /
+  //         (prevTransaction!.conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1)
+  //     : (user?.spend?.[month]?.[category!].USD ?? 0) +
+  //       Number(amount.replace(/,/g, '')) /
+  //         (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1);
+  //   await handleOfflineNotification({
+  //     category: category,
+  //     dispatch: dispatch,
+  //     realm: realm,
+  //     totalBudget: totalBudget,
+  //     totalSpent: totalSpent,
+  //     user: user,
+  //   });
+  // }
   if (trans.freq) {
     trans.freq.date = Timestamp.fromDate(trans.freq?.date as Date);
   }
@@ -830,10 +835,6 @@ export const handleOffline = async ({
         UpdateMode.Modified,
       );
     }
-    console.log('dsjfdnsjfnosdfnop', {
-      ...trans,
-      operation: isEdit ? 'update' : 'add',
-    });
     realm.create(
       'OfflineTransaction',
       {...trans, operation: isEdit ? 'update' : 'add'},
@@ -866,20 +867,32 @@ function handleOfflineExpenseTransfer({
   isEdit: boolean;
   prevTransaction: AllTransType;
   month: number;
-  dispatch;
+  dispatch: Dispatch;
   user: UserType | undefined;
   realm: Realm;
 }) {
   if (isEdit) {
+    const finalAmount: {[key: string]: string} = {};
+    const encryptedAmount: {[key: string]: string} = {};
+    Object.keys(currencies).forEach(dbCurrency => {
+      const x = Number(
+        (
+          (user?.spend[month]?.[category!]?.[dbCurrency] ?? 0) -
+          Number(prevTransaction!.amount) *
+            prevTransaction!.conversion.usd[dbCurrency.toLowerCase()] +
+          (Number(amount) /
+            prevTransaction!.conversion.usd[currency!.toLowerCase()]) *
+            prevTransaction!.conversion.usd[dbCurrency.toLowerCase()]
+        ).toFixed(2),
+      ).toString();
+      finalAmount[dbCurrency] = x;
+      encryptedAmount[dbCurrency] = encrypt(x, user?.uid!);
+    });
     dispatch(
       setExpense({
         month: month,
         category: category,
-        amount:
-          (user?.spend?.[month]?.[category!] ?? 0) -
-          prevTransaction?.amount! +
-          Number(amount.replace(/,/g, '')) /
-            (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1),
+        amount: finalAmount,
       }),
     );
     realm.write(() => {
@@ -887,25 +900,35 @@ function handleOfflineExpenseTransfer({
         'amount',
         {
           id: month + '_' + category + '_' + pageType,
-          amount:
-            (user?.spend?.[month]?.[category!] ?? 0) -
-            prevTransaction?.amount! +
-            Number(amount.replace(/,/g, '')) /
-              (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1),
+          amount: encryptedAmount,
         },
         UpdateMode.All,
       );
       console.log('done');
     });
   } else {
+    const finalAmount: {[key: string]: string} = {};
+    const encryptedAmount: {[key: string]: string} = {};
+    Object.keys(currencies).forEach(dbCurrency => {
+      const x = Number(
+        (
+          (user?.spend[month]?.[category!]?.[dbCurrency] ?? 0) +
+          Number(
+            (
+              (Number(amount) / conversion.usd[currency!.toLowerCase()]) *
+              conversion.usd[dbCurrency.toLowerCase()]
+            ).toFixed(2),
+          )
+        ).toFixed(2),
+      ).toString();
+      finalAmount[dbCurrency] = x;
+      encryptedAmount[dbCurrency] = encrypt(x, user?.uid!);
+    });
     dispatch(
       setExpense({
         month: month,
         category: category,
-        amount:
-          (user?.spend?.[month]?.[category!] ?? 0) +
-          Number(amount.replace(/,/g, '')) /
-            (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1),
+        amount: finalAmount,
       }),
     );
     realm.write(() => {
@@ -913,10 +936,7 @@ function handleOfflineExpenseTransfer({
         'amount',
         {
           id: month + '_' + category + '_' + pageType,
-          amount:
-            (user?.spend?.[month]?.[category!] ?? 0) +
-            Number(amount.replace(/,/g, '')) /
-              (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1),
+          amount: encryptedAmount,
         },
         UpdateMode.All,
       );
@@ -950,20 +970,32 @@ function handleOfflineIncome({
   isEdit: boolean;
   prevTransaction: AllTransType;
   month: number;
-  dispatch;
+  dispatch: Dispatch;
   user: UserType | undefined;
   realm: Realm;
 }) {
   if (isEdit) {
+    const finalAmount: {[key: string]: string} = {};
+    const encryptedAmount: {[key: string]: string} = {};
+    Object.keys(currencies).forEach(dbCurrency => {
+      const x = Number(
+        (
+          (user?.income[month]?.[category!]?.[dbCurrency] ?? 0) -
+          Number(prevTransaction!.amount) *
+            prevTransaction!.conversion.usd[dbCurrency.toLowerCase()] +
+          (Number(amount) /
+            prevTransaction!.conversion.usd[currency!.toLowerCase()]) *
+            prevTransaction!.conversion.usd[dbCurrency.toLowerCase()]
+        ).toFixed(2),
+      ).toString();
+      finalAmount[dbCurrency] = x;
+      encryptedAmount[dbCurrency] = encrypt(x, user?.uid!);
+    });
     dispatch(
       setIncome({
         month: month,
         category: category,
-        amount:
-          user?.income[month][category!]! -
-          prevTransaction?.amount! +
-          Number(amount.replace(/,/g, '')) /
-            (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1),
+        amount: finalAmount,
       }),
     );
     realm.write(() => {
@@ -971,11 +1003,7 @@ function handleOfflineIncome({
         'amount',
         {
           id: month + '_' + category + '_' + pageType,
-          amount:
-            user?.income[month][category!]! -
-            prevTransaction?.amount! +
-            Number(amount.replace(/,/g, '')) /
-              (conversion?.usd[currency?.toLowerCase() ?? 'usd'] ?? 1),
+          amount: encryptedAmount,
         },
         UpdateMode.All,
       );
@@ -1037,14 +1065,13 @@ export async function handleOfflineNotification({
   totalSpent: number;
   realm: Realm;
   category: string | undefined;
-  dispatch;
+  dispatch: Dispatch;
   user: UserType | undefined;
 }) {
-  if (totalBudget?.alert) {
+  if (totalBudget && totalBudget.alert) {
     if (
-      totalBudget &&
-      (totalSpent >= totalBudget.limit ||
-        totalSpent >= totalBudget.limit * (totalBudget.percentage / 100))
+      totalSpent >= totalBudget.limit ||
+      totalSpent >= totalBudget.limit * (totalBudget.percentage / 100)
     ) {
       try {
         const notificationId = uuid.v4();

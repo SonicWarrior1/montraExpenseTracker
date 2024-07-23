@@ -150,7 +150,16 @@ const decryptBudget = (json: FirebaseFirestoreTypes.DocumentData) => {
   return (
     Object.fromEntries(
       Object.entries<{
-        [key: string]: {alert: boolean; limit: string; percentage: string};
+        [key: string]: {
+          alert: boolean;
+          limit: string;
+          percentage: string;
+          conversion: {
+            [key: string]: {
+              [key: string]: number;
+            };
+          };
+        };
       }>(json?.budget ?? {}).map(([key, value]) => {
         return [
           key,
@@ -162,6 +171,7 @@ const decryptBudget = (json: FirebaseFirestoreTypes.DocumentData) => {
                   alert: subValue.alert,
                   limit: Number(decrypt(subValue.limit, json.uid)),
                   percentage: Number(decrypt(subValue.percentage, json.uid)),
+                  conversion: subValue.conversion,
                 },
               };
             }),

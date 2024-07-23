@@ -9,7 +9,16 @@ export type UserType = {
   incomeCategory: string[];
   budget: {
     [month: string]: {
-      [key: string]: {alert: boolean; limit: number; percentage: number};
+      [key: string]: {
+        alert: boolean;
+        limit: number;
+        percentage: number;
+        conversion: {
+          [key: string]: {
+            [key: string]: number;
+          };
+        };
+      };
     };
   };
   spend: {

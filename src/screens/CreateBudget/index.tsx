@@ -44,7 +44,18 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
   const month = new Date().getMonth();
   const isEdit = route.params.isEdit;
   let selectedCategory;
-  let oldBudget;
+  let oldBudget:
+    | {
+        alert: boolean;
+        limit: number;
+        percentage: number;
+        conversion: {
+          [key: string]: {
+            [key: string]: number;
+          };
+        };
+      }
+    | undefined;
   const x =
     useAppSelector(state => state.user.currentUser?.budget[month]) ?? {};
   if (isEdit) {
@@ -70,9 +81,10 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
   const [amount, setAmount] = useState<string>(
     isEdit
       ? Number(
-          (conversion.usd[currency!.toLowerCase()] * oldBudget?.limit!).toFixed(
-            2,
-          ),
+          (
+            (oldBudget?.conversion?.usd?.[currency?.toLowerCase() ?? 'usd'] ??
+              1) * Number(oldBudget?.limit!)
+          ).toFixed(2),
         ).toString()
       : '0',
   );
@@ -126,13 +138,16 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
                 limit: Number(
                   (
                     Number(amount.replace(/,/g, '')) /
-                    conversion.usd[currency!.toLowerCase()]
+                    (isEdit ? oldBudget!.conversion : conversion).usd[
+                      currency!.toLowerCase()
+                    ]
                   ).toFixed(10),
                 ),
                 alert: alert,
                 percentage: sliderVal,
                 id: month + '_' + category,
                 delete: false,
+                conversion: isEdit ? oldBudget!.conversion : conversion,
               },
               UpdateMode.Modified,
             );
@@ -144,31 +159,29 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
               budget: {
                 limit: (
                   Number(amount.replace(/,/g, '')) /
-                  conversion.usd[currency!.toLowerCase()]
+                  (isEdit ? oldBudget!.conversion : conversion).usd[
+                    currency!.toLowerCase()
+                  ]
                 ).toFixed(10),
                 alert: alert,
                 percentage: sliderVal,
+                conversion: isEdit ? oldBudget!.conversion : conversion,
               },
             }),
           );
-          const totalSpent = user?.spend?.[month]?.[category!] ?? 0;
-          handleOfflineNotification({
-            category: category!,
-            dispatch: dispatch,
-            realm: realm,
-            totalBudget: {
-              limit: Number(
-                (
-                  Number(amount.replace(/,/g, '')) /
-                  conversion.usd[currency!.toLowerCase()]
-                ).toFixed(10),
-              ),
-              alert: alert!,
-              percentage: sliderVal!,
-            },
-            totalSpent: totalSpent,
-            user: user,
-          });
+          // const totalSpent = user?.spend?.[month]?.[category!].USD ?? 0;
+          // handleOfflineNotification({
+          //   category: category!,
+          //   dispatch: dispatch,
+          //   realm: realm,
+          //   totalBudget: {
+          //     limit: Number(amount.replace(/,/g, '')),
+          //     alert: alert!,
+          //     percentage: sliderVal!,
+          //   },
+          //   totalSpent: totalSpent,
+          //   user: user,
+          // });
         } else {
           await firestore()
             .collection('users')
@@ -179,20 +192,23 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
                   String(
                     (
                       Number(amount.replace(/,/g, '')) /
-                      conversion.usd[currency!.toLowerCase()]
+                      (isEdit ? oldBudget!.conversion : conversion).usd[
+                        currency!.toLowerCase()
+                      ]
                     ).toFixed(10),
                   ),
                   user!.uid,
                 ),
                 alert: alert,
                 percentage: encrypt(String(sliderVal), user!.uid),
+                conversion: isEdit ? oldBudget!.conversion : conversion,
               },
             });
           const curr = await firestore()
             .collection('users')
             .doc(user!.uid)
             .get();
-          const totalSpent = user?.spend?.[month]?.[category!] ?? 0;
+          const totalSpent = user?.spend?.[month]?.[category!]?.USD ?? 0;
           await handleOnlineNotify({
             category: category!,
             month: month,
@@ -225,9 +241,10 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
     navigation,
     realm,
     month,
-    conversion.usd,
+    conversion,
     currency,
     user,
+    oldBudget,
   ]);
   useEffect(() => {
     setCatColors(

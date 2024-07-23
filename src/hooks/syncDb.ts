@@ -117,6 +117,7 @@ const syncBudgets = (
             limit: encrypt(String(item.limit), uid),
             alert: item.alert,
             percentage: encrypt(String(item.percentage), uid),
+            conversion: item.conversion,
           },
         });
       }
