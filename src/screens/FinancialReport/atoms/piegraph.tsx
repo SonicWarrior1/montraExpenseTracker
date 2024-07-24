@@ -11,7 +11,7 @@ function Piegraph({
   spends,
   incomes,
   catColors,
-  conversion,
+  // conversion,
   currency,
   totalSpend,
   totalIncome,
@@ -20,24 +20,30 @@ function Piegraph({
   spends:
     | never[]
     | {
-        [key: string]: number;
-      };
+        [category: string]: {
+          [currency: string]: number;
+        };
+      }
+    | undefined;
   incomes:
     | never[]
     | {
-        [key: string]: number;
-      };
+        [category: string]: {
+          [currency: string]: number;
+        };
+      }
+    | undefined;
   catColors:
     | {
         [key: string]: string;
       }
     | undefined;
   currency: string | undefined;
-  conversion: {
-    [key: string]: {
-      [key: string]: number;
-    };
-  };
+  // conversion: {
+  //   [key: string]: {
+  //     [key: string]: number;
+  //   };
+  // };
   totalSpend: number;
   totalIncome: number;
 }>) {
@@ -50,7 +56,7 @@ function Piegraph({
         {formatWithCommas(
           Number(
             (
-              conversion.usd?.[currency!.toLowerCase()] *
+              // conversion.usd?.[currency!.toLowerCase()] *
               Number(transType === 'expense' ? totalSpend : totalIncome)
             ).toFixed(2),
           ).toString(),
@@ -60,13 +66,13 @@ function Piegraph({
   }
   const getFlexValue = () => {
     if (transType === 'expense') {
-      if (spends.length !== 0) {
+      if (spends && spends.length !== 0) {
         return 0;
       } else {
         return 1;
       }
     } else if (transType === 'income') {
-      if (incomes.length !== 0) {
+      if (incomes && incomes.length !== 0) {
         return 0;
       } else {
         return 1;
@@ -95,11 +101,13 @@ function Piegraph({
           isAnimated={true}
           centerLabelComponent={labelComponent}
           innerCircleColor={COLOR.LIGHT[100]}
-          data={Object.entries(transType === 'expense' ? spends : incomes)
-            .sort((a, b) => b[1] - a[1])
+          data={Object.entries(
+            transType === 'expense' ? spends ?? {} : incomes ?? {},
+          )
+            .sort((a, b) => b[1].USD - a[1].USD)
             .map(item => {
               return {
-                value: item[1],
+                value: item[1][currency?.toUpperCase() ?? 'USD'],
                 color: catColors![item[0]],
               };
             })}

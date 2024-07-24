@@ -139,6 +139,7 @@ function Login({navigation}: Readonly<LoginScreenProps>) {
       }
     } catch (e: any) {
       const error: FirebaseAuthTypes.NativeFirebaseAuthError = e;
+      console.log(e);
       if (
         error.message !==
         'android.credentials.GetCredentialException.TYPE_USER_CANCELED'

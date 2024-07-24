@@ -27,23 +27,34 @@ export default function StoryScreen({navigation}: Readonly<StoryScreenProps>) {
   const screenWidth = Dimensions.get('screen').width;
   const COLOR = useAppTheme();
   const styles = style(COLOR);
-  const biggestSpend: [string, number][] =
+  const biggestSpend: [
+    string,
+    {
+      [currency: string]: number;
+    },
+  ][] =
     user?.spend[new Date().getMonth()] !== undefined
       ? Object.entries(user?.spend[new Date().getMonth()])
-          .sort((a, b) => b[1] - a[1])
+          .sort((a, b) => b[1].USD - a[1].USD)
           .filter(([, value], index, array) => value === array[0][1])
-      : [['', 0]];
-  const biggestIncome: [string, number][] =
+      : [['', {}]];
+  const biggestIncome: [
+    string,
+    {
+      [currency: string]: number;
+    },
+  ][] =
     user?.income[new Date().getMonth()] !== undefined
       ? Object.entries(user?.income[new Date().getMonth()])
-          .sort((a, b) => b[1] - a[1])
+          .sort((a, b) => b[1].USD - a[1].USD)
           .filter(([, value], index, array) => value === array[0][1])
-      : [['', 0]];
+      : [['', {}]];
   const budgetExceed =
     user?.budget[new Date().getMonth()] !== undefined &&
     user?.spend[new Date().getMonth()] !== undefined
       ? Object.entries(user?.budget[new Date().getMonth()]).filter(
-          item => item[1].limit <= user?.spend[new Date().getMonth()][item[0]],
+          item =>
+            item[1].limit <= user?.spend[new Date().getMonth()][item[0]].USD,
         )
       : undefined;
   const totalBudgets =
@@ -187,7 +198,11 @@ export default function StoryScreen({navigation}: Readonly<StoryScreenProps>) {
                         conversion.usd[currency!.toLowerCase()] *
                         Object.values(
                           user?.spend[new Date().getMonth()] ?? [],
-                        ).reduce((acc, curr) => acc + curr, 0)
+                        ).reduce(
+                          (acc, curr) =>
+                            acc + curr[currency?.toUpperCase() ?? 'USD'],
+                          0,
+                        )
                       ).toFixed(2),
                     ).toString(),
                   )
@@ -197,8 +212,12 @@ export default function StoryScreen({navigation}: Readonly<StoryScreenProps>) {
                         conversion.usd[currency!.toLowerCase()] *
                         Object.values(
                           user?.income[new Date().getMonth()] ?? [],
-                        ).reduce((acc, curr) => acc + curr, 0)
-                      ).toFixed( 2),
+                        ).reduce(
+                          (acc, curr) =>
+                            acc + curr[currency?.toUpperCase() ?? 'USD'],
+                          0,
+                        )
+                      ).toFixed(2),
                     ).toString(),
                   )}
             </Text>
@@ -249,7 +268,7 @@ export default function StoryScreen({navigation}: Readonly<StoryScreenProps>) {
                     Number(
                       (
                         conversion.usd[currency!.toLowerCase()] *
-                        biggestSpend[0][1]
+                        biggestSpend[0][1][currency?.toUpperCase() ?? 'USD']
                       ).toFixed(2),
                     ).toString(),
                   )
@@ -257,8 +276,8 @@ export default function StoryScreen({navigation}: Readonly<StoryScreenProps>) {
                     Number(
                       (
                         conversion.usd[currency!.toLowerCase()] *
-                        biggestIncome[0][1]
-                      ).toFixed( 2),
+                        biggestIncome[0][1][currency?.toUpperCase() ?? 'USD']
+                      ).toFixed(2),
                     ).toString(),
                   )}
             </Text>

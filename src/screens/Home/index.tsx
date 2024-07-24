@@ -46,6 +46,7 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
     ...onlineData.filter(item => item.changed !== true),
     ...offlineData.filter(item => item.operation !== 'delete'),
   ];
+  console.log(offlineData.filter(item => item.operation === 'delete'));
   const listData = data
     .slice()
     .filter(item => {
@@ -60,6 +61,7 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
 
   const theme = useAppSelector(state => state.user.currentUser?.theme);
   // constants
+  console.log(spends);
   const totalSpend = Object.values(spends ?? []).reduce((a, b) => {
     return a + (b?.[currency?.toUpperCase() ?? 'USD'] ?? 0);
   }, 0);

@@ -15,6 +15,7 @@ import {useAppSelector} from '../../redux/store';
 import {formatWithCommas} from '../../utils/commonFuncs';
 import {formatAMPM} from '../../utils/firebase';
 import style from './styles';
+import {RFValue} from 'react-native-responsive-fontsize';
 
 const TransactionItem = ({
   item,
@@ -135,7 +136,20 @@ const TransactionItem = ({
             ).toString(),
           )}
         </Text>
-        <Text style={styles.text2}>
+        <Text
+          style={[
+            styles.text2,
+            {fontSize: dateShow ? RFValue(11) : RFValue(13)},
+          ]}>
+          {formatAMPM(
+            Timestamp.fromMillis(item.timeStamp.seconds * 1000).toDate(),
+          )}
+        </Text>
+        <Text
+          style={[
+            styles.text2,
+            {fontSize: dateShow ? RFValue(11) : RFValue(13)},
+          ]}>
           {dateShow &&
             Timestamp.fromMillis(item.timeStamp.seconds * 1000)
               ?.toDate()
@@ -149,10 +163,7 @@ const TransactionItem = ({
               ' ' +
               Timestamp.fromMillis(item.timeStamp.seconds * 1000)
                 ?.toDate()
-                ?.getFullYear()}{' '}
-          {formatAMPM(
-            Timestamp.fromMillis(item.timeStamp.seconds * 1000).toDate(),
-          )}
+                ?.getFullYear()}
         </Text>
       </View>
     </Pressable>

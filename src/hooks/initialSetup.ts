@@ -15,6 +15,8 @@ import Realm, {UpdateMode} from 'realm';
 import {CategoryModel} from '../DbModels/CategoryModel';
 import {AmountModel} from '../DbModels/AmountModel';
 import {NotificationModel} from '../DbModels/NotificationModel';
+import storage from '@react-native-firebase/storage';
+
 export function useInitialSetup() {
   const realm = useRealm();
   const {isConnected} = useNetInfo();
@@ -82,6 +84,10 @@ async function handleDelete(
 ) {
   for (const item of data) {
     if (item.deleted) {
+      if (item?.attachementType !== 'none') {
+        console.log('doc delete');
+        await storage().refFromURL(item.attachement!).delete();
+      }
       await firestore()
         .collection('users')
         .doc(user.uid)

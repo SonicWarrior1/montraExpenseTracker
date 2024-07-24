@@ -38,7 +38,7 @@ function FinancialReportHeader({
         renderRightIcon={() => <></>}
         placeholder={STRINGS.Month}
         value={monthData[month]}
-        data={monthData}
+        data={monthData.slice(0, new Date().getMonth() + 1)}
         labelField={'label'}
         valueField={'value'}
         onChange={({value}) => {

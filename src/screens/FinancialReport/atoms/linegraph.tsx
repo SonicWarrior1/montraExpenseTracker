@@ -17,7 +17,7 @@ function Linegraph({
   data,
   currency,
   transType,
-  conversion,
+  // conversion,
   month,
 }: Readonly<{
   totalSpend: number;
@@ -25,11 +25,11 @@ function Linegraph({
   data: (OnlineTransactionModel | OfflineTransactionModel)[];
   currency: string | undefined;
   transType: 'income' | 'expense';
-  conversion: {
-    [key: string]: {
-      [key: string]: number;
-    };
-  };
+  // conversion: {
+  //   [key: string]: {
+  //     [key: string]: number;
+  //   };
+  // };
   month: number;
 }>) {
   const COLOR = useAppTheme();
@@ -40,10 +40,10 @@ function Linegraph({
         {currencies[currency!].symbol}
         {formatWithCommas(
           Number(
-            (
-              conversion.usd?.[currency!.toLowerCase()] *
-              Number(transType === 'expense' ? totalSpend : totalIncome)
-            ).toFixed(2),
+            // conversion.usd?.[currency!.toLowerCase()] *
+            Number(transType === 'expense' ? totalSpend : totalIncome).toFixed(
+              2,
+            ),
           ).toString(),
         )}
       </Text>
@@ -62,6 +62,7 @@ function Linegraph({
           <View
             style={{
               height: 230,
+              transform: [{translateX: 28}],
               justifyContent: 'center',
               alignItems: 'center',
             }}>
@@ -125,8 +126,8 @@ function Linegraph({
                 LinegraphLabel({
                   items: items,
                   currency: currency,
-                  conversion: conversion,
-                  COLOR:COLOR,
+                  // conversion: conversion,
+                  COLOR: COLOR,
                 }),
             }}
           />

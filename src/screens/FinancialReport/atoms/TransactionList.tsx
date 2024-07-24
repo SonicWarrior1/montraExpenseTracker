@@ -14,8 +14,8 @@ function TransactionList({
   data,
   transType,
   month,
-  conversion,
-  currency,
+  // conversion,
+  // currency,
   sort,
   expenseOffset,
   incomeOffset,
@@ -27,12 +27,12 @@ function TransactionList({
   data: (OnlineTransactionModel | OfflineTransactionModel)[];
   transType: 'income' | 'expense';
   month: number;
-  conversion: {
-    [key: string]: {
-      [key: string]: number;
-    };
-  };
-  currency: string | undefined;
+  // conversion: {
+  //   [key: string]: {
+  //     [key: string]: number;
+  //   };
+  // };
+  // currency: string | undefined;
   sort: boolean;
   expenseOffset: number;
   incomeOffset: number;

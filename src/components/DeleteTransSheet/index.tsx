@@ -7,7 +7,7 @@ import {
   setLoading,
 } from '../../redux/reducers/userSlice';
 import {transactionType} from '../../defs/transaction';
-import {STRINGS} from '../../constants/strings';
+import {currencies, STRINGS} from '../../constants/strings';
 import {OnlineTransactionModel} from '../../DbModels/OnlineTransactionModel';
 import {OfflineTransactionModel} from '../../DbModels/OfflineTransactionModel';
 // Third Party Libraries
@@ -17,11 +17,11 @@ import firestore, {Timestamp} from '@react-native-firebase/firestore';
 import {useObject, useRealm} from '@realm/react';
 import {useNetInfo} from '@react-native-community/netinfo';
 import {UpdateMode} from 'realm';
-import storage from '@react-native-firebase/storage';
 import {BottomSheetModalMethods} from '@gorhom/bottom-sheet/lib/typescript/types';
 import DeleteSheet from '../DeleteSheet';
 import {TimestampModel} from '../../DbModels/TimestampModel';
 import {handleExpenseUpdate, handleIncomeUpdate} from '../../utils/firebase';
+import {encrypt} from '../../utils/encryption';
 
 function DeleteTransactionSheet({
   bottomSheetModalRef,
@@ -76,11 +76,24 @@ function DeleteTransactionSheet({
       }
     });
     if (type === 'income') {
+      const finalAmount: {[key: string]: string} = {};
+      const encryptedAmount: {[key: string]: string} = {};
+      Object.keys(currencies).forEach(dbCurrency => {
+        const x = Number(
+          (
+            (user?.income[month]?.[category]?.[dbCurrency] ?? 0) -
+            Number(amt) * trans!.conversion.usd[dbCurrency.toLowerCase()]
+          ).toFixed(2),
+        ).toString();
+        finalAmount[dbCurrency] = x;
+        encryptedAmount[dbCurrency] = encrypt(x, user?.uid!);
+      });
+
       dispatch(
         setIncome({
           month: month,
           category: category,
-          amount: user?.income[month][category]! - Number(amt),
+          amount: finalAmount,
         }),
       );
       realm.write(() => {
@@ -88,18 +101,44 @@ function DeleteTransactionSheet({
           'amount',
           {
             id: month + '_' + category + '_' + type,
-            amount: user?.income[month][category]! - Number(amt),
+            amount: encryptedAmount,
           },
           UpdateMode.All,
         );
         console.log('done');
       });
     } else if (type === 'expense') {
+      const finalAmount: {[key: string]: string} = {};
+      const encryptedAmount: {[key: string]: string} = {};
+      console.log(user?.spend[month]?.[category]);
+      Object.keys(currencies).forEach(dbCurrency => {
+        console.log(
+          (user?.spend[month]?.[category]?.[dbCurrency] ?? 0) -
+            Number(
+              (
+                Number(amt) * trans!.conversion.usd[dbCurrency.toLowerCase()]
+              ).toFixed(2),
+            ),
+        );
+        const x = Number(
+          (
+            (user?.spend[month]?.[category]?.[dbCurrency] ?? 0) -
+            Number(
+              (
+                Number(amt) * trans!.conversion.usd[dbCurrency.toLowerCase()]
+              ).toFixed(2),
+            )
+          ).toFixed(2),
+        ).toString();
+        finalAmount[dbCurrency] = x;
+        encryptedAmount[dbCurrency] = encrypt(x, user?.uid!);
+      });
+      console.log('sdfjkbndjskgbnfdjksnfjk', finalAmount);
       dispatch(
         setExpense({
           month: month,
           category: category,
-          amount: user?.spend[month][category]! - Number(amt),
+          amount: finalAmount,
         }),
       );
       realm.write(() => {
@@ -107,18 +146,30 @@ function DeleteTransactionSheet({
           'amount',
           {
             id: month + '_' + category + '_' + type,
-            amount: user?.spend[month][category]! - Number(amt),
+            amount: encryptedAmount,
           },
           UpdateMode.All,
         );
         console.log('done');
       });
     } else {
+      const finalAmount: {[key: string]: string} = {};
+      const encryptedAmount: {[key: string]: string} = {};
+      Object.keys(currencies).forEach(dbCurrency => {
+        const x = Number(
+          (
+            (user?.spend[month]?.transfer?.[dbCurrency] ?? 0) -
+            Number(amt) * trans!.conversion.usd[dbCurrency.toLowerCase()]
+          ).toFixed(2),
+        ).toString();
+        finalAmount[dbCurrency] = x;
+        encryptedAmount[dbCurrency] = encrypt(x, user?.uid!);
+      });
       dispatch(
         setExpense({
           month: month,
           category: 'transfer',
-          amount: user?.spend[month].transfer! - Number(amt),
+          amount: finalAmount,
         }),
       );
       realm.write(() => {
@@ -126,7 +177,7 @@ function DeleteTransactionSheet({
           'amount',
           {
             id: month + '_' + 'transfer' + '_' + type,
-            amount: user?.spend[month].transfer! - Number(amt),
+            amount: encryptedAmount,
           },
           UpdateMode.All,
         );
@@ -138,7 +189,7 @@ function DeleteTransactionSheet({
   };
   const handleOnline = async () => {
     const userDoc = firestore().collection('users').doc(uid);
-    const curr = await firestore().collection('users').doc(uid).get();
+    const curr = await userDoc.get();
     if (type === 'expense' || type === 'transfer') {
       await handleExpenseUpdate({
         curr,
@@ -163,9 +214,6 @@ function DeleteTransactionSheet({
     bottomSheetModalRef.current?.dismiss();
     navigation.pop();
     await userDoc.collection('transactions').doc(id).update({deleted: true});
-    if (url !== '') {
-      await storage().refFromURL(url).delete();
-    }
   };
   const handleDelete = async () => {
     try {

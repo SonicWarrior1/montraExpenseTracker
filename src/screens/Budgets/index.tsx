@@ -1,4 +1,4 @@
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {FlatList, Pressable, SafeAreaView, Text, View} from 'react-native';
 import style from './styles';
 import {ICONS} from '../../constants/icons';
@@ -10,8 +10,6 @@ import {useAppSelector} from '../../redux/store';
 import {useAppTheme} from '../../hooks/themeHook';
 import TabBackdrop from '../../components/TabBackdrop';
 import BudgetItem from './atoms/BudgetItem';
-import {useQuery} from '@realm/react';
-import {BudgetModel} from '../../DbModels/BudgetModel';
 
 function BudgetScreen({navigation}: Readonly<BudgetScreenProps>) {
   // constants
@@ -19,16 +17,21 @@ function BudgetScreen({navigation}: Readonly<BudgetScreenProps>) {
   const styles = style(COLOR);
   // state
   const [month, setMonth] = useState<number>(new Date().getMonth());
+  const [spend, setSpend] = useState<{
+    [category: string]: {
+      [currency: string]: number;
+    };
+  }>({});
   // redux
   const budgets = useAppSelector(
     state => state.user.currentUser?.budget[month],
   );
   const currency = useAppSelector(state => state.user.currentUser?.currency);
   // const conversion = useAppSelector(state => state.user.conversion)
-  const spend =
-    useAppSelector(state => state.user.currentUser?.spend[month]) ?? {};
+  const monthlySpend = useAppSelector(
+    state => state.user.currentUser?.spend[month],
+  );
   // functions
-
   const onPress = useCallback(() => {
     setMonth(month => {
       if (month < new Date().getMonth()) {
@@ -37,6 +40,15 @@ function BudgetScreen({navigation}: Readonly<BudgetScreenProps>) {
       return month;
     });
   }, []);
+  useEffect(() => {
+    console.log('USE EFFECT');
+    if (
+      monthlySpend &&
+      Object.keys(monthlySpend).length >= Object.keys(spend).length
+    ) {
+      setSpend(monthlySpend ?? {});
+    }
+  }, [monthlySpend]);
   return (
     <>
       <View style={styles.safeView}>

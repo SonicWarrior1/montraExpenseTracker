@@ -50,8 +50,7 @@ export const NAVIGATION: {
 
 export const STRINGS = {
   InvalidEmail: 'Invalid Email Address',
-  ToManyRequestError:
-    'A verification email has been sent. Please wait two minutes before requesting again.',
+  ToManyRequestError: 'Too many requests. Please try again after sometime.',
   PopupClosedByUser: 'Authentication process canceled. Please try again.',
   AccountBalance: 'Account Balance',
   FileError: 'File should be less than 10 Mb',

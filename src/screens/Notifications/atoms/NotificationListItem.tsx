@@ -53,7 +53,7 @@ export default function NotificationListItem({
       }}>
       <View style={styles.ctr}>
         <View style={styles.textCtr}>
-          <Text style={styles.text1} numberOfLines={1}>
+          <Text style={styles.text1} >
             {item.type === 'budget-percent'
               ? `Exceeded ${item.percentage}% of ${
                   item.category[0].toUpperCase() + item.category.slice(1)

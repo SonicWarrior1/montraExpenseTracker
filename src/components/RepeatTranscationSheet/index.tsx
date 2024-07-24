@@ -46,7 +46,7 @@ function RepeatTransactionSheet({
         return repeatData?.date as Date;
       }
     } else {
-      return new Date();
+      return undefined;
     }
   }, [repeatData]);
   // state
@@ -60,9 +60,10 @@ function RepeatTransactionSheet({
   const [end, setEnd] = useState<'date' | 'never'>(
     (repeatData?.end as 'date' | 'never') ?? undefined,
   );
-  const [date, setDate] = useState<Date>(getDate());
+  const [date, setDate] = useState<Date | undefined>(getDate());
   const [isDateOpen, setIsDateOpen] = useState<boolean>(false);
   const [formkey, setFormkey] = useState<boolean>(false);
+  const [myDate, setMyDate] = useState<Date>();
   // constants
   const snapPoints = useMemo(() => ['35%'], []);
   const year = new Date().getFullYear();
@@ -93,6 +94,10 @@ function RepeatTransactionSheet({
     }
     return daysInYear;
   }, [year]);
+  useEffect(() => {
+    const x = new Date(`${new Date().getFullYear()}-${month}-${day}`);
+    setMyDate(x);
+  }, [month, day]);
   useEffect(() => {
     setFreq((repeatData?.freq as freqType) ?? undefined);
     setMonth(repeatData?.month ?? 1);
@@ -210,7 +215,7 @@ function RepeatTransactionSheet({
                 setIsDateOpen(true);
               }}>
               <CustomInput
-                value={date.toLocaleDateString()}
+                value={date?.toLocaleDateString() ?? ''}
                 onChangeText={() => {}}
                 placeholderText={STRINGS.Date}
                 type="name"
@@ -223,10 +228,17 @@ function RepeatTransactionSheet({
               <DatePicker
                 modal
                 mode="date"
-                date={date ?? new Date()}
+                date={
+                  date ??
+                  (freq === 'yearly' || freq === 'monthly'
+                    ? myDate ?? new Date()
+                    : new Date())
+                }
                 open={isDateOpen}
                 maximumDate={new Date('2050-1-1')}
-                minimumDate={new Date()}
+                minimumDate={
+                  freq === 'yearly' || freq === 'monthly' ? myDate : new Date()
+                }
                 onConfirm={d => {
                   setDate(d);
                   setIsDateOpen(false);

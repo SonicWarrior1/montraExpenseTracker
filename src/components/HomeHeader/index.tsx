@@ -54,7 +54,7 @@ function HomeHeader({
         placeholderStyle={{marginLeft: 10}}
         selectedTextStyle={{marginLeft: 10, color: COLOR.DARK[100]}}
         value={monthData[month]}
-        data={monthData}
+        data={monthData.slice(0, new Date().getMonth() + 1)}
         labelField={'label'}
         valueField={'value'}
         onChange={({value}) => {
@@ -70,14 +70,16 @@ function HomeHeader({
           props.navigation.push(NAVIGATION.Notification);
         }}>
         {ICONS.Notification({height: 25, width: 25})}
-        {notifications && (
-          <View style={styles.notifCount}>
-            <Text style={{color: COLORS.VIOLET[100]}}>
-              {Object.values(notifications ?? []).filter(item => !item.read)
-                ?.length ?? 0}
-            </Text>
-          </View>
-        )}
+        {notifications &&
+          Object.values(notifications ?? []).filter(item => !item.read)
+            ?.length !== 0 && (
+            <View style={styles.notifCount}>
+              <Text style={{color: COLORS.VIOLET[100]}}>
+                {Object.values(notifications ?? []).filter(item => !item.read)
+                  ?.length ?? 0}
+              </Text>
+            </View>
+          )}
       </Pressable>
     </View>
   );

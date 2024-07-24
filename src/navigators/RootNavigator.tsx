@@ -27,6 +27,7 @@ import {useAppTheme} from '../hooks/themeHook';
 import {useGetUsdConversionQuery} from '../redux/api/conversionApi';
 import {createStackNavigator} from '@react-navigation/stack';
 import {setConversionData} from '../redux/reducers/userSlice';
+
 export const Stack = createStackNavigator<RootStackParamList>();
 
 function RootNavigator(): React.JSX.Element {

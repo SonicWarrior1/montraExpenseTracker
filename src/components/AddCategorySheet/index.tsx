@@ -1,5 +1,5 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
-import {Keyboard} from 'react-native';
+import {Dimensions, Keyboard, Text, View} from 'react-native';
 import style from './styles';
 import {useAppDispatch, useAppSelector} from '../../redux/store';
 import CustomButton from '../CustomButton';
@@ -23,9 +23,12 @@ import {
   BottomSheetModal,
   BottomSheetTextInput,
   BottomSheetView,
+  TouchableOpacity,
 } from '@gorhom/bottom-sheet';
 import {BottomSheetModalMethods} from '@gorhom/bottom-sheet/lib/typescript/types';
 import {useRealm} from '@realm/react';
+import CustomInput from '../CustomInput';
+import {RFValue} from 'react-native-responsive-fontsize';
 
 function AddCategorySheet({
   bottomSheetModalRef,
@@ -100,8 +103,8 @@ function AddCategorySheet({
       dispatch(setLoading(true));
       if (
         type === 'expense'
-          ? expenseCats?.includes(category.toLowerCase())
-          : incomeCats?.includes(category.toLowerCase())
+          ? expenseCats?.includes(category.trim().toLowerCase())
+          : incomeCats?.includes(category.trim().toLowerCase())
       ) {
         Toast.show({
           text1: `${category}` + STRINGS.AlreadyAdded,
@@ -165,12 +168,41 @@ function AddCategorySheet({
           autoCorrect={false}
           maxLength={20}
         />
+        {/* <CustomInput
+          placeholderText={STRINGS.CategoryName}
+          onChangeText={(str: string) => {
+            setCategory(str.trim());
+          }}
+          type="name"
+          value={category}
+        /> */}
         <EmptyError
           errorText={STRINGS.CategoryCannotBeEmpty}
           formKey={formKey}
           value={category.trim()}
         />
-        <CustomButton title={STRINGS.Add} onPress={onPress} />
+        <View style={{width: '100%'}}>
+          <TouchableOpacity
+            onPress={onPress}
+            style={{
+              width: '100%',
+              height: Dimensions.get('screen').height * 0.066,
+              justifyContent: 'center',
+              alignItems: 'center',
+              borderRadius: 16,
+              backgroundColor: COLORS.PRIMARY.VIOLET,
+            }}>
+            <Text
+              style={{
+                fontWeight: 'bold',
+                fontSize: RFValue(16),
+                color: COLOR.LIGHT[100],
+              }}>
+              {STRINGS.Add}
+            </Text>
+          </TouchableOpacity>
+        </View>
+        {/* <CustomButton title={STRINGS.Add} onPress={onPress} /> */}
       </BottomSheetView>
     </BottomSheetModal>
   );

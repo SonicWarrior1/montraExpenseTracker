@@ -1,24 +1,23 @@
 import {Text, View} from 'react-native';
 import style from './styles';
 import {currencies} from '../../constants/strings';
-import { COLORS } from '../../constants/commonStyles';
+import {COLORS} from '../../constants/commonStyles';
 
 function LinegraphLabel({
   items,
   currency,
-  conversion,
+  // conversion,
   COLOR,
 }: Readonly<{
   items: {date: string; value: number}[];
   currency: string | undefined;
-  conversion: {
-    [key: string]: {
-      [key: string]: number;
-    };
-  };
-  COLOR:typeof COLORS
+  // conversion: {
+  //   [key: string]: {
+  //     [key: string]: number;
+  //   };
+  // };
+  COLOR: typeof COLORS;
 }>) {
-
   const styles = style(COLOR);
   return (
     <View style={styles.ctr}>
@@ -26,9 +25,7 @@ function LinegraphLabel({
       <View style={styles.amtCtr}>
         <Text style={styles.amt} numberOfLines={1}>
           {currencies[currency!].symbol}{' '}
-          {(conversion.usd?.[currency!.toLowerCase()] * Number(items[0].value))
-            .toFixed(2)
-            .toString()}
+          {Number(items[0].value).toFixed(2).toString()}
         </Text>
       </View>
     </View>

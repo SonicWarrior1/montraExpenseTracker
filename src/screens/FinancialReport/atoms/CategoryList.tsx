@@ -14,7 +14,7 @@ function CategoryList({
   transType,
   catColors,
   currency,
-  conversion,
+  // conversion,
   totalSpend,
   totalIncome,
   sort,
@@ -22,13 +22,19 @@ function CategoryList({
   spends:
     | never[]
     | {
-        [key: string]: number;
-      };
+        [category: string]: {
+          [currency: string]: number;
+        };
+      }
+    | undefined;
   incomes:
     | never[]
     | {
-        [key: string]: number;
-      };
+        [category: string]: {
+          [currency: string]: number;
+        };
+      }
+    | undefined;
   transType: 'income' | 'expense';
   catColors:
     | {
@@ -36,11 +42,11 @@ function CategoryList({
       }
     | undefined;
   currency: string | undefined;
-  conversion: {
-    [key: string]: {
-      [key: string]: number;
-    };
-  };
+  // conversion: {
+  //   [key: string]: {
+  //     [key: string]: number;
+  //   };
+  // };
   totalSpend: number;
   totalIncome: number;
   sort: boolean;
@@ -48,11 +54,12 @@ function CategoryList({
   const COLOR = useAppTheme();
   const styles = style(COLOR);
   const listData = Object.entries(
-    transType === 'expense' ? spends : incomes,
-  ).sort((a, b) => b[1] - a[1]);
+    transType === 'expense' ? spends ?? {} : incomes ?? {},
+  ).sort((a, b) => b[1].USD - a[1].USD);
   if (sort) {
     listData.reverse();
   }
+  console.log('sdfklsdmnofkmo', listData);
   return (
     <FlatList
       style={{paddingHorizontal: 20}}
@@ -60,7 +67,7 @@ function CategoryList({
       scrollEnabled={false}
       ListEmptyComponent={ListEmptyComponent}
       renderItem={({item}) =>
-        Number(item[1]) ? (
+        Number(item[1][currency?.toUpperCase() ?? 'USD']) ? (
           <View>
             <View style={styles.catRow}>
               <View style={styles.catCtr2}>
@@ -68,7 +75,8 @@ function CategoryList({
                   style={[
                     styles.colorBox,
                     {backgroundColor: catColors![item[0]]},
-                  ]} />
+                  ]}
+                />
                 <Text style={styles.catText} numberOfLines={1}>
                   {item[0][0].toUpperCase() + item[0].slice(1)}
                 </Text>
@@ -87,9 +95,7 @@ function CategoryList({
                 {currencies[currency!].symbol}
                 {formatWithCommas(
                   Number(
-                    (
-                      conversion.usd?.[currency!.toLowerCase()] * item[1]
-                    ).toFixed(2),
+                    item[1][currency?.toUpperCase() ?? 'USD'].toFixed(2),
                   ).toString(),
                 )}
               </Text>
@@ -97,7 +103,7 @@ function CategoryList({
             <Spacer height={5} />
             <Bar
               progress={
-                item[1] /
+                item[1].USD /
                 (transType === 'expense'
                   ? Number(totalSpend)
                   : Number(totalIncome))
