@@ -79,4 +79,4 @@ function TransactionHeader({
   );
 }
 
-export default TransactionHeader;
+export default React.memo(TransactionHeader);

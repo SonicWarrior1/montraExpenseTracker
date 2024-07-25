@@ -19,7 +19,7 @@ function Graph({
   month: number;
 }>) {
   const currency = useAppSelector(state => state.user.currentUser?.currency);
-  const conversion = useAppSelector(state => state.user.conversion);
+  // const conversion = useAppSelector(state => state.user.conversion);
   const theme = useAppSelector(state => state.user.currentUser?.theme);
   const COLOR = useAppTheme();
   const styles = style(COLOR);
@@ -78,24 +78,32 @@ function Graph({
         );
       }
     },
-    [data],
+    [graphDay],
   );
   const graphData = data
     .filter(item => {
       if (graphDay === 0) {
         return (
-          item.timeStamp.seconds >= startOfToday && item.type === 'expense'
+          item.timeStamp.seconds >= startOfToday &&
+          (item.type === 'expense' || item.type === 'transfer')
         );
       } else if (graphDay === 1) {
-        return item.timeStamp.seconds >= startOfWeek && item.type === 'expense';
+        return (
+          item.timeStamp.seconds >= startOfWeek &&
+          (item.type === 'expense' || item.type === 'transfer')
+        );
       } else if (graphDay === 2) {
         return (
           Timestamp.fromMillis(item.timeStamp.seconds * 1000)
             .toDate()
-            .getMonth() === month && item.type === 'expense'
+            .getMonth() === month &&
+          (item.type === 'expense' || item.type === 'transfer')
         );
       } else {
-        return item.timeStamp.seconds >= startOfYear && item.type === 'expense';
+        return (
+          item.timeStamp.seconds >= startOfYear &&
+          (item.type === 'expense' || item.type === 'transfer')
+        );
       }
     })
     .sort((a, b) => a.timeStamp.seconds - b.timeStamp.seconds)
@@ -153,7 +161,7 @@ function Graph({
                 LinegraphLabel({
                   items: items,
                   currency: currency,
-                  conversion: conversion,
+                  // conversion: conversion,
                   COLOR: COLOR,
                 }),
             }}

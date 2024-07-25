@@ -126,7 +126,7 @@ function CategoryList({
   );
 }
 
-export default CategoryList;
+export default React.memo(CategoryList);
 
 const ListEmptyComponent = () => {
   const COLOR = useAppTheme();

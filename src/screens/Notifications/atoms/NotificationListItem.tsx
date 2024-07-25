@@ -8,7 +8,7 @@ import {useAppTheme} from '../../../hooks/themeHook';
 import style from '../styles';
 import {formatAMPM} from '../../../utils/firebase';
 
-export default function NotificationListItem({
+function NotificationListItem({
   item,
   handleSingleDelete,
 }: Readonly<{
@@ -53,7 +53,7 @@ export default function NotificationListItem({
       }}>
       <View style={styles.ctr}>
         <View style={styles.textCtr}>
-          <Text style={styles.text1} >
+          <Text style={styles.text1}>
             {item.type === 'budget-percent'
               ? `Exceeded ${item.percentage}% of ${
                   item.category[0].toUpperCase() + item.category.slice(1)
@@ -100,3 +100,5 @@ export default function NotificationListItem({
     </Swipeable>
   );
 }
+
+export default React.memo(NotificationListItem);

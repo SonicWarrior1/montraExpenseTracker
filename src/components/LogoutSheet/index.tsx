@@ -100,4 +100,4 @@ function LogoutSheet() {
   );
 }
 
-export default LogoutSheet;
+export default React.memo(LogoutSheet);

@@ -130,22 +130,10 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
                   <Text style={styles.text1}>{STRINGS.Income}</Text>
                   <Text style={styles.text2} numberOfLines={1}>
                     {currencies[currency].symbol}
-                    {isNaN(
-                      Number(
-                        (
-                          conversion.usd?.[currency.toLowerCase()] *
-                          Number(totalIncome)
-                        ).toFixed(2),
-                      ),
-                    )
+                    {isNaN(Number(Number(totalIncome).toFixed(2)))
                       ? 0
                       : formatWithCommas(
-                          Number(
-                            (
-                              conversion.usd?.[currency.toLowerCase()] *
-                              Number(totalIncome)
-                            ).toFixed(2),
-                          ).toString(),
+                          Number(Number(totalIncome).toFixed(2)).toString(),
                         )}
                   </Text>
                 </View>
@@ -163,22 +151,10 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
                   <Text style={styles.text1}>{STRINGS.Expense}</Text>
                   <Text style={styles.text2} numberOfLines={1}>
                     {currencies[currency].symbol}
-                    {isNaN(
-                      Number(
-                        (
-                          conversion.usd?.[currency.toLowerCase()] *
-                          Number(totalSpend)
-                        ).toFixed(2),
-                      ),
-                    )
+                    {isNaN(Number(Number(totalSpend).toFixed(2)))
                       ? 0
                       : formatWithCommas(
-                          Number(
-                            (
-                              conversion.usd?.[currency.toLowerCase()] *
-                              Number(totalSpend)
-                            ).toFixed(2),
-                          ).toString(),
+                          Number(Number(totalSpend).toFixed(2)).toString(),
                         )}
                   </Text>
                 </View>

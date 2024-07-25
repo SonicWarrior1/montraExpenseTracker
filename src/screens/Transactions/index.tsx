@@ -324,4 +324,4 @@ function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
   );
 }
 
-export default TransactionScreen;
+export default React.memo(TransactionScreen);

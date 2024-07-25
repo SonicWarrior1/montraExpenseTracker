@@ -141,8 +141,10 @@ function Login({navigation}: Readonly<LoginScreenProps>) {
       const error: FirebaseAuthTypes.NativeFirebaseAuthError = e;
       console.log(e);
       if (
-        error.message !==
-        'android.credentials.GetCredentialException.TYPE_USER_CANCELED'
+        Platform.OS === 'android'
+          ? error.message !==
+            'android.credentials.GetCredentialException.TYPE_USER_CANCELED'
+          : e.code !== 'google_signin_error'
       ) {
         Toast.show({
           text1: FirebaseAuthErrorHandler(error.code),

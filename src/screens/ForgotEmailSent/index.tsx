@@ -45,4 +45,4 @@ function ForgotEmailSent({navigation, route}: Readonly<ForgotSentScreenProps>) {
   );
 }
 
-export default ForgotEmailSent;
+export default React.memo(ForgotEmailSent);

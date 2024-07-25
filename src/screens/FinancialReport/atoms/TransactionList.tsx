@@ -50,7 +50,10 @@ function TransactionList({
       item =>
         Timestamp.fromMillis(item.timeStamp.seconds * 1000)
           .toDate()
-          .getMonth() === month && item.type === transType,
+          .getMonth() === month &&
+        (transType === 'expense'
+          ? item.type === 'expense' || item.type === 'transfer'
+          : item.type === 'income'),
     )
     .sort((a, b) => b.amount - a.amount)
     .slice(
@@ -82,7 +85,7 @@ function TransactionList({
   );
 }
 
-export default TransactionList;
+export default React.memo(TransactionList);
 
 const ListEmptyComponent = () => {
   const COLOR = useAppTheme();

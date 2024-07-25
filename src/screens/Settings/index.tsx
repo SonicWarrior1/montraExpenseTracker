@@ -40,7 +40,7 @@ function SettingsScreen({navigation}: Readonly<SettingsScreenProps>) {
   );
 }
 
-export default SettingsScreen;
+export default React.memo(SettingsScreen);
 
 function ButtonRow({
   text,

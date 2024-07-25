@@ -2,6 +2,7 @@ import {Pressable, Text} from 'react-native';
 import style from '../FilePickerSheet/styles';
 import {iconProps} from '../../constants/icons';
 import {useAppTheme} from '../../hooks/themeHook';
+import React from 'react';
 
 function SheetButtons({
   icon,
@@ -21,4 +22,4 @@ function SheetButtons({
     </Pressable>
   );
 }
-export default SheetButtons;
+export default React.memo(SheetButtons);

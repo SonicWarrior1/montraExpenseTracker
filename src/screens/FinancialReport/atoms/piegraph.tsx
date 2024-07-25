@@ -55,10 +55,10 @@ function Piegraph({
         {currencies[currency!].symbol}
         {formatWithCommas(
           Number(
-            (
-              // conversion.usd?.[currency!.toLowerCase()] *
-              Number(transType === 'expense' ? totalSpend : totalIncome)
-            ).toFixed(2),
+            // conversion.usd?.[currency!.toLowerCase()] *
+            Number(transType === 'expense' ? totalSpend : totalIncome).toFixed(
+              2,
+            ),
           ).toString(),
         )}
       </Text>
@@ -121,4 +121,4 @@ function Piegraph({
   );
 }
 
-export default Piegraph;
+export default React.memo(Piegraph);

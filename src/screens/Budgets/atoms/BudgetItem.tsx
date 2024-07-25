@@ -62,9 +62,6 @@ function BudgetItem({
       },
       cat: string,
     ) => {
-      // console.log('==============================================');
-      // console.log(key, val, spend?.[cat]);
-      // console.log('==============================================');
       if (spend?.[cat]?.USD === undefined) {
         return (
           item[1].conversion.usd[currency?.toLowerCase() ?? 'usd'] *

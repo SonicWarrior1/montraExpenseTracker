@@ -261,4 +261,4 @@ function NotificationScreen({navigation}: Readonly<NotificationScreenProps>) {
   );
 }
 
-export default NotificationScreen;
+export default React.memo(NotificationScreen);

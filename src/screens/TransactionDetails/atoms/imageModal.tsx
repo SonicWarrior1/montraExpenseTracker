@@ -3,7 +3,7 @@ import {ActivityIndicator, Image, Modal, Pressable} from 'react-native';
 import {ICONS} from '../../../constants/icons';
 import {COLORS} from '../../../constants/commonStyles';
 import style from '../styles';
-import { useAppTheme } from '../../../hooks/themeHook';
+import {useAppTheme} from '../../../hooks/themeHook';
 
 function ImageModal({
   showImage,
@@ -12,7 +12,7 @@ function ImageModal({
 }: Readonly<{
   showImage: boolean;
   setShowImage: React.Dispatch<React.SetStateAction<boolean>>;
-  url:string
+  url: string;
 }>) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const COLOR = useAppTheme();
@@ -36,8 +36,8 @@ function ImageModal({
           <Image
             source={{uri: url}}
             style={{width: '100%', height: '100%'}}
-            onLoadStart={()=>{
-                setIsLoading(true)
+            onLoadStart={() => {
+              setIsLoading(true);
             }}
             onLoadEnd={() => {
               setIsLoading(false);
@@ -74,4 +74,4 @@ function ImageModal({
   );
 }
 
-export default ImageModal;
+export default React.memo(ImageModal);

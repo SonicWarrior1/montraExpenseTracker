@@ -132,4 +132,4 @@ function BudgetScreen({navigation}: Readonly<BudgetScreenProps>) {
     </>
   );
 }
-export default BudgetScreen;
+export default React.memo(BudgetScreen);

@@ -41,7 +41,7 @@ export const AmountInputSetter = (str: string, setAmount: React.Dispatch<React.S
     }
 
     if (decimalCount === 1 && numericValue.length > 9) {  // Adjusted to account for the two decimal places
-        numericValue = numericValue.slice(0, 9);
+        numericValue = numericValue.slice(0, 10);
     } else if (decimalCount === 0 && numericValue.length > 7) {
         numericValue = numericValue.slice(0, 7);
     }

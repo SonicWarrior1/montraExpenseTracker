@@ -8,7 +8,7 @@ import style from './styles';
 import {useAppTheme} from '../../hooks/themeHook';
 import CustomHeader from '../../components/CustomHeader';
 import {ThemeScreenProps} from '../../defs/navigation';
-import { STRINGS } from '../../constants/strings';
+import {STRINGS} from '../../constants/strings';
 
 function ThemeScreen({navigation}: Readonly<ThemeScreenProps>) {
   // redux
@@ -54,4 +54,4 @@ function ThemeScreen({navigation}: Readonly<ThemeScreenProps>) {
   );
 }
 
-export default ThemeScreen;
+export default React.memo(ThemeScreen);

@@ -95,4 +95,4 @@ function FinancialReportHeader({
   );
 }
 
-export default FinancialReportHeader;
+export default React.memo(FinancialReportHeader);

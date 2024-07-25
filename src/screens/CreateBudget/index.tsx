@@ -169,19 +169,19 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
               },
             }),
           );
-          // const totalSpent = user?.spend?.[month]?.[category!].USD ?? 0;
-          // handleOfflineNotification({
-          //   category: category!,
-          //   dispatch: dispatch,
-          //   realm: realm,
-          //   totalBudget: {
-          //     limit: Number(amount.replace(/,/g, '')),
-          //     alert: alert!,
-          //     percentage: sliderVal!,
-          //   },
-          //   totalSpent: totalSpent,
-          //   user: user,
-          // });
+          const totalSpent = user?.spend?.[month]?.[category!].USD ?? 0;
+          handleOfflineNotification({
+            category: category!,
+            dispatch: dispatch,
+            realm: realm,
+            totalBudget: {
+              limit: Number(amount.replace(/,/g, '')),
+              alert: alert!,
+              percentage: sliderVal!,
+            },
+            totalSpent: totalSpent,
+            user: user,
+          });
         } else {
           await firestore()
             .collection('users')

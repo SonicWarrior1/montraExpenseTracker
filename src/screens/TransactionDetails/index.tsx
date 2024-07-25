@@ -107,7 +107,7 @@ function TransactionDetails({
             {formatWithCommas(
               Number(
                 (
-                  conversion.usd[(currency ?? 'USD').toLowerCase()] *
+                  trans.conversion.usd[(currency ?? 'USD').toLowerCase()] *
                   trans.amount
                 ).toFixed(2),
               ).toString(),
@@ -222,4 +222,4 @@ function TransactionDetails({
   );
 }
 
-export default TransactionDetails;
+export default React.memo(TransactionDetails);

@@ -1,3 +1,4 @@
+import React, {useState} from 'react';
 import {
   View,
   TextInput,
@@ -6,7 +7,6 @@ import {
   TextInputFocusEventData,
 } from 'react-native';
 import styles from './styles';
-import {useState} from 'react';
 import {ICONS} from '../../constants/icons';
 import {useAppTheme} from '../../hooks/themeHook';
 import {PlaceholderTextColor} from '../../constants/commonStyles';
@@ -59,4 +59,4 @@ function CustomPassInput({
     </View>
   );
 }
-export default CustomPassInput;
+export default React.memo(CustomPassInput);

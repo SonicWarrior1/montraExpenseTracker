@@ -231,13 +231,7 @@ export default function StoryScreen({navigation}: Readonly<StoryScreenProps>) {
               {index === 0 ? STRINGS.BiggestSpending : STRINGS.BiggestIncome}
             </Text>
             <View
-              style={{
-                flexDirection: 'row',
-                columnGap: 10,
-                flexWrap: 'wrap',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}>
+              style={styles.wrapCtr}>
               {(index === 0 ? biggestSpend : biggestIncome).map(item => (
                 <View style={styles.catCtr} key={item[0]}>
                   <View

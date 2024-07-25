@@ -145,13 +145,13 @@ const TransactionItem = ({
             Timestamp.fromMillis(item.timeStamp.seconds * 1000).toDate(),
           )}
         </Text>
-        <Text
-          style={[
-            styles.text2,
-            {fontSize: dateShow ? RFValue(11) : RFValue(13)},
-          ]}>
-          {dateShow &&
-            Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+        {dateShow && (
+          <Text
+            style={[
+              styles.text2,
+              {fontSize: dateShow ? RFValue(11) : RFValue(13)},
+            ]}>
+            {Timestamp.fromMillis(item.timeStamp.seconds * 1000)
               ?.toDate()
               ?.getDate() +
               ' ' +
@@ -164,7 +164,8 @@ const TransactionItem = ({
               Timestamp.fromMillis(item.timeStamp.seconds * 1000)
                 ?.toDate()
                 ?.getFullYear()}
-        </Text>
+          </Text>
+        )}
       </View>
     </Pressable>
   );

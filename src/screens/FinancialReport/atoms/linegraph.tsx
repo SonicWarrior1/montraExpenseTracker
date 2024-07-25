@@ -75,7 +75,10 @@ function Linegraph({
                 item =>
                   Timestamp.fromMillis(item.timeStamp.seconds * 1000)
                     .toDate()
-                    .getMonth() === month && item.type === transType,
+                    .getMonth() === month &&
+                  (transType === 'expense'
+                    ? item.type === 'expense' || item.type === 'transfer'
+                    : item.type === 'income'),
               )
               .sort((a, b) => a.timeStamp.seconds - b.timeStamp.seconds)
               .map(item => {
@@ -137,4 +140,4 @@ function Linegraph({
   );
 }
 
-export default Linegraph;
+export default React.memo(Linegraph);

@@ -37,7 +37,7 @@ function MoneyInput({
         <Text
           style={[
             styles.text2,
-            {fontSize: RFValue(64 - (amount.length > 7 ? 15 : 0))},
+            {fontSize: RFValue(64 - (amount.length > 9 ? 25 : amount.length > 7 ? 15 : 0))},
           ]}>
           {currencies[currency].symbol}
         </Text>
@@ -45,10 +45,12 @@ function MoneyInput({
           style={[
             styles.input,
             {
-              fontSize: RFValue(64 - (amount.length > 7 ? 15 : 0)),
+              fontSize: RFValue(
+                64 - (amount.length > 9 ? 30 : amount.length > 7 ? 15 : 0),
+              ),
             },
           ]}
-          maxLength={10}
+          maxLength={12}
           numberOfLines={1}
           onPress={() => {
             if (amount === '0') {
@@ -67,7 +69,12 @@ function MoneyInput({
       </View>
       <View style={styles.amtError}>
         <EmptyZeroError
-          errorText={STRINGS.PleaseFillAnAmount}
+          errorText={
+            (Number(amount.replace(/,/g, '')) > 0 || amount.trim() !== '.') &&
+            amount.trim() === ''
+              ? STRINGS.PleaseFillAnAmount
+              : STRINGS.PleaseFillValidAmount
+          }
           value={amount}
           formKey={formKey}
           color={COLOR.LIGHT[100]}

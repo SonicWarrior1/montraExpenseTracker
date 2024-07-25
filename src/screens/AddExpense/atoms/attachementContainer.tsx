@@ -106,4 +106,4 @@ function AttachementContainer({
   }
 }
 
-export default AttachementContainer;
+export default React.memo(AttachementContainer);

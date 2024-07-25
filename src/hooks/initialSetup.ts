@@ -84,9 +84,13 @@ async function handleDelete(
 ) {
   for (const item of data) {
     if (item.deleted) {
-      if (item?.attachementType !== 'none') {
-        console.log('doc delete');
-        await storage().refFromURL(item.attachement!).delete();
+      try {
+        if (item?.attachementType !== 'none') {
+          console.log('doc delete');
+          await storage().refFromURL(item.attachement!).delete();
+        }
+      } catch (e) {
+        console.log(e);
       }
       await firestore()
         .collection('users')

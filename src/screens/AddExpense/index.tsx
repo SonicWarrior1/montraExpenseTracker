@@ -79,9 +79,9 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
         return screenHeight / 2.06;
       }
     } else if (pageType !== 'transfer') {
-      return screenHeight / 2.65;
+      return screenHeight / 2.6;
     } else {
-      return Dimensions.get('screen').height / 1.85;
+      return Dimensions.get('screen').height / 1.8;
     }
   }, [pageType, screenHeight]);
   const backgroundColor = getBackgroundColor;
@@ -375,7 +375,8 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
                   <CustomInput
                     placeholderText={'From'}
                     onChangeText={(str: string) => {
-                      setFrom(str);
+                      const value = str.replace(/[^a-zA-Z]/g, '');
+                      setFrom(value);
                     }}
                     type="name"
                     value={from}
@@ -390,7 +391,8 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
                   <CustomInput
                     placeholderText={'To'}
                     onChangeText={(str: string) => {
-                      setTo(str);
+                      const value = str.replace(/[^a-zA-Z]/g, '');
+                      setTo(value);
                     }}
                     type="name"
                     value={to}

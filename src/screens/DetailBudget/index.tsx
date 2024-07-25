@@ -27,7 +27,6 @@ function DetailBudget({navigation, route}: Readonly<DetailBudgetScreenProps>) {
   const COLOR = useAppTheme();
   const styles = style(COLOR);
   const selectedCategory = route.params.category;
-  // console.log(spends?.[selectedCategory]);
   const budget = budgets?.[selectedCategory];
   //ref
   const bottomSheetModalRef = useRef<BottomSheetModalMethods>(null);
