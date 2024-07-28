@@ -102,7 +102,7 @@ function TransactionDetails({
             HeaderRight={headerRight}
           />
           <Spacer height={Dimensions.get('screen').height * 0.025} />
-          <Text style={styles.amt} numberOfLines={1}>
+          <Text style={styles.amt}>
             {currencies[currency!].symbol ?? '$'}{' '}
             {formatWithCommas(
               Number(

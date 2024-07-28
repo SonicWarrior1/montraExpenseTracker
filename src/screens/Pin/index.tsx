@@ -10,7 +10,7 @@ import {
   View,
 } from 'react-native';
 import styles from './styles';
-import {TouchableOpacity} from 'react-native-gesture-handler';
+import {ScrollView, TouchableOpacity} from 'react-native-gesture-handler';
 import {PinSentScreenProps} from '../../defs/navigation';
 import {NAVIGATION, STRINGS} from '../../constants/strings';
 import {useAppDispatch, useAppSelector} from '../../redux/store';
@@ -103,42 +103,38 @@ function Pin({route, navigation}: Readonly<PinSentScreenProps>) {
     if (isSetup && oldPin) {
       navigation.goBack();
     } else if (isSetup && oldPin === '') {
-      Alert.alert(
-        STRINGS.LeaveWithoutSettingPin,
-        '',
-        [
-          {
-            text: STRINGS.Cancel,
-            onPress: () => null,
-            style: 'cancel',
+      Alert.alert(STRINGS.LeaveWithoutSettingPin, '', [
+        {
+          text: STRINGS.Cancel,
+          onPress: () => null,
+          style: 'cancel',
+        },
+        {
+          text: STRINGS.Yes,
+          onPress: () => {
+            (async () => {
+              dispatch(setLoading(true));
+              if (Platform.OS === 'ios') {
+                await NativeModules.GoogleSigninModule.googleSignOut();
+              } else {
+                await NativeModules.GoogleSignInHandler.signOut();
+              }
+              await auth().signOut();
+              dispatch(userLoggedIn(undefined));
+              setTimeout(() => {
+                navigation.reset({
+                  index: 1,
+                  routes: [
+                    {name: NAVIGATION.ONBOARDING},
+                    {name: NAVIGATION.LOGIN},
+                  ],
+                });
+                dispatch(setLoading(false));
+              }, 100);
+            })();
           },
-          {
-            text: STRINGS.Yes,
-            onPress: () => {
-              (async () => {
-                dispatch(setLoading(true));
-                if (Platform.OS === 'ios') {
-                  await NativeModules.GoogleSigninModule.googleSignOut();
-                } else {
-                  await NativeModules.GoogleSignInHandler.signOut();
-                }
-                await auth().signOut();
-                dispatch(userLoggedIn(undefined));
-                setTimeout(() => {
-                  navigation.reset({
-                    index: 1,
-                    routes: [
-                      {name: NAVIGATION.ONBOARDING},
-                      {name: NAVIGATION.LOGIN},
-                    ],
-                  });
-                  dispatch(setLoading(false));
-                }, 100);
-              })();
-            },
-          },
-        ],
-      );
+        },
+      ]);
     } else {
       BackHandler.exitApp();
     }

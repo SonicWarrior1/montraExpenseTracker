@@ -72,7 +72,7 @@ function DetailBudget({navigation, route}: Readonly<DetailBudgetScreenProps>) {
               </Text>
             </View>
             <Text style={styles.remainText}>{STRINGS.Remaining}</Text>
-            <Text style={styles.amtText} numberOfLines={1}>
+            <Text style={styles.amtText} >
               {currencies[currency!].symbol}
               {budget.limit - (spends?.[selectedCategory]?.USD ?? 0) < 0
                 ? '0'

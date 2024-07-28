@@ -121,8 +121,9 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
       ? formatWithCommas(
           Number(
             (
-              conversion.usd[(user?.currency ?? 'USD').toLowerCase()] *
-              prevTransaction.amount
+              prevTransaction.conversion.usd[
+                (user?.currency ?? 'USD').toLowerCase()
+              ] * prevTransaction.amount
             ).toFixed(2),
           ).toString(),
         )

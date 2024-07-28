@@ -29,7 +29,11 @@ import {useRealm} from '@realm/react';
 import {UpdateMode} from 'realm';
 import {Switch} from 'react-native-switch';
 import CustomHeader from '../../components/CustomHeader';
-import {AmountInputSetter, getMyColor} from '../../utils/commonFuncs';
+import {
+  AmountInputSetter,
+  formatWithCommas,
+  getMyColor,
+} from '../../utils/commonFuncs';
 import Toast from 'react-native-toast-message';
 import {
   handleOfflineNotification,
@@ -80,12 +84,14 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
   // state
   const [amount, setAmount] = useState<string>(
     isEdit
-      ? Number(
-          (
-            (oldBudget?.conversion?.usd?.[currency?.toLowerCase() ?? 'usd'] ??
-              1) * Number(oldBudget?.limit!)
-          ).toFixed(2),
-        ).toString()
+      ? formatWithCommas(
+          Number(
+            (
+              (oldBudget?.conversion?.usd?.[currency?.toLowerCase() ?? 'usd'] ??
+                1) * Number(oldBudget?.limit!)
+            ).toFixed(2),
+          ).toString(),
+        )
       : '0',
   );
   const [category, setCategory] = useState<string | undefined>(
@@ -299,15 +305,29 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
           <View style={styles.mainView}>
             <Text style={styles.text1}>{STRINGS.HowMuchDoSpent}</Text>
             <View style={styles.moneyCtr}>
-              <Text style={styles.text2}>{currencies[currency!].symbol}</Text>
+              <Text
+                style={[
+                  styles.text2,
+                  {
+                    fontSize: RFValue(
+                      64 -
+                        (amount.length > 9 ? 25 : amount.length > 7 ? 15 : 0),
+                    ),
+                  },
+                ]}>
+                {currencies[currency!].symbol}
+              </Text>
               <TextInput
                 style={[
                   styles.input,
                   {
-                    fontSize: RFValue(64 - (amount.length > 7 ? 15 : 0)),
+                    fontSize: RFValue(
+                      64 -
+                        (amount.length > 9 ? 25 : amount.length > 7 ? 15 : 0),
+                    ),
                   },
                 ]}
-                maxLength={10}
+                maxLength={12}
                 numberOfLines={1}
                 onPress={() => {
                   if (amount === '0') {

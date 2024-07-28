@@ -89,15 +89,15 @@ async function handleDelete(
           console.log('doc delete');
           await storage().refFromURL(item.attachement!).delete();
         }
-      } catch (e) {
-        console.log(e);
-      }
-      await firestore()
+        await firestore()
         .collection('users')
         .doc(user.uid)
         .collection('transactions')
         .doc(item.id)
         .delete();
+      } catch (e) {
+        console.log(e);
+      }
       setTimeout(
         () =>
           realm.write(() => {

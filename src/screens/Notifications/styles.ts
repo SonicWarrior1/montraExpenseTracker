@@ -31,7 +31,7 @@ const styles = (COLOR: typeof COLORS) =>
     ctr: {
       flexDirection: 'row',
       paddingLeft: 20,
-      paddingRight: 10,
+      paddingRight: 15,
       borderBottomWidth: 1,
       borderColor: COLOR.LIGHT[20],
       backgroundColor: COLOR.LIGHT[100],
@@ -39,6 +39,7 @@ const styles = (COLOR: typeof COLORS) =>
       // columnGap:10,
       justifyContent: 'space-between',
       alignItems: 'center',
+      // columnGap: 5,
     },
     text1: {
       fontSize: RFValue(16),
@@ -82,7 +83,7 @@ const styles = (COLOR: typeof COLORS) =>
       alignItems: 'center',
     },
     flex: {flex: 1},
-    textCtr: {maxWidth: '80%'},
+    textCtr: {maxWidth: '75%'},
     timeCtr: {textAlign: 'center', alignItems: 'flex-end'},
   });
 export default styles;

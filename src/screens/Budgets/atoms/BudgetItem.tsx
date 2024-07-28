@@ -71,6 +71,7 @@ function BudgetItem({
       if (budget.limit - (spend?.[cat]?.USD ?? 0) < 0) {
         return '0';
       }
+
       return (
         budget.limit *
           item[1].conversion.usd[currency?.toLowerCase() ?? 'usd'] -
@@ -117,10 +118,7 @@ function BudgetItem({
         {currencies[currency!].symbol}
         {formatWithCommas(
           Number(
-            (
-              val.conversion.usd[currency!.toLowerCase()] *
-              (spend?.[key]?.USD ?? 0)
-            ).toFixed(2),
+            (spend?.[key]?.[currency?.toUpperCase() ?? 'USD'] ?? 0).toFixed(2),
           ).toString(),
         )}{' '}
         of {currencies[currency!].symbol}

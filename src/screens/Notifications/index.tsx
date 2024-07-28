@@ -201,62 +201,57 @@ function NotificationScreen({navigation}: Readonly<NotificationScreenProps>) {
             setMenu(false);
           }
         }}
-        style={styles.header}>
-        <Pressable
-          onPress={() => {
-            navigation.goBack();
-          }}>
-          {ICONS.ArrowLeft({
-            height: 25,
-            width: 25,
-            color: COLOR.DARK[100],
-            borderColor: COLOR.DARK[100],
-          })}
-        </Pressable>
-        <Text style={styles.headerTitle}>{STRINGS.Notifications}</Text>
-        {Object.values(notifications!).length === 0 ? (
-          <Spacer width={25} />
-        ) : (
+        style={styles.safeView}>
+        <View style={styles.header}>
           <Pressable
             onPress={() => {
-              setMenu(menu => !menu);
+              navigation.goBack();
             }}>
-            {ICONS.More({height: 20, width: 20, color: COLOR.DARK[100]})}
+            {ICONS.ArrowLeft({
+              height: 25,
+              width: 25,
+              color: COLOR.DARK[100],
+              borderColor: COLOR.DARK[100],
+            })}
           </Pressable>
-        )}
-      </Pressable>
-      {notifications === undefined ||
-      Object.values(notifications).length === 0 ? (
-        <View style={styles.center}>
-          <Text style={styles.NoNotifText}>{STRINGS.NoNotification}</Text>
-        </View>
-      ) : (
-        <FlatList
-          data={Object.values(notifications).sort(
-            (a, b) => b.time.seconds - a.time.seconds,
-          )}
-          renderItem={({item}) => (
+          <Text style={styles.headerTitle}>{STRINGS.Notifications}</Text>
+          {Object.values(notifications!).length === 0 ? (
+            <Spacer width={25} />
+          ) : (
             <Pressable
               onPress={() => {
-                if (menu) {
-                  setMenu(false);
-                }
+                setMenu(menu => !menu);
               }}>
+              {ICONS.More({height: 20, width: 20, color: COLOR.DARK[100]})}
+            </Pressable>
+          )}
+        </View>
+        {notifications === undefined ||
+        Object.values(notifications).length === 0 ? (
+          <View style={styles.center}>
+            <Text style={styles.NoNotifText}>{STRINGS.NoNotification}</Text>
+          </View>
+        ) : (
+          <FlatList
+            data={Object.values(notifications).sort(
+              (a, b) => b.time.seconds - a.time.seconds,
+            )}
+            renderItem={({item}) => (
               <NotificationListItem
                 handleSingleDelete={handleSingleDelete}
                 item={item}
               />
-            </Pressable>
-          )}
-        />
-      )}
-      {menu && (
-        <View style={styles.menu}>
-          <TouchableOpacity onPress={handleDelete}>
-            <Text style={styles.menuText}>{STRINGS.ClearAll}</Text>
-          </TouchableOpacity>
-        </View>
-      )}
+            )}
+          />
+        )}
+        {menu && (
+          <View style={styles.menu}>
+            <TouchableOpacity onPress={handleDelete}>
+              <Text style={styles.menuText}>{STRINGS.ClearAll}</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      </Pressable>
     </SafeAreaView>
   );
 }

@@ -37,7 +37,11 @@ function MoneyInput({
         <Text
           style={[
             styles.text2,
-            {fontSize: RFValue(64 - (amount.length > 9 ? 25 : amount.length > 7 ? 15 : 0))},
+            {
+              fontSize: RFValue(
+                64 - (amount.length > 9 ? 25 : amount.length > 7 ? 15 : 0),
+              ),
+            },
           ]}>
           {currencies[currency].symbol}
         </Text>
@@ -46,7 +50,7 @@ function MoneyInput({
             styles.input,
             {
               fontSize: RFValue(
-                64 - (amount.length > 9 ? 30 : amount.length > 7 ? 15 : 0),
+                64 - (amount.length > 9 ? 25 : amount.length > 7 ? 15 : 0),
               ),
             },
           ]}

@@ -75,7 +75,7 @@ const styles = (COLOR: typeof COLORS) =>
       justifyContent: 'center',
     },
     amt: {
-      fontSize: RFValue(48),
+      fontSize: RFValue(40),
       fontWeight: '700',
       color: COLOR.LIGHT[100],
     },

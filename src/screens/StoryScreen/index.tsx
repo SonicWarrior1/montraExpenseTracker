@@ -54,13 +54,14 @@ export default function StoryScreen({navigation}: Readonly<StoryScreenProps>) {
     user?.spend[new Date().getMonth()] !== undefined
       ? Object.entries(user?.budget[new Date().getMonth()]).filter(
           item =>
-            item[1].limit <= user?.spend[new Date().getMonth()][item[0]].USD,
+            item[1].limit <=
+            (user?.spend?.[new Date().getMonth()]?.[item[0]]?.USD ?? 0),
         )
       : undefined;
   const totalBudgets =
     user?.budget[new Date().getMonth()] !== undefined &&
     user?.spend[new Date().getMonth()] !== undefined
-      ? Object.entries(user?.budget[new Date().getMonth()])
+      ? Object.entries(user?.budget?.[new Date().getMonth()] ?? {})
       : undefined;
   // state
   const [index, setIndex] = useState<number>(0);
@@ -194,30 +195,24 @@ export default function StoryScreen({navigation}: Readonly<StoryScreenProps>) {
               {index === 0
                 ? formatWithCommas(
                     Number(
-                      (
-                        conversion.usd[currency!.toLowerCase()] *
-                        Object.values(
-                          user?.spend[new Date().getMonth()] ?? [],
-                        ).reduce(
+                      Object.values(user?.spend[new Date().getMonth()] ?? [])
+                        .reduce(
                           (acc, curr) =>
                             acc + curr[currency?.toUpperCase() ?? 'USD'],
                           0,
                         )
-                      ).toFixed(2),
+                        .toFixed(2),
                     ).toString(),
                   )
                 : formatWithCommas(
                     Number(
-                      (
-                        conversion.usd[currency!.toLowerCase()] *
-                        Object.values(
-                          user?.income[new Date().getMonth()] ?? [],
-                        ).reduce(
+                      Object.values(user?.income[new Date().getMonth()] ?? [])
+                        .reduce(
                           (acc, curr) =>
                             acc + curr[currency?.toUpperCase() ?? 'USD'],
                           0,
                         )
-                      ).toFixed(2),
+                        .toFixed(2),
                     ).toString(),
                   )}
             </Text>
@@ -230,8 +225,7 @@ export default function StoryScreen({navigation}: Readonly<StoryScreenProps>) {
             <Text style={styles.cardText}>
               {index === 0 ? STRINGS.BiggestSpending : STRINGS.BiggestIncome}
             </Text>
-            <View
-              style={styles.wrapCtr}>
+            <View style={styles.wrapCtr}>
               {(index === 0 ? biggestSpend : biggestIncome).map(item => (
                 <View style={styles.catCtr} key={item[0]}>
                   <View
@@ -260,18 +254,16 @@ export default function StoryScreen({navigation}: Readonly<StoryScreenProps>) {
               {index === 0
                 ? formatWithCommas(
                     Number(
-                      (
-                        conversion.usd[currency!.toLowerCase()] *
-                        biggestSpend[0][1][currency?.toUpperCase() ?? 'USD']
-                      ).toFixed(2),
+                      biggestSpend[0][1][
+                        currency?.toUpperCase() ?? 'USD'
+                      ].toFixed(2),
                     ).toString(),
                   )
                 : formatWithCommas(
                     Number(
-                      (
-                        conversion.usd[currency!.toLowerCase()] *
-                        biggestIncome[0][1][currency?.toUpperCase() ?? 'USD']
-                      ).toFixed(2),
+                      biggestIncome[0][1][
+                        currency?.toUpperCase() ?? 'USD'
+                      ].toFixed(2),
                     ).toString(),
                   )}
             </Text>
