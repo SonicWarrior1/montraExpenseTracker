@@ -1,0 +1,22 @@
+diff --git a/node_modules/react-native-date-picker/src/modal.js b/node_modules/react-native-date-picker/src/modal.js
+index 039f0b6..6ffb550 100644
+--- a/node_modules/react-native-date-picker/src/modal.js
++++ b/node_modules/react-native-date-picker/src/modal.js
+@@ -52,7 +52,7 @@ export const useModal = ({ props, id }) => {
+ 
+   const onConfirm = useCallback(
+     (params) => {
+-      if (params.id !== id) return
++      if (params?.id !== id) return
+       closing.current = true
+       const date = Platform.select({
+         ios: params.timestamp,
+@@ -65,7 +65,7 @@ export const useModal = ({ props, id }) => {
+ 
+   const onCancel = useCallback(
+     (params) => {
+-      if (params.id !== id) return
++      if (params?.id !== id) return
+       closing.current = true
+       if (props.onCancel) props.onCancel()
+     },

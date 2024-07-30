@@ -95,9 +95,12 @@ function RepeatTransactionSheet({
     return daysInYear;
   }, [year]);
   useEffect(() => {
-    const x = new Date(`${new Date().getFullYear()}-${month}-${day}`);
+    let x = new Date(`${new Date().getFullYear()}-${month}-${day}`);
+    if (freq === 'monthly') {
+      x = new Date(new Date().getFullYear(), new Date().getMonth(), day);
+    }
     setMyDate(x);
-  }, [month, day]);
+  }, [month, day, freq]);
   useEffect(() => {
     setFreq((repeatData?.freq as freqType) ?? undefined);
     setMonth(repeatData?.month ?? 1);
@@ -205,7 +208,7 @@ function RepeatTransactionSheet({
               }}
               placeholder={STRINGS.EndAfter}
               value={end}
-              disable={freq === undefined}
+              // disable={freq === undefined}
             />
           </View>
           {end === 'date' && (
@@ -267,7 +270,7 @@ function RepeatTransactionSheet({
                 day: day,
                 weekDay: weekDay,
                 end: end ?? 'never',
-                date: date,
+                date: date ?? new Date(),
               });
               setIsSwitchOn(true);
               bottomSheetModalRef.current?.dismiss();

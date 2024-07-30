@@ -10,7 +10,7 @@ const styles = (COLOR: typeof COLORS) =>
       paddingBottom: 20,
     },
     mainView: {
-      paddingHorizontal: 30,
+      paddingHorizontal: 20,
       flex: 1,
       backgroundColor: COLOR.LIGHT[100],
       alignItems: 'center',
@@ -40,11 +40,12 @@ const styles = (COLOR: typeof COLORS) =>
       color: COLOR.DARK[100],
     },
     amtText: {
-      fontSize: RFValue(40),
+      fontSize: RFValue(36),
       fontWeight: '600',
       marginBottom: 20,
+      marginTop: 20,
       color: COLOR.DARK[100],
-      maxWidth: '95%',
+      // maxWidth: '95%',
       textAlign: 'center',
     },
     limitCtr: {

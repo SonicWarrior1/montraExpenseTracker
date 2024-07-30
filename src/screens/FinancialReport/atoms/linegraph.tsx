@@ -34,6 +34,35 @@ function Linegraph({
 }>) {
   const COLOR = useAppTheme();
   const styles = style(COLOR);
+  const graphData = data
+    .filter(
+      item =>
+        Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+          .toDate()
+          .getMonth() === month &&
+        (transType === 'expense'
+          ? item.type === 'expense' || item.type === 'transfer'
+          : item.type === 'income'),
+    )
+    .sort((a, b) => a.timeStamp.seconds - b.timeStamp.seconds)
+    .map(item => {
+      return {
+        value:
+          item.amount * item.conversion.usd[currency?.toLowerCase() ?? 'usd'],
+        date:
+          Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+            .toDate()
+            .getDay() +
+          '/' +
+          Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+            .toDate()
+            .getMonth() +
+          '/' +
+          Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+            .toDate()
+            .getFullYear(),
+      };
+    });
   return (
     <>
       <Text style={styles.amt}>
@@ -70,34 +99,7 @@ function Linegraph({
           </View>
         ) : (
           <LineChart
-            data={data
-              .filter(
-                item =>
-                  Timestamp.fromMillis(item.timeStamp.seconds * 1000)
-                    .toDate()
-                    .getMonth() === month &&
-                  (transType === 'expense'
-                    ? item.type === 'expense' || item.type === 'transfer'
-                    : item.type === 'income'),
-              )
-              .sort((a, b) => a.timeStamp.seconds - b.timeStamp.seconds)
-              .map(item => {
-                return {
-                  value: item.amount,
-                  date:
-                    Timestamp.fromMillis(item.timeStamp.seconds * 1000)
-                      .toDate()
-                      .getDay() +
-                    '/' +
-                    Timestamp.fromMillis(item.timeStamp.seconds * 1000)
-                      .toDate()
-                      .getMonth() +
-                    '/' +
-                    Timestamp.fromMillis(item.timeStamp.seconds * 1000)
-                      .toDate()
-                      .getFullYear(),
-                };
-              })}
+            data={graphData}
             areaChart
             adjustToWidth
             startFillColor1={COLORS.VIOLET[40]}
@@ -112,7 +114,7 @@ function Linegraph({
             hideAxesAndRules
             color={COLORS.VIOLET[100]}
             curveType={1}
-            curved={true}
+            curved={graphData.length === 2 ? false : true}
             overflowBottom={-1}
             onlyPositive
             disableScroll

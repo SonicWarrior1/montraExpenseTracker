@@ -12,11 +12,15 @@ function MoneyInput({
   setAmount,
   currency,
   formKey,
+  isEdit,
+  editAmt,
 }: Readonly<{
   amount: string;
   setAmount: React.Dispatch<React.SetStateAction<string>>;
   currency: string;
   formKey: boolean;
+  isEdit: boolean;
+  editAmt?: string;
 }>) {
   const COLOR = useAppTheme();
   const styles = style(COLOR);
@@ -39,7 +43,14 @@ function MoneyInput({
             styles.text2,
             {
               fontSize: RFValue(
-                64 - (amount.length > 9 ? 25 : amount.length > 7 ? 15 : 0),
+                64 -
+                  (amount.length > 11
+                    ? 33
+                    : amount.length > 9
+                    ? 25
+                    : amount.length > 7
+                    ? 15
+                    : 0),
               ),
             },
           ]}>
@@ -50,23 +61,33 @@ function MoneyInput({
             styles.input,
             {
               fontSize: RFValue(
-                64 - (amount.length > 9 ? 25 : amount.length > 7 ? 15 : 0),
+                64 -
+                  (amount.length > 11
+                    ? 33
+                    : amount.length > 9
+                    ? 25
+                    : amount.length > 7
+                    ? 15
+                    : 0),
               ),
             },
           ]}
-          maxLength={12}
+          // maxLength={12}
           numberOfLines={1}
           onPress={() => {
             if (amount === '0') {
               setAmount('');
             }
           }}
-          onChangeText={str => AmountInputSetter(str, setAmount)}
+          onChangeText={str =>
+            AmountInputSetter(str, setAmount, isEdit, editAmt)
+          }
           onBlur={() => {
             if (amount === '') {
               setAmount('0');
             }
           }}
+          contextMenuHidden={true}
           value={amount}
           keyboardType="numeric"
         />
@@ -79,7 +100,7 @@ function MoneyInput({
               ? STRINGS.PleaseFillAnAmount
               : STRINGS.PleaseFillValidAmount
           }
-          value={amount}
+          value={amount.replace(/,/g, '')}
           formKey={formKey}
           color={COLOR.LIGHT[100]}
           size={18}

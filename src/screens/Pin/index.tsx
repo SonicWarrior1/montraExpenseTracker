@@ -10,7 +10,7 @@ import {
   View,
 } from 'react-native';
 import styles from './styles';
-import {ScrollView, TouchableOpacity} from 'react-native-gesture-handler';
+import {TouchableOpacity} from 'react-native-gesture-handler';
 import {PinSentScreenProps} from '../../defs/navigation';
 import {NAVIGATION, STRINGS} from '../../constants/strings';
 import {useAppDispatch, useAppSelector} from '../../redux/store';
@@ -165,12 +165,14 @@ function Pin({route, navigation}: Readonly<PinSentScreenProps>) {
     );
     return () => backHandler.remove();
   }, []);
+
   return (
     <SafeAreaView style={styles.safeView}>
       <VerifyPassModal
         setShowModal={setShowModal}
         showModal={showModal}
         setMenu={setMenu}
+        setPin={setPin}
       />
       <Pressable
         style={styles.mainView}
@@ -192,7 +194,7 @@ function Pin({route, navigation}: Readonly<PinSentScreenProps>) {
             ))}
           </View>
         </View>
-        <View>
+        <View style={styles.keypad}>
           <KeyPad handlePin={handlePin} />
         </View>
       </Pressable>

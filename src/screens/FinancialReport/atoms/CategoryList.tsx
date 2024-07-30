@@ -59,7 +59,7 @@ function CategoryList({
   if (sort) {
     listData.reverse();
   }
-  console.log('sdfklsdmnofkmo', listData);
+  // console.log('sdfklsdmnofkmo', listData);
   return (
     <FlatList
       style={{paddingHorizontal: 20}}

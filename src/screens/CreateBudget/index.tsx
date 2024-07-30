@@ -311,7 +311,13 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
                   {
                     fontSize: RFValue(
                       64 -
-                        (amount.length > 9 ? 25 : amount.length > 7 ? 15 : 0),
+                        (amount.length > 11
+                          ? 33
+                          : amount.length > 9
+                          ? 25
+                          : amount.length > 7
+                          ? 15
+                          : 0),
                     ),
                   },
                 ]}>
@@ -323,11 +329,17 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
                   {
                     fontSize: RFValue(
                       64 -
-                        (amount.length > 9 ? 25 : amount.length > 7 ? 15 : 0),
+                        (amount.length > 11
+                          ? 33
+                          : amount.length > 9
+                          ? 25
+                          : amount.length > 7
+                          ? 16
+                          : 0),
                     ),
                   },
                 ]}
-                maxLength={12}
+                // maxLength={12}
                 numberOfLines={1}
                 onPress={() => {
                   if (amount === '0') {
@@ -335,7 +347,20 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
                   }
                 }}
                 onChangeText={(str: string) =>
-                  AmountInputSetter(str, setAmount)
+                  AmountInputSetter(
+                    str,
+                    setAmount,
+                    isEdit,
+                    isEdit
+                      ? Number(
+                          (
+                            (oldBudget?.conversion?.usd?.[
+                              currency?.toLowerCase() ?? 'usd'
+                            ] ?? 1) * Number(oldBudget?.limit!)
+                          ).toFixed(2),
+                        ).toString()
+                      : '0',
+                  )
                 }
                 value={amount}
                 keyboardType="numeric"
@@ -348,8 +373,14 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
             </View>
             <View style={{left: 20}}>
               <EmptyZeroError
-                errorText={STRINGS.PleaseFillAnAmount}
-                value={amount}
+                errorText={
+                  (Number(amount.replace(/,/g, '')) > 0 ||
+                    amount.trim() !== '.') &&
+                  amount.trim() === ''
+                    ? STRINGS.PleaseFillAnAmount
+                    : STRINGS.PleaseFillValidAmount
+                }
+                value={amount.replace(/,/g, '')}
                 formKey={form}
                 color={COLORS.RED[100]}
                 size={18}

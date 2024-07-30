@@ -109,7 +109,8 @@ function Graph({
     .sort((a, b) => a.timeStamp.seconds - b.timeStamp.seconds)
     .map(item => {
       return {
-        value: item.amount,
+        value:
+          item.amount * item.conversion.usd[currency?.toLowerCase() ?? 'usd'],
         date: formatDate(item),
       };
     });

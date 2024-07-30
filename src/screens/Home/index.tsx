@@ -26,10 +26,13 @@ import {OnlineTransactionModel} from '../../DbModels/OnlineTransactionModel';
 import {OfflineTransactionModel} from '../../DbModels/OfflineTransactionModel';
 import {formatWithCommas} from '../../utils/commonFuncs';
 import TransactionItem from '../../components/TransactionListItem/TransactionItem';
+import {RFValue} from 'react-native-responsive-fontsize';
 
 function Home({navigation, route}: Readonly<HomeScreenProps>) {
   // state
   const [month, setMonth] = useState<number>(new Date().getMonth());
+  const [expenseTip, setExpenseTip] = useState<boolean>(false);
+  const [incomeTip, setIncomeTip] = useState<boolean>(false);
   // redux
   const conversion = useAppSelector(state => state.user.conversion);
   const currency =
@@ -46,7 +49,7 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
     ...onlineData.filter(item => item.changed !== true),
     ...offlineData.filter(item => item.operation !== 'delete'),
   ];
-  console.log(offlineData.filter(item => item.operation === 'delete'));
+  // console.log(offlineData.filter(item => item.operation === 'delete'));
   const listData = data
     .slice()
     .filter(item => {
@@ -61,7 +64,7 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
 
   const theme = useAppSelector(state => state.user.currentUser?.theme);
   // constants
-  console.log(spends);
+  // console.log(spends);
   const totalSpend = Object.values(spends ?? []).reduce((a, b) => {
     return a + (b?.[currency?.toUpperCase() ?? 'USD'] ?? 0);
   }, 0);
@@ -117,8 +120,26 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
                     .toString()}
             </Text>
             <View style={styles.transRow}>
-              <View
-                style={[styles.moneyCtr, {backgroundColor: COLORS.GREEN[100]}]}>
+              <Pressable
+                style={[styles.moneyCtr, {backgroundColor: COLORS.GREEN[100]}]}
+                onLongPress={() => {
+                  setIncomeTip(true);
+                }}
+                onPressOut={() => {
+                  setIncomeTip(false);
+                }}>
+                {incomeTip && (
+                  <View style={styles.tooltip}>
+                    <Text style={styles.tipText}>
+                      {currencies[currency].symbol}
+                      {isNaN(Number(Number(totalIncome).toFixed(2)))
+                        ? 0
+                        : formatWithCommas(
+                            Number(Number(totalIncome).toFixed(2)).toString(),
+                          )}
+                    </Text>
+                  </View>
+                )}
                 <View style={styles.iconCtr}>
                   {ICONS.Income({
                     height: 25,
@@ -137,9 +158,27 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
                         )}
                   </Text>
                 </View>
-              </View>
-              <View
+              </Pressable>
+              <Pressable
+                onLongPress={() => {
+                  setExpenseTip(true);
+                }}
+                onPressOut={() => {
+                  setExpenseTip(false);
+                }}
                 style={[styles.moneyCtr, {backgroundColor: COLORS.RED[100]}]}>
+                {expenseTip && (
+                  <View style={styles.tooltip}>
+                    <Text style={styles.tipText}>
+                      {currencies[currency].symbol}
+                      {isNaN(Number(Number(totalSpend).toFixed(2)))
+                        ? 0
+                        : formatWithCommas(
+                            Number(Number(totalSpend).toFixed(2)).toString(),
+                          )}
+                    </Text>
+                  </View>
+                )}
                 <View style={styles.iconCtr}>
                   {ICONS.Expense({
                     height: 25,
@@ -158,7 +197,7 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
                         )}
                   </Text>
                 </View>
-              </View>
+              </Pressable>
             </View>
           </SafeAreaView>
         </LinearGradient>

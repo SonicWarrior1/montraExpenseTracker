@@ -53,6 +53,7 @@ function RootNavigator(): React.JSX.Element {
   const {data: conversion, isSuccess} = useGetUsdConversionQuery({});
   useEffect(() => {
     if (isSuccess) {
+      // console.log(conversion.date);
       const myCurrencies: {[key: string]: number} = {};
       Object.entries(conversion.usd as {[key: string]: number}).forEach(
         ([key, val]) => {
@@ -69,7 +70,6 @@ function RootNavigator(): React.JSX.Element {
       );
     }
   }, [conversion, dispatch, isSuccess]);
-
   return (
     <Stack.Navigator
       screenOptions={{

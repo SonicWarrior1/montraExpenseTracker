@@ -12,7 +12,7 @@ const styles = (COLOR: typeof COLORS) =>
       alignSelf: 'flex-start',
       fontWeight: '600',
       color: COLOR.LIGHT[80],
-      fontSize: RFValue(18),
+      fontSize: RFValue(20),
       paddingHorizontal: 30,
     },
     text2: {color: COLOR.LIGHT[100], fontSize: RFValue(64), fontWeight: '600'},

@@ -74,9 +74,9 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
   const height = useMemo(() => {
     if (Platform.OS !== 'ios') {
       if (pageType !== 'transfer') {
-        return screenHeight / 3;
+        return screenHeight / 2.85;
       } else {
-        return screenHeight / 2.06;
+        return screenHeight / 1.97;
       }
     } else if (pageType !== 'transfer') {
       return screenHeight / 2.6;
@@ -260,6 +260,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
         dispatch(setLoading(false));
       }
     } catch (e) {
+      console.log(e);
       dispatch(setLoading(false));
     }
   };
@@ -332,6 +333,18 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
             currency={user?.currency ?? 'usd'}
             formKey={formKey}
             setAmount={setAmount}
+            isEdit={isEdit}
+            editAmt={
+              isEdit
+                ? Number(
+                    (
+                      prevTransaction!.conversion.usd[
+                        (user?.currency ?? 'USD').toLowerCase()
+                      ] * prevTransaction!.amount
+                    ).toFixed(2),
+                  ).toString()
+                : '0'
+            }
           />
         </SafeAreaView>
         <View style={styles.detailsCtr}>

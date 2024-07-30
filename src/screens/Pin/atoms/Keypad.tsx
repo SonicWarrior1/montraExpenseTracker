@@ -24,8 +24,8 @@ function Keypad({
             onPress={handlePin(value)}>
             {value === 99 ? (
               ICONS.ArrowRight2({
-                height: 43,
-                width: 43,
+                height: 38,
+                width: 38,
                 color: COLORS.VIOLET[100],
               })
             ) : (

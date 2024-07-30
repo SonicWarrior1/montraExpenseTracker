@@ -26,6 +26,7 @@ import {OfflineTransactionModel} from '../../DbModels/OfflineTransactionModel';
 import CustomHeader from '../../components/CustomHeader';
 import {formatWithCommas} from '../../utils/commonFuncs';
 import DescriptionContainer from './atoms/DescriptionContainer';
+import {RFValue} from 'react-native-responsive-fontsize';
 
 function TransactionDetails({
   route,
@@ -34,10 +35,11 @@ function TransactionDetails({
   // constants
   const COLOR = useAppTheme();
   const styles = style(COLOR);
+
   // redux
 
   const currency = useAppSelector(state => state.user.currentUser?.currency);
-  const conversion = useAppSelector(state => state.user.conversion);
+  // const conversion = useAppSelector(state => state.user.conversion);
   const online = useObject(OnlineTransactionModel, route.params.transaction.id);
   const offline = useObject(
     OfflineTransactionModel,
@@ -72,6 +74,19 @@ function TransactionDetails({
       }
     }
   }, [trans]);
+  const lengthCheck =
+    (
+      (currencies[currency!].symbol ?? '$') +
+      ' ' +
+      formatWithCommas(
+        Number(
+          (
+            trans!.conversion.usd[(currency ?? 'USD').toLowerCase()] *
+            trans!.amount
+          ).toFixed(2),
+        ).toString(),
+      )
+    ).length < 7;
   return (
     trans !== null && (
       <View style={{flex: 1, backgroundColor: COLOR.LIGHT[100]}}>
@@ -102,7 +117,16 @@ function TransactionDetails({
             HeaderRight={headerRight}
           />
           <Spacer height={Dimensions.get('screen').height * 0.025} />
-          <Text style={styles.amt}>
+          <Text
+            style={[
+              styles.amt,
+              {
+                fontSize: lengthCheck ? RFValue(40) : RFValue(30),
+                marginTop: lengthCheck ? 10 : 25,
+                marginBottom: lengthCheck ? 5 : 15,
+              },
+            ]}
+            numberOfLines={1}>
             {currencies[currency!].symbol ?? '$'}{' '}
             {formatWithCommas(
               Number(

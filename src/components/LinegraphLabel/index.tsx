@@ -25,7 +25,7 @@ function LinegraphLabel({
       <View style={styles.amtCtr}>
         <Text style={styles.amt} numberOfLines={1}>
           {currencies[currency!].symbol}{' '}
-          {Number(items[0].value).toFixed(2).toString()}
+          {Number(items[0].value ).toFixed(2).toString()}
         </Text>
       </View>
     </View>

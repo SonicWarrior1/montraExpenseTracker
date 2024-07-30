@@ -1,8 +1,11 @@
-import {Dimensions, Platform, StyleSheet} from 'react-native';
+import {Dimensions, Platform, StatusBar, StyleSheet} from 'react-native';
 import {COLORS} from '../../constants/commonStyles';
 const screenWidth = Dimensions.get('screen').width;
 const screenHeight = Dimensions.get('screen').height;
-
+// the value returned does not include the bottom navigation bar, I am not sure why yours does.
+const windowHeight = Dimensions.get('window').height;
+const navbarHeight =
+  screenHeight - windowHeight - (StatusBar?.currentHeight ?? 0);
 const styles = StyleSheet.create({
   safeView: {
     flex: 1,
@@ -51,32 +54,41 @@ const styles = StyleSheet.create({
     position: 'absolute',
     justifyContent: 'space-between',
     alignItems: 'center',
-    rowGap: 30,
+    rowGap: 20,
     backgroundColor: COLORS.LIGHT[100],
     shadowColor: 'grey',
     shadowOpacity: 0.3,
-    right: screenWidth / 11,
-    top: Platform.OS === 'ios' ? screenHeight / 8.5 : screenHeight / 12,
+    right: screenWidth / 23,
+    top: Platform.OS === 'ios' ? screenHeight / 7.6 : screenHeight / 14,
     shadowRadius: 5,
     shadowOffset: {
       height: 2,
       width: 1,
     },
     elevation: 20,
+    borderRadius: 8,
   },
   menuText: {color: COLORS.DARK[100]},
   modalBackground: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.7)',
+    position: 'absolute',
+    height: screenHeight,
+    width: screenWidth * 0.9,
+    paddingBottom: 50,
   },
   upperView: {
     paddingTop: screenHeight * 0.03,
     rowGap: 100,
+    maxHeight:
+      Platform.OS === 'ios'
+        ? screenHeight / 2.2
+        : (screenHeight - navbarHeight * 1.074) / 2.1,
+    height: '100%',
+  },
+  keypad: {
+    height: screenHeight / 2,
   },
   modal: {
-    width: '90%',
+    // width: '90%',
     paddingVertical: 30,
     alignItems: 'center',
     justifyContent: 'center',

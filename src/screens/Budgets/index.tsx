@@ -100,7 +100,15 @@ function BudgetScreen({navigation}: Readonly<BudgetScreenProps>) {
             </View>
           ) : (
             <FlatList
-              data={Object.entries(budgets)}
+              data={Object.entries(budgets).sort((a, b) => {
+                if (a[0] < b[0]) {
+                  return -1;
+                }
+                if (a[0] > b[0]) {
+                  return 1;
+                }
+                return 0;
+              })}
               style={{marginTop: 15, width: '100%'}}
               showsVerticalScrollIndicator={false}
               renderItem={({item}) => (

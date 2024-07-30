@@ -58,7 +58,7 @@ const TransactionSlice = createSlice({
       state.isFilterOpen = false;
     },
     setCatFilter(state, action) {
-      console.log(action.payload);
+      // console.log(action.payload);
       state.filters.cat = action.payload;
     },
     clearCatFilter(state) {

@@ -80,7 +80,7 @@ const syncAmounts = (
       const month = item.id.split('_')[0];
       const category = item.id.split('_')[1];
       const type = item.id.split('_')[2];
-      console.log(item);
+      // console.log(item);
       if (type === 'income') {
         batch.update(firestore().collection('users').doc(uid), {
           [`income.${month}.${category}`]: item.amount,

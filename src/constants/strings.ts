@@ -233,7 +233,7 @@ export const STRINGS = {
   EmailAdressAlreadyUsed:
     'The email address is already in use by another account.',
   CredentialMalformed:
-    'The supplied auth credential is malformed or has expired.',
+    'The email or password entered is incorrect. Please check your credentials and try again.',
   NetworkError:
     'A network error (such as timeout, interrupted connection or unreachable host) has occurred.',
   UnknownError: 'An unknown error occurred. Please try again later.',

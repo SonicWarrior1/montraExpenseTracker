@@ -17,7 +17,9 @@ const styles = (COLOR: typeof COLORS) =>
       paddingHorizontal: 20,
     },
     amt: {
-      fontSize: RFValue(34),
+      marginTop: 25,
+      marginBottom: 15,
+      fontSize: RFValue(30),
       fontWeight: '700',
       color: COLOR.LIGHT[100],
       maxWidth: '90%',

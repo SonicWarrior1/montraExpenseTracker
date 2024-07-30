@@ -75,9 +75,10 @@ const styles = (COLOR: typeof COLORS) =>
       justifyContent: 'center',
     },
     amt: {
-      fontSize: RFValue(40),
+      fontSize: RFValue(36),
       fontWeight: '700',
       color: COLOR.LIGHT[100],
+      textAlign:'center'
     },
     card: {
       backgroundColor: COLOR.LIGHT[100],
@@ -98,7 +99,7 @@ const styles = (COLOR: typeof COLORS) =>
       color: COLOR.DARK[100],
     },
     amt2: {
-      fontSize: RFValue(36),
+      fontSize: RFValue(30),
       fontWeight: '500',
       color: COLOR.DARK[100],
     },
