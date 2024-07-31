@@ -27,6 +27,7 @@ import {
 } from '@gorhom/bottom-sheet';
 import {BottomSheetModalMethods} from '@gorhom/bottom-sheet/lib/typescript/types';
 import {useRealm} from '@realm/react';
+import {getMyColor} from '../../utils/commonFuncs';
 
 function AddCategorySheet({
   bottomSheetModalRef,
@@ -45,6 +46,12 @@ function AddCategorySheet({
   const incomeCats = useAppSelector(
     state => state.user.currentUser?.incomeCategory,
   );
+  const expenseColors = useAppSelector(
+    state => state.user.currentUser?.expenseColors,
+  );
+  const incomeColors = useAppSelector(
+    state => state.user.currentUser?.incomeColors,
+  );
   // constants
   const dispatch = useAppDispatch();
   const snapPoints = useMemo(() => ['25%'], []);
@@ -56,12 +63,22 @@ function AddCategorySheet({
   const [category, setCategory] = useState<string>('');
   const [formKey, setFormKey] = useState<boolean>(false);
   // functions
+  const getUniqueColor = (existingColors: string[]): string => {
+    let color;
+    do {
+      color = getMyColor();
+    } while (existingColors.includes(color));
+    return color;
+  };
   const handleOffline = useCallback(async () => {
     if (type === 'expense') {
       dispatch(addExpenseCategory(category.toLowerCase()));
       realm.write(() => {
         realm.create('category', {
-          name: category.toLowerCase(),
+          name:
+            category.toLowerCase() +
+            '__' +
+            getUniqueColor(Object.values(expenseColors ?? {})),
           type: 'expense',
         });
       });
@@ -69,7 +86,10 @@ function AddCategorySheet({
       dispatch(addIncomeCategory(category.toLowerCase()));
       realm.write(() => {
         realm.create('category', {
-          name: category.toLowerCase(),
+          name:
+            category.toLowerCase() +
+            '__' +
+            getUniqueColor(Object.values(incomeColors ?? {})),
           type: 'income',
         });
       });
@@ -78,22 +98,39 @@ function AddCategorySheet({
 
   const handleOnline = useCallback(async () => {
     const userDoc = firestore().collection('users').doc(uid);
+
     if (type === 'expense') {
       dispatch(addExpenseCategory(category.toLowerCase()));
       await userDoc.update({
-        expenseCategory: [...expenseCats!, category.toLowerCase()].map(item =>
-          encrypt(item, uid!),
+        expenseCategory: [...expenseCats!, category.toLowerCase()].map(
+          item => ({
+            color:
+              expenseColors?.[item] ??
+              getUniqueColor(Object.values(expenseColors ?? {})),
+            name: encrypt(item, uid!),
+          }),
         ),
       });
     } else if (type === 'income') {
       dispatch(addIncomeCategory(category.toLowerCase()));
       await userDoc.update({
-        incomeCategory: [...incomeCats!, category.toLowerCase()].map(item =>
-          encrypt(item, uid!),
-        ),
+        incomeCategory: [...incomeCats!, category.toLowerCase()].map(item => ({
+          color:
+            incomeColors?.[item] ??
+            getUniqueColor(Object.values(incomeColors ?? {})),
+          name: encrypt(item, uid!),
+        })),
       });
     }
-  }, [category, expenseCats, incomeCats, type, uid]);
+  }, [
+    category,
+    expenseColors,
+    incomeColors,
+    expenseCats,
+    incomeCats,
+    type,
+    uid,
+  ]);
 
   const onPress = useCallback(async () => {
     setFormKey(true);

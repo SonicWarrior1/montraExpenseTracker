@@ -1,7 +1,7 @@
 import React, {useCallback} from 'react';
 import {Pressable, Text, View} from 'react-native';
 import {ICONS} from '../../../constants/icons';
-import {formatWithCommas, getMyColor} from '../../../utils/commonFuncs';
+import {formatWithCommas} from '../../../utils/commonFuncs';
 import {currencies, NAVIGATION, STRINGS} from '../../../constants/strings';
 import {COLORS} from '../../../constants/commonStyles';
 import {BottomParamList, RootStackParamList} from '../../../defs/navigation';
@@ -9,6 +9,7 @@ import {CompositeNavigationProp} from '@react-navigation/native';
 import {BottomTabNavigationProp} from '@react-navigation/bottom-tabs';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {Bar} from 'react-native-progress';
+import {useAppSelector} from '../../../redux/store';
 
 function BudgetItem({
   item,
@@ -52,7 +53,10 @@ function BudgetItem({
 }>) {
   const key = item[0];
   const val = item[1];
-  const color = getMyColor();
+  const expenseColors = useAppSelector(
+    state => state.user.currentUser?.expenseColors,
+  );
+  const color = expenseColors?.[key] ?? 'green';
   const getValue = useCallback(
     (
       budget: {

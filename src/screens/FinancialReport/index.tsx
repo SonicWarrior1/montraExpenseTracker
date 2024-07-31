@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useMemo, useState} from 'react';
 import {
   NativeScrollEvent,
   Pressable,
@@ -26,7 +26,6 @@ import {OnlineTransactionModel} from '../../DbModels/OnlineTransactionModel';
 import {OfflineTransactionModel} from '../../DbModels/OfflineTransactionModel';
 import CustomHeader from '../../components/CustomHeader';
 import {FinancialReportScreenProps} from '../../defs/navigation';
-import {getMyColor} from '../../utils/commonFuncs';
 
 function FinancialReport({navigation}: Readonly<FinancialReportScreenProps>) {
   // state
@@ -34,7 +33,7 @@ function FinancialReport({navigation}: Readonly<FinancialReportScreenProps>) {
   const [graph, setGraph] = useState<number>(0);
   const [transType, setTransType] = useState<'expense' | 'income'>('expense');
   const [type, setType] = useState<'transaction' | 'category'>('transaction');
-  const [catColors, setCatColors] = useState<{[key: string]: string}>();
+  // const [catColors, setCatColors] = useState<{[key: string]: string}>();
   const [sort, setSort] = useState<boolean>(false);
   const [incomeOffset, setIncomeOffset] = useState<number>(0);
   const [expenseOffset, setExpenseOffset] = useState<number>(0);
@@ -44,6 +43,12 @@ function FinancialReport({navigation}: Readonly<FinancialReportScreenProps>) {
   );
   const incomes = useAppSelector(
     state => state.user.currentUser?.income?.[month],
+  );
+  const expenseColors = useAppSelector(
+    state => state.user.currentUser?.expenseColors,
+  );
+  const incomeColors = useAppSelector(
+    state => state.user.currentUser?.incomeColors,
   );
   const currency = useAppSelector(state => state.user.currentUser?.currency);
   // const {conversion} = useAppSelector(state => state.user);
@@ -70,19 +75,19 @@ function FinancialReport({navigation}: Readonly<FinancialReportScreenProps>) {
       ),
     [currency, incomes],
   );
-  useEffect(() => {
-    setCatColors(
-      Object.entries(
-        transType === 'expense' ? spends ?? {} : incomes ?? {},
-      ).reduce((acc: {[key: string]: string}, item) => {
-        acc[item[0]] = getMyColor();
-        return acc;
-      }, {}),
-    );
-    return () => {
-      setCatColors(undefined);
-    };
-  }, [incomes, spends, transType]);
+  // useEffect(() => {
+  //   setCatColors(
+  //     Object.entries(
+  //       transType === 'expense' ? spends ?? {} : incomes ?? {},
+  //     ).reduce((acc: {[key: string]: string}, item) => {
+  //       acc[item[0]] = getMyColor();
+  //       return acc;
+  //     }, {}),
+  //   );
+  //   return () => {
+  //     setCatColors(undefined);
+  //   };
+  // }, [incomes, spends, transType]);
   const isCloseToBottom = ({
     layoutMeasurement,
     contentOffset,
@@ -153,7 +158,7 @@ function FinancialReport({navigation}: Readonly<FinancialReportScreenProps>) {
           />
         ) : (
           <Piegraph
-            catColors={catColors}
+            catColors={transType === 'expense' ? expenseColors : incomeColors}
             // conversion={conversion}
             currency={currency}
             incomes={incomes}
@@ -291,7 +296,7 @@ function FinancialReport({navigation}: Readonly<FinancialReportScreenProps>) {
           />
         ) : (
           <CategoryList
-            catColors={catColors}
+            catColors={transType === 'expense' ? expenseColors : incomeColors}
             // conversion={conversion}
             currency={currency}
             incomes={incomes}

@@ -18,7 +18,9 @@ export const syncDb = async ({
   realm,
   budget,
   incomeCategory,
+  incomeColors,
   expenseCategory,
+  expenseColors,
   category,
   amounts,
   notifications,
@@ -29,7 +31,9 @@ export const syncDb = async ({
   realm: Realm;
   budget: Results<BudgetModel>;
   incomeCategory: string[];
+  incomeColors: {[key: string]: string};
   expenseCategory: string[];
+  expenseColors: {[key: string]: string};
   category: Results<CategoryModel>;
   amounts: Results<AmountModel>;
   notifications: Results<NotificationModel>;
@@ -55,6 +59,8 @@ export const syncDb = async ({
         realm,
         expenseCategory,
         incomeCategory,
+        incomeColors,
+        expenseColors,
       );
       syncNotifications(notifications, batch, uid, realm);
       if (data.length > 0) {
@@ -134,36 +140,61 @@ const syncCategory = (
   realm: Realm,
   expenseCategory: string[],
   incomeCategory: string[],
+  incomeColors: {[key: string]: string},
+  expenseColors: {[key: string]: string},
 ) => {
   if (category.length > 0) {
     console.log('Category Syncing');
+    console.log(
+      incomeCategory.concat(
+        category
+          .filter(
+            cat =>
+              cat.type === 'income' &&
+              !incomeCategory.includes(cat.name.split('__')[0]),
+          )
+          .map(item => item.name),
+      ),
+    );
     batch.update(firestore().collection('users').doc(uid), {
       expenseCategory: expenseCategory
         .concat(
           category
             .filter(
               cat =>
-                cat.type === 'expense' && !expenseCategory.includes(cat.name),
+                cat.type === 'income' &&
+                !expenseCategory.includes(cat.name.split('__')[0]),
             )
-            .reduce((acc: string[], item) => {
-              acc.push(item.name);
-              return acc;
-            }, []),
+            .map(item => item.name),
         )
-        .map(item => encrypt(item, uid)),
+        .map(item => {
+          const [name, colorFromCategory] = item.split('__');
+          const color =
+            expenseColors?.[name] ?? colorFromCategory ?? 'default-color';
+          return {
+            name: encrypt(name, uid),
+            color,
+          };
+        }),
       incomeCategory: incomeCategory
         .concat(
           category
             .filter(
               cat =>
-                cat.type === 'income' && !incomeCategory.includes(cat.name),
+                cat.type === 'income' &&
+                !incomeCategory.includes(cat.name.split('__')[0]),
             )
-            .reduce((acc: string[], item) => {
-              acc.push(item.name);
-              return acc;
-            }, []),
+            .map(item => item.name),
         )
-        .map(item => encrypt(item, uid)),
+        .map(item => {
+          const [name, colorFromCategory] = item.split('__');
+          const color =
+            incomeColors?.[name] ?? colorFromCategory ?? 'default-color';
+          return {
+            name: encrypt(name, uid),
+            color,
+          };
+        }),
     });
     realm.write(() => {
       realm.delete(category);

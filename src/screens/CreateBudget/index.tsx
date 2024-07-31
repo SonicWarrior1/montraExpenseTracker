@@ -32,7 +32,6 @@ import CustomHeader from '../../components/CustomHeader';
 import {
   AmountInputSetter,
   formatWithCommas,
-  getMyColor,
 } from '../../utils/commonFuncs';
 import Toast from 'react-native-toast-message';
 import {
@@ -103,7 +102,7 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
   const [sliderVal, setSliderVal] = useState<number | undefined>(
     isEdit ? oldBudget?.percentage : 0,
   );
-  const [catColors, setCatColors] = useState<{[key: string]: string}>();
+  // const [catColors, setCatColors] = useState<{[key: string]: string}>();
   const [form, setForm] = useState<boolean>(false);
 
   // ref
@@ -252,20 +251,20 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
     user,
     oldBudget,
   ]);
-  useEffect(() => {
-    setCatColors(
-      Object.values(expenseCat!).reduce(
-        (acc: {[key: string]: string}, item) => {
-          acc[item] = getMyColor();
-          return acc;
-        },
-        {},
-      ),
-    );
-    return () => {
-      setCatColors(undefined);
-    };
-  }, [expenseCat]);
+  // useEffect(() => {
+  //   setCatColors(
+  //     Object.values(expenseCat!).reduce(
+  //       (acc: {[key: string]: string}, item) => {
+  //         acc[item] = getMyColor();
+  //         return acc;
+  //       },
+  //       {},
+  //     ),
+  //   );
+  //   return () => {
+  //     setCatColors(undefined);
+  //   };
+  // }, [expenseCat]);
   const backAction = () => {
     if (
       ((amount.replace(/,/g, '').trim() !== '' ||
@@ -400,8 +399,8 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
             }}
             value={category}
             placeholder={STRINGS.Category}
-            leftIcon={CategoryDropdownIcon(category!, catColors!)}
-            catColors={catColors}
+            leftIcon={CategoryDropdownIcon(category!, user!.expenseColors)}
+            catColors={user?.expenseColors}
           />
           <EmptyError
             errorText={STRINGS.PleaseSelectACategory}

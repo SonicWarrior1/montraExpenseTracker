@@ -26,7 +26,7 @@ import {OnlineTransactionModel} from '../../DbModels/OnlineTransactionModel';
 import {OfflineTransactionModel} from '../../DbModels/OfflineTransactionModel';
 import {formatWithCommas} from '../../utils/commonFuncs';
 import TransactionItem from '../../components/TransactionListItem/TransactionItem';
-import {RFValue} from 'react-native-responsive-fontsize';
+import {CategoryModel} from '../../DbModels/CategoryModel';
 
 function Home({navigation, route}: Readonly<HomeScreenProps>) {
   // state
@@ -49,6 +49,8 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
     ...onlineData.filter(item => item.changed !== true),
     ...offlineData.filter(item => item.operation !== 'delete'),
   ];
+  const gg = useQuery(CategoryModel);
+  console.log(gg);
   // console.log(offlineData.filter(item => item.operation === 'delete'));
   const listData = data
     .slice()

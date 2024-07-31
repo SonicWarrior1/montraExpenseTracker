@@ -35,7 +35,9 @@ export function useInitialSetup() {
         realm: realm,
         budget: budget,
         incomeCategory: user.incomeCategory,
+        incomeColors: user.incomeColors,
         expenseCategory: user.expenseCategory,
+        expenseColors: user.expenseColors,
         category: category,
         amounts: amounts,
         notifications: notfications,
@@ -90,11 +92,11 @@ async function handleDelete(
           await storage().refFromURL(item.attachement!).delete();
         }
         await firestore()
-        .collection('users')
-        .doc(user.uid)
-        .collection('transactions')
-        .doc(item.id)
-        .delete();
+          .collection('users')
+          .doc(user.uid)
+          .collection('transactions')
+          .doc(item.id)
+          .delete();
       } catch (e) {
         console.log(e);
       }

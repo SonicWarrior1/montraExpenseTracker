@@ -31,7 +31,7 @@ import {OfflineTransactionModel} from '../../DbModels/OfflineTransactionModel';
 import CustomHeader from '../../components/CustomHeader';
 import MoneyInput from './atoms/MoneyInput';
 import {RepeatDataModel} from '../../DbModels/RepeatDataModel';
-import {formatWithCommas, getMyColor} from '../../utils/commonFuncs';
+import {formatWithCommas} from '../../utils/commonFuncs';
 import RepeatInput from './atoms/RepeatInput';
 import CategoryDropdownIcon from '../../components/CategoryColorIcon';
 // Third Party Libraries
@@ -89,6 +89,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
   // redux
   const conversion = useAppSelector(state => state.user.conversion);
   const user = useAppSelector(state => state.user.currentUser);
+
   // state
   const [firstTime, setFirstTime] = useState<boolean>(true);
   const [image, setImage] = useState<string | undefined>(
@@ -142,7 +143,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
     prevTransaction ? prevTransaction.to : '',
   );
   const [formKey, setFormKey] = useState<boolean>(false);
-  const [catColors, setCatColors] = useState<{[key: string]: string}>();
+  // const [catColors, setCatColors] = useState<{[key: string]: string}>();
   const [isSwitchOn, setIsSwitchOn] = useState<boolean>(
     repeatData !== undefined ? repeatData !== null : repeatData !== undefined,
   );
@@ -292,19 +293,19 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
     }
     return true;
   };
-  useEffect(() => {
-    setCatColors(
-      Object.values(
-        pageType === 'expense' ? user?.expenseCategory! : user?.incomeCategory!,
-      ).reduce((acc: {[key: string]: string}, item) => {
-        acc[item] = getMyColor();
-        return acc;
-      }, {}),
-    );
-    return () => {
-      setCatColors(undefined);
-    };
-  }, [pageType, user?.expenseCategory, user?.incomeCategory]);
+  // useEffect(() => {
+  //   setCatColors(
+  //     Object.values(
+  //       pageType === 'expense' ? user?.expenseCategory! : user?.incomeCategory!,
+  //     ).reduce((acc: {[key: string]: string}, item) => {
+  //       acc[item] = getMyColor();
+  //       return acc;
+  //     }, {}),
+  //   );
+  //   return () => {
+  //     setCatColors(undefined);
+  //   };
+  // }, [pageType, user?.expenseCategory, user?.incomeCategory]);
 
   useEffect(() => {
     setFirstTime(false);
@@ -372,8 +373,17 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
                 }}
                 value={category}
                 placeholder={STRINGS.Category}
-                leftIcon={CategoryDropdownIcon(category!, catColors!)}
-                catColors={catColors}
+                leftIcon={CategoryDropdownIcon(
+                  category!,
+                  pageType === 'expense'
+                    ? user?.expenseColors!
+                    : user?.incomeColors!,
+                )}
+                catColors={
+                  pageType === 'expense'
+                    ? user?.expenseColors!
+                    : user?.incomeColors!
+                }
               />
               <EmptyError
                 errorText={STRINGS.PleaseSelectACategory}
