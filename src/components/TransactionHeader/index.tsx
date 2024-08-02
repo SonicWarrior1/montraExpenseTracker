@@ -36,6 +36,33 @@ function TransactionHeader({
             })}
           </View>
         )}
+        renderItem={item => {
+          return (
+            <View
+              style={[
+                styles.itemCtr,
+                {
+                  backgroundColor:
+                    item.value === month + 1
+                      ? COLOR.VIOLET[60]
+                      : COLOR.LIGHT[100],
+                },
+              ]}>
+              <Text
+                style={[
+                  styles.text,
+                  {
+                    color:
+                      item.value === month + 1
+                        ? COLORS.LIGHT[100]
+                        : COLOR.DARK[100],
+                  },
+                ]}>
+                {item.label}
+              </Text>
+            </View>
+          );
+        }}
         autoScroll={false}
         renderRightIcon={() => <></>}
         placeholder={STRINGS.Month}

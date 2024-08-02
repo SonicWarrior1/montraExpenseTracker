@@ -128,12 +128,12 @@ const TransactionItem = ({
           ]}>
           {getAmtSymbol(item)} {currencies[user?.currency ?? 'USD'].symbol}
           {formatWithCommas(
-            Number(
-              (
-                item.conversion.usd[(user?.currency ?? 'USD').toLowerCase()] *
-                item.amount
-              ).toFixed(2),
-            ).toString(),
+            (
+              item.conversion.usd[(user?.currency ?? 'USD').toLowerCase()] *
+              item.amount
+            )
+              .toFixed(2)
+              .toString(),
           )}
         </Text>
         <Text

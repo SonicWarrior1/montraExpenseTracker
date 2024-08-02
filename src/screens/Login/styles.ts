@@ -26,6 +26,7 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
         borderColor: COLOR.LIGHT[20],
     },
     flex: { flex: 1 },
+    flexRow:{flexDirection: 'row'},
     googleRow: { flexDirection: 'row', alignItems: 'center', gap: 20 },
     forgotText: {
         color: COLOR.PRIMARY.VIOLET,

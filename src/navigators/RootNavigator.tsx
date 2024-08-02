@@ -50,10 +50,13 @@ function RootNavigator(): React.JSX.Element {
   const isLoggedIn = useAppSelector(state => state.user.currentUser);
   const dispatch = useAppDispatch();
   const COLORS = useAppTheme();
-  const {data: conversion, isSuccess} = useGetUsdConversionQuery({});
+  const todayDate = new Date().toISOString().split('T')[0]; // Format date as YYYY-MM-DD
+  const {data: conversion, isSuccess} = useGetUsdConversionQuery({
+    date: todayDate,
+  });
+
   useEffect(() => {
     if (isSuccess) {
-      // console.log(conversion.date);
       const myCurrencies: {[key: string]: number} = {};
       Object.entries(conversion.usd as {[key: string]: number}).forEach(
         ([key, val]) => {

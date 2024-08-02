@@ -41,6 +41,14 @@ const UserSlice = createSlice({
         action.payload,
       ];
     },
+    addExpenseColor(state, action) {
+      state.currentUser!.expenseColors[action.payload.cat] =
+        action.payload.color;
+    },
+    addIncomeColor(state, action) {
+      state.currentUser!.incomeColors[action.payload.cat] =
+        action.payload.color;
+    },
     addIncomeCategory(state, action: PayloadAction<string>) {
       state.currentUser!.incomeCategory = [
         ...state.currentUser!.incomeCategory,
@@ -93,5 +101,7 @@ export const {
   setExpense,
   updateNotification,
   setConversionData,
+  addExpenseColor,
+  addIncomeColor,
 } = UserSlice.actions;
 export default UserSlice.reducer;

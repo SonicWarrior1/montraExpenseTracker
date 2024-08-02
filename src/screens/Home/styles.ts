@@ -71,7 +71,7 @@ const styles = (COLOR: typeof COLORS) =>
       marginTop: 18,
     },
     amt: {
-      fontSize: RFValue(40),
+      fontSize: RFValue(38),
       fontWeight: '600',
       marginTop: 10,
       color: COLOR.DARK[100],
@@ -124,6 +124,8 @@ const styles = (COLOR: typeof COLORS) =>
       borderRadius: 20,
     },
     tipText: {color: COLOR.DARK[100], fontSize: RFValue(16)},
+    paddingHorizontal: {paddingHorizontal: 20},
+    empty: {justifyContent: 'center', alignItems: 'center'},
   });
 
 export default styles;

@@ -59,7 +59,7 @@ function CategoryList({
   if (sort) {
     listData.reverse();
   }
-  // console.log('sdfklsdmnofkmo', listData);
+
   return (
     <FlatList
       style={{paddingHorizontal: 20}}
@@ -94,9 +94,9 @@ function CategoryList({
                 {transType === 'expense' ? '- ' : '+ '}
                 {currencies[currency!].symbol}
                 {formatWithCommas(
-                  Number(
-                    item[1][currency?.toUpperCase() ?? 'USD'].toFixed(2),
-                  ).toString(),
+                  item[1][currency?.toUpperCase() ?? 'USD']
+                    .toFixed(2)
+                    .toString(),
                 )}
               </Text>
             </View>

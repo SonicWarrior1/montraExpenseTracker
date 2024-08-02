@@ -79,7 +79,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
         return screenHeight / 1.97;
       }
     } else if (pageType !== 'transfer') {
-      return screenHeight / 2.6;
+      return screenHeight / 2.58;
     } else {
       return Dimensions.get('screen').height / 1.8;
     }
@@ -120,13 +120,13 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
   const [amount, setAmount] = useState<string>(
     prevTransaction
       ? formatWithCommas(
-          Number(
-            (
-              prevTransaction.conversion.usd[
-                (user?.currency ?? 'USD').toLowerCase()
-              ] * prevTransaction.amount
-            ).toFixed(2),
-          ).toString(),
+          (
+            prevTransaction.conversion.usd[
+              (user?.currency ?? 'USD').toLowerCase()
+            ] * prevTransaction.amount
+          )
+            .toFixed(2)
+            .toString(),
         )
       : '0',
   );
@@ -337,13 +337,13 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
             isEdit={isEdit}
             editAmt={
               isEdit
-                ? Number(
-                    (
-                      prevTransaction!.conversion.usd[
-                        (user?.currency ?? 'USD').toLowerCase()
-                      ] * prevTransaction!.amount
-                    ).toFixed(2),
-                  ).toString()
+                ? (
+                    prevTransaction!.conversion.usd[
+                      (user?.currency ?? 'USD').toLowerCase()
+                    ] * prevTransaction!.amount
+                  )
+                    .toFixed(2)
+                    .toString()
                 : '0'
             }
           />

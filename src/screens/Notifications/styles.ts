@@ -36,7 +36,7 @@ const styles = (COLOR: typeof COLORS) =>
       borderColor: COLOR.LIGHT[20],
       backgroundColor: COLOR.LIGHT[100],
       paddingVertical: 10,
-      // columnGap:10,
+      columnGap:5,
       justifyContent: 'space-between',
       alignItems: 'center',
       // columnGap: 5,

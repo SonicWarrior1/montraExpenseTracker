@@ -1,5 +1,5 @@
 import {Timestamp} from '@react-native-firebase/firestore';
-import React from 'react';
+import React, {useMemo} from 'react';
 import {ColorSchemeName, FlatList, Text, View} from 'react-native';
 import style from '../styles';
 import {useAppTheme} from '../../../hooks/themeHook';
@@ -45,25 +45,28 @@ function TransactionList({
     undefined
   >;
 }>) {
-  const listData = data
-    .filter(
-      item =>
-        Timestamp.fromMillis(item.timeStamp.seconds * 1000)
-          .toDate()
-          .getMonth() === month &&
-        (transType === 'expense'
-          ? item.type === 'expense' || item.type === 'transfer'
-          : item.type === 'income'),
-    )
-    .sort((a, b) => b.amount - a.amount)
-    .slice(
-      0,
-      transType === 'income' ? incomeOffset + limit : expenseOffset + limit,
-    );
+  const listData = useMemo(
+    () =>
+      data
+        .filter(
+          item =>
+            Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+              .toDate()
+              .getMonth() === month &&
+            (transType === 'expense'
+              ? item.type === 'expense' || item.type === 'transfer'
+              : item.type === 'income'),
+        )
+        .sort((a, b) => b.amount - a.amount)
+        .slice(
+          0,
+          transType === 'income' ? incomeOffset + limit : expenseOffset + limit,
+        ),
+    [data, expenseOffset, incomeOffset, limit, month, transType],
+  );
   if (sort) {
     listData.reverse();
   }
-
   return (
     <FlatList
       style={{paddingHorizontal: 20}}

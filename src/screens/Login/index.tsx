@@ -159,7 +159,7 @@ function Login({navigation}: Readonly<LoginScreenProps>) {
   return (
     <SafeAreaView style={styles.safeView}>
       <KeyboardAwareScrollView
-        style={{flex: 1}}
+        style={styles.flex}
         keyboardShouldPersistTaps="handled">
         <CustomHeader
           backgroundColor={COLOR.LIGHT[100]}
@@ -186,7 +186,7 @@ function Login({navigation}: Readonly<LoginScreenProps>) {
             placeholderText={STRINGS.Password}
             value={pass}
             inputColor={COLOR.DARK[100]}
-            onBlur={e => {
+            onBlur={() => {
               if (pass === '') {
                 setForm(formkey => ({...formkey, pass: true}));
               }
@@ -212,7 +212,7 @@ function Login({navigation}: Readonly<LoginScreenProps>) {
             <Text style={styles.forgotText}>{STRINGS.ForgotPassword}</Text>
           </Pressable>
           <Spacer height={20} />
-          <View style={{flexDirection: 'row'}}>
+          <View style={styles.flexRow}>
             <Text style={styles.dontHaveAcc}>{STRINGS.DontHaveAccount} </Text>
             <Pressable
               onPress={() => {

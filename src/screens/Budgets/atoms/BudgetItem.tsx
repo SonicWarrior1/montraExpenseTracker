@@ -110,7 +110,7 @@ function BudgetItem({
       </View>
       <Text style={styles.text1}>
         Remaining {currencies[currency!].symbol}
-        {formatWithCommas(Number(getValue(val, key)).toString())}
+        {formatWithCommas(getValue(val, key).toString())}
       </Text>
       <Bar
         progress={(spend?.[key]?.USD ?? 0) / val.limit}
@@ -121,17 +121,15 @@ function BudgetItem({
       <Text style={styles.text2}>
         {currencies[currency!].symbol}
         {formatWithCommas(
-          Number(
-            (spend?.[key]?.[currency?.toUpperCase() ?? 'USD'] ?? 0).toFixed(2),
-          ).toString(),
+          (spend?.[key]?.[currency?.toUpperCase() ?? 'USD'] ?? 0)
+            .toFixed(2)
+            .toString(),
         )}{' '}
         of {currencies[currency!].symbol}
         {formatWithCommas(
-          Number(
-            (val.conversion.usd[currency!.toLowerCase()] * val.limit).toFixed(
-              2,
-            ),
-          ).toString(),
+          (val.conversion.usd[currency!.toLowerCase()] * val.limit)
+            .toFixed(2)
+            .toString(),
         )}
       </Text>
       {(spend?.[key]?.USD ?? 0) >= val.limit && (

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useMemo} from 'react';
 import {Dimensions, Text, View} from 'react-native';
 import {COLORS} from '../../../constants/commonStyles';
 import {LineChart} from 'react-native-gifted-charts';
@@ -34,67 +34,69 @@ function Linegraph({
 }>) {
   const COLOR = useAppTheme();
   const styles = style(COLOR);
-  const graphData = data
-    .filter(
-      item =>
-        Timestamp.fromMillis(item.timeStamp.seconds * 1000)
-          .toDate()
-          .getMonth() === month &&
-        (transType === 'expense'
-          ? item.type === 'expense' || item.type === 'transfer'
-          : item.type === 'income'),
-    )
-    .sort((a, b) => a.timeStamp.seconds - b.timeStamp.seconds)
-    .map(item => {
-      return {
-        value:
-          item.amount * item.conversion.usd[currency?.toLowerCase() ?? 'usd'],
-        date:
-          Timestamp.fromMillis(item.timeStamp.seconds * 1000)
-            .toDate()
-            .getDay() +
-          '/' +
-          Timestamp.fromMillis(item.timeStamp.seconds * 1000)
-            .toDate()
-            .getMonth() +
-          '/' +
-          Timestamp.fromMillis(item.timeStamp.seconds * 1000)
-            .toDate()
-            .getFullYear(),
-      };
-    });
+  const graphData = useMemo(
+    () =>
+      data
+        .filter(
+          item =>
+            Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+              .toDate()
+              .getMonth() === month &&
+            (transType === 'expense'
+              ? item.type === 'expense' || item.type === 'transfer'
+              : item.type === 'income'),
+        )
+        .sort((a, b) => a.timeStamp.seconds - b.timeStamp.seconds)
+        .map(item => {
+          return {
+            value:
+              item.amount *
+              item.conversion.usd[currency?.toLowerCase() ?? 'usd'],
+            date:
+              Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+                .toDate()
+                .getDay() +
+              '/' +
+              Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+                .toDate()
+                .getMonth() +
+              '/' +
+              Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+                .toDate()
+                .getFullYear(),
+          };
+        }),
+    [currency, data, month, transType],
+  );
+  const emptyCheck = useMemo(
+    () =>
+      data
+        .filter(
+          item =>
+            Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+              .toDate()
+              .getMonth() === month && item.type === transType,
+        )
+        .sort((a, b) => a.timeStamp.seconds - b.timeStamp.seconds)
+        .map(item => {
+          return {value: item.amount};
+        }).length <= 1,
+    [data, month, transType],
+  );
   return (
     <>
       <Text style={styles.amt}>
         {currencies[currency!].symbol}
         {formatWithCommas(
-          Number(
-            // conversion.usd?.[currency!.toLowerCase()] *
-            Number(transType === 'expense' ? totalSpend : totalIncome).toFixed(
-              2,
-            ),
-          ).toString(),
+          // conversion.usd?.[currency!.toLowerCase()] *
+          (transType === 'expense' ? totalSpend : totalIncome)
+            .toFixed(2)
+            .toString(),
         )}
       </Text>
       <View style={styles.graphView}>
-        {data
-          .filter(
-            item =>
-              Timestamp.fromMillis(item.timeStamp.seconds * 1000)
-                .toDate()
-                .getMonth() === month && item.type === transType,
-          )
-          .sort((a, b) => a.timeStamp.seconds - b.timeStamp.seconds)
-          .map(item => {
-            return {value: item.amount};
-          }).length <= 1 ? (
-          <View
-            style={{
-              height: 230,
-              transform: [{translateX: 28}],
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}>
+        {emptyCheck ? (
+          <View style={styles.emtpyCtr}>
             <Text style={styles.emptyText}>Not Enough Data</Text>
           </View>
         ) : (

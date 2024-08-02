@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
     maxHeight:
       Platform.OS === 'ios'
         ? screenHeight / 2.2
-        : (screenHeight - navbarHeight * 1.074) / 2.1,
+        : (screenHeight - navbarHeight * 1.074) / 2.13,
     height: '100%',
   },
   keypad: {

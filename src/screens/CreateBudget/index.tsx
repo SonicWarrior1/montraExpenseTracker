@@ -29,10 +29,7 @@ import {useRealm} from '@realm/react';
 import {UpdateMode} from 'realm';
 import {Switch} from 'react-native-switch';
 import CustomHeader from '../../components/CustomHeader';
-import {
-  AmountInputSetter,
-  formatWithCommas,
-} from '../../utils/commonFuncs';
+import {AmountInputSetter, formatWithCommas} from '../../utils/commonFuncs';
 import Toast from 'react-native-toast-message';
 import {
   handleOfflineNotification,
@@ -84,12 +81,12 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
   const [amount, setAmount] = useState<string>(
     isEdit
       ? formatWithCommas(
-          Number(
-            (
-              (oldBudget?.conversion?.usd?.[currency?.toLowerCase() ?? 'usd'] ??
-                1) * Number(oldBudget?.limit!)
-            ).toFixed(2),
-          ).toString(),
+          (
+            (oldBudget?.conversion?.usd?.[currency?.toLowerCase() ?? 'usd'] ??
+              1) * Number(oldBudget?.limit!)
+          )
+            .toFixed(2)
+            .toString(),
         )
       : '0',
   );
@@ -351,13 +348,13 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
                     setAmount,
                     isEdit,
                     isEdit
-                      ? Number(
-                          (
-                            (oldBudget?.conversion?.usd?.[
-                              currency?.toLowerCase() ?? 'usd'
-                            ] ?? 1) * Number(oldBudget?.limit!)
-                          ).toFixed(2),
-                        ).toString()
+                      ? (
+                          (oldBudget?.conversion?.usd?.[
+                            currency?.toLowerCase() ?? 'usd'
+                          ] ?? 1) * Number(oldBudget?.limit!)
+                        )
+                          .toFixed(2)
+                          .toString()
                       : '0',
                   )
                 }

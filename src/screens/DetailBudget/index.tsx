@@ -72,24 +72,22 @@ function DetailBudget({navigation, route}: Readonly<DetailBudgetScreenProps>) {
               </Text>
             </View>
             <Text style={styles.remainText}>{STRINGS.Remaining}</Text>
-            <Text style={styles.amtText} numberOfLines={1} >
+            <Text style={styles.amtText} numberOfLines={1}>
               {currencies[currency!].symbol}
               {budget.limit - (spends?.[selectedCategory]?.USD ?? 0) < 0
                 ? '0'
                 : formatWithCommas(
-                    Number(
-                      (
-                        budget.conversion.usd[
-                          currency?.toLowerCase() ?? 'usd'
-                        ] *
-                          Number(budget.limit) -
-                        Number(
-                          spends?.[selectedCategory]?.[
-                            currency?.toUpperCase() ?? 'USD'
-                          ] ?? 0,
-                        )
-                      ).toFixed(2),
-                    ).toString(),
+                    (
+                      budget.conversion.usd[currency?.toLowerCase() ?? 'usd'] *
+                        Number(budget.limit) -
+                      Number(
+                        spends?.[selectedCategory]?.[
+                          currency?.toUpperCase() ?? 'USD'
+                        ] ?? 0,
+                      )
+                    )
+                      .toFixed(2)
+                      .toString(),
                   )}
             </Text>
             <View style={styles.progressbar}>

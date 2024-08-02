@@ -10,6 +10,7 @@ import {Timestamp} from '@react-native-firebase/firestore';
 import LinegraphLabel from '../../../components/LinegraphLabel';
 import {OnlineTransactionModel} from '../../../DbModels/OnlineTransactionModel';
 import {OfflineTransactionModel} from '../../../DbModels/OfflineTransactionModel';
+import {formatAMPM} from '../../../utils/firebase';
 
 function Graph({
   data,
@@ -46,21 +47,8 @@ function Graph({
   const formatDate = useCallback(
     (item: OnlineTransactionModel | OfflineTransactionModel) => {
       if (graphDay === 0) {
-        return (
-          Timestamp.fromMillis(item.timeStamp.seconds * 1000)
-            .toDate()
-            .getHours() +
-          ':' +
-          (Timestamp.fromMillis(item.timeStamp.seconds * 1000)
-            .toDate()
-            .getMinutes() < 10
-            ? '0' +
-              Timestamp.fromMillis(item.timeStamp.seconds * 1000)
-                .toDate()
-                .getMinutes()
-            : Timestamp.fromMillis(item.timeStamp.seconds * 1000)
-                .toDate()
-                .getMinutes())
+        return formatAMPM(
+          Timestamp.fromMillis(item.timeStamp.seconds * 1000).toDate(),
         );
       } else {
         return (
@@ -109,8 +97,11 @@ function Graph({
     .sort((a, b) => a.timeStamp.seconds - b.timeStamp.seconds)
     .map(item => {
       return {
-        value:
-          item.amount * item.conversion.usd[currency?.toLowerCase() ?? 'usd'],
+        value: Number(
+          (
+            item.amount * item.conversion.usd[currency?.toLowerCase() ?? 'usd']
+          ).toFixed(2),
+        ),
         date: formatDate(item),
       };
     });

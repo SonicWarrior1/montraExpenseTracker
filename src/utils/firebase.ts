@@ -393,10 +393,11 @@ export async function handleOnlineNotify({
   const totalBudget = UserFromJson(curr.data() as UserType)?.budget?.[month]?.[
     category
   ];
+
   if (totalBudget && totalBudget.alert) {
     if (
       totalSpent >= totalBudget.limit ||
-      totalSpent >= totalBudget.limit * (totalBudget.percentage / 100)
+      Number((totalBudget.limit * (totalBudget.percentage / 100)).toFixed(2))
     ) {
       try {
         const notificationId = uuid.v4();
@@ -438,7 +439,9 @@ export async function handleOnlineNotify({
           });
         } else if (
           totalSpent >=
-          totalBudget.limit * (totalBudget.percentage / 100)
+          Number(
+            (totalBudget.limit * (totalBudget.percentage / 100)).toFixed(2),
+          )
         ) {
           await firestore()
             .collection('users')
@@ -1096,7 +1099,7 @@ export async function handleOfflineNotification({
   if (totalBudget && totalBudget.alert) {
     if (
       totalSpent >= totalBudget.limit ||
-      totalSpent >= totalBudget.limit * (totalBudget.percentage / 100)
+      Number((totalBudget.limit * (totalBudget.percentage / 100)).toFixed(2))
     ) {
       try {
         const notificationId = uuid.v4();
@@ -1165,7 +1168,9 @@ export async function handleOfflineNotification({
           });
         } else if (
           totalSpent >=
-          totalBudget.limit * (totalBudget.percentage / 100)
+          Number(
+            (totalBudget.limit * (totalBudget.percentage / 100)).toFixed(2),
+          )
         ) {
           realm.write(() => {
             console.log({

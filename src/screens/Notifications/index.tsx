@@ -4,6 +4,7 @@ import {
   FlatList,
   Pressable,
   SafeAreaView,
+  ScrollView,
   Text,
   TouchableOpacity,
   View,
@@ -36,7 +37,6 @@ function NotificationScreen({navigation}: Readonly<NotificationScreenProps>) {
   const userDoc = firestore().collection('users').doc(uid);
   const {isConnected} = useNetInfo();
   const realm = useRealm();
-
   // state
   const [menu, setMenu] = useState<boolean>(false);
   // functions
@@ -83,8 +83,10 @@ function NotificationScreen({navigation}: Readonly<NotificationScreenProps>) {
         await userDoc.update({notification: readNotifications});
       }
       setMenu(false);
-    } catch (e) {}
-  }, [notifications, uid, isConnected, userDoc]);
+    } catch (e) {
+      console.log(e);
+    }
+  }, [isConnected, notifications, userDoc, uid]);
   const handleDelete = useCallback(() => {
     Alert.alert(STRINGS.AreYouSure, STRINGS.AreYouSureDelete, [
       {
@@ -190,9 +192,14 @@ function NotificationScreen({navigation}: Readonly<NotificationScreenProps>) {
       Object.values(notifications!).filter(item => item.read === false)
         .length !== 0
     ) {
-      handleMarkRead();
+      if (isConnected !== null) {
+        handleMarkRead();
+      }
     }
-  }, [notifications]);
+  }, [notifications, isConnected]);
+  const data = Object.values(notifications ?? {}).sort(
+    (a, b) => b.time.seconds - a.time.seconds,
+  );
   return (
     <SafeAreaView style={styles.safeView}>
       <Pressable
@@ -233,9 +240,8 @@ function NotificationScreen({navigation}: Readonly<NotificationScreenProps>) {
           </View>
         ) : (
           <FlatList
-            data={Object.values(notifications).sort(
-              (a, b) => b.time.seconds - a.time.seconds,
-            )}
+            data={data}
+            style={{flex:1}}
             renderItem={({item}) => (
               <NotificationListItem
                 handleSingleDelete={handleSingleDelete}

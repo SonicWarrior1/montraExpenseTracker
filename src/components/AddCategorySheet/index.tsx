@@ -5,7 +5,9 @@ import {useAppDispatch, useAppSelector} from '../../redux/store';
 // import CustomButton from '../CustomButton'
 import {
   addExpenseCategory,
+  addExpenseColor,
   addIncomeCategory,
+  addIncomeColor,
   setLoading,
 } from '../../redux/reducers/userSlice';
 import {transactionType} from '../../defs/transaction';
@@ -54,7 +56,7 @@ function AddCategorySheet({
   );
   // constants
   const dispatch = useAppDispatch();
-  const snapPoints = useMemo(() => ['25%'], []);
+  const snapPoints = useMemo(() => ['30%'], []);
   const COLOR = useAppTheme();
   const styles = style(COLOR);
   const {isConnected} = useNetInfo();
@@ -73,28 +75,26 @@ function AddCategorySheet({
   const handleOffline = useCallback(async () => {
     if (type === 'expense') {
       dispatch(addExpenseCategory(category.toLowerCase()));
+      const color = getUniqueColor(Object.values(expenseColors ?? {}));
+      dispatch(addExpenseColor({cat: category.toLowerCase(), color: color}));
       realm.write(() => {
         realm.create('category', {
-          name:
-            category.toLowerCase() +
-            '__' +
-            getUniqueColor(Object.values(expenseColors ?? {})),
+          name: category.toLowerCase() + '__' + color,
           type: 'expense',
         });
       });
     } else if (type === 'income') {
       dispatch(addIncomeCategory(category.toLowerCase()));
+      const color = getUniqueColor(Object.values(incomeColors ?? {}));
+      dispatch(addIncomeColor({cat: category.toLowerCase(), color: color}));
       realm.write(() => {
         realm.create('category', {
-          name:
-            category.toLowerCase() +
-            '__' +
-            getUniqueColor(Object.values(incomeColors ?? {})),
+          name: category.toLowerCase() + '__' + color,
           type: 'income',
         });
       });
     }
-  }, [category, type]);
+  }, [category, expenseColors, incomeColors, type]);
 
   const handleOnline = useCallback(async () => {
     const userDoc = firestore().collection('users').doc(uid);

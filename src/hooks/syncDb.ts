@@ -86,7 +86,6 @@ const syncAmounts = (
       const month = item.id.split('_')[0];
       const category = item.id.split('_')[1];
       const type = item.id.split('_')[2];
-      // console.log(item);
       if (type === 'income') {
         batch.update(firestore().collection('users').doc(uid), {
           [`income.${month}.${category}`]: item.amount,
@@ -133,7 +132,7 @@ const syncBudgets = (
     });
   }
 };
-const syncCategory = (
+function syncCategory(
   category: Results<CategoryModel>,
   batch: FirebaseFirestoreTypes.WriteBatch,
   uid: string,
@@ -142,54 +141,59 @@ const syncCategory = (
   incomeCategory: string[],
   incomeColors: {[key: string]: string},
   expenseColors: {[key: string]: string},
-) => {
+) {
   if (category.length > 0) {
     console.log('Category Syncing');
     console.log(
-      incomeCategory.concat(
-        category
-          .filter(
-            cat =>
-              cat.type === 'income' &&
-              !incomeCategory.includes(cat.name.split('__')[0]),
-          )
-          .map(item => item.name),
-      ),
+      incomeCategory
+        .filter(item => {
+          return !category.some(
+            cat => cat.type === 'income' && cat.name.split('__')[0] === item,
+          );
+        })
+        .concat(
+          category.filter(cat => cat.type === 'income').map(item => item.name),
+        ),
+      expenseCategory
+        .filter(item => {
+          return !category.some(
+            cat => cat.type === 'expense' && cat.name.split('__')[0] === item,
+          );
+        })
+        .concat(
+          category.filter(cat => cat.type === 'expense').map(item => item.name),
+        ),
     );
     batch.update(firestore().collection('users').doc(uid), {
       expenseCategory: expenseCategory
+        .filter(item => {
+          return !category.some(
+            cat => cat.type === 'expense' && cat.name.split('__')[0] === item,
+          );
+        })
         .concat(
-          category
-            .filter(
-              cat =>
-                cat.type === 'income' &&
-                !expenseCategory.includes(cat.name.split('__')[0]),
-            )
-            .map(item => item.name),
+          category.filter(cat => cat.type === 'expense').map(item => item.name),
         )
         .map(item => {
           const [name, colorFromCategory] = item.split('__');
-          const color =
-            expenseColors?.[name] ?? colorFromCategory ?? 'default-color';
+          const color = expenseColors?.[name] ?? colorFromCategory;
           return {
             name: encrypt(name, uid),
             color,
           };
         }),
       incomeCategory: incomeCategory
+        .filter(item => {
+          return !category.some(
+            cat => cat.type === 'income' && cat.name.split('__')[0] === item,
+          );
+        })
         .concat(
-          category
-            .filter(
-              cat =>
-                cat.type === 'income' &&
-                !incomeCategory.includes(cat.name.split('__')[0]),
-            )
-            .map(item => item.name),
+          category.filter(cat => cat.type === 'income').map(item => item.name),
         )
         .map(item => {
           const [name, colorFromCategory] = item.split('__');
-          const color =
-            incomeColors?.[name] ?? colorFromCategory ?? 'default-color';
+          const color = incomeColors?.[name] ?? colorFromCategory;
           return {
             name: encrypt(name, uid),
             color,
@@ -200,7 +204,7 @@ const syncCategory = (
       realm.delete(category);
     });
   }
-};
+}
 const syncNotifications = (
   notifications: Results<NotificationModel>,
   batch: FirebaseFirestoreTypes.WriteBatch,

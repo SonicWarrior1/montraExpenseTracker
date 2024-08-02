@@ -4,7 +4,7 @@ import style from './styles';
 import {useAppTheme} from '../../hooks/themeHook';
 import {ICONS} from '../../constants/icons';
 import {Text, View} from 'react-native';
-import {PlaceholderTextColor} from '../../constants/commonStyles';
+import {COLORS, PlaceholderTextColor} from '../../constants/commonStyles';
 
 function CustomDropdown({
   data,
@@ -15,6 +15,7 @@ function CustomDropdown({
   leftIcon,
   catColors,
   disable,
+  dropdownPosition = 'auto',
 }: Readonly<{
   data: Array<{label: number | string; value: number | string}>;
   onChange: (item: any) => void;
@@ -26,6 +27,7 @@ function CustomDropdown({
     [key: string]: string;
   };
   disable?: boolean;
+  dropdownPosition?: 'auto' | 'top' | 'bottom';
 }>) {
   const COLOR = useAppTheme();
   const styles = style(COLOR);
@@ -39,7 +41,14 @@ function CustomDropdown({
       value={{label: value, value: value}}
       renderItem={item => {
         return (
-          <View style={styles.itemCtr}>
+          <View
+            style={[
+              styles.itemCtr,
+              {
+                backgroundColor:
+                  item.value === value ? COLOR.VIOLET[60] : COLOR.LIGHT[100],
+              },
+            ]}>
             {leftIcon && item.value !== 'add' && (
               <View
                 style={[
@@ -55,6 +64,8 @@ function CustomDropdown({
                 styles.text,
                 {
                   fontWeight: item.value === 'add' ? '700' : undefined,
+                  color:
+                    item.value === value ? COLORS.LIGHT[100] : COLOR.DARK[100],
                 },
               ]}>
               {item.label}
@@ -71,6 +82,7 @@ function CustomDropdown({
       containerStyle={{backgroundColor: COLOR.LIGHT[100]}}
       activeColor={COLOR.LIGHT[100]}
       selectedTextStyle={{color: COLOR.DARK[100]}}
+      dropdownPosition={dropdownPosition}
       renderRightIcon={() => (
         <View>
           {ICONS.ArrowDown({
@@ -80,6 +92,7 @@ function CustomDropdown({
           })}
         </View>
       )}
+      autoScroll={false}
     />
   );
 }

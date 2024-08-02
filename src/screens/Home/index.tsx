@@ -26,7 +26,6 @@ import {OnlineTransactionModel} from '../../DbModels/OnlineTransactionModel';
 import {OfflineTransactionModel} from '../../DbModels/OfflineTransactionModel';
 import {formatWithCommas} from '../../utils/commonFuncs';
 import TransactionItem from '../../components/TransactionListItem/TransactionItem';
-import {CategoryModel} from '../../DbModels/CategoryModel';
 
 function Home({navigation, route}: Readonly<HomeScreenProps>) {
   // state
@@ -49,9 +48,6 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
     ...onlineData.filter(item => item.changed !== true),
     ...offlineData.filter(item => item.operation !== 'delete'),
   ];
-  const gg = useQuery(CategoryModel);
-  console.log(gg);
-  // console.log(offlineData.filter(item => item.operation === 'delete'));
   const listData = data
     .slice()
     .filter(item => {
@@ -66,7 +62,6 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
 
   const theme = useAppSelector(state => state.user.currentUser?.theme);
   // constants
-  // console.log(spends);
   const totalSpend = Object.values(spends ?? []).reduce((a, b) => {
     return a + (b?.[currency?.toUpperCase() ?? 'USD'] ?? 0);
   }, 0);
@@ -77,7 +72,17 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
   const styles = style(COLOR);
   const scheme = useColorScheme();
   const finalTheme = theme === 'device' ? scheme : theme;
-
+  console.log(conversion.date, new Date().toISOString().split('T')[0]);
+  fetch(
+    `https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@${
+      new Date().toISOString().split('T')[0]
+    }/v1/currencies/usd.json`,
+  ).then(async res => {
+    const x = await res.json();
+    console.log('====================================');
+    console.log(x.date);
+    console.log('====================================');
+  });
   return (
     <>
       <ScrollView
@@ -117,9 +122,11 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
                 ),
               )
                 ? 0
-                : (conversion.usd?.[(currency ?? 'USD').toLowerCase()] * 9400)
-                    .toFixed(2)
-                    .toString()}
+                : formatWithCommas(
+                    (conversion.usd?.[(currency ?? 'USD').toLowerCase()] * 9400)
+                      .toFixed(2)
+                      .toString(),
+                  )}
             </Text>
             <View style={styles.transRow}>
               <Pressable
@@ -136,9 +143,7 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
                       {currencies[currency].symbol}
                       {isNaN(Number(Number(totalIncome).toFixed(2)))
                         ? 0
-                        : formatWithCommas(
-                            Number(Number(totalIncome).toFixed(2)).toString(),
-                          )}
+                        : formatWithCommas(totalIncome.toFixed(2).toString())}
                     </Text>
                   </View>
                 )}
@@ -155,9 +160,7 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
                     {currencies[currency].symbol}
                     {isNaN(Number(Number(totalIncome).toFixed(2)))
                       ? 0
-                      : formatWithCommas(
-                          Number(Number(totalIncome).toFixed(2)).toString(),
-                        )}
+                      : formatWithCommas(totalIncome.toFixed(2).toString())}
                   </Text>
                 </View>
               </Pressable>
@@ -175,9 +178,7 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
                       {currencies[currency].symbol}
                       {isNaN(Number(Number(totalSpend).toFixed(2)))
                         ? 0
-                        : formatWithCommas(
-                            Number(Number(totalSpend).toFixed(2)).toString(),
-                          )}
+                        : formatWithCommas(totalSpend.toFixed(2).toString())}
                     </Text>
                   </View>
                 )}
@@ -194,9 +195,7 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
                     {currencies[currency].symbol}
                     {isNaN(Number(Number(totalSpend).toFixed(2)))
                       ? 0
-                      : formatWithCommas(
-                          Number(Number(totalSpend).toFixed(2)).toString(),
-                        )}
+                      : formatWithCommas(totalSpend.toFixed(2).toString())}
                   </Text>
                 </View>
               </Pressable>
@@ -228,7 +227,7 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
             )}
           </View>
           <FlatList
-            style={{paddingHorizontal: 20}}
+            style={styles.paddingHorizontal}
             ListEmptyComponent={ListEmptyComponent}
             data={listData}
             scrollEnabled={false}
@@ -255,7 +254,7 @@ function ListEmptyComponent() {
   const COLOR = useAppTheme();
   const styles = style(COLOR);
   return (
-    <View style={{justifyContent: 'center', alignItems: 'center'}}>
+    <View style={styles.empty}>
       <Text style={styles.emptyText}>{STRINGS.NoRecentTransactions}</Text>
     </View>
   );

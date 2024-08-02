@@ -80,7 +80,7 @@ function NotificationListItem({
               Timestamp.fromMillis(item.time.seconds * 1000).toDate(),
             )}
           </Text>
-          <Text style={styles.text2}>
+          <Text style={[styles.text2, {textAlign: 'right'}]}>
             {Timestamp.fromMillis(item.time.seconds * 1000)
               ?.toDate()
               ?.getDate() +
@@ -90,7 +90,7 @@ function NotificationListItem({
                   ?.toDate()
                   ?.getMonth()
               ].label +
-              ' ' +
+              '\n' +
               Timestamp.fromMillis(item.time.seconds * 1000)
                 ?.toDate()
                 ?.getFullYear()}

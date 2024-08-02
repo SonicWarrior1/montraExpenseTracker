@@ -190,30 +190,28 @@ export default function StoryScreen({navigation}: Readonly<StoryScreenProps>) {
             </View>
           )}
           {(index === 0 || index === 1) && (
-            <Text style={[styles.amt, {marginTop: 15}]} >
+            <Text style={[styles.amt, {marginTop: 15}]}>
               {currencies[currency!].symbol}
               {index === 0
                 ? formatWithCommas(
-                    Number(
-                      Object.values(user?.spend[new Date().getMonth()] ?? [])
-                        .reduce(
-                          (acc, curr) =>
-                            acc + curr[currency?.toUpperCase() ?? 'USD'],
-                          0,
-                        )
-                        .toFixed(2),
-                    ).toString(),
+                    Object.values(user?.spend[new Date().getMonth()] ?? [])
+                      .reduce(
+                        (acc, curr) =>
+                          acc + curr[currency?.toUpperCase() ?? 'USD'],
+                        0,
+                      )
+                      .toFixed(2)
+                      .toString(),
                   )
                 : formatWithCommas(
-                    Number(
-                      Object.values(user?.income[new Date().getMonth()] ?? [])
-                        .reduce(
-                          (acc, curr) =>
-                            acc + curr[currency?.toUpperCase() ?? 'USD'],
-                          0,
-                        )
-                        .toFixed(2),
-                    ).toString(),
+                    Object.values(user?.income[new Date().getMonth()] ?? [])
+                      .reduce(
+                        (acc, curr) =>
+                          acc + curr[currency?.toUpperCase() ?? 'USD'],
+                        0,
+                      )
+                      .toFixed(2)
+                      .toString(),
                   )}
             </Text>
           )}
@@ -253,18 +251,14 @@ export default function StoryScreen({navigation}: Readonly<StoryScreenProps>) {
               {currencies[currency!].symbol}
               {index === 0
                 ? formatWithCommas(
-                    Number(
-                      biggestSpend[0][1][
-                        currency?.toUpperCase() ?? 'USD'
-                      ].toFixed(2),
-                    ).toString(),
+                    biggestSpend[0][1][currency?.toUpperCase() ?? 'USD']
+                      .toFixed(2)
+                      .toString(),
                   )
                 : formatWithCommas(
-                    Number(
-                      biggestIncome[0][1][
-                        currency?.toUpperCase() ?? 'USD'
-                      ].toFixed(2),
-                    ).toString(),
+                    biggestIncome[0][1][currency?.toUpperCase() ?? 'USD']
+                      .toFixed(2)
+                      .toString(),
                   )}
             </Text>
           </View>

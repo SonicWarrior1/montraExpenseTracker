@@ -27,6 +27,7 @@ import CustomHeader from '../../components/CustomHeader';
 import {formatWithCommas} from '../../utils/commonFuncs';
 import DescriptionContainer from './atoms/DescriptionContainer';
 import {RFValue} from 'react-native-responsive-fontsize';
+import {formatAMPM} from '../../utils/firebase';
 
 function TransactionDetails({
   route,
@@ -79,12 +80,12 @@ function TransactionDetails({
       (currencies[currency!].symbol ?? '$') +
       ' ' +
       formatWithCommas(
-        Number(
-          (
-            trans!.conversion.usd[(currency ?? 'USD').toLowerCase()] *
-            trans!.amount
-          ).toFixed(2),
-        ).toString(),
+        (
+          trans!.conversion.usd[(currency ?? 'USD').toLowerCase()] *
+          trans!.amount
+        )
+          .toFixed(2)
+          .toString(),
       )
     ).length < 7;
   return (
@@ -129,12 +130,12 @@ function TransactionDetails({
             numberOfLines={1}>
             {currencies[currency!].symbol ?? '$'}{' '}
             {formatWithCommas(
-              Number(
-                (
-                  trans.conversion.usd[(currency ?? 'USD').toLowerCase()] *
-                  trans.amount
-                ).toFixed(2),
-              ).toString(),
+              (
+                trans.conversion.usd[(currency ?? 'USD').toLowerCase()] *
+                trans.amount
+              )
+                .toFixed(2)
+                .toString(),
             )}
           </Text>
           <Text style={styles.desc} numberOfLines={1}>
@@ -147,7 +148,8 @@ function TransactionDetails({
                   .toDate()
                   .getDay()
               ].label
-            }{' '}
+            }
+            {', '}
             {Timestamp.fromMillis(trans.timeStamp.seconds * 1000)
               .toDate()
               .getDate()}{' '}
@@ -160,14 +162,11 @@ function TransactionDetails({
             }{' '}
             {Timestamp.fromMillis(trans.timeStamp.seconds * 1000)
               .toDate()
-              .getFullYear()}{' '}
-            {Timestamp.fromMillis(trans.timeStamp.seconds * 1000)
-              .toDate()
-              .getHours()}
-            :
-            {Timestamp.fromMillis(trans.timeStamp.seconds * 1000)
-              .toDate()
-              .getMinutes()}
+              .getFullYear()}
+            {', '}
+            {formatAMPM(
+              Timestamp.fromMillis(trans.timeStamp.seconds * 1000).toDate(),
+            )}
           </Text>
         </SafeAreaView>
         <View style={styles.bottomView}>

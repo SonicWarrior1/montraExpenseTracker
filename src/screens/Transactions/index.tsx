@@ -218,6 +218,7 @@ function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
   }
   const theme = useAppSelector(state => state.user.currentUser?.theme);
   const finaltheme = theme === 'device' ? scheme : theme;
+  console.log(applyFilters(offset));
   return (
     <>
       <SafeAreaView
@@ -230,9 +231,11 @@ function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
         ]}>
         <TransactionHeader month={month} setMonth={setMonth} />
         <View style={styles.mainView}>
-          {applyFilters(offset).length === 2 &&
-          applyFilters(offset)[0].data.length === 0 &&
-          applyFilters(offset)[1].data.length === 0 ? (
+          {(applyFilters(offset).length === 1 &&
+            applyFilters(offset)[0].data.length === 0) ||
+          (applyFilters(offset).length === 2 &&
+            applyFilters(offset)[0].data.length === 0 &&
+            applyFilters(offset)[1].data.length === 0) ? (
             <>
               <TouchableOpacity
                 style={styles.financialBtn}

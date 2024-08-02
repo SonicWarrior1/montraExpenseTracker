@@ -3,14 +3,15 @@ import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
 export const convertApi = createApi({
   reducerPath: 'convert',
   baseQuery: fetchBaseQuery({
-    baseUrl: `https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@${
-      new Date().toISOString().split('T')[0]
-    }/v1/currencies/`,
+    baseUrl: 'https://cdn.jsdelivr.net/npm/@fawazahmed0',
   }),
   endpoints: builder => ({
     getUsdConversion: builder.query({
-      query: () => 'usd.json',
+      query: ({date}) => {
+        return `/currency-api@${date}/v1/currencies/usd.json`;
+      },
     }),
   }),
 });
+
 export const {useGetUsdConversionQuery} = convertApi;

@@ -1,10 +1,11 @@
 import React from 'react';
-import {Pressable, View} from 'react-native';
+import {Pressable, Text, View} from 'react-native';
 import {ICONS} from '../../../constants/icons';
 import {Dropdown} from 'react-native-element-dropdown';
 import style from '../styles';
 import {monthData, STRINGS} from '../../../constants/strings';
 import {useAppTheme} from '../../../hooks/themeHook';
+import { COLORS } from '../../../constants/commonStyles';
 
 function FinancialReportHeader({
   month,
@@ -35,6 +36,33 @@ function FinancialReportHeader({
             })}
           </View>
         )}
+        renderItem={item => {
+          return (
+            <View
+              style={[
+                styles.itemCtr,
+                {
+                  backgroundColor:
+                    item.value === month + 1
+                      ? COLOR.VIOLET[60]
+                      : COLOR.LIGHT[100],
+                },
+              ]}>
+              <Text
+                style={[
+                  styles.text,
+                  {
+                    color:
+                      item.value === month + 1
+                        ? COLORS.LIGHT[100]
+                        : COLOR.DARK[100],
+                  },
+                ]}>
+                {item.label}
+              </Text>
+            </View>
+          );
+        }}
         renderRightIcon={() => <></>}
         placeholder={STRINGS.Month}
         value={monthData[month]}
