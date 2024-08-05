@@ -26,7 +26,7 @@ import {encrypt} from '../../utils/encryption';
 function DeleteTransactionSheet({
   bottomSheetModalRef,
   id,
-  url,
+  // url,
   navigation,
   type,
   amt,
@@ -110,7 +110,6 @@ function DeleteTransactionSheet({
     } else if (type === 'expense') {
       const finalAmount: {[key: string]: string} = {};
       const encryptedAmount: {[key: string]: string} = {};
-      // console.log(user?.spend[month]?.[category]);
       Object.keys(currencies).forEach(dbCurrency => {
         console.log(
           (user?.spend[month]?.[category]?.[dbCurrency] ?? 0) -

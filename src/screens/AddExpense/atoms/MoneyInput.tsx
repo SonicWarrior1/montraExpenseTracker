@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useMemo} from 'react';
 import {Text, TextInput, View} from 'react-native';
 import {EmptyZeroError} from '../../../constants/errors';
 import {currencies, STRINGS} from '../../../constants/strings';
@@ -24,6 +24,17 @@ function MoneyInput({
 }>) {
   const COLOR = useAppTheme();
   const styles = style(COLOR);
+  const fontSize = useMemo(() => {
+    if (currencies[currency].symbol.length + amount.length > 13) {
+      return RFValue(64 - 33);
+    } else if (currencies[currency].symbol.length + amount.length > 10) {
+      return RFValue(64 - 25);
+    } else if (currencies[currency].symbol.length + amount.length > 7) {
+      return RFValue(64 - 15);
+    } else {
+      return RFValue(64 - 0);
+    }
+  }, [amount, currency]);
   return (
     <View
       style={[
@@ -42,16 +53,7 @@ function MoneyInput({
           style={[
             styles.text2,
             {
-              fontSize: RFValue(
-                64 -
-                  (amount.length > 11
-                    ? 33
-                    : amount.length > 9
-                    ? 25
-                    : amount.length > 7
-                    ? 15
-                    : 0),
-              ),
+              fontSize: fontSize,
             },
           ]}>
           {currencies[currency].symbol}
@@ -60,16 +62,7 @@ function MoneyInput({
           style={[
             styles.input,
             {
-              fontSize: RFValue(
-                64 -
-                  (amount.length > 11
-                    ? 33
-                    : amount.length > 9
-                    ? 25
-                    : amount.length > 7
-                    ? 15
-                    : 0),
-              ),
+              fontSize: fontSize,
             },
           ]}
           // maxLength={12}

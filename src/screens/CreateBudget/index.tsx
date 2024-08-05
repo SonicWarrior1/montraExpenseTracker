@@ -248,20 +248,6 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
     user,
     oldBudget,
   ]);
-  // useEffect(() => {
-  //   setCatColors(
-  //     Object.values(expenseCat!).reduce(
-  //       (acc: {[key: string]: string}, item) => {
-  //         acc[item] = getMyColor();
-  //         return acc;
-  //       },
-  //       {},
-  //     ),
-  //   );
-  //   return () => {
-  //     setCatColors(undefined);
-  //   };
-  // }, [expenseCat]);
   const backAction = () => {
     if (
       ((amount.replace(/,/g, '').trim() !== '' ||
@@ -285,6 +271,17 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
     const back = BackHandler.addEventListener('hardwareBackPress', backAction);
     return () => back.remove();
   });
+  const fontSize = useMemo(() => {
+    if (currencies[currency!].symbol.length + amount.length > 13) {
+      return RFValue(64 - 33);
+    } else if (currencies[currency!].symbol.length + amount.length > 10) {
+      return RFValue(64 - 25);
+    } else if (currencies[currency!].symbol.length + amount.length > 7) {
+      return RFValue(64 - 16);
+    } else {
+      return RFValue(64 - 0);
+    }
+  }, [amount, currency]);
   return (
     <KeyboardAwareScrollView
       // extraHeight={150}
@@ -305,16 +302,7 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
                 style={[
                   styles.text2,
                   {
-                    fontSize: RFValue(
-                      64 -
-                        (amount.length > 11
-                          ? 33
-                          : amount.length > 9
-                          ? 25
-                          : amount.length > 7
-                          ? 15
-                          : 0),
-                    ),
+                    fontSize: fontSize,
                   },
                 ]}>
                 {currencies[currency!].symbol}
@@ -323,16 +311,7 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
                 style={[
                   styles.input,
                   {
-                    fontSize: RFValue(
-                      64 -
-                        (amount.length > 11
-                          ? 33
-                          : amount.length > 9
-                          ? 25
-                          : amount.length > 7
-                          ? 16
-                          : 0),
-                    ),
+                    fontSize: fontSize,
                   },
                 ]}
                 // maxLength={12}
