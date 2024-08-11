@@ -5,12 +5,14 @@ const initialState: {
   currentUser: UserType | undefined;
   loading: boolean;
   theme?: 'device' | 'light' | 'dark';
+  biometrics: boolean | undefined;
   conversion: {[key: string]: {[key: string]: number}};
 } = {
   currentUser: undefined,
   loading: false,
   theme: undefined,
   conversion: {},
+  biometrics: undefined,
 };
 const UserSlice = createSlice({
   name: 'user',
@@ -85,6 +87,9 @@ const UserSlice = createSlice({
     setConversionData(state, action) {
       state.conversion = action.payload;
     },
+    setBiometrics(state, action) {
+      state.biometrics = action.payload;
+    },
   },
 });
 
@@ -103,5 +108,6 @@ export const {
   setConversionData,
   addExpenseColor,
   addIncomeColor,
+  setBiometrics,
 } = UserSlice.actions;
 export default UserSlice.reducer;

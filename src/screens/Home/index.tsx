@@ -72,17 +72,7 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
   const styles = style(COLOR);
   const scheme = useColorScheme();
   const finalTheme = theme === 'device' ? scheme : theme;
-  console.log(conversion.date, new Date().toISOString().split('T')[0]);
-  fetch(
-    `https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@${
-      new Date().toISOString().split('T')[0]
-    }/v1/currencies/usd.json`,
-  ).then(async res => {
-    const x = await res.json();
-    console.log('====================================');
-    console.log(x.date);
-    console.log('====================================');
-  });
+
   return (
     <>
       <ScrollView

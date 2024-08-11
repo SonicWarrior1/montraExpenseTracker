@@ -50,6 +50,8 @@
 	<string></string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Allow access to the photo library for selecting images</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>We use Face ID to securely lock and unlock your app, ensuring that only you can access your personal information.</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Inter-Black.ttf</string>
