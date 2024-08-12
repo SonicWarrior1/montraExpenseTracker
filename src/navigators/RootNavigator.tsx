@@ -4,7 +4,7 @@ import Onboarding from '../screens/Onboarding';
 import {currencies, NAVIGATION} from '../constants/strings';
 import Signup from '../screens/Signup';
 import {ICONS} from '../constants/icons';
-import {Pressable} from 'react-native';
+import {Linking, Pressable} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import Login from '../screens/Login';
 import {useAppDispatch, useAppSelector} from '../redux/store';
@@ -27,6 +27,7 @@ import {useAppTheme} from '../hooks/themeHook';
 import {useGetUsdConversionQuery} from '../redux/api/conversionApi';
 import {createStackNavigator} from '@react-navigation/stack';
 import {setConversionData} from '../redux/reducers/userSlice';
+import ResetPassword from '../screens/ResetPassword';
 
 export const Stack = createStackNavigator<RootStackParamList>();
 
@@ -73,6 +74,49 @@ function RootNavigator(): React.JSX.Element {
       );
     }
   }, [conversion, dispatch, isSuccess]);
+
+  useEffect(() => {
+    try {
+      Linking.getInitialURL().then(url => {
+        if (url) {
+          const regex = /[?&]([^=#]+)=([^&#]*)/g;
+          const params: {[key: string]: string} = {};
+          let match;
+          while ((match = regex.exec(url ?? ''))) {
+            params[match[1]] = match[2];
+          }
+          // console.log('PARAMS', url!.split('//')[1].split('?')[0], params);
+          if (url?.split('//')?.[1]?.split('?')?.[0] === 'reset-pass') {
+            navigation.navigate(NAVIGATION.ResetPassword, params);
+          }
+        }
+      });
+    } catch (e) {
+      console.log(e);
+    }
+    const handleDeepLink = async (event: {url: string}) => {
+      try {
+        const url = event.url;
+        const regex = /[?&]([^=#]+)=([^&#]*)/g;
+        const params: {[key: string]: string} = {};
+        let match;
+        while ((match = regex.exec(url))) {
+          params[match[1]] = match[2];
+        }
+        // console.log('PARAMS', event.url.split('//')[1].split('?')[0], params);
+        if (event?.url?.split('//')?.[1]?.split('?')?.[0] === 'reset-pass') {
+          navigation.navigate(NAVIGATION.ResetPassword, params);
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    };
+
+    const subscription = Linking.addEventListener('url', handleDeepLink);
+
+    return () => subscription.remove();
+  }, []);
+
   return (
     <Stack.Navigator
       screenOptions={{
@@ -121,6 +165,10 @@ function RootNavigator(): React.JSX.Element {
           <Stack.Screen name={NAVIGATION.Theme} component={ThemeScreen} />
           <Stack.Screen name={NAVIGATION.ExportData} component={ExportData} />
           <Stack.Screen name={NAVIGATION.Story} component={StoryScreen} />
+          <Stack.Screen
+            name={NAVIGATION.ResetPassword}
+            component={ResetPassword}
+          />
         </Stack.Group>
       ) : (
         <Stack.Group>
@@ -134,6 +182,10 @@ function RootNavigator(): React.JSX.Element {
           <Stack.Screen
             name={NAVIGATION.FORGOTEMAILSENT}
             component={ForgotEmailSent}
+          />
+          <Stack.Screen
+            name={NAVIGATION.ResetPassword}
+            component={ResetPassword}
           />
           {/* <Stack.Screen
             name={NAVIGATION.PIN}

@@ -24,6 +24,7 @@ export const NAVIGATION: {
   Currency: 'Currency';
   ExportData: 'ExportData';
   Theme: 'Theme';
+  ResetPassword: 'ResetPassword';
 } = {
   ONBOARDING: 'Onboarding',
   SIGNUP: 'Signup',
@@ -48,9 +49,11 @@ export const NAVIGATION: {
   Currency: 'Currency',
   ExportData: 'ExportData',
   Theme: 'Theme',
+  ResetPassword: 'ResetPassword',
 };
 
 export const STRINGS = {
+  ResetPassword:'Reset Password',
   InvalidEmail: 'Invalid Email Address',
   ToManyRequestError: 'Too many requests. Please try again after sometime.',
   PopupClosedByUser: 'Authentication process canceled. Please try again.',
@@ -75,6 +78,8 @@ export const STRINGS = {
   Continue: 'Continue',
   Email: 'Email',
   Name: 'Name',
+  RetypeNewPassword: 'Retype New Password',
+  NewPassword: 'New Password',
   Password: 'Password',
   ConfrimPassword: 'Confirm Password',
   BySigningUp: 'By signing up, you agree to the',
@@ -206,7 +211,7 @@ export const STRINGS = {
   CheckInternet: 'Please check your internet connection',
   PasswordDoNotMatch: 'Password do not match',
   ConfirmPasswordCannotBeEmpty: 'Confirm Password cannot be Empty',
-  PasswordNotValid: 'Password must be at least 6 characters long',
+  PasswordNotValid: 'Password must contain atleast 1 Uppercase, 1 Lowercase, 1 Numeric and 1 Symbol Character',
   PasswordCannotBeEmpty: 'Password cannot be Empty',
   EmailIsNotValid: 'Email is not Valid',
   EmailCannotBeEmpty: 'Email cannot be Empty',
@@ -239,6 +244,7 @@ export const STRINGS = {
   NetworkError:
     'A network error (such as timeout, interrupted connection or unreachable host) has occurred.',
   UnknownError: 'An unknown error occurred. Please try again later.',
+  PasswordResetSucessful:'Password Reset Sucessful'
 };
 export const OnboardData = [
   {

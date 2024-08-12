@@ -3,6 +3,7 @@
 #import <Firebase.h>
 #import <React/RCTBundleURLProvider.h>
 #import <GoogleSignIn/GoogleSignIn.h>
+#import <React/RCTLinkingManager.h>
 
 @implementation AppDelegate
 
@@ -35,7 +36,22 @@
 - (void)customizeRootView:(RCTRootView *)rootView {
   [RNBootSplash initWithStoryboard:@"BootSplash" rootView:rootView];
 }
-- (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary<UIApplicationOpenURLOptionsKey, id> *)options {
-  return [[GIDSignIn sharedInstance] handleURL:url];
+- (BOOL)application:(UIApplication *)application
+            openURL:(NSURL *)url
+            options:(NSDictionary<UIApplicationOpenURLOptionsKey, id> *)options
+{
+    // First, handle Google Sign-In URL
+    if ([[GIDSignIn sharedInstance] handleURL:url]) {
+        return YES; // Google Sign-In successfully handled the URL
+    }
+
+    // Then, handle React Native Linking Manager URL
+    if ([RCTLinkingManager application:application openURL:url options:options]) {
+        return YES; // React Native Linking successfully handled the URL
+    }
+
+    // If neither Google Sign-In nor React Native handled the URL, return NO
+    return NO;
 }
+
 @end

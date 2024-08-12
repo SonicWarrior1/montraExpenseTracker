@@ -25,6 +25,7 @@ import {
   emailRegex,
   nameRegex,
   NAVIGATION,
+  passRegex,
   STRINGS,
 } from '../../constants/strings';
 import {COLORS} from '../../constants/commonStyles';
@@ -100,7 +101,7 @@ function Signup({navigation}: Readonly<SignupScreenProps>) {
       email !== '' &&
       testInput(emailRegex, email) &&
       pass.trim() !== '' &&
-      pass.length >= 6 &&
+      testInput(passRegex, pass) &&
       pass === confirmPass &&
       checked
     ) {
