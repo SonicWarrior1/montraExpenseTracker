@@ -5,6 +5,7 @@ import {useAppTheme} from '../../hooks/themeHook';
 import {ICONS} from '../../constants/icons';
 import {Text, View} from 'react-native';
 import {COLORS, PlaceholderTextColor} from '../../constants/commonStyles';
+import { RFValue } from 'react-native-responsive-fontsize';
 
 function CustomDropdown({
   data,
@@ -33,9 +34,10 @@ function CustomDropdown({
   const styles = style(COLOR);
   return (
     <Dropdown
+    showsVerticalScrollIndicator={false}
       style={styles.dropdown}
       placeholder={placeholder}
-      placeholderStyle={{color: PlaceholderTextColor}}
+      placeholderStyle={{color: PlaceholderTextColor,fontSize:RFValue(14)}}
       data={data}
       labelField={'label'}
       value={{label: value, value: value}}
@@ -81,7 +83,7 @@ function CustomDropdown({
       itemTextStyle={{color: COLOR.DARK[100]}}
       containerStyle={{backgroundColor: COLOR.LIGHT[100]}}
       activeColor={COLOR.LIGHT[100]}
-      selectedTextStyle={{color: COLOR.DARK[100]}}
+      selectedTextStyle={{color: COLOR.DARK[100],fontSize: RFValue(14),}}
       dropdownPosition={dropdownPosition}
       renderRightIcon={() => (
         <View>

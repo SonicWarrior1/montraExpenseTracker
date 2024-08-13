@@ -47,6 +47,7 @@ import firestore from '@react-native-firebase/firestore';
 import Toast from 'react-native-toast-message';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import CustomHeader from '../../components/CustomHeader/index.tsx';
+import { RFValue } from 'react-native-responsive-fontsize';
 
 function Signup({navigation}: Readonly<SignupScreenProps>) {
   // constants
@@ -247,7 +248,7 @@ function Signup({navigation}: Readonly<SignupScreenProps>) {
             formKey={form.confirmPass}
           />
           <BouncyCheckbox
-            size={25}
+            size={RFValue(22)}
             fillColor={
               !checked && form.terms ? COLORS.RED[100] : COLORS.PRIMARY.VIOLET
             }
@@ -261,7 +262,7 @@ function Signup({navigation}: Readonly<SignupScreenProps>) {
             isChecked={checked}
             textComponent={
               <View style={{flex: 1, marginLeft: 16}}>
-                <Text style={{color: COLOR.DARK[100]}}>
+                <Text style={{color: COLOR.DARK[100],fontSize:RFValue(12)}}>
                   {STRINGS.BySigningUp}{' '}
                   <Text
                     style={{color: COLORS.PRIMARY.VIOLET}}

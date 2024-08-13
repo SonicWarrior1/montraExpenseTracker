@@ -1,4 +1,4 @@
-import {StyleSheet} from 'react-native';
+import {Dimensions, StyleSheet} from 'react-native';
 import {COLORS} from '../../constants/commonStyles';
 
 const styles = (COLOR: typeof COLORS) =>
@@ -17,6 +17,10 @@ const styles = (COLOR: typeof COLORS) =>
       backgroundColor: COLOR.LIGHT[100],
     },
     flex: {flex: 1},
-    calender: {position: 'absolute', right: 14, top: 19},
+    calender: {
+      position: 'absolute',
+      right: 14,
+      
+    },
   });
 export default styles;

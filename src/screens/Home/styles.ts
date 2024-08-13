@@ -5,7 +5,8 @@ const screenWidth = Dimensions.get('screen').width;
 const styles = (COLOR: typeof COLORS) =>
   StyleSheet.create({
     moneyCtr: {
-      height: 80,
+      height: screenWidth / 5.4,
+      maxHeight:100,
       borderRadius: 28,
       flexDirection: 'row',
       paddingHorizontal: 15,
@@ -28,7 +29,7 @@ const styles = (COLOR: typeof COLORS) =>
       fontSize: RFValue(16),
       fontWeight: '600',
       color: COLOR.LIGHT[100],
-      maxWidth: 100,
+      // borderWidth: 1,
     },
     filterBtn: {
       paddingVertical: 10,
@@ -117,7 +118,7 @@ const styles = (COLOR: typeof COLORS) =>
     tooltip: {
       position: 'absolute',
       transform: [{translateY: -60}, {translateX: 5}],
-      width: 180,
+      width: screenWidth / 2.3,
       backgroundColor: COLOR.LIGHT[100],
       paddingHorizontal: 20,
       paddingVertical: 10,

@@ -1,4 +1,4 @@
-import {StyleSheet} from 'react-native';
+import {Dimensions, StyleSheet} from 'react-native';
 import {COLORS, InputBorderColor} from '../../constants/commonStyles';
 import {RFValue} from 'react-native-responsive-fontsize';
 const styles = (COLOR: typeof COLORS) =>
@@ -46,7 +46,7 @@ const styles = (COLOR: typeof COLORS) =>
       borderTopRightRadius: 32,
     },
     attachementCtr: {
-      height: 60,
+      height: Dimensions.get('screen').width * 0.15,
       width: '100%',
       borderWidth: 1,
       borderRadius: 20,

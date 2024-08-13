@@ -5,6 +5,7 @@ import {Pressable} from 'react-native';
 import {COLORS} from '../../../constants/commonStyles';
 import {useAppTheme} from '../../../hooks/themeHook';
 import React from 'react';
+import {isTablet} from 'react-native-device-info';
 
 function AnimatedBtn({
   translateX,
@@ -29,7 +30,7 @@ function AnimatedBtn({
         styles.animatedBtnOuter,
         {
           position: 'absolute',
-          marginLeft: '39%',
+          marginLeft: isTablet() ? '44%' : '39%',
           zIndex: zIndex,
           transform: [{translateY: -15}, {translateX}, {translateY}],
         },
@@ -37,7 +38,11 @@ function AnimatedBtn({
       <Pressable
         style={[styles.animatedBtn, {backgroundColor: backgrounColor}]}
         onPress={onPress}>
-        {icon({height: 30, width: 30, color: COLORS.LIGHT[100]})}
+        {icon({
+          height: isTablet() ? 25 : 30,
+          width: isTablet() ? 25 : 30,
+          color: COLORS.LIGHT[100],
+        })}
       </Pressable>
     </Animated.View>
   );

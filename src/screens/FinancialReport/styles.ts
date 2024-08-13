@@ -1,4 +1,4 @@
-import {StyleSheet} from 'react-native';
+import {Dimensions, Platform, StyleSheet} from 'react-native';
 import {COLORS} from '../../constants/commonStyles';
 import {RFValue} from 'react-native-responsive-fontsize';
 
@@ -42,7 +42,7 @@ const styles = (COLOR: typeof COLORS) =>
       maxWidth: 180,
     },
     catAmt: {fontSize: RFValue(24), fontWeight: '500'},
-    safeView: {backgroundColor: COLOR.LIGHT[100],},
+    safeView: {backgroundColor: COLOR.LIGHT[100]},
     monthRow: {
       flexDirection: 'row',
       alignItems: 'center',
@@ -61,7 +61,7 @@ const styles = (COLOR: typeof COLORS) =>
       paddingHorizontal: 10,
     },
     amt: {
-      fontSize: RFValue(32),
+      fontSize: Platform.OS === 'ios' ? RFValue(28) : RFValue(32),
       fontWeight: '700',
       paddingLeft: 20,
       color: COLOR.DARK[100],
@@ -84,8 +84,9 @@ const styles = (COLOR: typeof COLORS) =>
       borderRadius: 32,
     },
     typeBtn: {
-      width: 165,
-      height: 48,
+      width: Dimensions.get('screen').width / 2.35,
+      height: Dimensions.get('screen').width / 8,
+      maxHeight:60,
       justifyContent: 'center',
       alignItems: 'center',
       borderRadius: 32,

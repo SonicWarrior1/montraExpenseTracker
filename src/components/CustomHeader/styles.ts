@@ -1,5 +1,6 @@
 import { Dimensions, Platform, StyleSheet } from 'react-native';
 import { COLORS } from '../../constants/commonStyles';
+import { RFValue } from 'react-native-responsive-fontsize';
 
 const styles = (COLOR: typeof COLORS) => StyleSheet.create({
     view: {
@@ -12,7 +13,7 @@ const styles = (COLOR: typeof COLORS) => StyleSheet.create({
         borderColor: COLOR.LIGHT[40],
     },
     text: {
-        fontSize: 18,
+        fontSize: RFValue(18),
         fontWeight: '600',
     },
 });

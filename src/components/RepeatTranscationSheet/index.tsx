@@ -1,5 +1,5 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
-import {Pressable, View} from 'react-native';
+import {Dimensions, Pressable, View} from 'react-native';
 import style from './styles';
 import CustomDropdown from '../CustomDropDown';
 import CustomButton from '../CustomButton';
@@ -24,6 +24,7 @@ import {RepeatDataModel} from '../../DbModels/RepeatDataModel';
 import {Timestamp} from '@react-native-firebase/firestore';
 import {ICONS} from '../../constants/icons';
 import {PlaceholderTextColor} from '../../constants/commonStyles';
+import {isTablet} from 'react-native-device-info';
 
 function RepeatTransactionSheet({
   bottomSheetModalRef,
@@ -257,7 +258,16 @@ function RepeatTransactionSheet({
                   setIsDateOpen(false);
                 }}
               />
-              <View style={styles.calender}>
+              <View
+                style={[
+                  styles.calender,
+                  {
+                    top:
+                      Dimensions.get('screen').width *
+                      0.15 *
+                      (isTablet() ? 0.36 : 0.31),
+                  },
+                ]}>
                 {ICONS.Calender({
                   height: 20,
                   width: 20,

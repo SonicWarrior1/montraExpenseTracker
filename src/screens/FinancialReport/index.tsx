@@ -214,6 +214,7 @@ function FinancialReport({navigation}: Readonly<FinancialReportScreenProps>) {
         </View>
         <View style={styles.flexRow}>
           <Dropdown
+          showsVerticalScrollIndicator={false}
             style={[styles.dropdown, {width: 160}]}
             renderLeftIcon={() => (
               <View style={{marginRight: 10}}>

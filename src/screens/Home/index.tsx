@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import {
+  Dimensions,
   FlatList,
   Pressable,
   SafeAreaView,
@@ -26,6 +27,7 @@ import {OnlineTransactionModel} from '../../DbModels/OnlineTransactionModel';
 import {OfflineTransactionModel} from '../../DbModels/OfflineTransactionModel';
 import {formatWithCommas} from '../../utils/commonFuncs';
 import TransactionItem from '../../components/TransactionListItem/TransactionItem';
+import {isTablet} from 'react-native-device-info';
 
 function Home({navigation, route}: Readonly<HomeScreenProps>) {
   // state
@@ -146,7 +148,16 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
                 </View>
                 <View>
                   <Text style={styles.text1}>{STRINGS.Income}</Text>
-                  <Text style={styles.text2} numberOfLines={1}>
+                  <Text
+                    style={[
+                      styles.text2,
+                      {
+                        maxWidth:
+                          Dimensions.get('screen').width /
+                          (isTablet() ? 3 : 4),
+                      },
+                    ]}
+                    numberOfLines={1}>
                     {currencies[currency].symbol}
                     {isNaN(Number(Number(totalIncome).toFixed(2)))
                       ? 0
@@ -181,7 +192,16 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
                 </View>
                 <View>
                   <Text style={styles.text1}>{STRINGS.Expense}</Text>
-                  <Text style={styles.text2} numberOfLines={1}>
+                  <Text
+                    style={[
+                      styles.text2,
+                      {
+                        maxWidth:
+                          Dimensions.get('screen').width /
+                          (isTablet() ? 3 : 4),
+                      },
+                    ]}
+                    numberOfLines={1}>
                     {currencies[currency].symbol}
                     {isNaN(Number(Number(totalSpend).toFixed(2)))
                       ? 0

@@ -1,8 +1,8 @@
 import {Dimensions, Platform, StatusBar, StyleSheet} from 'react-native';
 import {COLORS} from '../../constants/commonStyles';
+import {RFValue} from 'react-native-responsive-fontsize';
 const screenWidth = Dimensions.get('screen').width;
 const screenHeight = Dimensions.get('screen').height;
-// the value returned does not include the bottom navigation bar, I am not sure why yours does.
 const windowHeight = Dimensions.get('window').height;
 const navbarHeight =
   screenHeight - windowHeight - (StatusBar?.currentHeight ?? 0);
@@ -25,14 +25,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   progressDot: {
-    height: 32,
-    width: 32,
-    borderRadius: 20,
+    height: RFValue(28),
+    width: RFValue(28),
+    borderRadius: 200,
     borderColor: COLORS.VIOLET[20],
   },
   text: {
     color: COLORS.LIGHT[80],
-    fontSize: 18,
+    fontSize: RFValue(18),
     fontWeight: '600',
   },
   flexRow: {flexDirection: 'row'},

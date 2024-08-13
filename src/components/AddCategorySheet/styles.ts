@@ -14,10 +14,12 @@ const styles = (COLOR: typeof COLORS) =>
       color: COLOR.DARK[100],
       borderWidth: 1,
       borderRadius: 20,
-      height: 60,
+      // height: 60,
+      fontSize:RFValue(14),
       paddingHorizontal: 20,
       borderColor: COLORS.LIGHT[20],
       width: '100%',
+      height: Dimensions.get('screen').width * 0.15,
     },
     sheetBack: {
       borderTopLeftRadius: 32,
@@ -26,7 +28,7 @@ const styles = (COLOR: typeof COLORS) =>
     },
     btn: {
       width: '100%',
-      height: Dimensions.get('screen').height * 0.066,
+      height: Dimensions.get('screen').width * 0.15,
       justifyContent: 'center',
       alignItems: 'center',
       borderRadius: 16,

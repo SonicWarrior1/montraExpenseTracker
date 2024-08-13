@@ -1,7 +1,9 @@
 import {Image, View, Text, Dimensions} from 'react-native';
 import {useAppTheme} from '../../../hooks/themeHook';
 import style from '../styles';
-import { useMemo} from 'react';
+import {useMemo} from 'react';
+import {isTablet} from 'react-native-device-info';
+
 const CarasoulCtr = ({
   item,
   index,
@@ -31,7 +33,7 @@ const CarasoulCtr = ({
         source={getImage}
         style={{
           height: screenHeight * 0.4,
-          width: screenWidth * 0.9,
+          width: screenWidth * (isTablet() ? 0.77 : 0.9),
           transform: [{scale: 0.9}],
         }}
       />

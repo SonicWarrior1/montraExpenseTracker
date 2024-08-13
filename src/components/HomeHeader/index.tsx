@@ -39,6 +39,7 @@ function HomeHeader({
         </View>
       </Pressable>
       <Dropdown
+        showsVerticalScrollIndicator={false}
         style={styles.dropdown}
         renderLeftIcon={() => (
           <View>

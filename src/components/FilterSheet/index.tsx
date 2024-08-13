@@ -94,226 +94,237 @@ function FilterSheet() {
             dispatch(openFilterSheet(false));
           }}>
           <BottomSheetView style={styles.sheet}>
-            <View style={styles.sheetView}>
-              <Text style={styles.text1}>{STRINGS.FilterTransaction}</Text>
-              <Pressable
-                style={styles.editBtn}
-                onPress={() => {
-                  setFilter(-1);
-                  setSort(-1);
-                  dispatch(setFilters(-1));
-                  dispatch(setSortFilter(-1));
-                  dispatch(clearCatFilter());
-                }}>
-                <Text style={styles.editBtnText}>{STRINGS.Reset}</Text>
-              </Pressable>
-            </View>
-            <Text style={[styles.text1, {marginBottom: 15}]}>
-              {STRINGS.FilterBy}
-            </Text>
-            <View style={styles.flexRow}>
-              <Pressable
-                style={[
-                  styles.filterBtn,
-                  {
-                    backgroundColor:
-                      filter === 0 ? COLOR.VIOLET[20] : COLOR.LIGHT[100],
-                  },
-                ]}
-                onPress={() => {
-                  if (filter === 0) {
+            <View>
+              <View style={styles.sheetView}>
+                <Text style={styles.text1}>{STRINGS.FilterTransaction}</Text>
+                <Pressable
+                  style={styles.editBtn}
+                  onPress={() => {
                     setFilter(-1);
-                  } else {
-                    setFilter(0);
-                  }
-                }}>
-                <Text
-                  style={[
-                    styles.filterBtnText,
-                    {color: filter === 0 ? COLOR.VIOLET[100] : COLOR.DARK[100]},
-                  ]}>
-                  {STRINGS.Income}
-                </Text>
-              </Pressable>
-              <Pressable
-                style={[
-                  styles.filterBtn,
-                  {
-                    backgroundColor:
-                      filter === 1 ? COLOR.VIOLET[20] : COLOR.LIGHT[100],
-                  },
-                ]}
-                onPress={() => {
-                  if (filter === 1) {
-                    setFilter(-1);
-                  } else {
-                    setFilter(1);
-                  }
-                }}>
-                <Text
-                  style={[
-                    styles.filterBtnText,
-                    {color: filter === 1 ? COLOR.VIOLET[100] : COLOR.DARK[100]},
-                  ]}>
-                  {STRINGS.Expense}
-                </Text>
-              </Pressable>
-              <Pressable
-                style={[
-                  styles.filterBtn,
-                  {
-                    backgroundColor:
-                      filter === 2 ? COLOR.VIOLET[20] : COLOR.LIGHT[100],
-                  },
-                ]}
-                onPress={() => {
-                  if (filter === 2) {
-                    setFilter(-1);
-                  } else {
-                    setFilter(2);
-                  }
-                }}>
-                <Text
-                  style={[
-                    styles.filterBtnText,
-                    {color: filter === 2 ? COLOR.VIOLET[100] : COLOR.DARK[100]},
-                  ]}>
-                  {STRINGS.Transfer}
-                </Text>
-              </Pressable>
-            </View>
-            <Text
-              style={[
-                styles.text1,
-                {
-                  marginVertical: 15,
-                },
-              ]}>
-              {STRINGS.SortBy}
-            </Text>
-            <View style={styles.wrapRow}>
-              <Pressable
-                style={[
-                  styles.filterBtn,
-                  {
-                    backgroundColor:
-                      sort === 0 ? COLOR.VIOLET[20] : COLOR.LIGHT[100],
-                  },
-                ]}
-                onPress={() => {
-                  if (sort === 0) {
                     setSort(-1);
-                  } else {
-                    setSort(0);
-                  }
-                }}>
-                <Text
-                  style={[
-                    styles.filterBtnText,
-                    {color: sort === 0 ? COLOR.VIOLET[100] : COLOR.DARK[100]},
-                  ]}>
-                  {STRINGS.Highest}
-                </Text>
-              </Pressable>
-              <Pressable
-                style={[
-                  styles.filterBtn,
-                  {
-                    backgroundColor:
-                      sort === 1 ? COLOR.VIOLET[20] : COLOR.LIGHT[100],
-                  },
-                ]}
-                onPress={() => {
-                  if (sort === 1) {
-                    setSort(-1);
-                  } else {
-                    setSort(1);
-                  }
-                }}>
-                <Text
-                  style={[
-                    styles.filterBtnText,
-                    {color: sort === 1 ? COLOR.VIOLET[100] : COLOR.DARK[100]},
-                  ]}>
-                  {STRINGS.Lowest}
-                </Text>
-              </Pressable>
-              <Pressable
-                style={[
-                  styles.filterBtn,
-                  {
-                    backgroundColor:
-                      sort === 2 ? COLOR.VIOLET[20] : COLOR.LIGHT[100],
-                  },
-                ]}
-                onPress={() => {
-                  if (sort === 2) {
-                    setSort(-1);
-                  } else {
-                    setSort(2);
-                  }
-                }}>
-                <Text
-                  style={[
-                    styles.filterBtnText,
-                    {color: sort === 2 ? COLOR.VIOLET[100] : COLOR.DARK[100]},
-                  ]}>
-                  {STRINGS.Newest}
-                </Text>
-              </Pressable>
-              <Pressable
-                style={[
-                  styles.filterBtn,
-                  {
-                    backgroundColor:
-                      sort === 3 ? COLOR.VIOLET[20] : COLOR.LIGHT[100],
-                  },
-                ]}
-                onPress={() => {
-                  if (sort === 3) {
-                    setSort(-1);
-                  } else {
-                    setSort(3);
-                  }
-                }}>
-                <Text
-                  style={[
-                    styles.filterBtnText,
-                    {color: sort === 3 ? COLOR.VIOLET[100] : COLOR.DARK[100]},
-                  ]}>
-                  {STRINGS.Oldest}
-                </Text>
-              </Pressable>
-            </View>
-            <Text
-              style={[
-                styles.text1,
-                {
-                  marginBottom: 25,
-                  marginTop: 15,
-                },
-              ]}>
-              {STRINGS.Category}
-            </Text>
-            <View style={styles.catRow}>
-              <Text style={[styles.text1, {fontWeight: '500'}]}>
-                {STRINGS.ChooseCategory}
+                    dispatch(setFilters(-1));
+                    dispatch(setSortFilter(-1));
+                    dispatch(clearCatFilter());
+                  }}>
+                  <Text style={styles.editBtnText}>{STRINGS.Reset}</Text>
+                </Pressable>
+              </View>
+              <Text style={[styles.text1, {marginBottom: 15}]}>
+                {STRINGS.FilterBy}
               </Text>
-              <Pressable
-                onPress={() => {
-                  dispatch(openCatSheet(true));
-                }}
-                style={styles.pressable}>
-                <Text style={styles.text2}>
-                  {category?.length ?? 0} {STRINGS.Selected}
+              <View style={styles.flexRow}>
+                <Pressable
+                  style={[
+                    styles.filterBtn,
+                    {
+                      backgroundColor:
+                        filter === 0 ? COLOR.VIOLET[20] : COLOR.LIGHT[100],
+                    },
+                  ]}
+                  onPress={() => {
+                    if (filter === 0) {
+                      setFilter(-1);
+                    } else {
+                      setFilter(0);
+                    }
+                  }}>
+                  <Text
+                    style={[
+                      styles.filterBtnText,
+                      {
+                        color:
+                          filter === 0 ? COLOR.VIOLET[100] : COLOR.DARK[100],
+                      },
+                    ]}>
+                    {STRINGS.Income}
+                  </Text>
+                </Pressable>
+                <Pressable
+                  style={[
+                    styles.filterBtn,
+                    {
+                      backgroundColor:
+                        filter === 1 ? COLOR.VIOLET[20] : COLOR.LIGHT[100],
+                    },
+                  ]}
+                  onPress={() => {
+                    if (filter === 1) {
+                      setFilter(-1);
+                    } else {
+                      setFilter(1);
+                    }
+                  }}>
+                  <Text
+                    style={[
+                      styles.filterBtnText,
+                      {
+                        color:
+                          filter === 1 ? COLOR.VIOLET[100] : COLOR.DARK[100],
+                      },
+                    ]}>
+                    {STRINGS.Expense}
+                  </Text>
+                </Pressable>
+                <Pressable
+                  style={[
+                    styles.filterBtn,
+                    {
+                      backgroundColor:
+                        filter === 2 ? COLOR.VIOLET[20] : COLOR.LIGHT[100],
+                    },
+                  ]}
+                  onPress={() => {
+                    if (filter === 2) {
+                      setFilter(-1);
+                    } else {
+                      setFilter(2);
+                    }
+                  }}>
+                  <Text
+                    style={[
+                      styles.filterBtnText,
+                      {
+                        color:
+                          filter === 2 ? COLOR.VIOLET[100] : COLOR.DARK[100],
+                      },
+                    ]}>
+                    {STRINGS.Transfer}
+                  </Text>
+                </Pressable>
+              </View>
+              <Text
+                style={[
+                  styles.text1,
+                  {
+                    marginVertical: 15,
+                  },
+                ]}>
+                {STRINGS.SortBy}
+              </Text>
+              <View style={styles.wrapRow}>
+                <Pressable
+                  style={[
+                    styles.filterBtn,
+                    {
+                      backgroundColor:
+                        sort === 0 ? COLOR.VIOLET[20] : COLOR.LIGHT[100],
+                    },
+                  ]}
+                  onPress={() => {
+                    if (sort === 0) {
+                      setSort(-1);
+                    } else {
+                      setSort(0);
+                    }
+                  }}>
+                  <Text
+                    style={[
+                      styles.filterBtnText,
+                      {color: sort === 0 ? COLOR.VIOLET[100] : COLOR.DARK[100]},
+                    ]}>
+                    {STRINGS.Highest}
+                  </Text>
+                </Pressable>
+                <Pressable
+                  style={[
+                    styles.filterBtn,
+                    {
+                      backgroundColor:
+                        sort === 1 ? COLOR.VIOLET[20] : COLOR.LIGHT[100],
+                    },
+                  ]}
+                  onPress={() => {
+                    if (sort === 1) {
+                      setSort(-1);
+                    } else {
+                      setSort(1);
+                    }
+                  }}>
+                  <Text
+                    style={[
+                      styles.filterBtnText,
+                      {color: sort === 1 ? COLOR.VIOLET[100] : COLOR.DARK[100]},
+                    ]}>
+                    {STRINGS.Lowest}
+                  </Text>
+                </Pressable>
+                <Pressable
+                  style={[
+                    styles.filterBtn,
+                    {
+                      backgroundColor:
+                        sort === 2 ? COLOR.VIOLET[20] : COLOR.LIGHT[100],
+                    },
+                  ]}
+                  onPress={() => {
+                    if (sort === 2) {
+                      setSort(-1);
+                    } else {
+                      setSort(2);
+                    }
+                  }}>
+                  <Text
+                    style={[
+                      styles.filterBtnText,
+                      {color: sort === 2 ? COLOR.VIOLET[100] : COLOR.DARK[100]},
+                    ]}>
+                    {STRINGS.Newest}
+                  </Text>
+                </Pressable>
+                <Pressable
+                  style={[
+                    styles.filterBtn,
+                    {
+                      backgroundColor:
+                        sort === 3 ? COLOR.VIOLET[20] : COLOR.LIGHT[100],
+                    },
+                  ]}
+                  onPress={() => {
+                    if (sort === 3) {
+                      setSort(-1);
+                    } else {
+                      setSort(3);
+                    }
+                  }}>
+                  <Text
+                    style={[
+                      styles.filterBtnText,
+                      {color: sort === 3 ? COLOR.VIOLET[100] : COLOR.DARK[100]},
+                    ]}>
+                    {STRINGS.Oldest}
+                  </Text>
+                </Pressable>
+              </View>
+              <Text
+                style={[
+                  styles.text1,
+                  {
+                    marginBottom: 25,
+                    marginTop: 15,
+                  },
+                ]}>
+                {STRINGS.Category}
+              </Text>
+              <View style={styles.catRow}>
+                <Text style={[styles.text1, {fontWeight: '500'}]}>
+                  {STRINGS.ChooseCategory}
                 </Text>
-                {ICONS.ArrowRight({
-                  height: 25,
-                  width: 25,
-                  color: COLOR.VIOLET[100],
-                  borderColor: COLOR.VIOLET[100],
-                })}
-              </Pressable>
+                <Pressable
+                  onPress={() => {
+                    dispatch(openCatSheet(true));
+                  }}
+                  style={styles.pressable}>
+                  <Text style={styles.text2}>
+                    {category?.length ?? 0} {STRINGS.Selected}
+                  </Text>
+                  {ICONS.ArrowRight({
+                    height: 25,
+                    width: 25,
+                    color: COLOR.VIOLET[100],
+                    borderColor: COLOR.VIOLET[100],
+                  })}
+                </Pressable>
+              </View>
             </View>
             <CustomButton
               title={STRINGS.Apply}
@@ -326,7 +337,10 @@ function FilterSheet() {
           </BottomSheetView>
         </BottomSheetModal>
       </BottomSheetModalProvider>
-      <CategorySelectionSheet filterCategory={category} setFilterCategory={setCategory} />
+      <CategorySelectionSheet
+        filterCategory={category}
+        setFilterCategory={setCategory}
+      />
     </>
   );
 }

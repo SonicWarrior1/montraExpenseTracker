@@ -2,10 +2,12 @@ import React, {useCallback, useEffect, useState} from 'react';
 import {
   Alert,
   BackHandler,
+  Dimensions,
   NativeModules,
   Platform,
   Pressable,
   SafeAreaView,
+  StatusBar,
   Text,
   View,
 } from 'react-native';
@@ -30,6 +32,7 @@ import PinHeader from './atoms/PinHeader';
 import ProgressDot from './atoms/ProgressDot';
 import KeyPad from './atoms/Keypad';
 import ReactNativeBiometrics from 'react-native-biometrics';
+import {isTablet} from 'react-native-device-info';
 
 function Pin({route, navigation}: Readonly<PinSentScreenProps>) {
   // constants
@@ -249,6 +252,12 @@ function Pin({route, navigation}: Readonly<PinSentScreenProps>) {
       })();
     }
   }, [isSetup]);
+  // const screenWidth = Dimensions.get('screen').width;
+  const screenHeight = Dimensions.get('screen').height;
+  // the value returned does not include the bottom navigation bar, I am not sure why yours does.
+  const windowHeight = Dimensions.get('window').height;
+  const navbarHeight =
+    screenHeight - windowHeight - (StatusBar?.currentHeight ?? 0);
   return (
     <SafeAreaView style={styles.safeView}>
       <VerifyPassModal
@@ -264,7 +273,17 @@ function Pin({route, navigation}: Readonly<PinSentScreenProps>) {
             setMenu(false);
           }
         }}>
-        <View style={styles.upperView}>
+        <View
+          style={[
+            styles.upperView,
+            {
+              maxHeight: isTablet()
+                ? (screenHeight - navbarHeight * 1.074) / 1.75
+                : Platform.OS === 'ios'
+                ? screenHeight / 2.2
+                : (screenHeight - navbarHeight * 1.074) / 2.13,
+            },
+          ]}>
           <PinHeader
             backAction={backAction}
             isSetup={isSetup}
