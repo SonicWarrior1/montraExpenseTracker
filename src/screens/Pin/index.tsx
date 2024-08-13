@@ -14,7 +14,11 @@ import {TouchableOpacity} from 'react-native-gesture-handler';
 import {PinSentScreenProps} from '../../defs/navigation';
 import {NAVIGATION, STRINGS} from '../../constants/strings';
 import {useAppDispatch, useAppSelector} from '../../redux/store';
-import {setLoading, userLoggedIn} from '../../redux/reducers/userSlice';
+import {
+  setBiometrics,
+  setLoading,
+  userLoggedIn,
+} from '../../redux/reducers/userSlice';
 import firestore from '@react-native-firebase/firestore';
 import {encrypt} from '../../utils/encryption';
 // Third Party Libraries
@@ -25,13 +29,16 @@ import VerifyPassModal from './atoms/VerifyPassModal';
 import PinHeader from './atoms/PinHeader';
 import ProgressDot from './atoms/ProgressDot';
 import KeyPad from './atoms/Keypad';
+import ReactNativeBiometrics from 'react-native-biometrics';
 
 function Pin({route, navigation}: Readonly<PinSentScreenProps>) {
   // constants
   const dispatch = useAppDispatch();
   const currentUser = useAppSelector(state => state.user.currentUser);
+  const biometrics = useAppSelector(state => state.user.biometrics);
   const isSetup = currentUser?.pin === '';
   const oldPin = route.params.pin ?? '';
+  const rnBiometrics = new ReactNativeBiometrics();
   // dispatch(setLoading(false));
   // state
   const [pin, setPin] = useState<number[]>([]);
@@ -71,8 +78,9 @@ function Pin({route, navigation}: Readonly<PinSentScreenProps>) {
                   pin: encrypt(pin.join(''), user.uid),
                 });
               dispatch(userLoggedIn({...user, pin: pin.join('')}));
-              navigation.replace(NAVIGATION.BottomTab);
               dispatch(setLoading(false));
+              await enrollBiometrics();
+              // navigation.replace(NAVIGATION.BottomTab);
             } else {
               Toast.show({
                 text1: STRINGS.PinDontMatch,
@@ -81,12 +89,14 @@ function Pin({route, navigation}: Readonly<PinSentScreenProps>) {
             }
           } else if (pin.join('') === currentUser?.pin) {
             // dispatch(setLoading(true))
-            navigation.reset({
-              index: 0,
-              routes: [{name: NAVIGATION.BottomTab}],
-            });
-            setPin([]);
             console.log('home');
+            await enrollBiometrics();
+            // navigation.reset({
+            //   index: 0,
+            //   routes: [{name: NAVIGATION.BottomTab}],
+            // });
+            // setPin([]);
+            // console.log('home');
           } else {
             console.log(currentUser?.pin);
             Toast.show({text1: STRINGS.IncorrectPin, type: 'error'});
@@ -158,6 +168,42 @@ function Pin({route, navigation}: Readonly<PinSentScreenProps>) {
       dispatch(setLoading(false));
     }, 50);
   }, []);
+  async function enrollBiometrics() {
+    const sensor = await rnBiometrics.isSensorAvailable();
+
+    if (biometrics === undefined && sensor.available) {
+      Alert.alert('Would you like to enable biometrics?', '', [
+        {
+          text: 'No',
+          onPress: () => {
+            navigation.replace(NAVIGATION.BottomTab);
+            dispatch(setLoading(false));
+            dispatch(setBiometrics(false));
+          },
+        },
+        {
+          text: 'Yes',
+          onPress: async () => {
+            const {success} = await rnBiometrics.simplePrompt({
+              promptMessage:
+                sensor.biometryType === 'FaceID'
+                  ? 'Confirm Face Id'
+                  : 'Confirm fingerprint',
+            });
+            if (success) {
+              dispatch(setBiometrics(true));
+              navigation.replace(NAVIGATION.BottomTab);
+              dispatch(setLoading(false));
+            }
+          },
+        },
+      ]);
+      return;
+    } else {
+      navigation.replace(NAVIGATION.BottomTab);
+      dispatch(setLoading(false));
+    }
+  }
   useEffect(() => {
     const backHandler = BackHandler.addEventListener(
       'hardwareBackPress',
@@ -165,7 +211,44 @@ function Pin({route, navigation}: Readonly<PinSentScreenProps>) {
     );
     return () => backHandler.remove();
   }, []);
-
+  useEffect(() => {
+    if (!isSetup) {
+      (async () => {
+        try {
+          const sensor = await rnBiometrics.isSensorAvailable();
+          console.log('sensor sa', sensor);
+          if (biometrics) {
+            if (sensor.available) {
+              const {success} = await rnBiometrics.simplePrompt({
+                promptMessage:
+                  sensor.biometryType === 'FaceID'
+                    ? 'Confirm Face Id'
+                    : 'Confirm fingerprint',
+              });
+              if (success) {
+                navigation.reset({
+                  index: 0,
+                  routes: [{name: NAVIGATION.BottomTab}],
+                });
+                setPin([]);
+              }
+            } else {
+              dispatch(setBiometrics(false));
+              // Toast.show({text1: sensor.error, type: 'error'});
+            }
+          }
+        } catch (e) {
+          if (e.code === 'Too many attempts. Use screen lock instead.') {
+            Toast.show({
+              text1: 'Too many attempts. Use pin instead.',
+              type: 'error',
+            });
+          }
+          console.log(e);
+        }
+      })();
+    }
+  }, [isSetup]);
   return (
     <SafeAreaView style={styles.safeView}>
       <VerifyPassModal

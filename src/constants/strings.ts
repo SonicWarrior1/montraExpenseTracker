@@ -53,6 +53,7 @@ export const NAVIGATION: {
 };
 
 export const STRINGS = {
+  Biometrics:'Biometrics',
   ResetPassword:'Reset Password',
   InvalidEmail: 'Invalid Email Address',
   ToManyRequestError: 'Too many requests. Please try again after sometime.',
