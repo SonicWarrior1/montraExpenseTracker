@@ -24,10 +24,14 @@ function ExportData({navigation}: ExportScreenProps) {
   // redux
   const onlineData = useQuery(OnlineTransactionModel);
   const offlineData = useQuery(OfflineTransactionModel);
-  const data = [
-    ...onlineData.filter(item => item.changed !== true),
-    ...offlineData.filter(item => item.operation !== 'delete'),
-  ];
+  const data = useMemo(
+    () => [
+      ...onlineData.filter(item => item.changed !== true),
+      ...offlineData.filter(item => item.operation !== 'delete'),
+    ],
+    [offlineData, onlineData],
+  );
+  console.log(data.length);
   const dispatch = useAppDispatch();
   // state
   const [dataType, setDataType] = useState<
@@ -46,35 +50,38 @@ function ExportData({navigation}: ExportScreenProps) {
             daysAgo && (dataType === 'all' ? true : dataType === item.type),
       )
       .map(val => {
-        if (val.type === 'transfer') {
+        const item = {...val};
+        delete item.changed;
+        delete item.conversion;
+        if (item.type === 'transfer') {
           return {
-            ...val,
+            ...item,
             timeStamp: Timestamp.fromMillis(
-              val.timeStamp.seconds * 1000,
+              item.timeStamp.seconds * 1000,
             ).toDate(),
           };
         }
         let frequency = '';
-        if (val.freq?.freq === 'yearly') {
-          frequency = val.freq.day + monthData[val.freq.month].label;
-        } else if (val.freq?.freq === 'monthly') {
-          frequency = String(val.freq.day);
-        } else if (val.freq?.freq === 'weekly') {
-          frequency = weekData[val.freq.weekDay].label;
+        if (item.freq?.freq === 'yearly') {
+          frequency = item.freq.day + monthData[item.freq.month].label;
+        } else if (item.freq?.freq === 'monthly') {
+          frequency = String(item.freq.day);
+        } else if (item.freq?.freq === 'weekly') {
+          frequency = weekData[item.freq.weekDay].label;
         }
         return {
-          ...val,
+          ...item,
           timeStamp: Timestamp.fromMillis(
-            val.timeStamp.seconds * 1000,
+            item.timeStamp.seconds * 1000,
           ).toDate(),
           freq:
-            (val.freq?.freq ?? 'never') +
+            (item.freq?.freq ?? 'never') +
             ' ' +
             frequency +
             ' ' +
-            (val.freq?.end !== undefined && val.freq.end === 'date'
+            (item.freq?.end !== undefined && item.freq.end === 'date'
               ? ',end - ' +
-                Timestamp.fromMillis(val.freq.date?.seconds! * 1000).toDate()
+                Timestamp.fromMillis(item.freq.date?.seconds! * 1000).toDate()
               : ''),
         };
       });
@@ -93,6 +100,7 @@ function ExportData({navigation}: ExportScreenProps) {
         Platform.OS === 'ios'
           ? ReactNativeBlobUtil.fs.dirs.DocumentDir
           : ReactNativeBlobUtil.fs.dirs.LegacyDownloadDir;
+      console.log(dirPath, csvData);
       await ReactNativeBlobUtil.fs.writeFile(`${dirPath}/${id}.csv`, csvData);
       if (Platform.OS === 'ios') {
         ReactNativeBlobUtil.ios.openDocument(`${dirPath}/${id}.csv`);
@@ -104,7 +112,7 @@ function ExportData({navigation}: ExportScreenProps) {
       console.log(e);
       dispatch(setLoading(false));
     }
-  }, [data, dataRange, dataType]);
+  }, [dispatch, formatExportData]);
   // constants
   const COLOR = useAppTheme();
   const styles = style(COLOR);

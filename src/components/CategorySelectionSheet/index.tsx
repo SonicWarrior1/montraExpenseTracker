@@ -2,10 +2,7 @@ import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {Pressable, Text, View} from 'react-native';
 import style from './styles';
 import {useAppDispatch, useAppSelector} from '../../redux/store';
-import {
-  openCatSheet,
-  setCatFilter,
-} from '../../redux/reducers/transactionSlice';
+import {openCatSheet} from '../../redux/reducers/transactionSlice';
 import SheetBackdrop from '../SheetBackDrop';
 import CustomButton from '../CustomButton';
 import {useAppTheme} from '../../hooks/themeHook';
@@ -18,7 +15,13 @@ import {
 } from '@gorhom/bottom-sheet';
 import {STRINGS} from '../../constants/strings';
 
-function CategorySelectionSheet() {
+function CategorySelectionSheet({
+  filterCategory,
+  setFilterCategory,
+}: Readonly<{
+  filterCategory: string[];
+  setFilterCategory: React.Dispatch<React.SetStateAction<string[]>>;
+}>) {
   // constants
   const dispatch = useAppDispatch();
   const snapPoints = useMemo(() => ['40%'], []);
@@ -38,15 +41,14 @@ function CategorySelectionSheet() {
 
   // state
   const [category, setCategory] = useState<string[]>([]);
-
   useEffect(() => {
+    setCategory(filterCategory);
     if (isOpen === true) {
-      setCategory(selected);
       ref.current?.present();
     } else {
       ref.current?.close();
     }
-  }, [isOpen, selected]);
+  }, [filterCategory, isOpen, selected, setCategory]);
 
   return (
     <BottomSheetModalProvider>
@@ -110,7 +112,7 @@ function CategorySelectionSheet() {
           <CustomButton
             title={STRINGS.Continue}
             onPress={() => {
-              dispatch(setCatFilter(category));
+              setFilterCategory(category);
               dispatch(openCatSheet(false));
             }}
           />

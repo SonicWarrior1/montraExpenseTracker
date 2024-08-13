@@ -32,6 +32,7 @@ function AttachementContainer({
       | {
           uri: string;
           name: string;
+          type: string;
         }
       | undefined
     >
@@ -105,4 +106,4 @@ function AttachementContainer({
   }
 }
 
-export default AttachementContainer;
+export default React.memo(AttachementContainer);

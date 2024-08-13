@@ -10,6 +10,7 @@ import {Timestamp} from '@react-native-firebase/firestore';
 import LinegraphLabel from '../../../components/LinegraphLabel';
 import {OnlineTransactionModel} from '../../../DbModels/OnlineTransactionModel';
 import {OfflineTransactionModel} from '../../../DbModels/OfflineTransactionModel';
+import {formatAMPM} from '../../../utils/firebase';
 
 function Graph({
   data,
@@ -19,7 +20,7 @@ function Graph({
   month: number;
 }>) {
   const currency = useAppSelector(state => state.user.currentUser?.currency);
-  const conversion = useAppSelector(state => state.transaction.conversion);
+  // const conversion = useAppSelector(state => state.user.conversion);
   const theme = useAppSelector(state => state.user.currentUser?.theme);
   const COLOR = useAppTheme();
   const styles = style(COLOR);
@@ -46,21 +47,8 @@ function Graph({
   const formatDate = useCallback(
     (item: OnlineTransactionModel | OfflineTransactionModel) => {
       if (graphDay === 0) {
-        return (
-          Timestamp.fromMillis(item.timeStamp.seconds * 1000)
-            .toDate()
-            .getHours() +
-          ':' +
-          (Timestamp.fromMillis(item.timeStamp.seconds * 1000)
-            .toDate()
-            .getMinutes() < 10
-            ? '0' +
-              Timestamp.fromMillis(item.timeStamp.seconds * 1000)
-                .toDate()
-                .getMinutes()
-            : Timestamp.fromMillis(item.timeStamp.seconds * 1000)
-                .toDate()
-                .getMinutes())
+        return formatAMPM(
+          Timestamp.fromMillis(item.timeStamp.seconds * 1000).toDate(),
         );
       } else {
         return (
@@ -78,30 +66,42 @@ function Graph({
         );
       }
     },
-    [data],
+    [graphDay],
   );
   const graphData = data
     .filter(item => {
       if (graphDay === 0) {
         return (
-          item.timeStamp.seconds >= startOfToday && item.type === 'expense'
+          item.timeStamp.seconds >= startOfToday &&
+          (item.type === 'expense' || item.type === 'transfer')
         );
       } else if (graphDay === 1) {
-        return item.timeStamp.seconds >= startOfWeek && item.type === 'expense';
+        return (
+          item.timeStamp.seconds >= startOfWeek &&
+          (item.type === 'expense' || item.type === 'transfer')
+        );
       } else if (graphDay === 2) {
         return (
           Timestamp.fromMillis(item.timeStamp.seconds * 1000)
             .toDate()
-            .getMonth() === month && item.type === 'expense'
+            .getMonth() === month &&
+          (item.type === 'expense' || item.type === 'transfer')
         );
       } else {
-        return item.timeStamp.seconds >= startOfYear && item.type === 'expense';
+        return (
+          item.timeStamp.seconds >= startOfYear &&
+          (item.type === 'expense' || item.type === 'transfer')
+        );
       }
     })
     .sort((a, b) => a.timeStamp.seconds - b.timeStamp.seconds)
     .map(item => {
       return {
-        value: item.amount,
+        value: Number(
+          (
+            item.amount * item.conversion.usd[currency?.toLowerCase() ?? 'usd']
+          ).toFixed(2),
+        ),
         date: formatDate(item),
       };
     });
@@ -135,7 +135,7 @@ function Graph({
             hideAxesAndRules
             color={COLORS.VIOLET[100]}
             curveType={1}
-            curved={true}
+            curved={graphData.length === 2 ? false : true}
             overflowBottom={-1}
             onlyPositive
             disableScroll
@@ -153,7 +153,7 @@ function Graph({
                 LinegraphLabel({
                   items: items,
                   currency: currency,
-                  conversion: conversion,
+                  // conversion: conversion,
                   COLOR: COLOR,
                 }),
             }}

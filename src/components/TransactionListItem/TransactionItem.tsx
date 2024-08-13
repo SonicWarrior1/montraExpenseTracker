@@ -15,6 +15,7 @@ import {useAppSelector} from '../../redux/store';
 import {formatWithCommas} from '../../utils/commonFuncs';
 import {formatAMPM} from '../../utils/firebase';
 import style from './styles';
+import {RFValue} from 'react-native-responsive-fontsize';
 
 const TransactionItem = ({
   item,
@@ -50,7 +51,7 @@ const TransactionItem = ({
   const finaltheme = theme === 'device' ? scheme : theme;
   // redux
   const user = useAppSelector(state => state.user.currentUser);
-  const conversion = useAppSelector(state => state.transaction.conversion);
+  // const conversion = useAppSelector(state => state.user.conversion);
   // functions
   const getAmtSymbol = (
     item: OnlineTransactionModel | OfflineTransactionModel,
@@ -127,17 +128,30 @@ const TransactionItem = ({
           ]}>
           {getAmtSymbol(item)} {currencies[user?.currency ?? 'USD'].symbol}
           {formatWithCommas(
-            Number(
-              (
-                conversion.usd[(user?.currency ?? 'USD').toLowerCase()] *
-                item.amount
-              ).toFixed(1),
-            ).toString(),
+            (
+              item.conversion.usd[(user?.currency ?? 'USD').toLowerCase()] *
+              item.amount
+            )
+              .toFixed(2)
+              .toString(),
           )}
         </Text>
-        <Text style={styles.text2}>
-          {dateShow &&
-            Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+        <Text
+          style={[
+            styles.text2,
+            {fontSize: dateShow ? RFValue(11) : RFValue(13)},
+          ]}>
+          {formatAMPM(
+            Timestamp.fromMillis(item.timeStamp.seconds * 1000).toDate(),
+          )}
+        </Text>
+        {dateShow && (
+          <Text
+            style={[
+              styles.text2,
+              {fontSize: dateShow ? RFValue(11) : RFValue(13)},
+            ]}>
+            {Timestamp.fromMillis(item.timeStamp.seconds * 1000)
               ?.toDate()
               ?.getDate() +
               ' ' +
@@ -149,11 +163,9 @@ const TransactionItem = ({
               ' ' +
               Timestamp.fromMillis(item.timeStamp.seconds * 1000)
                 ?.toDate()
-                ?.getFullYear()}{' '}
-          {formatAMPM(
-            Timestamp.fromMillis(item.timeStamp.seconds * 1000).toDate(),
-          )}
-        </Text>
+                ?.getFullYear()}
+          </Text>
+        )}
       </View>
     </Pressable>
   );

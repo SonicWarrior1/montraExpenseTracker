@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import {
+  Dimensions,
   FlatList,
   Pressable,
   SafeAreaView,
@@ -26,12 +27,15 @@ import {OnlineTransactionModel} from '../../DbModels/OnlineTransactionModel';
 import {OfflineTransactionModel} from '../../DbModels/OfflineTransactionModel';
 import {formatWithCommas} from '../../utils/commonFuncs';
 import TransactionItem from '../../components/TransactionListItem/TransactionItem';
+import {isTablet} from 'react-native-device-info';
 
 function Home({navigation, route}: Readonly<HomeScreenProps>) {
   // state
   const [month, setMonth] = useState<number>(new Date().getMonth());
+  const [expenseTip, setExpenseTip] = useState<boolean>(false);
+  const [incomeTip, setIncomeTip] = useState<boolean>(false);
   // redux
-  const conversion = useAppSelector(state => state.transaction.conversion);
+  const conversion = useAppSelector(state => state.user.conversion);
   const currency =
     useAppSelector(state => state.user.currentUser?.currency) ?? 'USD';
   const spends = useAppSelector(
@@ -60,8 +64,12 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
 
   const theme = useAppSelector(state => state.user.currentUser?.theme);
   // constants
-  const totalSpend = Object.values(spends ?? []).reduce((a, b) => a + b, 0);
-  const totalIncome = Object.values(incomes ?? []).reduce((a, b) => a + b, 0);
+  const totalSpend = Object.values(spends ?? []).reduce((a, b) => {
+    return a + (b?.[currency?.toUpperCase() ?? 'USD'] ?? 0);
+  }, 0);
+  const totalIncome = Object.values(incomes ?? []).reduce((a, b) => {
+    return a + (b[currency?.toUpperCase() ?? 'USD'] ?? 0);
+  }, 0);
   const COLOR = useAppTheme();
   const styles = style(COLOR);
   const scheme = useColorScheme();
@@ -95,24 +103,42 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
               setMonth={setMonth}
               month={month}
             />
-            <Text style={styles.actText}>Account Balance</Text>
+            <Text style={styles.actText}>{STRINGS.AccountBalance}</Text>
             <Text style={styles.amt}>
               {currencies[currency ?? 'USD'].symbol}
               {isNaN(
                 Number(
                   (
                     conversion.usd?.[(currency ?? 'USD').toLowerCase()] * 9400
-                  ).toFixed(1),
+                  ).toFixed(2),
                 ),
               )
                 ? 0
-                : (conversion.usd?.[(currency ?? 'USD').toLowerCase()] * 9400)
-                    .toFixed(1)
-                    .toString()}
+                : formatWithCommas(
+                    (conversion.usd?.[(currency ?? 'USD').toLowerCase()] * 9400)
+                      .toFixed(2)
+                      .toString(),
+                  )}
             </Text>
             <View style={styles.transRow}>
-              <View
-                style={[styles.moneyCtr, {backgroundColor: COLORS.GREEN[100]}]}>
+              <Pressable
+                style={[styles.moneyCtr, {backgroundColor: COLORS.GREEN[100]}]}
+                onLongPress={() => {
+                  setIncomeTip(true);
+                }}
+                onPressOut={() => {
+                  setIncomeTip(false);
+                }}>
+                {incomeTip && (
+                  <View style={styles.tooltip}>
+                    <Text style={styles.tipText}>
+                      {currencies[currency].symbol}
+                      {isNaN(Number(Number(totalIncome).toFixed(2)))
+                        ? 0
+                        : formatWithCommas(totalIncome.toFixed(2).toString())}
+                    </Text>
+                  </View>
+                )}
                 <View style={styles.iconCtr}>
                   {ICONS.Income({
                     height: 25,
@@ -121,31 +147,42 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
                   })}
                 </View>
                 <View>
-                  <Text style={styles.text1}>Income</Text>
-                  <Text style={styles.text2} numberOfLines={1}>
+                  <Text style={styles.text1}>{STRINGS.Income}</Text>
+                  <Text
+                    style={[
+                      styles.text2,
+                      {
+                        maxWidth:
+                          Dimensions.get('screen').width /
+                          (isTablet() ? 3 : 4),
+                      },
+                    ]}
+                    numberOfLines={1}>
                     {currencies[currency].symbol}
-                    {isNaN(
-                      Number(
-                        (
-                          conversion.usd?.[currency.toLowerCase()] *
-                          Number(totalIncome)
-                        ).toFixed(1),
-                      ),
-                    )
+                    {isNaN(Number(Number(totalIncome).toFixed(2)))
                       ? 0
-                      : formatWithCommas(
-                          Number(
-                            (
-                              conversion.usd?.[currency.toLowerCase()] *
-                              Number(totalIncome)
-                            ).toFixed(1),
-                          ).toString(),
-                        )}
+                      : formatWithCommas(totalIncome.toFixed(2).toString())}
                   </Text>
                 </View>
-              </View>
-              <View
+              </Pressable>
+              <Pressable
+                onLongPress={() => {
+                  setExpenseTip(true);
+                }}
+                onPressOut={() => {
+                  setExpenseTip(false);
+                }}
                 style={[styles.moneyCtr, {backgroundColor: COLORS.RED[100]}]}>
+                {expenseTip && (
+                  <View style={styles.tooltip}>
+                    <Text style={styles.tipText}>
+                      {currencies[currency].symbol}
+                      {isNaN(Number(Number(totalSpend).toFixed(2)))
+                        ? 0
+                        : formatWithCommas(totalSpend.toFixed(2).toString())}
+                    </Text>
+                  </View>
+                )}
                 <View style={styles.iconCtr}>
                   {ICONS.Expense({
                     height: 25,
@@ -154,29 +191,24 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
                   })}
                 </View>
                 <View>
-                  <Text style={styles.text1}>Expense</Text>
-                  <Text style={styles.text2} numberOfLines={1}>
+                  <Text style={styles.text1}>{STRINGS.Expense}</Text>
+                  <Text
+                    style={[
+                      styles.text2,
+                      {
+                        maxWidth:
+                          Dimensions.get('screen').width /
+                          (isTablet() ? 3 : 4),
+                      },
+                    ]}
+                    numberOfLines={1}>
                     {currencies[currency].symbol}
-                    {isNaN(
-                      Number(
-                        (
-                          conversion.usd?.[currency.toLowerCase()] *
-                          Number(totalSpend)
-                        ).toFixed(1),
-                      ),
-                    )
+                    {isNaN(Number(Number(totalSpend).toFixed(2)))
                       ? 0
-                      : formatWithCommas(
-                          Number(
-                            (
-                              conversion.usd?.[currency.toLowerCase()] *
-                              Number(totalSpend)
-                            ).toFixed(1),
-                          ).toString(),
-                        )}
+                      : formatWithCommas(totalSpend.toFixed(2).toString())}
                   </Text>
                 </View>
-              </View>
+              </Pressable>
             </View>
           </SafeAreaView>
         </LinearGradient>
@@ -205,7 +237,7 @@ function Home({navigation, route}: Readonly<HomeScreenProps>) {
             )}
           </View>
           <FlatList
-            style={{paddingHorizontal: 20}}
+            style={styles.paddingHorizontal}
             ListEmptyComponent={ListEmptyComponent}
             data={listData}
             scrollEnabled={false}
@@ -232,7 +264,7 @@ function ListEmptyComponent() {
   const COLOR = useAppTheme();
   const styles = style(COLOR);
   return (
-    <View style={{justifyContent: 'center', alignItems: 'center'}}>
+    <View style={styles.empty}>
       <Text style={styles.emptyText}>{STRINGS.NoRecentTransactions}</Text>
     </View>
   );

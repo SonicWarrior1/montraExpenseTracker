@@ -1,5 +1,5 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
-import {Pressable, View} from 'react-native';
+import {Dimensions, Pressable, View} from 'react-native';
 import style from './styles';
 import CustomDropdown from '../CustomDropDown';
 import CustomButton from '../CustomButton';
@@ -22,6 +22,9 @@ import {AnimatedEmptyError} from '../../constants/errors';
 import Spacer from '../Spacer';
 import {RepeatDataModel} from '../../DbModels/RepeatDataModel';
 import {Timestamp} from '@react-native-firebase/firestore';
+import {ICONS} from '../../constants/icons';
+import {PlaceholderTextColor} from '../../constants/commonStyles';
+import {isTablet} from 'react-native-device-info';
 
 function RepeatTransactionSheet({
   bottomSheetModalRef,
@@ -46,7 +49,7 @@ function RepeatTransactionSheet({
         return repeatData?.date as Date;
       }
     } else {
-      return new Date();
+      return undefined;
     }
   }, [repeatData]);
   // state
@@ -60,9 +63,10 @@ function RepeatTransactionSheet({
   const [end, setEnd] = useState<'date' | 'never'>(
     (repeatData?.end as 'date' | 'never') ?? undefined,
   );
-  const [date, setDate] = useState<Date>(getDate());
+  const [date, setDate] = useState<Date | undefined>(getDate());
   const [isDateOpen, setIsDateOpen] = useState<boolean>(false);
   const [formkey, setFormkey] = useState<boolean>(false);
+  const [myDate, setMyDate] = useState<Date>();
   // constants
   const snapPoints = useMemo(() => ['35%'], []);
   const year = new Date().getFullYear();
@@ -94,6 +98,13 @@ function RepeatTransactionSheet({
     return daysInYear;
   }, [year]);
   useEffect(() => {
+    let x = new Date(`${new Date().getFullYear()}-${month}-${day}`);
+    if (freq === 'monthly') {
+      x = new Date(new Date().getFullYear(), new Date().getMonth(), day);
+    }
+    setMyDate(x);
+  }, [month, day, freq]);
+  useEffect(() => {
     setFreq((repeatData?.freq as freqType) ?? undefined);
     setMonth(repeatData?.month ?? 1);
     setDay(repeatData?.day ?? 1);
@@ -116,14 +127,21 @@ function RepeatTransactionSheet({
         if (repeatData === undefined) {
           setIsSwitchOn(false);
         }
+        setFreq((repeatData?.freq as freqType) ?? undefined);
+        setMonth(repeatData?.month ?? 1);
+        setDay(repeatData?.day ?? 1);
+        setWeekDay(repeatData?.weekDay ?? 1);
+        setEnd((repeatData?.end as 'date' | 'never') ?? undefined);
+        setDate(getDate());
       }}>
       <BottomSheetView style={styles.sheetView}>
         <View style={styles.flexRow}>
-          <View style={[styles.flex, {minWidth: 35}]}>
+          <View style={[styles.flex, {minWidth: 45}]}>
             <CustomDropdown
               data={FreqDropdownData}
               onChange={val => {
                 setFreq(val.value);
+                setDate(undefined);
               }}
               placeholder={STRINGS.Frequency}
               value={freq}
@@ -135,6 +153,7 @@ function RepeatTransactionSheet({
                 data={monthData}
                 onChange={val => {
                   setMonth(val.value);
+                  setDate(undefined);
                 }}
                 placeholder={STRINGS.Month}
                 value={month}
@@ -161,6 +180,7 @@ function RepeatTransactionSheet({
                 }
                 onChange={val => {
                   setDay(val.value);
+                  setDate(undefined);
                 }}
                 placeholder={STRINGS.Day}
                 value={day}
@@ -173,6 +193,7 @@ function RepeatTransactionSheet({
                 data={weekData}
                 onChange={val => {
                   setWeekDay(val.value);
+                  setDate(undefined);
                 }}
                 placeholder={STRINGS.Day}
                 value={weekDay}
@@ -194,7 +215,8 @@ function RepeatTransactionSheet({
               }}
               placeholder={STRINGS.EndAfter}
               value={end}
-              disable={freq === undefined}
+              dropdownPosition="top"
+              // disable={freq === undefined}
             />
           </View>
           {end === 'date' && (
@@ -204,7 +226,7 @@ function RepeatTransactionSheet({
                 setIsDateOpen(true);
               }}>
               <CustomInput
-                value={date.toLocaleDateString()}
+                value={date?.toLocaleDateString() ?? ''}
                 onChangeText={() => {}}
                 placeholderText={STRINGS.Date}
                 type="name"
@@ -217,10 +239,17 @@ function RepeatTransactionSheet({
               <DatePicker
                 modal
                 mode="date"
-                date={date ?? new Date()}
+                date={
+                  date ??
+                  (freq === 'yearly' || freq === 'monthly'
+                    ? myDate ?? new Date()
+                    : new Date())
+                }
                 open={isDateOpen}
                 maximumDate={new Date('2050-1-1')}
-                minimumDate={new Date()}
+                minimumDate={
+                  freq === 'yearly' || freq === 'monthly' ? myDate : new Date()
+                }
                 onConfirm={d => {
                   setDate(d);
                   setIsDateOpen(false);
@@ -229,27 +258,56 @@ function RepeatTransactionSheet({
                   setIsDateOpen(false);
                 }}
               />
+              <View
+                style={[
+                  styles.calender,
+                  {
+                    top:
+                      Dimensions.get('screen').width *
+                      0.15 *
+                      (isTablet() ? 0.36 : 0.31),
+                  },
+                ]}>
+                {ICONS.Calender({
+                  height: 20,
+                  width: 20,
+                  color: PlaceholderTextColor,
+                })}
+              </View>
             </Pressable>
           )}
         </View>
-        <AnimatedEmptyError
-          errorText={STRINGS.PleaseSelectOption}
-          value={end ?? ''}
-          formKey={formkey}
-        />
+        {end === undefined ? (
+          <AnimatedEmptyError
+            errorText={STRINGS.PleaseSelectOption}
+            value={end ?? ''}
+            formKey={formkey}
+          />
+        ) : (
+          end === 'date' && (
+            <AnimatedEmptyError
+              errorText={STRINGS.PleaseSelectDate}
+              value={date?.toLocaleDateString() ?? ''}
+              formKey={formkey}
+            />
+          )
+        )}
         <Spacer height={10} />
         <CustomButton
           title={STRINGS.Next}
           onPress={() => {
             setFormkey(true);
             if (freq && end) {
+              if (end === 'date' && date === undefined) {
+                return true;
+              }
               setRepeatData({
                 freq: freq ?? 'daily',
                 month: month,
                 day: day,
                 weekDay: weekDay,
                 end: end ?? 'never',
-                date: date,
+                date: date ?? new Date(),
               });
               setIsSwitchOn(true);
               bottomSheetModalRef.current?.dismiss();

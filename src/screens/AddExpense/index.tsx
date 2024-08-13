@@ -31,7 +31,7 @@ import {OfflineTransactionModel} from '../../DbModels/OfflineTransactionModel';
 import CustomHeader from '../../components/CustomHeader';
 import MoneyInput from './atoms/MoneyInput';
 import {RepeatDataModel} from '../../DbModels/RepeatDataModel';
-import {formatWithCommas, getMyColor} from '../../utils/commonFuncs';
+import {formatWithCommas} from '../../utils/commonFuncs';
 import RepeatInput from './atoms/RepeatInput';
 import CategoryDropdownIcon from '../../components/CategoryColorIcon';
 // Third Party Libraries
@@ -74,21 +74,22 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
   const height = useMemo(() => {
     if (Platform.OS !== 'ios') {
       if (pageType !== 'transfer') {
-        return screenHeight / 3.13;
+        return screenHeight / 2.85;
       } else {
-        return screenHeight / 2.06;
+        return screenHeight / 1.97;
       }
     } else if (pageType !== 'transfer') {
-      return screenHeight / 2.65;
+      return screenHeight / 2.58;
     } else {
-      return Dimensions.get('screen').height / 1.85;
+      return Dimensions.get('screen').height / 1.8;
     }
   }, [pageType, screenHeight]);
   const backgroundColor = getBackgroundColor;
   const dispatch = useAppDispatch();
   // redux
-  const conversion = useAppSelector(state => state.transaction.conversion);
+  const conversion = useAppSelector(state => state.user.conversion);
   const user = useAppSelector(state => state.user.currentUser);
+
   // state
   const [firstTime, setFirstTime] = useState<boolean>(true);
   const [image, setImage] = useState<string | undefined>(
@@ -96,9 +97,17 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
       ? prevTransaction.attachement
       : '',
   );
-  const [doc, setDoc] = useState<{uri: string; name: string} | undefined>(
-    prevTransaction && prevTransaction.attachementType === 'doc'
-      ? {uri: prevTransaction.attachement!, name: 'Document'}
+  const [doc, setDoc] = useState<
+    {uri: string; name: string; type: string} | undefined
+  >(
+    prevTransaction &&
+      prevTransaction.attachementType !== 'none' &&
+      prevTransaction.attachementType !== 'image'
+      ? {
+          uri: prevTransaction.attachement!,
+          name: 'Document',
+          type: prevTransaction.attachementType,
+        }
       : undefined,
   );
   const [repeatData, setRepeatData] = useState<
@@ -111,12 +120,13 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
   const [amount, setAmount] = useState<string>(
     prevTransaction
       ? formatWithCommas(
-          Number(
-            (
-              conversion.usd[(user?.currency ?? 'USD').toLowerCase()] *
-              prevTransaction.amount
-            ).toFixed(1),
-          ).toString(),
+          (
+            prevTransaction.conversion.usd[
+              (user?.currency ?? 'USD').toLowerCase()
+            ] * prevTransaction.amount
+          )
+            .toFixed(2)
+            .toString(),
         )
       : '0',
   );
@@ -133,7 +143,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
     prevTransaction ? prevTransaction.to : '',
   );
   const [formKey, setFormKey] = useState<boolean>(false);
-  const [catColors, setCatColors] = useState<{[key: string]: string}>();
+  // const [catColors, setCatColors] = useState<{[key: string]: string}>();
   const [isSwitchOn, setIsSwitchOn] = useState<boolean>(
     repeatData !== undefined ? repeatData !== null : repeatData !== undefined,
   );
@@ -150,7 +160,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
       attachementType = 'image';
     } else if (doc) {
       attachement = doc.uri;
-      attachementType = 'doc';
+      attachementType = doc.type as transactionType['attachementType'];
     }
     return {attachement, attachementType};
   }, [image, doc]);
@@ -251,6 +261,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
         dispatch(setLoading(false));
       }
     } catch (e) {
+      console.log(e);
       dispatch(setLoading(false));
     }
   };
@@ -271,34 +282,30 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
           category !== '' ||
           wallet !== ''))
     ) {
-      Alert.alert(
-        STRINGS.DiscardChanges,
-        STRINGS.UnsavedChanges,
-        [
-          {
-            text: STRINGS.No,
-          },
-          {text: STRINGS.Yes, onPress: () => [navigation.goBack()]},
-        ],
-      );
+      Alert.alert(STRINGS.DiscardChanges, STRINGS.UnsavedChanges, [
+        {
+          text: STRINGS.No,
+        },
+        {text: STRINGS.Yes, onPress: () => [navigation.goBack()]},
+      ]);
     } else {
       navigation.goBack();
     }
     return true;
   };
-  useEffect(() => {
-    setCatColors(
-      Object.values(
-        pageType === 'expense' ? user?.expenseCategory! : user?.incomeCategory!,
-      ).reduce((acc: {[key: string]: string}, item) => {
-        acc[item] = getMyColor();
-        return acc;
-      }, {}),
-    );
-    return () => {
-      setCatColors(undefined);
-    };
-  }, [pageType, user?.expenseCategory, user?.incomeCategory]);
+  // useEffect(() => {
+  //   setCatColors(
+  //     Object.values(
+  //       pageType === 'expense' ? user?.expenseCategory! : user?.incomeCategory!,
+  //     ).reduce((acc: {[key: string]: string}, item) => {
+  //       acc[item] = getMyColor();
+  //       return acc;
+  //     }, {}),
+  //   );
+  //   return () => {
+  //     setCatColors(undefined);
+  //   };
+  // }, [pageType, user?.expenseCategory, user?.incomeCategory]);
 
   useEffect(() => {
     setFirstTime(false);
@@ -327,6 +334,18 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
             currency={user?.currency ?? 'usd'}
             formKey={formKey}
             setAmount={setAmount}
+            isEdit={isEdit}
+            editAmt={
+              isEdit
+                ? (
+                    prevTransaction!.conversion.usd[
+                      (user?.currency ?? 'USD').toLowerCase()
+                    ] * prevTransaction!.amount
+                  )
+                    .toFixed(2)
+                    .toString()
+                : '0'
+            }
           />
         </SafeAreaView>
         <View style={styles.detailsCtr}>
@@ -354,8 +373,17 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
                 }}
                 value={category}
                 placeholder={STRINGS.Category}
-                leftIcon={CategoryDropdownIcon(category!, catColors!)}
-                catColors={catColors}
+                leftIcon={CategoryDropdownIcon(
+                  category!,
+                  pageType === 'expense'
+                    ? user?.expenseColors!
+                    : user?.incomeColors!,
+                )}
+                catColors={
+                  pageType === 'expense'
+                    ? user?.expenseColors!
+                    : user?.incomeColors!
+                }
               />
               <EmptyError
                 errorText={STRINGS.PleaseSelectACategory}
@@ -371,11 +399,13 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
                   <CustomInput
                     placeholderText={'From'}
                     onChangeText={(str: string) => {
-                      setFrom(str);
+                      const value = str.replace(/[^a-zA-Z]/g, '');
+                      setFrom(value);
                     }}
                     type="name"
                     value={from}
                     inputColor={COLOR.DARK[100]}
+                    maxLength={20}
                   />
                 </View>
                 <View style={[styles.transferIcon, {zIndex: zindex}]}>
@@ -385,11 +415,13 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
                   <CustomInput
                     placeholderText={'To'}
                     onChangeText={(str: string) => {
-                      setTo(str);
+                      const value = str.replace(/[^a-zA-Z]/g, '');
+                      setTo(value);
                     }}
                     type="name"
                     value={to}
                     inputColor={COLOR.DARK[100]}
+                    maxLength={20}
                   />
                 </View>
               </View>

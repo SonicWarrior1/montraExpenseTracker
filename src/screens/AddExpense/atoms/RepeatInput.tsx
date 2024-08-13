@@ -111,8 +111,8 @@ function RepeatInput({
               onValueChange={val => {
                 if (!val) {
                   Alert.alert(
-                    'Clearing Repeating Transaction Frequency',
-                    'Are you sure you want to clear the repeating transaction frequency?',
+                    'Clearing Repeat Transaction Frequency',
+                    'Are you sure you want to clear the repeat transaction frequency?',
                     [
                       {
                         text: 'Cancel',
@@ -151,18 +151,20 @@ function RepeatInput({
                 weekData[repeatData.weekDay].label}
             </Text>
           </View>
-          {repeatData.end === 'date' && (
-            <View>
-              <Text style={styles.flexRowText1}>{STRINGS.EndAfter}</Text>
-              <Text style={styles.flexRowText2}>{getDate()}</Text>
-            </View>
-          )}
+          {/* {repeatData.end === 'date' && ( */}
+          <View>
+            <Text style={styles.flexRowText1}>{STRINGS.EndAfter}</Text>
+            <Text style={styles.flexRowText2}>
+              {repeatData.end === 'date' ? getDate() : 'Never'}
+            </Text>
+          </View>
+          {/* )} */}
           <Pressable
             style={styles.editBtn}
             onPress={() => {
               repeatSheetRef.current?.present();
             }}>
-            <Text style={styles.editBtnText}>Edit</Text>
+            <Text style={styles.editBtnText}>{STRINGS.Edit}</Text>
           </Pressable>
         </View>
       )}

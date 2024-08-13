@@ -98,4 +98,4 @@ function ForgotPassword({navigation}: Readonly<ForgotScreenProps>) {
   );
 }
 
-export default ForgotPassword;
+export default React.memo(ForgotPassword);

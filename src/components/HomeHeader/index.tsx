@@ -39,6 +39,7 @@ function HomeHeader({
         </View>
       </Pressable>
       <Dropdown
+        showsVerticalScrollIndicator={false}
         style={styles.dropdown}
         renderLeftIcon={() => (
           <View>
@@ -54,11 +55,38 @@ function HomeHeader({
         placeholderStyle={{marginLeft: 10}}
         selectedTextStyle={{marginLeft: 10, color: COLOR.DARK[100]}}
         value={monthData[month]}
-        data={monthData}
+        data={monthData.slice(0, new Date().getMonth() + 1)}
         labelField={'label'}
         valueField={'value'}
         onChange={({value}) => {
           setMonth(value - 1);
+        }}
+        renderItem={item => {
+          return (
+            <View
+              style={[
+                styles.itemCtr,
+                {
+                  backgroundColor:
+                    item.value === month + 1
+                      ? COLOR.VIOLET[60]
+                      : COLOR.LIGHT[100],
+                },
+              ]}>
+              <Text
+                style={[
+                  styles.text,
+                  {
+                    color:
+                      item.value === month + 1
+                        ? COLORS.LIGHT[100]
+                        : COLOR.DARK[100],
+                  },
+                ]}>
+                {item.label}
+              </Text>
+            </View>
+          );
         }}
         autoScroll={false}
         itemTextStyle={{color: COLOR.DARK[100]}}
@@ -70,14 +98,16 @@ function HomeHeader({
           props.navigation.push(NAVIGATION.Notification);
         }}>
         {ICONS.Notification({height: 25, width: 25})}
-        {notifications && (
-          <View style={styles.notifCount}>
-            <Text style={{color: COLORS.VIOLET[100]}}>
-              {Object.values(notifications ?? []).filter(item => !item.read)
-                ?.length ?? 0}
-            </Text>
-          </View>
-        )}
+        {notifications &&
+          Object.values(notifications ?? []).filter(item => !item.read)
+            ?.length !== 0 && (
+            <View style={styles.notifCount}>
+              <Text style={{color: COLORS.VIOLET[100]}}>
+                {Object.values(notifications ?? []).filter(item => !item.read)
+                  ?.length ?? 0}
+              </Text>
+            </View>
+          )}
       </Pressable>
     </View>
   );

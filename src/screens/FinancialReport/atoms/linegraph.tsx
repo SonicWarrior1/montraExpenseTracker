@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useMemo} from 'react';
 import {Dimensions, Text, View} from 'react-native';
 import {COLORS} from '../../../constants/commonStyles';
 import {LineChart} from 'react-native-gifted-charts';
@@ -17,7 +17,7 @@ function Linegraph({
   data,
   currency,
   transType,
-  conversion,
+  // conversion,
   month,
 }: Readonly<{
   totalSpend: number;
@@ -25,75 +25,83 @@ function Linegraph({
   data: (OnlineTransactionModel | OfflineTransactionModel)[];
   currency: string | undefined;
   transType: 'income' | 'expense';
-  conversion: {
-    [key: string]: {
-      [key: string]: number;
-    };
-  };
+  // conversion: {
+  //   [key: string]: {
+  //     [key: string]: number;
+  //   };
+  // };
   month: number;
 }>) {
   const COLOR = useAppTheme();
   const styles = style(COLOR);
+  const graphData = useMemo(
+    () =>
+      data
+        .filter(
+          item =>
+            Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+              .toDate()
+              .getMonth() === month &&
+            (transType === 'expense'
+              ? item.type === 'expense' || item.type === 'transfer'
+              : item.type === 'income'),
+        )
+        .sort((a, b) => a.timeStamp.seconds - b.timeStamp.seconds)
+        .map(item => {
+          return {
+            value:
+              item.amount *
+              item.conversion.usd[currency?.toLowerCase() ?? 'usd'],
+            date:
+              Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+                .toDate()
+                .getDay() +
+              '/' +
+              Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+                .toDate()
+                .getMonth() +
+              '/' +
+              Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+                .toDate()
+                .getFullYear(),
+          };
+        }),
+    [currency, data, month, transType],
+  );
+  const emptyCheck = useMemo(
+    () =>
+      data
+        .filter(
+          item =>
+            Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+              .toDate()
+              .getMonth() === month && item.type === transType,
+        )
+        .sort((a, b) => a.timeStamp.seconds - b.timeStamp.seconds)
+        .map(item => {
+          return {value: item.amount};
+        }).length <= 1,
+    [data, month, transType],
+  );
   return (
     <>
       <Text style={styles.amt}>
         {currencies[currency!].symbol}
         {formatWithCommas(
-          Number(
-            (
-              conversion.usd?.[currency!.toLowerCase()] *
-              Number(transType === 'expense' ? totalSpend : totalIncome)
-            ).toFixed(1),
-          ).toString(),
+          // conversion.usd?.[currency!.toLowerCase()] *
+          (transType === 'expense' ? totalSpend : totalIncome)
+            .toFixed(2)
+            .toString(),
         )}
       </Text>
       <View style={styles.graphView}>
-        {data
-          .filter(
-            item =>
-              Timestamp.fromMillis(item.timeStamp.seconds * 1000)
-                .toDate()
-                .getMonth() === month && item.type === transType,
-          )
-          .sort((a, b) => a.timeStamp.seconds - b.timeStamp.seconds)
-          .map(item => {
-            return {value: item.amount};
-          }).length <= 1 ? (
-          <View
-            style={{
-              height: 230,
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}>
+        {emptyCheck ? (
+          <View style={styles.emtpyCtr}>
             <Text style={styles.emptyText}>Not Enough Data</Text>
           </View>
         ) : (
           <LineChart
-            data={data
-              .filter(
-                item =>
-                  Timestamp.fromMillis(item.timeStamp.seconds * 1000)
-                    .toDate()
-                    .getMonth() === month && item.type === transType,
-              )
-              .sort((a, b) => a.timeStamp.seconds - b.timeStamp.seconds)
-              .map(item => {
-                return {
-                  value: item.amount,
-                  date:
-                    Timestamp.fromMillis(item.timeStamp.seconds * 1000)
-                      .toDate()
-                      .getDay() +
-                    '/' +
-                    Timestamp.fromMillis(item.timeStamp.seconds * 1000)
-                      .toDate()
-                      .getMonth() +
-                    '/' +
-                    Timestamp.fromMillis(item.timeStamp.seconds * 1000)
-                      .toDate()
-                      .getFullYear(),
-                };
-              })}
+            data={graphData}
             areaChart
             adjustToWidth
             startFillColor1={COLORS.VIOLET[40]}
@@ -108,7 +116,7 @@ function Linegraph({
             hideAxesAndRules
             color={COLORS.VIOLET[100]}
             curveType={1}
-            curved={true}
+            curved={graphData.length === 2 ? false : true}
             overflowBottom={-1}
             onlyPositive
             disableScroll
@@ -125,8 +133,8 @@ function Linegraph({
                 LinegraphLabel({
                   items: items,
                   currency: currency,
-                  conversion: conversion,
-                  COLOR:COLOR
+                  // conversion: conversion,
+                  COLOR: COLOR,
                 }),
             }}
           />
@@ -136,4 +144,4 @@ function Linegraph({
   );
 }
 
-export default Linegraph;
+export default React.memo(Linegraph);

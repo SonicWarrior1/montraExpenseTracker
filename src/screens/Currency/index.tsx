@@ -63,4 +63,4 @@ function CurrencyScreen({navigation}: Readonly<CurrencyScreenProps>) {
   );
 }
 
-export default CurrencyScreen;
+export default React.memo(CurrencyScreen);

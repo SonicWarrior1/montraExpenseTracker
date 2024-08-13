@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {
   NativeScrollEvent,
   Pressable,
@@ -26,7 +26,6 @@ import {OnlineTransactionModel} from '../../DbModels/OnlineTransactionModel';
 import {OfflineTransactionModel} from '../../DbModels/OfflineTransactionModel';
 import CustomHeader from '../../components/CustomHeader';
 import {FinancialReportScreenProps} from '../../defs/navigation';
-import {getMyColor} from '../../utils/commonFuncs';
 
 function FinancialReport({navigation}: Readonly<FinancialReportScreenProps>) {
   // state
@@ -34,17 +33,24 @@ function FinancialReport({navigation}: Readonly<FinancialReportScreenProps>) {
   const [graph, setGraph] = useState<number>(0);
   const [transType, setTransType] = useState<'expense' | 'income'>('expense');
   const [type, setType] = useState<'transaction' | 'category'>('transaction');
-  const [catColors, setCatColors] = useState<{[key: string]: string}>();
+  // const [catColors, setCatColors] = useState<{[key: string]: string}>();
   const [sort, setSort] = useState<boolean>(false);
   const [incomeOffset, setIncomeOffset] = useState<number>(0);
   const [expenseOffset, setExpenseOffset] = useState<number>(0);
   // redux
-  const spends =
-    useAppSelector(state => state.user.currentUser?.spend?.[month]) ?? [];
-  const incomes =
-    useAppSelector(state => state.user.currentUser?.income?.[month]) ?? [];
+  const spends = useAppSelector(
+    state => state.user.currentUser?.spend?.[month],
+  );
+  const incomes = useAppSelector(
+    state => state.user.currentUser?.income?.[month],
+  );
+  const expenseColors = useAppSelector(
+    state => state.user.currentUser?.expenseColors,
+  );
+  const incomeColors = useAppSelector(
+    state => state.user.currentUser?.incomeColors,
+  );
   const currency = useAppSelector(state => state.user.currentUser?.currency);
-  const {conversion} = useAppSelector(state => state.transaction);
   const onlineData = useQuery(OnlineTransactionModel);
   const offlineData = useQuery(OfflineTransactionModel);
   const data = [
@@ -53,27 +59,21 @@ function FinancialReport({navigation}: Readonly<FinancialReportScreenProps>) {
   ];
   //
   const totalSpend = useMemo(
-    () => Object.values(spends).reduce((a, b) => a + b, 0),
-    [spends],
+    () =>
+      Object.values(spends ?? {}).reduce(
+        (a, b) => a + b[currency?.toUpperCase() ?? 'USD'],
+        0,
+      ),
+    [currency, spends],
   );
   const totalIncome = useMemo(
-    () => Object.values(incomes).reduce((a, b) => a + b, 0),
-    [incomes],
-  );
-  useEffect(() => {
-    setCatColors(
-      Object.entries(transType === 'expense' ? spends : incomes).reduce(
-        (acc: {[key: string]: string}, item) => {
-          acc[item[0]] = getMyColor();
-          return acc;
-        },
-        {},
+    () =>
+      Object.values(incomes ?? {}).reduce(
+        (a, b) => a + b[currency?.toUpperCase() ?? 'USD'],
+        0,
       ),
-    );
-    return () => {
-      setCatColors(undefined);
-    };
-  }, [transType]);
+    [currency, incomes],
+  );
   const isCloseToBottom = ({
     layoutMeasurement,
     contentOffset,
@@ -102,6 +102,7 @@ function FinancialReport({navigation}: Readonly<FinancialReportScreenProps>) {
     }
   };
   const onScroll = ({nativeEvent}: {nativeEvent: NativeScrollEvent}) => {
+    console.log('sdkml');
     if (isCloseToBottom(nativeEvent)) {
       if (incomeOffset + limit < Object.values(data).length) {
         if (transType === 'expense') {
@@ -113,12 +114,12 @@ function FinancialReport({navigation}: Readonly<FinancialReportScreenProps>) {
     }
   };
   return (
-    <ScrollView
-      contentContainerStyle={[styles.safeView]}
-      style={[styles.safeView, {paddingBottom: 20}]}
-      onScroll={onScroll}
-      scrollEventThrottle={400}>
-      <SafeAreaView>
+    <SafeAreaView style={[styles.safeView, {flex: 1}]}>
+      <ScrollView
+        contentContainerStyle={[styles.safeView]}
+        style={[styles.safeView, {paddingBottom: 20}]}
+        onScroll={onScroll}
+        scrollEventThrottle={400}>
         <CustomHeader
           backgroundColor={COLOR.LIGHT[100]}
           title={STRINGS.FinancialReport}
@@ -134,7 +135,7 @@ function FinancialReport({navigation}: Readonly<FinancialReportScreenProps>) {
         />
         {graph === 0 ? (
           <Linegraph
-            conversion={conversion}
+            // conversion={conversion}
             currency={currency}
             data={data}
             month={month}
@@ -144,8 +145,8 @@ function FinancialReport({navigation}: Readonly<FinancialReportScreenProps>) {
           />
         ) : (
           <Piegraph
-            catColors={catColors}
-            conversion={conversion}
+            catColors={transType === 'expense' ? expenseColors : incomeColors}
+            // conversion={conversion}
             currency={currency}
             incomes={incomes}
             spends={spends}
@@ -213,6 +214,7 @@ function FinancialReport({navigation}: Readonly<FinancialReportScreenProps>) {
         </View>
         <View style={styles.flexRow}>
           <Dropdown
+          showsVerticalScrollIndicator={false}
             style={[styles.dropdown, {width: 160}]}
             renderLeftIcon={() => (
               <View style={{marginRight: 10}}>
@@ -223,6 +225,33 @@ function FinancialReport({navigation}: Readonly<FinancialReportScreenProps>) {
                 })}
               </View>
             )}
+            renderItem={item => {
+              return (
+                <View
+                  style={[
+                    styles.itemCtr,
+                    {
+                      backgroundColor:
+                        item.value === type
+                          ? COLOR.VIOLET[60]
+                          : COLOR.LIGHT[100],
+                    },
+                  ]}>
+                  <Text
+                    style={[
+                      styles.text,
+                      {
+                        color:
+                          item.value === type
+                            ? COLORS.LIGHT[100]
+                            : COLOR.DARK[100],
+                      },
+                    ]}>
+                    {item.label}
+                  </Text>
+                </View>
+              );
+            }}
             renderRightIcon={() => <></>}
             value={type}
             data={['transaction', 'category'].map(item => {
@@ -267,8 +296,6 @@ function FinancialReport({navigation}: Readonly<FinancialReportScreenProps>) {
         <Spacer height={10} />
         {type === 'transaction' ? (
           <TransactionList
-            conversion={conversion}
-            currency={currency}
             data={data}
             month={month}
             transType={transType}
@@ -282,8 +309,7 @@ function FinancialReport({navigation}: Readonly<FinancialReportScreenProps>) {
           />
         ) : (
           <CategoryList
-            catColors={catColors}
-            conversion={conversion}
+            catColors={transType === 'expense' ? expenseColors : incomeColors}
             currency={currency}
             incomes={incomes}
             spends={spends}
@@ -293,8 +319,8 @@ function FinancialReport({navigation}: Readonly<FinancialReportScreenProps>) {
             sort={sort}
           />
         )}
-      </SafeAreaView>
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 

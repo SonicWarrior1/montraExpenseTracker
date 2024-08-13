@@ -26,6 +26,8 @@ import {OfflineTransactionModel} from '../../DbModels/OfflineTransactionModel';
 import CustomHeader from '../../components/CustomHeader';
 import {formatWithCommas} from '../../utils/commonFuncs';
 import DescriptionContainer from './atoms/DescriptionContainer';
+import {RFValue} from 'react-native-responsive-fontsize';
+import {formatAMPM} from '../../utils/firebase';
 
 function TransactionDetails({
   route,
@@ -34,10 +36,11 @@ function TransactionDetails({
   // constants
   const COLOR = useAppTheme();
   const styles = style(COLOR);
+
   // redux
 
   const currency = useAppSelector(state => state.user.currentUser?.currency);
-  const conversion = useAppSelector(state => state.transaction.conversion);
+  // const conversion = useAppSelector(state => state.user.conversion);
   const online = useObject(OnlineTransactionModel, route.params.transaction.id);
   const offline = useObject(
     OfflineTransactionModel,
@@ -72,6 +75,19 @@ function TransactionDetails({
       }
     }
   }, [trans]);
+  const lengthCheck =
+    (
+      (currencies[currency!].symbol ?? '$') +
+      ' ' +
+      formatWithCommas(
+        (
+          trans!.conversion.usd[(currency ?? 'USD').toLowerCase()] *
+          trans!.amount
+        )
+          .toFixed(2)
+          .toString(),
+      )
+    ).length < 7;
   return (
     trans !== null && (
       <View style={{flex: 1, backgroundColor: COLOR.LIGHT[100]}}>
@@ -102,15 +118,24 @@ function TransactionDetails({
             HeaderRight={headerRight}
           />
           <Spacer height={Dimensions.get('screen').height * 0.025} />
-          <Text style={styles.amt} numberOfLines={1}>
+          <Text
+            style={[
+              styles.amt,
+              {
+                fontSize: lengthCheck ? RFValue(40) : RFValue(30),
+                marginTop: lengthCheck ? 10 : 25,
+                marginBottom: lengthCheck ? 5 : 15,
+              },
+            ]}
+            numberOfLines={1}>
             {currencies[currency!].symbol ?? '$'}{' '}
             {formatWithCommas(
-              Number(
-                (
-                  conversion.usd[(currency ?? 'USD').toLowerCase()] *
-                  trans.amount
-                ).toFixed(1),
-              ).toString(),
+              (
+                trans.conversion.usd[(currency ?? 'USD').toLowerCase()] *
+                trans.amount
+              )
+                .toFixed(2)
+                .toString(),
             )}
           </Text>
           <Text style={styles.desc} numberOfLines={1}>
@@ -123,7 +148,8 @@ function TransactionDetails({
                   .toDate()
                   .getDay()
               ].label
-            }{' '}
+            }
+            {', '}
             {Timestamp.fromMillis(trans.timeStamp.seconds * 1000)
               .toDate()
               .getDate()}{' '}
@@ -136,14 +162,11 @@ function TransactionDetails({
             }{' '}
             {Timestamp.fromMillis(trans.timeStamp.seconds * 1000)
               .toDate()
-              .getFullYear()}{' '}
-            {Timestamp.fromMillis(trans.timeStamp.seconds * 1000)
-              .toDate()
-              .getHours()}
-            :
-            {Timestamp.fromMillis(trans.timeStamp.seconds * 1000)
-              .toDate()
-              .getMinutes()}
+              .getFullYear()}
+            {', '}
+            {formatAMPM(
+              Timestamp.fromMillis(trans.timeStamp.seconds * 1000).toDate(),
+            )}
           </Text>
         </SafeAreaView>
         <View style={styles.bottomView}>
@@ -215,10 +238,11 @@ function TransactionDetails({
           category={trans.category}
           amt={trans.amount}
           url={trans.attachement ?? ''}
+          timeStamp={trans.timeStamp}
         />
       </View>
     )
   );
 }
 
-export default TransactionDetails;
+export default React.memo(TransactionDetails);

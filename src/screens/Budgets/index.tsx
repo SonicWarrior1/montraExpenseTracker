@@ -1,4 +1,4 @@
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {FlatList, Pressable, SafeAreaView, Text, View} from 'react-native';
 import style from './styles';
 import {ICONS} from '../../constants/icons';
@@ -17,16 +17,21 @@ function BudgetScreen({navigation}: Readonly<BudgetScreenProps>) {
   const styles = style(COLOR);
   // state
   const [month, setMonth] = useState<number>(new Date().getMonth());
+  const [spend, setSpend] = useState<{
+    [category: string]: {
+      [currency: string]: number;
+    };
+  }>({});
   // redux
   const budgets = useAppSelector(
     state => state.user.currentUser?.budget[month],
   );
   const currency = useAppSelector(state => state.user.currentUser?.currency);
-  const conversion = useAppSelector(state => state.transaction.conversion);
-  const spend =
-    useAppSelector(state => state.user.currentUser?.spend[month]) ?? {};
+  // const conversion = useAppSelector(state => state.user.conversion)
+  const monthlySpend = useAppSelector(
+    state => state.user.currentUser?.spend[month],
+  );
   // functions
-
   const onPress = useCallback(() => {
     setMonth(month => {
       if (month < new Date().getMonth()) {
@@ -35,6 +40,15 @@ function BudgetScreen({navigation}: Readonly<BudgetScreenProps>) {
       return month;
     });
   }, []);
+  useEffect(() => {
+    console.log('USE EFFECT');
+    if (
+      monthlySpend &&
+      Object.keys(monthlySpend).length >= Object.keys(spend).length
+    ) {
+      setSpend(monthlySpend ?? {});
+    }
+  }, [monthlySpend]);
   return (
     <>
       <View style={styles.safeView}>
@@ -86,13 +100,21 @@ function BudgetScreen({navigation}: Readonly<BudgetScreenProps>) {
             </View>
           ) : (
             <FlatList
-              data={Object.entries(budgets)}
+              data={Object.entries(budgets).sort((a, b) => {
+                if (a[0] < b[0]) {
+                  return -1;
+                }
+                if (a[0] > b[0]) {
+                  return 1;
+                }
+                return 0;
+              })}
               style={{marginTop: 15, width: '100%'}}
               showsVerticalScrollIndicator={false}
               renderItem={({item}) => (
                 <BudgetItem
                   item={item}
-                  conversion={conversion}
+                  // conversion={conversion}
                   currency={currency}
                   month={month}
                   navigation={navigation}
@@ -118,4 +140,4 @@ function BudgetScreen({navigation}: Readonly<BudgetScreenProps>) {
     </>
   );
 }
-export default BudgetScreen;
+export default React.memo(BudgetScreen);

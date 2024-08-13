@@ -24,12 +24,14 @@ function Keypad({
             onPress={handlePin(value)}>
             {value === 99 ? (
               ICONS.ArrowRight2({
-                height: 43,
-                width: 43,
+                height: 38,
+                width: 38,
                 color: COLORS.VIOLET[100],
               })
             ) : (
-              <Text style={styles.number}>{value === -1 ? 'DEL' : value}</Text>
+              <Text style={[styles.number, {fontSize: value === -1 ? 36 : 48}]}>
+                {value === -1 ? 'DEL' : value}
+              </Text>
             )}
           </TouchableOpacity>
         );

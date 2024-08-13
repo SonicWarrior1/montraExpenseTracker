@@ -9,7 +9,11 @@ import CustomButton from '../CustomButton';
 import {useAppDispatch, useAppSelector} from '../../redux/store';
 import style from './styles';
 import {COLORS} from '../../constants/commonStyles';
-import {setTheme, userLoggedIn} from '../../redux/reducers/userSlice';
+import {
+  setBiometrics,
+  setTheme,
+  userLoggedIn,
+} from '../../redux/reducers/userSlice';
 import SheetBackdrop from '../SheetBackDrop';
 import {STRINGS} from '../../constants/strings';
 import {useAppTheme} from '../../hooks/themeHook';
@@ -49,6 +53,7 @@ function LogoutSheet() {
       dispatch(setTheme(authTheme));
       dispatch(userLoggedIn(undefined));
       dispatch(openLogoutSheet(false));
+      dispatch(setBiometrics(undefined));
       realm.write(() => {
         realm.deleteAll();
       });
@@ -100,4 +105,4 @@ function LogoutSheet() {
   );
 }
 
-export default LogoutSheet;
+export default React.memo(LogoutSheet);

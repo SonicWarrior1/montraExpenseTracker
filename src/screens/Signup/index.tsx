@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import {
+  Linking,
   NativeModules,
   Platform,
   Pressable,
@@ -24,6 +25,7 @@ import {
   emailRegex,
   nameRegex,
   NAVIGATION,
+  passRegex,
   STRINGS,
 } from '../../constants/strings';
 import {COLORS} from '../../constants/commonStyles';
@@ -45,6 +47,7 @@ import firestore from '@react-native-firebase/firestore';
 import Toast from 'react-native-toast-message';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import CustomHeader from '../../components/CustomHeader/index.tsx';
+import { RFValue } from 'react-native-responsive-fontsize';
 
 function Signup({navigation}: Readonly<SignupScreenProps>) {
   // constants
@@ -99,7 +102,7 @@ function Signup({navigation}: Readonly<SignupScreenProps>) {
       email !== '' &&
       testInput(emailRegex, email) &&
       pass.trim() !== '' &&
-      pass.length >= 6 &&
+      testInput(passRegex, pass) &&
       pass === confirmPass &&
       checked
     ) {
@@ -113,6 +116,7 @@ function Signup({navigation}: Readonly<SignupScreenProps>) {
         dispatch(setLoading(false));
       } catch (e: any) {
         const error: FirebaseAuthTypes.NativeFirebaseAuthError = e;
+        console.log(e);
         Toast.show({
           text1: FirebaseAuthErrorHandler(error.code),
           type: 'error',
@@ -159,9 +163,12 @@ function Signup({navigation}: Readonly<SignupScreenProps>) {
       dispatch(setLoading(false));
     } catch (e: any) {
       const error: FirebaseAuthTypes.NativeFirebaseAuthError = e;
+      console.log(e.code);
       if (
-        error.message !==
-        'android.credentials.GetCredentialException.TYPE_USER_CANCELED'
+        Platform.OS === 'android'
+          ? error.message !==
+            'android.credentials.GetCredentialException.TYPE_USER_CANCELED'
+          : e.code !== 'google_signin_error'
       ) {
         Toast.show({
           text1: FirebaseAuthErrorHandler(error.code),
@@ -241,7 +248,7 @@ function Signup({navigation}: Readonly<SignupScreenProps>) {
             formKey={form.confirmPass}
           />
           <BouncyCheckbox
-            size={25}
+            size={RFValue(22)}
             fillColor={
               !checked && form.terms ? COLORS.RED[100] : COLORS.PRIMARY.VIOLET
             }
@@ -255,9 +262,24 @@ function Signup({navigation}: Readonly<SignupScreenProps>) {
             isChecked={checked}
             textComponent={
               <View style={{flex: 1, marginLeft: 16}}>
-                <Text style={{color: COLOR.DARK[100]}}>
+                <Text style={{color: COLOR.DARK[100],fontSize:RFValue(12)}}>
                   {STRINGS.BySigningUp}{' '}
-                  <Text style={{color: COLORS.PRIMARY.VIOLET}}>
+                  <Text
+                    style={{color: COLORS.PRIMARY.VIOLET}}
+                    onPress={() => {
+                      Linking.canOpenURL(
+                        'https://montra-e9c39.web.app/terms',
+                      ).then(supported => {
+                        if (supported) {
+                          Linking.openURL('https://montra-e9c39.web.app/terms');
+                        } else {
+                          console.log(
+                            "Don't know how to open URI: " +
+                              'https://montra-e9c39.web.app/terms',
+                          );
+                        }
+                      });
+                    }}>
                     {STRINGS.Terms}
                   </Text>
                 </Text>
@@ -268,7 +290,7 @@ function Signup({navigation}: Readonly<SignupScreenProps>) {
           <Spacer height={20} />
           <CustomButton title={STRINGS.SIGNUP} onPress={handleSignup} />
           <Spacer height={10} />
-          <Text style={styles.orText}>{STRINGS.OrWith}</Text>
+          <Text style={styles.orText}>{STRINGS.Or}</Text>
           <Spacer height={10} />
           <TouchableOpacity onPress={onGoogleButtonPress} style={[styles.btn]}>
             <View style={styles.googleBtn}>

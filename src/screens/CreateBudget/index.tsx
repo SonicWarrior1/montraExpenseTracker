@@ -29,13 +29,14 @@ import {useRealm} from '@realm/react';
 import {UpdateMode} from 'realm';
 import {Switch} from 'react-native-switch';
 import CustomHeader from '../../components/CustomHeader';
-import {AmountInputSetter, getMyColor} from '../../utils/commonFuncs';
+import {AmountInputSetter, formatWithCommas} from '../../utils/commonFuncs';
 import Toast from 'react-native-toast-message';
 import {
   handleOfflineNotification,
   handleOnlineNotify,
 } from '../../utils/firebase';
 import CategoryDropdownIcon from '../../components/CategoryColorIcon';
+import {RFValue} from 'react-native-responsive-fontsize';
 function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
   // constants
   const COLOR = useAppTheme();
@@ -43,7 +44,18 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
   const month = new Date().getMonth();
   const isEdit = route.params.isEdit;
   let selectedCategory;
-  let oldBudget;
+  let oldBudget:
+    | {
+        alert: boolean;
+        limit: number;
+        percentage: number;
+        conversion: {
+          [key: string]: {
+            [key: string]: number;
+          };
+        };
+      }
+    | undefined;
   const x =
     useAppSelector(state => state.user.currentUser?.budget[month]) ?? {};
   if (isEdit) {
@@ -55,7 +67,7 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
   const dispatch = useAppDispatch();
   const {isConnected} = useNetInfo();
   // redux
-  const conversion = useAppSelector(state => state.transaction.conversion);
+  const conversion = useAppSelector(state => state.user.conversion);
   const currency = useAppSelector(state => state.user.currentUser?.currency);
   const budgets = useAppSelector(
     state => state.user.currentUser?.budget[month],
@@ -68,9 +80,14 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
   // state
   const [amount, setAmount] = useState<string>(
     isEdit
-      ? (conversion.usd[currency!.toLowerCase()] * oldBudget?.limit!)
-          .toFixed(1)
-          .toString()
+      ? formatWithCommas(
+          (
+            (oldBudget?.conversion?.usd?.[currency?.toLowerCase() ?? 'usd'] ??
+              1) * Number(oldBudget?.limit!)
+          )
+            .toFixed(2)
+            .toString(),
+        )
       : '0',
   );
   const [category, setCategory] = useState<string | undefined>(
@@ -82,7 +99,7 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
   const [sliderVal, setSliderVal] = useState<number | undefined>(
     isEdit ? oldBudget?.percentage : 0,
   );
-  const [catColors, setCatColors] = useState<{[key: string]: string}>();
+  // const [catColors, setCatColors] = useState<{[key: string]: string}>();
   const [form, setForm] = useState<boolean>(false);
 
   // ref
@@ -123,13 +140,16 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
                 limit: Number(
                   (
                     Number(amount.replace(/,/g, '')) /
-                    conversion.usd[currency!.toLowerCase()]
+                    (isEdit ? oldBudget!.conversion : conversion).usd[
+                      currency!.toLowerCase()
+                    ]
                   ).toFixed(10),
                 ),
                 alert: alert,
                 percentage: sliderVal,
                 id: month + '_' + category,
                 delete: false,
+                conversion: isEdit ? oldBudget!.conversion : conversion,
               },
               UpdateMode.Modified,
             );
@@ -141,25 +161,23 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
               budget: {
                 limit: (
                   Number(amount.replace(/,/g, '')) /
-                  conversion.usd[currency!.toLowerCase()]
+                  (isEdit ? oldBudget!.conversion : conversion).usd[
+                    currency!.toLowerCase()
+                  ]
                 ).toFixed(10),
                 alert: alert,
                 percentage: sliderVal,
+                conversion: isEdit ? oldBudget!.conversion : conversion,
               },
             }),
           );
-          const totalSpent = user?.spend?.[month]?.[category!] ?? 0;
+          const totalSpent = user?.spend?.[month]?.[category!].USD ?? 0;
           handleOfflineNotification({
             category: category!,
             dispatch: dispatch,
             realm: realm,
             totalBudget: {
-              limit: Number(
-                (
-                  Number(amount.replace(/,/g, '')) /
-                  conversion.usd[currency!.toLowerCase()]
-                ).toFixed(10),
-              ),
+              limit: Number(amount.replace(/,/g, '')),
               alert: alert!,
               percentage: sliderVal!,
             },
@@ -176,20 +194,23 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
                   String(
                     (
                       Number(amount.replace(/,/g, '')) /
-                      conversion.usd[currency!.toLowerCase()]
+                      (isEdit ? oldBudget!.conversion : conversion).usd[
+                        currency!.toLowerCase()
+                      ]
                     ).toFixed(10),
                   ),
                   user!.uid,
                 ),
                 alert: alert,
                 percentage: encrypt(String(sliderVal), user!.uid),
+                conversion: isEdit ? oldBudget!.conversion : conversion,
               },
             });
           const curr = await firestore()
             .collection('users')
             .doc(user!.uid)
             .get();
-          const totalSpent = user?.spend?.[month]?.[category!] ?? 0;
+          const totalSpent = user?.spend?.[month]?.[category!]?.USD ?? 0;
           await handleOnlineNotify({
             category: category!,
             month: month,
@@ -198,7 +219,12 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
             curr: curr,
           });
         }
-        Toast.show({text1: STRINGS.BudgetCreatedSuccesfully, type: 'custom'});
+        Toast.show({
+          text1: isEdit
+            ? STRINGS.BudgetUpdatedSuccesfully
+            : STRINGS.BudgetCreatedSuccesfully,
+          type: 'custom',
+        });
         dispatch(setLoading(false));
         navigation.pop();
       } catch (e) {
@@ -208,30 +234,20 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
     }
   }, [
     amount,
+    category,
     alert,
     sliderVal,
-    category,
-    month,
-    currency,
-    conversion,
-    user!.uid,
+    dispatch,
     isConnected,
+    isEdit,
+    navigation,
+    realm,
+    month,
+    conversion,
+    currency,
     user,
+    oldBudget,
   ]);
-  useEffect(() => {
-    setCatColors(
-      Object.values(expenseCat!).reduce(
-        (acc: {[key: string]: string}, item) => {
-          acc[item] = getMyColor();
-          return acc;
-        },
-        {},
-      ),
-    );
-    return () => {
-      setCatColors(undefined);
-    };
-  }, [expenseCat]);
   const backAction = () => {
     if (
       ((amount.replace(/,/g, '').trim() !== '' ||
@@ -240,16 +256,12 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
       Number(amount.replace(/,/g, '')) > 0 ||
       category !== ''
     ) {
-      Alert.alert(
-        STRINGS.DiscardChanges,
-        STRINGS.UnsavedChanges,
-        [
-          {
-            text: 'No',
-          },
-          {text: 'Yes', onPress: () => [navigation.goBack()]},
-        ],
-      );
+      Alert.alert(STRINGS.DiscardChanges, STRINGS.UnsavedChanges, [
+        {
+          text: 'No',
+        },
+        {text: 'Yes', onPress: () => [navigation.goBack()]},
+      ]);
     } else {
       navigation.goBack();
     }
@@ -259,6 +271,17 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
     const back = BackHandler.addEventListener('hardwareBackPress', backAction);
     return () => back.remove();
   });
+  const fontSize = useMemo(() => {
+    if (currencies[currency!].symbol.length + amount.length > 13) {
+      return RFValue(64 - 33);
+    } else if (currencies[currency!].symbol.length + amount.length > 10) {
+      return RFValue(64 - 25);
+    } else if (currencies[currency!].symbol.length + amount.length > 7) {
+      return RFValue(64 - 16);
+    } else {
+      return RFValue(64 - 0);
+    }
+  }, [amount, currency]);
   return (
     <KeyboardAwareScrollView
       // extraHeight={150}
@@ -275,16 +298,45 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
           <View style={styles.mainView}>
             <Text style={styles.text1}>{STRINGS.HowMuchDoSpent}</Text>
             <View style={styles.moneyCtr}>
-              <Text style={styles.text2}>{currencies[currency!].symbol}</Text>
+              <Text
+                style={[
+                  styles.text2,
+                  {
+                    fontSize: fontSize,
+                  },
+                ]}>
+                {currencies[currency!].symbol}
+              </Text>
               <TextInput
-                style={styles.input}
-                maxLength={10}
+                style={[
+                  styles.input,
+                  {
+                    fontSize: fontSize,
+                  },
+                ]}
+                // maxLength={12}
+                numberOfLines={1}
                 onPress={() => {
                   if (amount === '0') {
                     setAmount('');
                   }
                 }}
-                onChangeText={(str: string) => AmountInputSetter(str,setAmount)}
+                onChangeText={(str: string) =>
+                  AmountInputSetter(
+                    str,
+                    setAmount,
+                    isEdit,
+                    isEdit
+                      ? (
+                          (oldBudget?.conversion?.usd?.[
+                            currency?.toLowerCase() ?? 'usd'
+                          ] ?? 1) * Number(oldBudget?.limit!)
+                        )
+                          .toFixed(2)
+                          .toString()
+                      : '0',
+                  )
+                }
                 value={amount}
                 keyboardType="numeric"
                 onBlur={() => {
@@ -296,8 +348,14 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
             </View>
             <View style={{left: 20}}>
               <EmptyZeroError
-                errorText={STRINGS.PleaseFillAnAmount}
-                value={amount}
+                errorText={
+                  (Number(amount.replace(/,/g, '')) > 0 ||
+                    amount.trim() !== '.') &&
+                  amount.trim() === ''
+                    ? STRINGS.PleaseFillAnAmount
+                    : STRINGS.PleaseFillValidAmount
+                }
+                value={amount.replace(/,/g, '')}
                 formKey={form}
                 color={COLORS.RED[100]}
                 size={18}
@@ -317,8 +375,8 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
             }}
             value={category}
             placeholder={STRINGS.Category}
-            leftIcon={CategoryDropdownIcon(category!, catColors!)}
-            catColors={catColors}
+            leftIcon={CategoryDropdownIcon(category!, user!.expenseColors)}
+            catColors={user?.expenseColors}
           />
           <EmptyError
             errorText={STRINGS.PleaseSelectACategory}

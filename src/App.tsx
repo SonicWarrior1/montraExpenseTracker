@@ -19,9 +19,27 @@ import {BudgetModel} from './DbModels/BudgetModel';
 import {CategoryModel} from './DbModels/CategoryModel';
 import {AmountModel} from './DbModels/AmountModel';
 import {NotificationModel} from './DbModels/NotificationModel';
+import {ConversionModel} from './DbModels/ConversionModel';
+import {TextInput, TextStyle, Text} from 'react-native';
 
 firestore().settings({persistence: false});
+interface ExtendedText extends Text {
+  defaultProps: {
+    allowFontScaling: boolean;
+    style?: TextStyle;
+  };
+}
+
+interface ExtendedTextInput extends TextInput {
+  defaultProps: {
+    allowFontScaling: boolean;
+  };
+}
 function App(): React.JSX.Element {
+  (Text as unknown as ExtendedText).defaultProps = {allowFontScaling: false};
+  (TextInput as unknown as ExtendedTextInput).defaultProps = {
+    allowFontScaling: false,
+  };
   return (
     <GestureHandlerRootView style={{flex: 1}}>
       <RealmProvider
@@ -34,6 +52,7 @@ function App(): React.JSX.Element {
           CategoryModel,
           AmountModel,
           NotificationModel,
+          ConversionModel,
         ]}>
         <Provider store={store}>
           <PersistGate persistor={persistor}>

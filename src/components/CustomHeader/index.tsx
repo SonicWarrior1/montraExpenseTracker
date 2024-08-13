@@ -33,6 +33,7 @@ function CustomHeader({
     | 'Currency'
     | 'ExportData'
     | 'Theme'
+    | 'ResetPassword'
   >;
   color?: string;
   bottomBorder?: boolean;

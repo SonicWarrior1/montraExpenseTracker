@@ -1,9 +1,10 @@
+import React, {useEffect} from 'react';
 import {RootStackParamList} from '../defs/navigation';
 import Onboarding from '../screens/Onboarding';
-import {NAVIGATION} from '../constants/strings';
+import {currencies, NAVIGATION} from '../constants/strings';
 import Signup from '../screens/Signup';
 import {ICONS} from '../constants/icons';
-import {Pressable} from 'react-native';
+import {Linking, Pressable} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import Login from '../screens/Login';
 import {useAppDispatch, useAppSelector} from '../redux/store';
@@ -24,9 +25,10 @@ import ExportData from '../screens/ExportData';
 import ThemeScreen from '../screens/Theme';
 import {useAppTheme} from '../hooks/themeHook';
 import {useGetUsdConversionQuery} from '../redux/api/conversionApi';
-import {useEffect} from 'react';
-import {setConversionData} from '../redux/reducers/transactionSlice';
-import { createStackNavigator } from '@react-navigation/stack';
+import {createStackNavigator} from '@react-navigation/stack';
+import {setConversionData} from '../redux/reducers/userSlice';
+import ResetPassword from '../screens/ResetPassword';
+
 export const Stack = createStackNavigator<RootStackParamList>();
 
 function RootNavigator(): React.JSX.Element {
@@ -49,13 +51,71 @@ function RootNavigator(): React.JSX.Element {
   const isLoggedIn = useAppSelector(state => state.user.currentUser);
   const dispatch = useAppDispatch();
   const COLORS = useAppTheme();
-  const {data: conversion, isSuccess} = useGetUsdConversionQuery({});
+  const todayDate = new Date().toISOString().split('T')[0]; // Format date as YYYY-MM-DD
+  const {data: conversion, isSuccess} = useGetUsdConversionQuery({
+    date: todayDate,
+  });
+
   useEffect(() => {
     if (isSuccess) {
-      dispatch(setConversionData(conversion));
-      console.log('Ok');
+      const myCurrencies: {[key: string]: number} = {};
+      Object.entries(conversion.usd as {[key: string]: number}).forEach(
+        ([key, val]) => {
+          if (currencies[key.toUpperCase()] !== undefined) {
+            myCurrencies[key] = val;
+          }
+        },
+      );
+      dispatch(
+        setConversionData({
+          date: conversion.date,
+          usd: myCurrencies,
+        }),
+      );
     }
-  }, [isSuccess]);
+  }, [conversion, dispatch, isSuccess]);
+
+  useEffect(() => {
+    try {
+      Linking.getInitialURL().then(url => {
+        if (url) {
+          const regex = /[?&]([^=#]+)=([^&#]*)/g;
+          const params: {[key: string]: string} = {};
+          let match;
+          while ((match = regex.exec(url ?? ''))) {
+            params[match[1]] = match[2];
+          }
+          // console.log('PARAMS', url!.split('//')[1].split('?')[0], params);
+          if (url?.split('//')?.[1]?.split('?')?.[0] === 'reset-pass') {
+            navigation.navigate(NAVIGATION.ResetPassword, params);
+          }
+        }
+      });
+    } catch (e) {
+      console.log(e);
+    }
+    const handleDeepLink = async (event: {url: string}) => {
+      try {
+        const url = event.url;
+        const regex = /[?&]([^=#]+)=([^&#]*)/g;
+        const params: {[key: string]: string} = {};
+        let match;
+        while ((match = regex.exec(url))) {
+          params[match[1]] = match[2];
+        }
+        // console.log('PARAMS', event.url.split('//')[1].split('?')[0], params);
+        if (event?.url?.split('//')?.[1]?.split('?')?.[0] === 'reset-pass') {
+          navigation.navigate(NAVIGATION.ResetPassword, params);
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    };
+
+    const subscription = Linking.addEventListener('url', handleDeepLink);
+
+    return () => subscription.remove();
+  }, []);
 
   return (
     <Stack.Navigator
@@ -100,35 +160,21 @@ function RootNavigator(): React.JSX.Element {
             name={NAVIGATION.FinancialReport}
             component={FinancialReport}
           />
-          <Stack.Screen
-            name={NAVIGATION.Settings}
-            component={SettingsScreen}
-          />
-          <Stack.Screen
-            name={NAVIGATION.Currency}
-            component={CurrencyScreen}
-          />
-          <Stack.Screen
-            name={NAVIGATION.Theme}
-            component={ThemeScreen}
-          />
-          <Stack.Screen
-            name={NAVIGATION.ExportData}
-            component={ExportData}
-          />
+          <Stack.Screen name={NAVIGATION.Settings} component={SettingsScreen} />
+          <Stack.Screen name={NAVIGATION.Currency} component={CurrencyScreen} />
+          <Stack.Screen name={NAVIGATION.Theme} component={ThemeScreen} />
+          <Stack.Screen name={NAVIGATION.ExportData} component={ExportData} />
           <Stack.Screen name={NAVIGATION.Story} component={StoryScreen} />
+          <Stack.Screen
+            name={NAVIGATION.ResetPassword}
+            component={ResetPassword}
+          />
         </Stack.Group>
       ) : (
         <Stack.Group>
           <Stack.Screen name={NAVIGATION.ONBOARDING} component={Onboarding} />
-          <Stack.Screen
-            name={NAVIGATION.SIGNUP}
-            component={Signup}
-          />
-          <Stack.Screen
-            name={NAVIGATION.LOGIN}
-            component={Login}
-          />
+          <Stack.Screen name={NAVIGATION.SIGNUP} component={Signup} />
+          <Stack.Screen name={NAVIGATION.LOGIN} component={Login} />
           <Stack.Screen
             name={NAVIGATION.FORGOTPASSWORD}
             component={ForgotPassword}
@@ -136,6 +182,10 @@ function RootNavigator(): React.JSX.Element {
           <Stack.Screen
             name={NAVIGATION.FORGOTEMAILSENT}
             component={ForgotEmailSent}
+          />
+          <Stack.Screen
+            name={NAVIGATION.ResetPassword}
+            component={ResetPassword}
           />
           {/* <Stack.Screen
             name={NAVIGATION.PIN}

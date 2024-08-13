@@ -35,4 +35,4 @@ function TabBackdrop() {
   );
 }
 
-export default TabBackdrop;
+export default React.memo(TabBackdrop);

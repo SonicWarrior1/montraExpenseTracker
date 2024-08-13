@@ -20,36 +20,48 @@ import {formatWithCommas} from '../../utils/commonFuncs';
 export default function StoryScreen({navigation}: Readonly<StoryScreenProps>) {
   // redux
   const user = useAppSelector(state => state.user.currentUser);
-  const conversion = useAppSelector(state => state.transaction.conversion);
+  // const conversion = useAppSelector(state => state.user.conversion);
   const currency = useAppSelector(state => state.user.currentUser?.currency);
   // constants
   const screenHeight = Dimensions.get('screen').height;
   const screenWidth = Dimensions.get('screen').width;
   const COLOR = useAppTheme();
   const styles = style(COLOR);
-  const biggestSpend: [string, number][] =
+  const biggestSpend: [
+    string,
+    {
+      [currency: string]: number;
+    },
+  ][] =
     user?.spend[new Date().getMonth()] !== undefined
       ? Object.entries(user?.spend[new Date().getMonth()])
-          .sort((a, b) => b[1] - a[1])
+          .sort((a, b) => b[1].USD - a[1].USD)
           .filter(([, value], index, array) => value === array[0][1])
-      : [['', 0]];
-  const biggestIncome: [string, number][] =
+      : [['', {}]];
+  const biggestIncome: [
+    string,
+    {
+      [currency: string]: number;
+    },
+  ][] =
     user?.income[new Date().getMonth()] !== undefined
       ? Object.entries(user?.income[new Date().getMonth()])
-          .sort((a, b) => b[1] - a[1])
+          .sort((a, b) => b[1].USD - a[1].USD)
           .filter(([, value], index, array) => value === array[0][1])
-      : [['', 0]];
+      : [['', {}]];
   const budgetExceed =
     user?.budget[new Date().getMonth()] !== undefined &&
     user?.spend[new Date().getMonth()] !== undefined
       ? Object.entries(user?.budget[new Date().getMonth()]).filter(
-          item => item[1].limit <= user?.spend[new Date().getMonth()][item[0]],
+          item =>
+            item[1].limit <=
+            (user?.spend?.[new Date().getMonth()]?.[item[0]]?.USD ?? 0),
         )
       : undefined;
   const totalBudgets =
     user?.budget[new Date().getMonth()] !== undefined &&
     user?.spend[new Date().getMonth()] !== undefined
-      ? Object.entries(user?.budget[new Date().getMonth()])
+      ? Object.entries(user?.budget?.[new Date().getMonth()] ?? {})
       : undefined;
   // state
   const [index, setIndex] = useState<number>(0);
@@ -158,7 +170,7 @@ export default function StoryScreen({navigation}: Readonly<StoryScreenProps>) {
           {index === 2 && (
             <View style={styles.catRow}>
               {budgetExceed?.map(item => (
-                <View style={styles.catCtr} key={item?.[0]?.[0] ?? ''}>
+                <View style={styles.catCtr} key={item?.[0] ?? ''}>
                   <View
                     style={[
                       styles.colorBox,
@@ -178,28 +190,28 @@ export default function StoryScreen({navigation}: Readonly<StoryScreenProps>) {
             </View>
           )}
           {(index === 0 || index === 1) && (
-            <Text style={[styles.amt, {marginTop: 15}]} numberOfLines={1}>
+            <Text style={[styles.amt, {marginTop: 15}]}>
               {currencies[currency!].symbol}
               {index === 0
                 ? formatWithCommas(
-                    Number(
-                      (
-                        conversion.usd[currency!.toLowerCase()] *
-                        Object.values(
-                          user?.spend[new Date().getMonth()] ?? [],
-                        ).reduce((acc, curr) => acc + curr, 0)
-                      ).toFixed(1),
-                    ).toString(),
+                    Object.values(user?.spend[new Date().getMonth()] ?? [])
+                      .reduce(
+                        (acc, curr) =>
+                          acc + curr[currency?.toUpperCase() ?? 'USD'],
+                        0,
+                      )
+                      .toFixed(2)
+                      .toString(),
                   )
                 : formatWithCommas(
-                    Number(
-                      (
-                        conversion.usd[currency!.toLowerCase()] *
-                        Object.values(
-                          user?.income[new Date().getMonth()] ?? [],
-                        ).reduce((acc, curr) => acc + curr, 0)
-                      ).toFixed(1),
-                    ).toString(),
+                    Object.values(user?.income[new Date().getMonth()] ?? [])
+                      .reduce(
+                        (acc, curr) =>
+                          acc + curr[currency?.toUpperCase() ?? 'USD'],
+                        0,
+                      )
+                      .toFixed(2)
+                      .toString(),
                   )}
             </Text>
           )}
@@ -211,14 +223,7 @@ export default function StoryScreen({navigation}: Readonly<StoryScreenProps>) {
             <Text style={styles.cardText}>
               {index === 0 ? STRINGS.BiggestSpending : STRINGS.BiggestIncome}
             </Text>
-            <View
-              style={{
-                flexDirection: 'row',
-                columnGap: 10,
-                flexWrap: 'wrap',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}>
+            <View style={styles.wrapCtr}>
               {(index === 0 ? biggestSpend : biggestIncome).map(item => (
                 <View style={styles.catCtr} key={item[0]}>
                   <View
@@ -246,20 +251,14 @@ export default function StoryScreen({navigation}: Readonly<StoryScreenProps>) {
               {currencies[currency!].symbol}
               {index === 0
                 ? formatWithCommas(
-                    Number(
-                      (
-                        conversion.usd[currency!.toLowerCase()] *
-                        biggestSpend[0][1]
-                      ).toFixed(1),
-                    ).toString(),
+                    biggestSpend[0][1][currency?.toUpperCase() ?? 'USD']
+                      .toFixed(2)
+                      .toString(),
                   )
                 : formatWithCommas(
-                    Number(
-                      (
-                        conversion.usd[currency!.toLowerCase()] *
-                        biggestIncome[0][1]
-                      ).toFixed(1),
-                    ).toString(),
+                    biggestIncome[0][1][currency?.toUpperCase() ?? 'USD']
+                      .toFixed(2)
+                      .toString(),
                   )}
             </Text>
           </View>

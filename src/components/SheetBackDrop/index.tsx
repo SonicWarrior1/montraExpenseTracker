@@ -30,4 +30,4 @@ function SheetBackdrop() {
   );
 }
 
-export default SheetBackdrop;
+export default React.memo(SheetBackdrop);

@@ -4,6 +4,7 @@ import {
   FlatList,
   Pressable,
   SafeAreaView,
+  ScrollView,
   Text,
   TouchableOpacity,
   View,
@@ -36,7 +37,6 @@ function NotificationScreen({navigation}: Readonly<NotificationScreenProps>) {
   const userDoc = firestore().collection('users').doc(uid);
   const {isConnected} = useNetInfo();
   const realm = useRealm();
-
   // state
   const [menu, setMenu] = useState<boolean>(false);
   // functions
@@ -83,8 +83,10 @@ function NotificationScreen({navigation}: Readonly<NotificationScreenProps>) {
         await userDoc.update({notification: readNotifications});
       }
       setMenu(false);
-    } catch (e) {}
-  }, [notifications, uid, isConnected, userDoc]);
+    } catch (e) {
+      console.log(e);
+    }
+  }, [isConnected, notifications, userDoc, uid]);
   const handleDelete = useCallback(() => {
     Alert.alert(STRINGS.AreYouSure, STRINGS.AreYouSureDelete, [
       {
@@ -190,9 +192,14 @@ function NotificationScreen({navigation}: Readonly<NotificationScreenProps>) {
       Object.values(notifications!).filter(item => item.read === false)
         .length !== 0
     ) {
-      handleMarkRead();
+      if (isConnected !== null) {
+        handleMarkRead();
+      }
     }
-  }, [notifications]);
+  }, [notifications, isConnected]);
+  const data = Object.values(notifications ?? {}).sort(
+    (a, b) => b.time.seconds - a.time.seconds,
+  );
   return (
     <SafeAreaView style={styles.safeView}>
       <Pressable
@@ -201,64 +208,58 @@ function NotificationScreen({navigation}: Readonly<NotificationScreenProps>) {
             setMenu(false);
           }
         }}
-        style={styles.header}>
-        <Pressable
-          onPress={() => {
-            navigation.goBack();
-          }}>
-          {ICONS.ArrowLeft({
-            height: 25,
-            width: 25,
-            color: COLOR.DARK[100],
-            borderColor: COLOR.DARK[100],
-          })}
-        </Pressable>
-        <Text style={styles.headerTitle}>{STRINGS.Notifications}</Text>
-        {Object.values(notifications!).length === 0 ? (
-          <Spacer width={25} />
-        ) : (
+        style={styles.safeView}>
+        <View style={styles.header}>
           <Pressable
             onPress={() => {
-              setMenu(menu => !menu);
+              navigation.goBack();
             }}>
-            {ICONS.More({height: 20, width: 20, color: COLOR.DARK[100]})}
+            {ICONS.ArrowLeft({
+              height: 25,
+              width: 25,
+              color: COLOR.DARK[100],
+              borderColor: COLOR.DARK[100],
+            })}
           </Pressable>
-        )}
-      </Pressable>
-      {notifications === undefined ||
-      Object.values(notifications).length === 0 ? (
-        <View style={styles.center}>
-          <Text style={styles.NoNotifText}>{STRINGS.NoNotification}</Text>
-        </View>
-      ) : (
-        <FlatList
-          data={Object.values(notifications).sort(
-            (a, b) => b.time.seconds - a.time.seconds,
-          )}
-          renderItem={({item}) => (
+          <Text style={styles.headerTitle}>{STRINGS.Notifications}</Text>
+          {Object.values(notifications!).length === 0 ? (
+            <Spacer width={25} />
+          ) : (
             <Pressable
               onPress={() => {
-                if (menu) {
-                  setMenu(false);
-                }
+                setMenu(menu => !menu);
               }}>
+              {ICONS.More({height: 20, width: 20, color: COLOR.DARK[100]})}
+            </Pressable>
+          )}
+        </View>
+        {notifications === undefined ||
+        Object.values(notifications).length === 0 ? (
+          <View style={styles.center}>
+            <Text style={styles.NoNotifText}>{STRINGS.NoNotification}</Text>
+          </View>
+        ) : (
+          <FlatList
+            data={data}
+            style={{flex:1}}
+            renderItem={({item}) => (
               <NotificationListItem
                 handleSingleDelete={handleSingleDelete}
                 item={item}
               />
-            </Pressable>
-          )}
-        />
-      )}
-      {menu && (
-        <View style={styles.menu}>
-          <TouchableOpacity onPress={handleDelete}>
-            <Text style={styles.menuText}>{STRINGS.RemoveAll}</Text>
-          </TouchableOpacity>
-        </View>
-      )}
+            )}
+          />
+        )}
+        {menu && (
+          <View style={styles.menu}>
+            <TouchableOpacity onPress={handleDelete}>
+              <Text style={styles.menuText}>{STRINGS.ClearAll}</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      </Pressable>
     </SafeAreaView>
   );
 }
 
-export default NotificationScreen;
+export default React.memo(NotificationScreen);

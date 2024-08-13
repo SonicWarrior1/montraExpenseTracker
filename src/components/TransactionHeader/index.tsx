@@ -26,6 +26,7 @@ function TransactionHeader({
   return (
     <View style={styles.header}>
       <Dropdown
+      showsVerticalScrollIndicator={false}
         style={styles.dropdown}
         renderLeftIcon={() => (
           <View>
@@ -36,11 +37,38 @@ function TransactionHeader({
             })}
           </View>
         )}
+        renderItem={item => {
+          return (
+            <View
+              style={[
+                styles.itemCtr,
+                {
+                  backgroundColor:
+                    item.value === month + 1
+                      ? COLOR.VIOLET[60]
+                      : COLOR.LIGHT[100],
+                },
+              ]}>
+              <Text
+                style={[
+                  styles.text,
+                  {
+                    color:
+                      item.value === month + 1
+                        ? COLORS.LIGHT[100]
+                        : COLOR.DARK[100],
+                  },
+                ]}>
+                {item.label}
+              </Text>
+            </View>
+          );
+        }}
         autoScroll={false}
         renderRightIcon={() => <></>}
         placeholder={STRINGS.Month}
         value={monthData[month]}
-        data={monthData}
+        data={monthData.slice(0, new Date().getMonth() + 1)}
         labelField={'label'}
         valueField={'value'}
         onChange={({value}) => {
@@ -79,4 +107,4 @@ function TransactionHeader({
   );
 }
 
-export default TransactionHeader;
+export default React.memo(TransactionHeader);

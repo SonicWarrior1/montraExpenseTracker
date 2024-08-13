@@ -1,5 +1,6 @@
 import {Dimensions, StyleSheet} from 'react-native';
 import {COLORS, InputBorderColor} from '../../constants/commonStyles';
+import { RFValue } from 'react-native-responsive-fontsize';
 
 const styles = (COLOR: typeof COLORS) =>
   StyleSheet.create({
@@ -24,7 +25,7 @@ const styles = (COLOR: typeof COLORS) =>
       marginRight: 8,
     },
     text: {
-      fontSize: 16,
+      fontSize: RFValue(14),
       color: COLOR.DARK[100],
     },
   });

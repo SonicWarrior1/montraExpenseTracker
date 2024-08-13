@@ -1,11 +1,13 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
-import {Keyboard} from 'react-native';
+import {Keyboard, Text, View} from 'react-native';
 import style from './styles';
 import {useAppDispatch, useAppSelector} from '../../redux/store';
-import CustomButton from '../CustomButton';
+// import CustomButton from '../CustomButton'
 import {
   addExpenseCategory,
+  addExpenseColor,
   addIncomeCategory,
+  addIncomeColor,
   setLoading,
 } from '../../redux/reducers/userSlice';
 import {transactionType} from '../../defs/transaction';
@@ -23,9 +25,11 @@ import {
   BottomSheetModal,
   BottomSheetTextInput,
   BottomSheetView,
+  TouchableOpacity,
 } from '@gorhom/bottom-sheet';
 import {BottomSheetModalMethods} from '@gorhom/bottom-sheet/lib/typescript/types';
 import {useRealm} from '@realm/react';
+import {getMyColor} from '../../utils/commonFuncs';
 
 function AddCategorySheet({
   bottomSheetModalRef,
@@ -44,9 +48,15 @@ function AddCategorySheet({
   const incomeCats = useAppSelector(
     state => state.user.currentUser?.incomeCategory,
   );
+  const expenseColors = useAppSelector(
+    state => state.user.currentUser?.expenseColors,
+  );
+  const incomeColors = useAppSelector(
+    state => state.user.currentUser?.incomeColors,
+  );
   // constants
   const dispatch = useAppDispatch();
-  const snapPoints = useMemo(() => ['25%'], []);
+  const snapPoints = useMemo(() => ['30%'], []);
   const COLOR = useAppTheme();
   const styles = style(COLOR);
   const {isConnected} = useNetInfo();
@@ -55,44 +65,72 @@ function AddCategorySheet({
   const [category, setCategory] = useState<string>('');
   const [formKey, setFormKey] = useState<boolean>(false);
   // functions
+  const getUniqueColor = (existingColors: string[]): string => {
+    let color;
+    do {
+      color = getMyColor();
+    } while (existingColors.includes(color));
+    return color;
+  };
   const handleOffline = useCallback(async () => {
     if (type === 'expense') {
       dispatch(addExpenseCategory(category.toLowerCase()));
+      const color = getUniqueColor(Object.values(expenseColors ?? {}));
+      dispatch(addExpenseColor({cat: category.toLowerCase(), color: color}));
       realm.write(() => {
         realm.create('category', {
-          name: category.toLowerCase(),
+          name: category.toLowerCase() + '__' + color,
           type: 'expense',
         });
       });
     } else if (type === 'income') {
       dispatch(addIncomeCategory(category.toLowerCase()));
+      const color = getUniqueColor(Object.values(incomeColors ?? {}));
+      dispatch(addIncomeColor({cat: category.toLowerCase(), color: color}));
       realm.write(() => {
         realm.create('category', {
-          name: category.toLowerCase(),
+          name: category.toLowerCase() + '__' + color,
           type: 'income',
         });
       });
     }
-  }, [category, type]);
+  }, [category, expenseColors, incomeColors, type]);
 
   const handleOnline = useCallback(async () => {
     const userDoc = firestore().collection('users').doc(uid);
+
     if (type === 'expense') {
       dispatch(addExpenseCategory(category.toLowerCase()));
       await userDoc.update({
-        expenseCategory: [...expenseCats!, category.toLowerCase()].map(item =>
-          encrypt(item, uid!),
+        expenseCategory: [...expenseCats!, category.toLowerCase()].map(
+          item => ({
+            color:
+              expenseColors?.[item] ??
+              getUniqueColor(Object.values(expenseColors ?? {})),
+            name: encrypt(item, uid!),
+          }),
         ),
       });
     } else if (type === 'income') {
       dispatch(addIncomeCategory(category.toLowerCase()));
       await userDoc.update({
-        incomeCategory: [...incomeCats!, category.toLowerCase()].map(item =>
-          encrypt(item, uid!),
-        ),
+        incomeCategory: [...incomeCats!, category.toLowerCase()].map(item => ({
+          color:
+            incomeColors?.[item] ??
+            getUniqueColor(Object.values(incomeColors ?? {})),
+          name: encrypt(item, uid!),
+        })),
       });
     }
-  }, [category, expenseCats, incomeCats, type, uid]);
+  }, [
+    category,
+    expenseColors,
+    incomeColors,
+    expenseCats,
+    incomeCats,
+    type,
+    uid,
+  ]);
 
   const onPress = useCallback(async () => {
     setFormKey(true);
@@ -100,8 +138,8 @@ function AddCategorySheet({
       dispatch(setLoading(true));
       if (
         type === 'expense'
-          ? expenseCats?.includes(category.toLowerCase())
-          : incomeCats?.includes(category.toLowerCase())
+          ? expenseCats?.includes(category.trim().toLowerCase())
+          : incomeCats?.includes(category.trim().toLowerCase())
       ) {
         Toast.show({
           text1: `${category}` + STRINGS.AlreadyAdded,
@@ -127,10 +165,11 @@ function AddCategorySheet({
     }
   }, [
     category,
+    type,
     expenseCats,
     incomeCats,
     isConnected,
-    type,
+    setMyCategory,
     handleOffline,
     handleOnline,
   ]);
@@ -170,7 +209,11 @@ function AddCategorySheet({
           formKey={formKey}
           value={category.trim()}
         />
-        <CustomButton title={STRINGS.Add} onPress={onPress} />
+        <View style={styles.btnCtr}>
+          <TouchableOpacity onPress={onPress} style={styles.btn}>
+            <Text style={styles.btnText}>{STRINGS.Add}</Text>
+          </TouchableOpacity>
+        </View>
       </BottomSheetView>
     </BottomSheetModal>
   );

@@ -78,15 +78,16 @@ function DescriptionContainer({
                 try {
                   if (!isConnected) {
                     Toast.show({
-                      text1:STRINGS.NoInternetAccess,
+                      text1: STRINGS.NoInternetAccess,
                       type: 'error',
                     });
                     return;
                   }
                   dispatch(setLoading(true));
+                  console.log(trans.attachementType);
                   const res = await ReactNativeBlobUtil.config({
                     fileCache: true,
-                    appendExt: 'pdf',
+                    appendExt: trans.attachementType,
                   }).fetch('GET', trans.attachement ?? '');
                   // console.log(res.path())
                   dispatch(setLoading(false));

@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
 import {StyleSheet, Text} from 'react-native';
-import {emailRegex, nameRegex, STRINGS} from './strings';
+import {emailRegex, nameRegex, passRegex, STRINGS} from './strings';
 import Spacer from '../components/Spacer';
 import Animated, {useSharedValue, withTiming} from 'react-native-reanimated';
 
@@ -31,16 +31,26 @@ export function PassValidationError({
   pass,
   formKey,
 }: Readonly<{pass: string; formKey: boolean}>) {
-  if (!!pass && pass.length < 6) {
+  const height = useSharedValue(25);
+  useEffect(() => {
+    if (!!pass && !testInput(passRegex, pass)) {
+      height.value = withTiming(40);
+    } else if (pass.trim() === '' && formKey) {
+      height.value = withTiming(25);
+    } else{
+      height.value = withTiming(25);
+    }
+  }, [pass, formKey]);
+  if (!!pass && !testInput(passRegex, pass)) {
     return (
-      <Text style={[style.error]} numberOfLines={1}>
+      <Animated.Text style={[style.error, {height}]}>
         {STRINGS.PasswordNotValid}
-      </Text>
+      </Animated.Text>
     );
   } else if (pass.trim() === '' && formKey) {
-    return <Text style={[style.error]}>{STRINGS.PasswordCannotBeEmpty}</Text>;
+    return <Animated.Text style={[style.error, {height}]}>{STRINGS.PasswordCannotBeEmpty}</Animated.Text>;
   } else {
-    return <Spacer height={25} />;
+    return <Animated.View style={{height}}/>;
   }
 }
 

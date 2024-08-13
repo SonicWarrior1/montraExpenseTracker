@@ -1,3 +1,4 @@
+import React, {useRef, useState} from 'react';
 import {
   View,
   TextInput,
@@ -6,10 +7,10 @@ import {
   TextInputFocusEventData,
 } from 'react-native';
 import styles from './styles';
-import {useState} from 'react';
 import {ICONS} from '../../constants/icons';
 import {useAppTheme} from '../../hooks/themeHook';
 import {PlaceholderTextColor} from '../../constants/commonStyles';
+import Clipboard from '@react-native-clipboard/clipboard';
 
 function CustomPassInput({
   value,
@@ -25,6 +26,16 @@ function CustomPassInput({
   eyeColor?: string;
   inputColor?: string;
 }>) {
+  const inputRef = useRef<TextInput>(null);
+  const handleTextChange = (text: string) => {
+    Clipboard.getString().then(clipText => {
+      if (text.includes(clipText)) {
+        const sanitizedText = text.replace(clipText, '');
+        inputRef.current?.setNativeProps({text: sanitizedText});
+      }
+    });
+    onChangeText(text);
+  };
   const [showPass, setShowPass] = useState<boolean>(true);
   const COLOR = useAppTheme();
   return (
@@ -34,10 +45,12 @@ function CustomPassInput({
         placeholder={placeholderText}
         secureTextEntry={showPass}
         value={value}
-        onChangeText={onChangeText}
+        ref={inputRef}
+        onChangeText={handleTextChange}
         placeholderTextColor={PlaceholderTextColor}
         textContentType="oneTimeCode"
         onBlur={onBlur}
+        contextMenuHidden={true}
       />
       <Pressable
         onPress={() => {
@@ -59,4 +72,4 @@ function CustomPassInput({
     </View>
   );
 }
-export default CustomPassInput;
+export default React.memo(CustomPassInput);

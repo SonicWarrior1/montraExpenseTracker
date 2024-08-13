@@ -1,23 +1,21 @@
-import React from 'react';
+import React, {useCallback} from 'react';
 import {Pressable, Text, View} from 'react-native';
 import {ICONS} from '../../../constants/icons';
-import {formatWithCommas, getMyColor} from '../../../utils/commonFuncs';
+import {formatWithCommas} from '../../../utils/commonFuncs';
 import {currencies, NAVIGATION, STRINGS} from '../../../constants/strings';
 import {COLORS} from '../../../constants/commonStyles';
-import {
-  BottomParamList,
-  RootStackParamList,
-} from '../../../defs/navigation';
+import {BottomParamList, RootStackParamList} from '../../../defs/navigation';
 import {CompositeNavigationProp} from '@react-navigation/native';
 import {BottomTabNavigationProp} from '@react-navigation/bottom-tabs';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {Bar} from 'react-native-progress';
+import {useAppSelector} from '../../../redux/store';
 
 function BudgetItem({
   item,
   spend,
   currency,
-  conversion,
+  // conversion,
   styles,
   navigation,
   month,
@@ -28,18 +26,25 @@ function BudgetItem({
       alert: boolean;
       limit: number;
       percentage: number;
+      conversion: {
+        [key: string]: {
+          [key: string]: number;
+        };
+      };
     },
   ];
   month: number;
   currency: string | undefined;
   spend: {
-    [key: string]: number;
-  };
-  conversion: {
-    [key: string]: {
-      [key: string]: number;
+    [category: string]: {
+      [currency: string]: number;
     };
   };
+  // conversion: {
+  //   [key: string]: {
+  //     [key: string]: number;
+  //   };
+  // };
   styles: any;
   navigation: CompositeNavigationProp<
     BottomTabNavigationProp<BottomParamList, 'Budget', undefined>,
@@ -48,26 +53,37 @@ function BudgetItem({
 }>) {
   const key = item[0];
   const val = item[1];
-  const color = getMyColor();
-  const getValue = (
-    val: {
-      alert: boolean;
-      limit: number;
-      percentage: number;
-    },
-    key: string,
-  ) => {
-    if (val.limit - spend[key] < 0) {
-      return '0';
-    } else if (spend[key] === undefined) {
-      return (conversion.usd[currency!.toLowerCase()] * val.limit).toFixed(1);
-    } else {
+  const expenseColors = useAppSelector(
+    state => state.user.currentUser?.expenseColors,
+  );
+  const color = expenseColors?.[key] ?? 'green';
+  const getValue = useCallback(
+    (
+      budget: {
+        alert: boolean;
+        limit: number;
+        percentage: number;
+      },
+      cat: string,
+    ) => {
+      if (spend?.[cat]?.USD === undefined) {
+        return (
+          item[1].conversion.usd[currency?.toLowerCase() ?? 'usd'] *
+          budget.limit
+        ).toFixed(2);
+      }
+      if (budget.limit - (spend?.[cat]?.USD ?? 0) < 0) {
+        return '0';
+      }
+
       return (
-        conversion.usd[currency!.toLowerCase()] *
-        (val.limit - (spend[key] ?? 0))
-      ).toFixed(1);
-    }
-  };
+        budget.limit *
+          item[1].conversion.usd[currency?.toLowerCase() ?? 'usd'] -
+        (spend?.[cat]?.[currency?.toUpperCase() ?? 'USD'] ?? 0)
+      ).toFixed(2);
+    },
+    [currency, item, spend],
+  );
   return (
     <Pressable
       key={key}
@@ -85,7 +101,7 @@ function BudgetItem({
             {key[0].toUpperCase() + key.slice(1)}
           </Text>
         </View>
-        {(spend[key] ?? 0) >= val.limit &&
+        {(spend?.[key]?.USD ?? 0) >= val.limit &&
           ICONS.Alert({
             height: 25,
             width: 25,
@@ -94,10 +110,10 @@ function BudgetItem({
       </View>
       <Text style={styles.text1}>
         Remaining {currencies[currency!].symbol}
-        {formatWithCommas(Number(getValue(val, key)).toString())}
+        {formatWithCommas(getValue(val, key).toString())}
       </Text>
       <Bar
-        progress={(spend[key] ?? 0) / val.limit}
+        progress={(spend?.[key]?.USD ?? 0) / val.limit}
         height={8}
         width={null}
         color={color}
@@ -105,20 +121,18 @@ function BudgetItem({
       <Text style={styles.text2}>
         {currencies[currency!].symbol}
         {formatWithCommas(
-          Number(
-            (
-              conversion.usd[currency!.toLowerCase()] * (spend[key] ?? 0)
-            ).toFixed(1),
-          ).toString(),
+          (spend?.[key]?.[currency?.toUpperCase() ?? 'USD'] ?? 0)
+            .toFixed(2)
+            .toString(),
         )}{' '}
         of {currencies[currency!].symbol}
         {formatWithCommas(
-          Number(
-            (conversion.usd[currency!.toLowerCase()] * val.limit).toFixed(1),
-          ).toString(),
+          (val.conversion.usd[currency!.toLowerCase()] * val.limit)
+            .toFixed(2)
+            .toString(),
         )}
       </Text>
-      {(spend[key] ?? 0) >= val.limit && (
+      {(spend?.[key]?.USD ?? 0) >= val.limit && (
         <Text style={styles.limitText}>{STRINGS.LimitExceeded}</Text>
       )}
     </Pressable>

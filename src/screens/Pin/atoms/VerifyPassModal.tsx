@@ -1,5 +1,5 @@
 import React, {useCallback, useState} from 'react';
-import {ActivityIndicator, Alert, Modal, Pressable} from 'react-native';
+import {ActivityIndicator, Alert, View} from 'react-native';
 import styles from '../styles';
 import CustomPassInput from '../../../components/CustomPassInput';
 import CustomButton from '../../../components/CustomButton';
@@ -13,15 +13,18 @@ import {encrypt} from '../../../utils/encryption';
 import {userLoggedIn} from '../../../redux/reducers/userSlice';
 import {FirebaseAuthErrorHandler} from '../../../utils/firebase';
 import {STRINGS} from '../../../constants/strings';
+import Modal from 'react-native-modal';
 
 function VerifyPassModal({
   showModal,
   setShowModal,
   setMenu,
+  setPin,
 }: Readonly<{
   showModal: boolean;
   setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
   setMenu: React.Dispatch<React.SetStateAction<boolean>>;
+  setPin: React.Dispatch<React.SetStateAction<number[]>>;
 }>) {
   const email = useAppSelector(state => state.user.currentUser?.email);
   const [pass, setPass] = useState<string>('');
@@ -45,6 +48,7 @@ function VerifyPassModal({
             .doc(creds.user.uid)
             .update({pin: encrypt('', creds.user.uid)});
           dispatch(userLoggedIn({...user, pin: ''}));
+          setPin([]);
           setMenu(false);
           setShowModal(false);
           setLoading(false);
@@ -61,31 +65,33 @@ function VerifyPassModal({
       setLoading(false);
     }
   }, [email, pass]);
+  const onDismiss = useCallback(() => {
+    setPass('');
+    setShowModal(false);
+    setFormKey(false);
+  }, [setShowModal]);
   return (
-    <Modal transparent={true} visible={showModal} animationType="fade">
-      <Pressable
-        style={styles.modalBackground}
-        onPress={() => {
-          setPass('');
-          setShowModal(false);
-          setFormKey(false);
-        }}>
-        <Pressable onPress={() => {}} style={styles.modal}>
-          <CustomPassInput
-            onChangeText={str => {
-              setPass(str);
-            }}
-            placeholderText={STRINGS.Password}
-            value={pass}
-          />
-          <PassEmptyError pass={pass} formKey={formKey} />
-          {loading ? (
-            <ActivityIndicator />
-          ) : (
-            <CustomButton title={STRINGS.Verify} onPress={onPress} />
-          )}
-        </Pressable>
-      </Pressable>
+    <Modal
+      isVisible={showModal}
+      avoidKeyboard={true}
+      onBackdropPress={onDismiss}
+      onBackButtonPress={onDismiss}
+      style={styles.modalBackground}>
+      <View style={styles.modal}>
+        <CustomPassInput
+          onChangeText={str => {
+            setPass(str);
+          }}
+          placeholderText={STRINGS.Password}
+          value={pass}
+        />
+        <PassEmptyError pass={pass} formKey={formKey} />
+        {loading ? (
+          <ActivityIndicator />
+        ) : (
+          <CustomButton title={STRINGS.Verify} onPress={onPress} />
+        )}
+      </View>
     </Modal>
   );
 }

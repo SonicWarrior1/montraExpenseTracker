@@ -18,7 +18,6 @@ import {formatWithCommas} from '../../utils/commonFuncs';
 function DetailBudget({navigation, route}: Readonly<DetailBudgetScreenProps>) {
   const month = route.params.month;
   // redux
-  const conversion = useAppSelector(state => state.transaction.conversion);
   const currency = useAppSelector(state => state.user.currentUser?.currency);
   const budgets = useAppSelector(
     state => state.user.currentUser?.budget[month],
@@ -28,12 +27,7 @@ function DetailBudget({navigation, route}: Readonly<DetailBudgetScreenProps>) {
   const COLOR = useAppTheme();
   const styles = style(COLOR);
   const selectedCategory = route.params.category;
-  const budget = budgets?.[selectedCategory] ?? {
-    alert: false,
-    limit: 0,
-    percentage: 0,
-  };
-  const spend = spends?.[selectedCategory] ?? 0;
+  const budget = budgets?.[selectedCategory];
   //ref
   const bottomSheetModalRef = useRef<BottomSheetModalMethods>(null);
   // functions
@@ -51,7 +45,7 @@ function DetailBudget({navigation, route}: Readonly<DetailBudgetScreenProps>) {
 
   return (
     <>
-      {budget.limit !== 0 && (
+      {budget && (
         <SafeAreaView style={styles.safeView}>
           <CustomHeader
             backgroundColor={COLOR.LIGHT[100]}
@@ -80,26 +74,36 @@ function DetailBudget({navigation, route}: Readonly<DetailBudgetScreenProps>) {
             <Text style={styles.remainText}>{STRINGS.Remaining}</Text>
             <Text style={styles.amtText} numberOfLines={1}>
               {currencies[currency!].symbol}
-              {budget.limit - spend < 0 || spend === undefined
+              {budget.limit - (spends?.[selectedCategory]?.USD ?? 0) < 0
                 ? '0'
                 : formatWithCommas(
-                    Number(
-                      (
-                        conversion.usd[currency!.toLowerCase()] *
-                        (Number(budget.limit) - Number(spend))
-                      ).toFixed(1),
-                    ).toString(),
+                    (
+                      budget.conversion.usd[currency?.toLowerCase() ?? 'usd'] *
+                        Number(budget.limit) -
+                      Number(
+                        spends?.[selectedCategory]?.[
+                          currency?.toUpperCase() ?? 'USD'
+                        ] ?? 0,
+                      )
+                    )
+                      .toFixed(2)
+                      .toString(),
                   )}
             </Text>
             <View style={styles.progressbar}>
               <Bar
-                progress={(spend ?? 0) / budget.limit}
+                progress={
+                  (spends?.[selectedCategory]?.[
+                    currency?.toUpperCase() ?? 'USD'
+                  ] ?? 0) / budget.limit
+                }
                 height={10}
                 borderRadius={10}
                 width={null}
               />
             </View>
-            {(spend ?? 0) >= budget.limit && (
+            {(spends?.[selectedCategory]?.[currency?.toUpperCase() ?? 'USD'] ??
+              0) >= budget.limit && (
               <View style={styles.limitCtr}>
                 {ICONS.Alert({height: 20, width: 20, color: COLOR.LIGHT[100]})}
                 <Text style={styles.limitText}>{STRINGS.LimitExceeded}</Text>
@@ -120,7 +124,14 @@ function DetailBudget({navigation, route}: Readonly<DetailBudgetScreenProps>) {
         </SafeAreaView>
       )}
       <DeleteBudgetSheet
-        budget={budget}
+        budget={
+          budget ?? {
+            alert: false,
+            limit: 0,
+            percentage: 0,
+            conversion: {},
+          }
+        }
         category={selectedCategory}
         navigation={navigation}
         bottomSheetModalRef={bottomSheetModalRef}
