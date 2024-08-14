@@ -28,6 +28,8 @@ import {useGetUsdConversionQuery} from '../redux/api/conversionApi';
 import {createStackNavigator} from '@react-navigation/stack';
 import {setConversionData} from '../redux/reducers/userSlice';
 import ResetPassword from '../screens/ResetPassword';
+import LanguageScreen from '../screens/LanguageScreen';
+import {STRINGS} from '../localization';
 
 export const Stack = createStackNavigator<RootStackParamList>();
 
@@ -55,7 +57,14 @@ function RootNavigator(): React.JSX.Element {
   const {data: conversion, isSuccess} = useGetUsdConversionQuery({
     date: todayDate,
   });
-
+  console.log('DEVICE LANGUAGE', STRINGS.getInterfaceLanguage());
+  useEffect(() => {
+    if (isLoggedIn) {
+      STRINGS.setLanguage(isLoggedIn?.lang ?? STRINGS.getInterfaceLanguage());
+    } else {
+      STRINGS.setLanguage(STRINGS.getInterfaceLanguage());
+    }
+  }, []);
   useEffect(() => {
     if (isSuccess) {
       const myCurrencies: {[key: string]: number} = {};
@@ -163,6 +172,7 @@ function RootNavigator(): React.JSX.Element {
           <Stack.Screen name={NAVIGATION.Settings} component={SettingsScreen} />
           <Stack.Screen name={NAVIGATION.Currency} component={CurrencyScreen} />
           <Stack.Screen name={NAVIGATION.Theme} component={ThemeScreen} />
+          <Stack.Screen name={NAVIGATION.Language} component={LanguageScreen} />
           <Stack.Screen name={NAVIGATION.ExportData} component={ExportData} />
           <Stack.Screen name={NAVIGATION.Story} component={StoryScreen} />
           <Stack.Screen

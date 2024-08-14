@@ -15,7 +15,6 @@ import {
   userLoggedIn,
 } from '../../redux/reducers/userSlice';
 import SheetBackdrop from '../SheetBackDrop';
-import {STRINGS} from '../../constants/strings';
 import {useAppTheme} from '../../hooks/themeHook';
 // Third Party Libraries
 import {BottomSheetModalMethods} from '@gorhom/bottom-sheet/lib/typescript/types';
@@ -24,6 +23,7 @@ import {openLogoutSheet} from '../../redux/reducers/transactionSlice';
 import {useRealm} from '@realm/react';
 import {useNetInfo} from '@react-native-community/netinfo';
 import Toast from 'react-native-toast-message';
+import { STRINGS } from '../../localization';
 function LogoutSheet() {
   // constants
   const COLOR = useAppTheme();

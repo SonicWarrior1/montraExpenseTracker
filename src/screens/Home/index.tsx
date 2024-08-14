@@ -12,7 +12,7 @@ import {
 import style from './styles';
 import {useAppSelector} from '../../redux/store';
 import {ICONS} from '../../constants/icons';
-import {currencies, NAVIGATION, STRINGS} from '../../constants/strings';
+import {currencies, NAVIGATION} from '../../constants/strings';
 import {COLORS} from '../../constants/commonStyles';
 import {HomeScreenProps} from '../../defs/navigation';
 import {useAppTheme} from '../../hooks/themeHook';
@@ -28,6 +28,7 @@ import {OfflineTransactionModel} from '../../DbModels/OfflineTransactionModel';
 import {formatWithCommas} from '../../utils/commonFuncs';
 import TransactionItem from '../../components/TransactionListItem/TransactionItem';
 import {isTablet} from 'react-native-device-info';
+import { STRINGS } from '../../localization';
 
 function Home({navigation, route}: Readonly<HomeScreenProps>) {
   // state

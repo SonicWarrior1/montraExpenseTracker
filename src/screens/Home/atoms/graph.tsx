@@ -3,7 +3,6 @@ import {Dimensions, Pressable, Text, useColorScheme, View} from 'react-native';
 import {LineChart} from 'react-native-gifted-charts';
 import {COLORS} from '../../../constants/commonStyles';
 import style from '../styles';
-import {STRINGS} from '../../../constants/strings';
 import {useAppTheme} from '../../../hooks/themeHook';
 import {useAppSelector} from '../../../redux/store';
 import {Timestamp} from '@react-native-firebase/firestore';
@@ -11,6 +10,7 @@ import LinegraphLabel from '../../../components/LinegraphLabel';
 import {OnlineTransactionModel} from '../../../DbModels/OnlineTransactionModel';
 import {OfflineTransactionModel} from '../../../DbModels/OfflineTransactionModel';
 import {formatAMPM} from '../../../utils/firebase';
+import { STRINGS } from '../../../localization';
 
 function Graph({
   data,

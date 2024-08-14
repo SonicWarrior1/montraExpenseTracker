@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import style from './styles';
 import {ProfileScreenProps} from '../../defs/navigation';
-import {NAVIGATION, STRINGS} from '../../constants/strings';
+import {NAVIGATION} from '../../constants/strings';
 import {useAppDispatch, useAppSelector} from '../../redux/store';
 import {COLORS} from '../../constants/commonStyles';
 import {ICONS} from '../../constants/icons';
@@ -17,6 +17,7 @@ import {useAppTheme} from '../../hooks/themeHook';
 // Third Party Libraries
 import {openLogoutSheet} from '../../redux/reducers/transactionSlice';
 import TabBackdrop from '../../components/TabBackdrop';
+import { STRINGS } from '../../localization';
 
 function ProfileScreen({navigation}: Readonly<ProfileScreenProps>) {
   const dispatch = useAppDispatch();

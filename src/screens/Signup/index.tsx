@@ -26,7 +26,6 @@ import {
   nameRegex,
   NAVIGATION,
   passRegex,
-  STRINGS,
 } from '../../constants/strings';
 import {COLORS} from '../../constants/commonStyles';
 import {ICONS} from '../../constants/icons';
@@ -48,6 +47,7 @@ import Toast from 'react-native-toast-message';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import CustomHeader from '../../components/CustomHeader/index.tsx';
 import { RFValue } from 'react-native-responsive-fontsize';
+import { STRINGS } from '../../localization/index.ts';
 
 function Signup({navigation}: Readonly<SignupScreenProps>) {
   // constants

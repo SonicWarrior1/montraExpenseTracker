@@ -3,7 +3,6 @@ import {useAppDispatch, useAppSelector} from '../../redux/store';
 import {deleteBudget, setLoading} from '../../redux/reducers/userSlice';
 import {RootStackParamList} from '../../defs/navigation';
 import {StackNavigationProp} from '@react-navigation/stack';
-import {STRINGS} from '../../constants/strings';
 // Third Party Libraries
 import {BottomSheetModalMethods} from '@gorhom/bottom-sheet/lib/typescript/types';
 import Toast from 'react-native-toast-message';
@@ -12,6 +11,7 @@ import {useNetInfo} from '@react-native-community/netinfo';
 import {useRealm} from '@realm/react';
 import {UpdateMode} from 'realm';
 import DeleteSheet from '../DeleteSheet';
+import { STRINGS } from '../../localization';
 function DeleteBudgetSheet({
   bottomSheetModalRef,
   navigation,

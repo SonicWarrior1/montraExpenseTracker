@@ -14,7 +14,7 @@ import {
 import styles from './styles';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import {PinSentScreenProps} from '../../defs/navigation';
-import {NAVIGATION, STRINGS} from '../../constants/strings';
+import {NAVIGATION} from '../../constants/strings';
 import {useAppDispatch, useAppSelector} from '../../redux/store';
 import {
   setBiometrics,
@@ -33,6 +33,7 @@ import ProgressDot from './atoms/ProgressDot';
 import KeyPad from './atoms/Keypad';
 import ReactNativeBiometrics from 'react-native-biometrics';
 import {isTablet} from 'react-native-device-info';
+import { STRINGS } from '../../localization';
 
 function Pin({route, navigation}: Readonly<PinSentScreenProps>) {
   // constants

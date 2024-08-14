@@ -9,7 +9,6 @@ import {
 } from 'react-native-image-picker';
 import style from './styles';
 import SheetBackdrop from '../SheetBackDrop';
-import {STRINGS} from '../../constants/strings';
 import {useAppTheme} from '../../hooks/themeHook';
 import SheetButtons from '../SheetButton';
 // Third Party Libraries
@@ -21,6 +20,7 @@ import {Platform} from 'react-native';
 import {throttle} from '../../utils/transFuncs';
 import Toast from 'react-native-toast-message';
 import {MimeToExtension} from '../../utils/commonFuncs';
+import { STRINGS } from '../../localization';
 
 function FilePickerSheet({
   bottomSheetModalRef,

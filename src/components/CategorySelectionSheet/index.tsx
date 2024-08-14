@@ -13,7 +13,7 @@ import {
   BottomSheetModalProvider,
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
-import {STRINGS} from '../../constants/strings';
+import {convertCatLang, STRINGS} from '../../localization';
 
 function CategorySelectionSheet({
   filterCategory,
@@ -68,7 +68,10 @@ function CategorySelectionSheet({
             {['expense', 'income'].map(catTypes => (
               <View key={catTypes}>
                 <Text style={styles.text1}>
-                  {catTypes[0].toUpperCase() + catTypes.slice(1)}
+                  {convertCatLang(
+                    STRINGS,
+                    catTypes[0].toUpperCase() + catTypes.slice(1),
+                  )}
                 </Text>
                 <View style={styles.row}>
                   {(catTypes === 'income' ? incomeCats : expenseCats)
@@ -101,7 +104,7 @@ function CategorySelectionSheet({
                                 : COLOR.DARK[100],
                             },
                           ]}>
-                          {item[0].toUpperCase() + item.slice(1)}
+                          {convertCatLang(STRINGS, item)}
                         </Text>
                       </Pressable>
                     ))}

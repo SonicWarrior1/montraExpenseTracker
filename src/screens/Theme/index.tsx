@@ -8,7 +8,7 @@ import style from './styles';
 import {useAppTheme} from '../../hooks/themeHook';
 import CustomHeader from '../../components/CustomHeader';
 import {ThemeScreenProps} from '../../defs/navigation';
-import {STRINGS} from '../../constants/strings';
+import { STRINGS } from '../../localization';
 
 function ThemeScreen({navigation}: Readonly<ThemeScreenProps>) {
   // redux

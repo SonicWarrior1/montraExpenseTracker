@@ -1,11 +1,12 @@
 import React, {useMemo} from 'react';
 import {Text, TextInput, View} from 'react-native';
 import {EmptyZeroError} from '../../../constants/errors';
-import {currencies, STRINGS} from '../../../constants/strings';
+import {currencies} from '../../../constants/strings';
 import {useAppTheme} from '../../../hooks/themeHook';
 import style from '../styles';
 import {AmountInputSetter} from '../../../utils/commonFuncs';
 import {RFValue} from 'react-native-responsive-fontsize';
+import { STRINGS } from '../../../localization';
 
 function MoneyInput({
   amount,

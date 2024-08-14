@@ -40,6 +40,7 @@ export type RootStackParamList = {
     mode: string;
     oobCode: string;
   };
+  Language:undefined
 };
 
 export type BottomParamList = {

@@ -6,7 +6,7 @@ import CustomInput from '../../components/CustomInput';
 import {EmailValError, testInput} from '../../constants/errors';
 import CustomButton from '../../components/CustomButton';
 import {ForgotScreenProps} from '../../defs/navigation';
-import {emailRegex, NAVIGATION, STRINGS} from '../../constants/strings';
+import {emailRegex, NAVIGATION} from '../../constants/strings';
 import {useAppTheme} from '../../hooks/themeHook';
 // Third Party Libraries
 import auth, {FirebaseAuthTypes} from '@react-native-firebase/auth';
@@ -16,6 +16,7 @@ import {setLoading} from '../../redux/reducers/userSlice';
 import Toast from 'react-native-toast-message';
 import {decrypt} from '../../utils/encryption';
 import CustomHeader from '../../components/CustomHeader';
+import { STRINGS } from '../../localization';
 
 function ForgotPassword({navigation}: Readonly<ForgotScreenProps>) {
   // constants

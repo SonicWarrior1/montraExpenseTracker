@@ -1,20 +1,19 @@
+import {Text, FlatList, Pressable, SafeAreaView} from 'react-native';
 import React from 'react';
-import {FlatList, Pressable, SafeAreaView, Text} from 'react-native';
-import {currencies} from '../../constants/strings';
-import BouncyCheckbox from 'react-native-bouncy-checkbox/build/dist/BouncyCheckbox';
+import BouncyCheckbox from 'react-native-bouncy-checkbox';
+import CustomHeader from '../../components/CustomHeader';
+import {CheckboxFillColor} from '../../constants/commonStyles';
+import {languages} from '../../constants/strings';
+import {useAppTheme} from '../../hooks/themeHook';
 import {useAppSelector} from '../../redux/store';
 import firestore from '@react-native-firebase/firestore';
-import {encrypt} from '../../utils/encryption';
-import {useAppTheme} from '../../hooks/themeHook';
+// import {encrypt} from '../../utils/encryption';
 import style from './styles';
-import CustomHeader from '../../components/CustomHeader';
-import {CurrencyScreenProps} from '../../defs/navigation';
-import {CheckboxFillColor} from '../../constants/commonStyles';
 import { STRINGS } from '../../localization';
 
-function CurrencyScreen({navigation}: Readonly<CurrencyScreenProps>) {
+const LanguageScreen = ({route, navigation}) => {
   // redux
-  const code = useAppSelector(state => state.user.currentUser?.currency);
+  const lang = useAppSelector(state => state.user.currentUser?.lang);
   const uid = useAppSelector(state => state.user.currentUser?.uid);
   // constants
   const COLORS = useAppTheme();
@@ -25,33 +24,30 @@ function CurrencyScreen({navigation}: Readonly<CurrencyScreenProps>) {
       <CustomHeader
         backgroundColor={COLORS.LIGHT[100]}
         navigation={navigation}
-        title={STRINGS.Currency}
+        title={STRINGS.Language}
         color={COLORS.DARK[100]}
         bottomBorder={true}
       />
       <FlatList
-        data={Object.values(currencies)}
+        data={Object.values(languages)}
         renderItem={({item}) => (
           <Pressable
             style={styles.row}
             onPress={async () => {
-              if (code !== item.code) {
-                await userDoc.update({currency: encrypt(item.code, uid!)});
+              if (lang !== item.locale) {
+                await userDoc.update({lang: item.locale});
               }
             }}>
-            <Text style={styles.text}>
-              {item.name} {'(' + item.code + ')'}{' '}
-            </Text>
-
+            <Text style={styles.text}>{item.language}</Text>
             <BouncyCheckbox
               style={styles.checkbox}
               disabled
               disableText={false}
               fillColor={CheckboxFillColor}
-              isChecked={code === item.code}
+              isChecked={lang === item.locale}
               onPress={async () => {
-                if (code !== item.code) {
-                  await userDoc.update({currency: encrypt(item.code, uid!)});
+                if (lang !== item.locale) {
+                  await userDoc.update({lang: item.locale});
                 }
               }}
               iconStyle={{height: 24, width: 24}}
@@ -62,6 +58,6 @@ function CurrencyScreen({navigation}: Readonly<CurrencyScreenProps>) {
       />
     </SafeAreaView>
   );
-}
+};
 
-export default React.memo(CurrencyScreen);
+export default LanguageScreen;

@@ -16,6 +16,7 @@ import {CategoryModel} from '../DbModels/CategoryModel';
 import {AmountModel} from '../DbModels/AmountModel';
 import {NotificationModel} from '../DbModels/NotificationModel';
 import storage from '@react-native-firebase/storage';
+import {STRINGS} from '../localization';
 
 export function useInitialSetup() {
   const realm = useRealm();
@@ -53,6 +54,9 @@ export function useInitialSetup() {
         .onSnapshot(snapshot => {
           const user = UserFromJson(snapshot.data() as UserType);
           console.log('USERRR', user);
+          if (STRINGS.getLanguage() !== user.lang) {
+            STRINGS.setLanguage(user.lang);
+          }
           dispatch(userLoggedIn(user));
         });
       return () => unsubscribe();

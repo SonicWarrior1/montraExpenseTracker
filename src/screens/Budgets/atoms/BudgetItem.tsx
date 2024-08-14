@@ -2,7 +2,7 @@ import React, {useCallback} from 'react';
 import {Pressable, Text, View} from 'react-native';
 import {ICONS} from '../../../constants/icons';
 import {formatWithCommas} from '../../../utils/commonFuncs';
-import {currencies, NAVIGATION, STRINGS} from '../../../constants/strings';
+import {currencies, NAVIGATION} from '../../../constants/strings';
 import {COLORS} from '../../../constants/commonStyles';
 import {BottomParamList, RootStackParamList} from '../../../defs/navigation';
 import {CompositeNavigationProp} from '@react-navigation/native';
@@ -10,6 +10,7 @@ import {BottomTabNavigationProp} from '@react-navigation/bottom-tabs';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {Bar} from 'react-native-progress';
 import {useAppSelector} from '../../../redux/store';
+import { STRINGS } from '../../../localization';
 
 function BudgetItem({
   item,

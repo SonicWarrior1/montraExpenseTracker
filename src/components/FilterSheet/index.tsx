@@ -13,7 +13,6 @@ import {
   setSortFilter,
 } from '../../redux/reducers/transactionSlice';
 import SheetBackdrop from '../SheetBackDrop';
-import {STRINGS} from '../../constants/strings';
 import {useAppTheme} from '../../hooks/themeHook';
 // Third Party Libraries
 import {
@@ -22,6 +21,7 @@ import {
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import CategorySelectionSheet from '../CategorySelectionSheet';
+import { STRINGS } from '../../localization';
 
 function FilterSheet() {
   // constants

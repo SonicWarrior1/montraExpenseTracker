@@ -7,7 +7,7 @@ import {
   setLoading,
 } from '../../redux/reducers/userSlice';
 import {transactionType} from '../../defs/transaction';
-import {currencies, STRINGS} from '../../constants/strings';
+import {currencies} from '../../constants/strings';
 import {OnlineTransactionModel} from '../../DbModels/OnlineTransactionModel';
 import {OfflineTransactionModel} from '../../DbModels/OfflineTransactionModel';
 // Third Party Libraries
@@ -22,6 +22,7 @@ import DeleteSheet from '../DeleteSheet';
 import {TimestampModel} from '../../DbModels/TimestampModel';
 import {handleExpenseUpdate, handleIncomeUpdate} from '../../utils/firebase';
 import {encrypt} from '../../utils/encryption';
+import { STRINGS } from '../../localization';
 
 function DeleteTransactionSheet({
   bottomSheetModalRef,

@@ -2,7 +2,7 @@ import {View, SafeAreaView} from 'react-native';
 import React, {useCallback, useEffect, useState} from 'react';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import CustomHeader from '../../components/CustomHeader';
-import {NAVIGATION, passRegex, STRINGS} from '../../constants/strings';
+import {NAVIGATION, passRegex} from '../../constants/strings';
 import CustomPassInput from '../../components/CustomPassInput';
 import {
   ConfirmPassError,
@@ -19,6 +19,7 @@ import {FirebaseAuthErrorHandler} from '../../utils/firebase';
 import auth, {FirebaseAuthTypes} from '@react-native-firebase/auth';
 import Toast from 'react-native-toast-message';
 import {ResetPasswordScreenProps} from '../../defs/navigation';
+import { STRINGS } from '../../localization';
 
 function ResetPassword({route, navigation}: ResetPasswordScreenProps) {
   const COLOR = useAppTheme();

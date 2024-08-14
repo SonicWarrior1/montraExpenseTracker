@@ -2,11 +2,12 @@ import {Pressable, Text, View} from 'react-native';
 import React from 'react';
 import {Swipeable} from 'react-native-gesture-handler';
 import {Timestamp} from '@react-native-firebase/firestore';
-import {monthData, STRINGS} from '../../../constants/strings';
+import {monthData} from '../../../constants/strings';
 import {ICONS} from '../../../constants/icons';
 import {useAppTheme} from '../../../hooks/themeHook';
 import style from '../styles';
 import {formatAMPM} from '../../../utils/firebase';
+import {convertNotificationText, STRINGS} from '../../../localization';
 
 function NotificationListItem({
   item,
@@ -55,23 +56,13 @@ function NotificationListItem({
         <View style={styles.textCtr}>
           <Text style={styles.text1}>
             {item.type === 'budget-percent'
-              ? `Exceeded ${item.percentage}% of ${
-                  item.category[0].toUpperCase() + item.category.slice(1)
-                } budget`
-              : item.category[0].toUpperCase() +
-                item.category.slice(1) +
-                ' Budget Limit Exceeded'}
+              ? convertNotificationText(STRINGS, item.category, 1,item.percentage)
+              : convertNotificationText(STRINGS, item.category,1)}
           </Text>
           <Text style={styles.text2}>
             {item.type === 'budget-percent'
-              ? `You've exceeded ${item.percentage}% of your ${
-                  item.category[0].toUpperCase() + item.category.slice(1)
-                } budget. Take action to stay on track.`
-              : 'Your ' +
-                item.category[0].toUpperCase() +
-                item.category.slice(1) +
-                ' ' +
-                STRINGS.BudgetExceed}
+              ? convertNotificationText(STRINGS, item.category, 2,item.percentage)
+              : convertNotificationText(STRINGS, item.category, 2)}
           </Text>
         </View>
         <View style={styles.timeCtr}>
@@ -85,7 +76,7 @@ function NotificationListItem({
               ?.toDate()
               ?.getDate() +
               ' ' +
-              monthData[
+              monthData(STRINGS)[
                 Timestamp.fromMillis(item.time.seconds * 1000)
                   ?.toDate()
                   ?.getMonth()

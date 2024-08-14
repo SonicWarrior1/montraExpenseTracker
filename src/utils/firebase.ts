@@ -7,7 +7,7 @@ import {OfflineTransactionModel} from '../DbModels/OfflineTransactionModel';
 import {RepeatDataModel} from '../DbModels/RepeatDataModel';
 import {setExpense, setIncome, userLoggedIn} from '../redux/reducers/userSlice';
 import {TransFromJson} from './transFuncs';
-import {currencies, STRINGS} from '../constants/strings';
+import {currencies} from '../constants/strings';
 // Third Party Libraries
 import storage from '@react-native-firebase/storage';
 import notifee from '@notifee/react-native';
@@ -20,6 +20,7 @@ import firestore, {
   Timestamp,
 } from '@react-native-firebase/firestore';
 import {Dispatch} from '@reduxjs/toolkit';
+import { STRINGS } from '../localization';
 
 type transType = 'income' | 'transfer' | 'expense';
 type AllTransType =

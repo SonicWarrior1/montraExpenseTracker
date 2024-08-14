@@ -2,7 +2,7 @@ import React, {useEffect, useRef, useState} from 'react';
 import {AppState, Pressable, SafeAreaView, Text, View} from 'react-native';
 import style from './styles';
 import {SettingsScreenProps} from '../../defs/navigation';
-import {NAVIGATION, STRINGS} from '../../constants/strings';
+import {languages, NAVIGATION} from '../../constants/strings';
 import {ICONS} from '../../constants/icons';
 import {useAppDispatch, useAppSelector} from '../../redux/store';
 import {useAppTheme} from '../../hooks/themeHook';
@@ -11,6 +11,7 @@ import {Switch} from 'react-native-switch';
 import {setBiometrics} from '../../redux/reducers/userSlice';
 import ReactNativeBiometrics from 'react-native-biometrics';
 import Toast from 'react-native-toast-message';
+import { STRINGS } from '../../localization';
 
 function SettingsScreen({navigation}: Readonly<SettingsScreenProps>) {
   const currency = useAppSelector(state => state.user.currentUser?.currency);
@@ -22,6 +23,8 @@ function SettingsScreen({navigation}: Readonly<SettingsScreenProps>) {
   const rnBiometrics = new ReactNativeBiometrics();
   const [checked, setChecked] = useState<boolean>(biometrics ?? false);
   const appState = useRef(AppState.currentState);
+  const lang = useAppSelector(state => state.user.currentUser?.lang);
+  
   useEffect(() => {
     rnBiometrics.isSensorAvailable().then(sensor => {
       if (sensor.error) {
@@ -51,7 +54,6 @@ function SettingsScreen({navigation}: Readonly<SettingsScreenProps>) {
       subscription.remove();
     };
   }, []);
-
   return (
     <SafeAreaView style={styles.safeView}>
       <CustomHeader
@@ -125,7 +127,7 @@ function SettingsScreen({navigation}: Readonly<SettingsScreenProps>) {
                       text1: 'No identities are enrolled',
                       type: 'error',
                     });
-                  }else{
+                  } else {
                     Toast.show({
                       text1: `Unexpected Biometric Error ${sensor.error}`,
                       type: 'error',
@@ -174,6 +176,13 @@ function SettingsScreen({navigation}: Readonly<SettingsScreenProps>) {
           />
         </Pressable>
       </View>
+      <ButtonRow
+        onPress={() => {
+          navigation.navigate(NAVIGATION.Language);
+        }}
+        text={STRINGS.Language}
+        subText={languages[lang ?? 'en-US'].language}
+      />
     </SafeAreaView>
   );
 }

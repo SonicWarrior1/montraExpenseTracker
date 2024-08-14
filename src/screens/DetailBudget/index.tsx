@@ -7,13 +7,14 @@ import {DetailBudgetScreenProps} from '../../defs/navigation';
 import {useAppSelector} from '../../redux/store';
 import {Bar} from 'react-native-progress';
 import CustomButton from '../../components/CustomButton';
-import {currencies, NAVIGATION, STRINGS} from '../../constants/strings';
+import {currencies, NAVIGATION} from '../../constants/strings';
 import DeleteBudgetSheet from '../../components/DeleteBudgetSheet';
 import {BottomSheetModalMethods} from '@gorhom/bottom-sheet/lib/typescript/types';
 import {COLORS} from '../../constants/commonStyles';
 import {useAppTheme} from '../../hooks/themeHook';
 import CustomHeader from '../../components/CustomHeader';
 import {formatWithCommas} from '../../utils/commonFuncs';
+import { STRINGS } from '../../localization';
 
 function DetailBudget({navigation, route}: Readonly<DetailBudgetScreenProps>) {
   const month = route.params.month;

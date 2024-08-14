@@ -4,11 +4,12 @@ import style from './styles';
 import {ICONS} from '../../constants/icons';
 import {useAppDispatch, useAppSelector} from '../../redux/store';
 import {openFilterSheet} from '../../redux/reducers/transactionSlice';
-import {monthData, STRINGS} from '../../constants/strings';
+import {monthData} from '../../constants/strings';
 import {useAppTheme} from '../../hooks/themeHook';
 import {COLORS} from '../../constants/commonStyles';
 // Third party Libraries
 import {Dropdown} from 'react-native-element-dropdown';
+import { STRINGS } from '../../localization';
 
 function TransactionHeader({
   month,
@@ -67,8 +68,8 @@ function TransactionHeader({
         autoScroll={false}
         renderRightIcon={() => <></>}
         placeholder={STRINGS.Month}
-        value={monthData[month]}
-        data={monthData.slice(0, new Date().getMonth() + 1)}
+        value={monthData(STRINGS)[month]}
+        data={monthData(STRINGS).slice(0, new Date().getMonth() + 1)}
         labelField={'label'}
         valueField={'value'}
         onChange={({value}) => {

@@ -19,7 +19,7 @@ import {Slider} from '@miblanchard/react-native-slider';
 import firestore from '@react-native-firebase/firestore';
 import {setLoading, addBudget} from '../../redux/reducers/userSlice';
 import {CreateBudgetScreenProps} from '../../defs/navigation';
-import {currencies, STRINGS} from '../../constants/strings';
+import {currencies} from '../../constants/strings';
 import {encrypt} from '../../utils/encryption';
 import {useAppTheme} from '../../hooks/themeHook';
 import {EmptyError, EmptyZeroError} from '../../constants/errors';
@@ -37,6 +37,7 @@ import {
 } from '../../utils/firebase';
 import CategoryDropdownIcon from '../../components/CategoryColorIcon';
 import {RFValue} from 'react-native-responsive-fontsize';
+import { STRINGS } from '../../localization';
 function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
   // constants
   const COLOR = useAppTheme();

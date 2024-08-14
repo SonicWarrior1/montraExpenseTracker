@@ -11,8 +11,8 @@ import style from './styles';
 import Spacer from '../../components/Spacer';
 import CustomButton from '../../components/CustomButton';
 import {ForgotSentScreenProps} from '../../defs/navigation';
-import {STRINGS} from '../../constants/strings';
 import {useAppTheme} from '../../hooks/themeHook';
+import { STRINGS } from '../../localization';
 
 function ForgotEmailSent({navigation, route}: Readonly<ForgotSentScreenProps>) {
   const screenWidth = Dimensions.get('screen').width;

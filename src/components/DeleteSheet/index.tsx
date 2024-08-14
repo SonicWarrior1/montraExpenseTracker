@@ -6,12 +6,12 @@ import {
 import React, {useMemo} from 'react';
 import {Text, View} from 'react-native';
 import {COLORS} from '../../constants/commonStyles';
-import {STRINGS} from '../../constants/strings';
 import CustomButton from '../CustomButton';
 import SheetBackdrop from '../SheetBackDrop';
 import {useAppTheme} from '../../hooks/themeHook';
 import style from './styles';
 import {BottomSheetModalMethods} from '@gorhom/bottom-sheet/lib/typescript/types';
+import { STRINGS } from '../../localization';
 
 function DeleteSheet({
   text1,

@@ -12,8 +12,8 @@ import {UserFromJson} from '../../../utils/userFuncs';
 import {encrypt} from '../../../utils/encryption';
 import {userLoggedIn} from '../../../redux/reducers/userSlice';
 import {FirebaseAuthErrorHandler} from '../../../utils/firebase';
-import {STRINGS} from '../../../constants/strings';
 import Modal from 'react-native-modal';
+import { STRINGS } from '../../../localization';
 
 function VerifyPassModal({
   showModal,

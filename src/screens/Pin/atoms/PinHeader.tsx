@@ -2,8 +2,8 @@ import React from 'react';
 import {Pressable, Text, View} from 'react-native';
 import Spacer from '../../../components/Spacer';
 import {ICONS} from '../../../constants/icons';
-import {STRINGS} from '../../../constants/strings';
 import styles from '../styles';
+import { STRINGS } from '../../../localization';
 
 function PinHeader({
   isSetup,

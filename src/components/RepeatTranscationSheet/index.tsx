@@ -8,7 +8,6 @@ import {
   EndDropdownData,
   FreqDropdownData,
   monthData,
-  STRINGS,
   weekData,
 } from '../../constants/strings';
 import {repeatDataType} from '../../defs/transaction';
@@ -25,6 +24,7 @@ import {Timestamp} from '@react-native-firebase/firestore';
 import {ICONS} from '../../constants/icons';
 import {PlaceholderTextColor} from '../../constants/commonStyles';
 import {isTablet} from 'react-native-device-info';
+import {STRINGS} from '../../localization';
 
 function RepeatTransactionSheet({
   bottomSheetModalRef,
@@ -138,7 +138,7 @@ function RepeatTransactionSheet({
         <View style={styles.flexRow}>
           <View style={[styles.flex, {minWidth: 45}]}>
             <CustomDropdown
-              data={FreqDropdownData}
+              data={FreqDropdownData(STRINGS)}
               onChange={val => {
                 setFreq(val.value);
                 setDate(undefined);
@@ -150,7 +150,7 @@ function RepeatTransactionSheet({
           {freq === 'yearly' && (
             <View style={[styles.flex, {minWidth: 70}]}>
               <CustomDropdown
-                data={monthData}
+                data={monthData(STRINGS)}
                 onChange={val => {
                   setMonth(val.value);
                   setDate(undefined);
@@ -190,7 +190,7 @@ function RepeatTransactionSheet({
           {freq === 'weekly' && (
             <View style={styles.flex}>
               <CustomDropdown
-                data={weekData}
+                data={weekData(STRINGS)}
                 onChange={val => {
                   setWeekDay(val.value);
                   setDate(undefined);
@@ -209,7 +209,7 @@ function RepeatTransactionSheet({
         <View style={styles.flexRow}>
           <View style={styles.flex}>
             <CustomDropdown
-              data={EndDropdownData}
+              data={EndDropdownData(STRINGS)}
               onChange={val => {
                 setEnd(val.value);
               }}

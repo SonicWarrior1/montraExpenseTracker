@@ -3,11 +3,12 @@ import {Image, Pressable, Text, View} from 'react-native';
 import style from './styles';
 import {COLORS} from '../../constants/commonStyles';
 import {Dropdown} from 'react-native-element-dropdown';
-import {monthData, NAVIGATION, STRINGS} from '../../constants/strings';
+import {monthData, NAVIGATION} from '../../constants/strings';
 import {ICONS} from '../../constants/icons';
 import {useAppSelector} from '../../redux/store';
 import {HomeScreenProps} from '../../defs/navigation';
 import {useAppTheme} from '../../hooks/themeHook';
+import { STRINGS } from '../../localization';
 
 function HomeHeader({
   props,
@@ -54,8 +55,8 @@ function HomeHeader({
         placeholder={STRINGS.Month}
         placeholderStyle={{marginLeft: 10}}
         selectedTextStyle={{marginLeft: 10, color: COLOR.DARK[100]}}
-        value={monthData[month]}
-        data={monthData.slice(0, new Date().getMonth() + 1)}
+        value={monthData(STRINGS)[month]}
+        data={monthData(STRINGS).slice(0, new Date().getMonth() + 1)}
         labelField={'label'}
         valueField={'value'}
         onChange={({value}) => {

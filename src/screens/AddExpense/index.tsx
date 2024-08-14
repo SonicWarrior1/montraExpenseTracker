@@ -15,7 +15,6 @@ import CustomDropdown from '../../components/CustomDropDown';
 import {ICONS} from '../../constants/icons';
 import FilePickerSheet from '../../components/FilePickerSheet';
 import RepeatTransactionSheet from '../../components/RepeatTranscationSheet';
-import {STRINGS} from '../../constants/strings';
 import CustomButton from '../../components/CustomButton';
 import {repeatDataType, transactionType} from '../../defs/transaction';
 import {useAppDispatch, useAppSelector} from '../../redux/store';
@@ -41,6 +40,8 @@ import {useObject, useRealm} from '@realm/react';
 import uuid from 'react-native-uuid';
 import Toast from 'react-native-toast-message';
 import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
+import {convertCatLang, STRINGS} from '../../localization';
+import {Wallets} from '../../constants/strings';
 
 function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
   // constants
@@ -293,19 +294,6 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
     }
     return true;
   };
-  // useEffect(() => {
-  //   setCatColors(
-  //     Object.values(
-  //       pageType === 'expense' ? user?.expenseCategory! : user?.incomeCategory!,
-  //     ).reduce((acc: {[key: string]: string}, item) => {
-  //       acc[item] = getMyColor();
-  //       return acc;
-  //     }, {}),
-  //   );
-  //   return () => {
-  //     setCatColors(undefined);
-  //   };
-  // }, [pageType, user?.expenseCategory, user?.incomeCategory]);
 
   useEffect(() => {
     setFirstTime(false);
@@ -325,7 +313,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
           ]}>
           <CustomHeader
             backgroundColor={getBackgroundColor}
-            title={pageType[0].toUpperCase() + pageType.slice(1)}
+            title={STRINGS[pageType[0].toUpperCase() + pageType.slice(1)]}
             navigation={navigation}
             onPress={backAction}
           />
@@ -357,10 +345,13 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
                   : user?.incomeCategory!
                 )?.map(item => {
                   return {
-                    label:
-                      item === 'add'
+                    label: convertCatLang(
+                      STRINGS,
+                      (item === 'add'
                         ? 'ADD NEW CATEGORY'
-                        : item[0].toUpperCase() + item.slice(1),
+                        : item[0].toUpperCase() + item.slice(1)
+                      ).toLowerCase(),
+                    ),
                     value: item,
                   };
                 })}
@@ -446,10 +437,7 @@ function AddExpense({navigation, route}: Readonly<ExpenseScreenProps>) {
           {pageType !== 'transfer' && (
             <>
               <CustomDropdown
-                data={[
-                  {label: 'Paypal', value: 'paypal'},
-                  {label: 'Chase', value: 'chase'},
-                ]}
+                data={Wallets}
                 onChange={val => {
                   setWallet(val.value);
                 }}

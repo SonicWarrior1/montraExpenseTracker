@@ -5,11 +5,12 @@ import {ICONS} from '../../constants/icons';
 import CustomButton from '../../components/CustomButton';
 import Spacer from '../../components/Spacer';
 import {BudgetScreenProps} from '../../defs/navigation';
-import {monthData, NAVIGATION, STRINGS} from '../../constants/strings';
+import {monthData, NAVIGATION} from '../../constants/strings';
 import {useAppSelector} from '../../redux/store';
 import {useAppTheme} from '../../hooks/themeHook';
 import TabBackdrop from '../../components/TabBackdrop';
 import BudgetItem from './atoms/BudgetItem';
+import { STRINGS } from '../../localization';
 
 function BudgetScreen({navigation}: Readonly<BudgetScreenProps>) {
   // constants
@@ -70,7 +71,7 @@ function BudgetScreen({navigation}: Readonly<BudgetScreenProps>) {
                 color: COLOR.LIGHT[100],
               })}
             </Pressable>
-            <Text style={styles.month}>{monthData[month].label}</Text>
+            <Text style={styles.month}>{monthData(STRINGS)[month].label}</Text>
             <Pressable onPress={onPress}>
               {ICONS.ArrowRight({
                 height: 30,

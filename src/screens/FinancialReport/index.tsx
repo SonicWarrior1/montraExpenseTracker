@@ -20,12 +20,12 @@ import Piegraph from './atoms/piegraph';
 import TransactionList from './atoms/TransactionList';
 import CategoryList from './atoms/CategoryList';
 import {useAppTheme} from '../../hooks/themeHook';
-import {STRINGS} from '../../constants/strings';
 import {useQuery} from '@realm/react';
 import {OnlineTransactionModel} from '../../DbModels/OnlineTransactionModel';
 import {OfflineTransactionModel} from '../../DbModels/OfflineTransactionModel';
 import CustomHeader from '../../components/CustomHeader';
 import {FinancialReportScreenProps} from '../../defs/navigation';
+import { STRINGS } from '../../localization';
 
 function FinancialReport({navigation}: Readonly<FinancialReportScreenProps>) {
   // state

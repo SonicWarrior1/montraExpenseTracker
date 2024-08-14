@@ -1,7 +1,7 @@
 import React, {useCallback, useState} from 'react';
 import {Dimensions, SafeAreaView, View} from 'react-native';
 import style from './styles';
-import {NAVIGATION, OnboardData, STRINGS} from '../../constants/strings';
+import {NAVIGATION, OnboardData} from '../../constants/strings';
 import {OnboardingScreenProps} from '../../defs/navigation';
 import {COLORS} from '../../constants/commonStyles';
 import {useAppTheme} from '../../hooks/themeHook';
@@ -9,6 +9,7 @@ import CustomButton from '../../components/CustomButton';
 // Third party libraries
 import Carousel from 'react-native-reanimated-carousel';
 import CarasoulCtr from './atoms/CarasoulCtr';
+import { STRINGS } from '../../localization';
 
 const screenWidth = Dimensions.get('screen').width;
 

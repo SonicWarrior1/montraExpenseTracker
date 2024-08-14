@@ -1,7 +1,7 @@
 import React, {useCallback, useEffect} from 'react';
 import {Alert, Pressable, Text, View} from 'react-native';
 import {Switch} from 'react-native-switch';
-import {monthData, STRINGS, weekData} from '../../../constants/strings';
+import {monthData, weekData} from '../../../constants/strings';
 import {COLORS} from '../../../constants/commonStyles';
 import Spacer from '../../../components/Spacer';
 import {Timestamp} from '@react-native-firebase/firestore';
@@ -10,6 +10,7 @@ import style from '../styles';
 import {repeatDataType} from '../../../defs/transaction';
 import {RepeatDataModel} from '../../../DbModels/RepeatDataModel';
 import {BottomSheetModalMethods} from '@gorhom/bottom-sheet/lib/typescript/types';
+import { STRINGS } from '../../../localization';
 
 function RepeatInput({
   pageType,
@@ -41,7 +42,7 @@ function RepeatInput({
               ?.toDate()
               ?.getDate() +
             ' ' +
-            monthData[
+            monthData(STRINGS)[
               Timestamp.fromMillis(
                 (repeatData.date as Timestamp)?.seconds * 1000,
               )
@@ -57,7 +58,7 @@ function RepeatInput({
           return (
             (repeatData.date as Date)?.getDate() +
             ' ' +
-            monthData[(repeatData.date as Date)?.getMonth()].label +
+            monthData(STRINGS)[(repeatData.date as Date)?.getMonth()].label +
             ' ' +
             (repeatData.date as Date)?.getFullYear()
           );
@@ -66,7 +67,7 @@ function RepeatInput({
         return (
           (repeatData.date as Date)?.getDate() +
           ' ' +
-          monthData[(repeatData.date as Date)?.getMonth()].label +
+          monthData(STRINGS)[(repeatData.date as Date)?.getMonth()].label +
           ' ' +
           (repeatData.date as Date)?.getFullYear()
         );
@@ -143,12 +144,12 @@ function RepeatInput({
               {repeatData.freq[0].toUpperCase() + repeatData.freq.slice(1)}
               {repeatData.freq !== 'daily' && ' - '}
               {repeatData.freq === 'yearly' &&
-                monthData[repeatData.month! - 1].label}{' '}
+                monthData(STRINGS)[repeatData.month! - 1].label}{' '}
               {(repeatData.freq === 'yearly' ||
                 repeatData.freq === 'monthly') &&
                 repeatData.day}
               {repeatData.freq === 'weekly' &&
-                weekData[repeatData.weekDay].label}
+                weekData(STRINGS)[repeatData.weekDay].label}
             </Text>
           </View>
           {/* {repeatData.end === 'date' && ( */}

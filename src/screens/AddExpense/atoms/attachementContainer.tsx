@@ -2,10 +2,10 @@ import React from 'react';
 import {Image, Pressable, Text, View} from 'react-native';
 import {ICONS} from '../../../constants/icons';
 import style from '../styles';
-import {STRINGS} from '../../../constants/strings';
 import {useAppTheme} from '../../../hooks/themeHook';
 import {BottomSheetModalMethods} from '@gorhom/bottom-sheet/lib/typescript/types';
 import {useNetInfo} from '@react-native-community/netinfo';
+import { STRINGS } from '../../../localization';
 
 function AttachementContainer({
   image,

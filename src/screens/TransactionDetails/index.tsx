@@ -8,7 +8,6 @@ import {
   currencies,
   monthData,
   NAVIGATION,
-  STRINGS,
   weekData,
 } from '../../constants/strings';
 import Spacer from '../../components/Spacer';
@@ -28,6 +27,7 @@ import {formatWithCommas} from '../../utils/commonFuncs';
 import DescriptionContainer from './atoms/DescriptionContainer';
 import {RFValue} from 'react-native-responsive-fontsize';
 import {formatAMPM} from '../../utils/firebase';
+import {convertCatLang, STRINGS} from '../../localization';
 
 function TransactionDetails({
   route,
@@ -143,7 +143,7 @@ function TransactionDetails({
           </Text>
           <Text style={styles.time}>
             {
-              weekData[
+              weekData(STRINGS)[
                 Timestamp.fromMillis(trans.timeStamp.seconds * 1000)
                   .toDate()
                   .getDay()
@@ -154,7 +154,7 @@ function TransactionDetails({
               .toDate()
               .getDate()}{' '}
             {
-              monthData[
+              monthData(STRINGS)[
                 Timestamp.fromMillis(trans.timeStamp.seconds * 1000)
                   .toDate()
                   .getMonth()
@@ -174,7 +174,11 @@ function TransactionDetails({
             <View style={styles.ctrColumn}>
               <Text style={styles.text1}>{STRINGS.Type}</Text>
               <Text style={styles.text2}>
-                {trans.type[0].toLocaleUpperCase() + trans.type.slice(1)}
+                {
+                  STRINGS[
+                    trans.type[0].toLocaleUpperCase() + trans.type.slice(1)
+                  ]
+                }
               </Text>
             </View>
             {trans.type === 'transfer' ? (
@@ -200,8 +204,7 @@ function TransactionDetails({
                   <Text
                     style={[styles.text2, {maxWidth: 140}]}
                     numberOfLines={1}>
-                    {(trans.category ?? '')[0].toLocaleUpperCase() +
-                      (trans.category ?? '').slice(1)}
+                    {convertCatLang(STRINGS, trans.category ?? '')}
                   </Text>
                 </View>
                 <View style={styles.ctrColumn}>

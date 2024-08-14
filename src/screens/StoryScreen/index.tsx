@@ -13,9 +13,10 @@ import {catIcons, ICONS} from '../../constants/icons';
 import CustomButton from '../../components/CustomButton';
 import {StoryScreenProps} from '../../defs/navigation';
 import {useAppSelector} from '../../redux/store';
-import {currencies, NAVIGATION, STRINGS} from '../../constants/strings';
+import {currencies, NAVIGATION} from '../../constants/strings';
 import {useAppTheme} from '../../hooks/themeHook';
 import {formatWithCommas} from '../../utils/commonFuncs';
+import { STRINGS } from '../../localization';
 
 export default function StoryScreen({navigation}: Readonly<StoryScreenProps>) {
   // redux

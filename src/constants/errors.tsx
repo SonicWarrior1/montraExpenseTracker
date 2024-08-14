@@ -1,8 +1,9 @@
 import React, {useEffect} from 'react';
 import {StyleSheet, Text} from 'react-native';
-import {emailRegex, nameRegex, passRegex, STRINGS} from './strings';
+import {emailRegex, nameRegex, passRegex} from './strings';
 import Spacer from '../components/Spacer';
 import Animated, {useSharedValue, withTiming} from 'react-native-reanimated';
+import { STRINGS } from '../localization';
 
 export function ConfirmPassError({
   pass,

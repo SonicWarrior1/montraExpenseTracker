@@ -9,12 +9,13 @@ import Animated, {
 } from 'react-native-reanimated';
 import style from './styles';
 import TabButton from './atoms/TabButton';
-import {NAVIGATION, STRINGS} from '../../constants/strings';
+import {NAVIGATION} from '../../constants/strings';
 import AnimatedBtn from './atoms/animatedButton';
 import {useAppTheme} from '../../hooks/themeHook';
 import {useAppDispatch, useAppSelector} from '../../redux/store';
 import React, {useEffect, useMemo} from 'react';
 import {setTabButton} from '../../redux/reducers/transactionSlice';
+import { STRINGS } from '../../localization';
 
 function CustomTab(props: Readonly<BottomTabBarProps>): React.JSX.Element {
   const deg = useSharedValue('-45deg');

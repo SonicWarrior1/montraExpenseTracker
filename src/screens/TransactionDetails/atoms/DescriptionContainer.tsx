@@ -4,7 +4,6 @@ import ReactNativeBlobUtil from 'react-native-blob-util';
 import Toast from 'react-native-toast-message';
 import CustomButton from '../../../components/CustomButton';
 import {COLORS} from '../../../constants/commonStyles';
-import {STRINGS} from '../../../constants/strings';
 import {setLoading} from '../../../redux/reducers/userSlice';
 import style from '../styles';
 import {useAppTheme} from '../../../hooks/themeHook';
@@ -13,6 +12,7 @@ import FileViewer from 'react-native-file-viewer';
 import {useAppDispatch} from '../../../redux/store';
 import {OfflineTransactionModel} from '../../../DbModels/OfflineTransactionModel';
 import {OnlineTransactionModel} from '../../../DbModels/OnlineTransactionModel';
+import { STRINGS } from '../../../localization';
 
 function DescriptionContainer({
   trans,

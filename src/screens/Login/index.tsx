@@ -14,7 +14,7 @@ import CustomInput from '../../components/CustomInput';
 import {EmailEmptyError, PassEmptyError} from '../../constants/errors';
 import CustomPassInput from '../../components/CustomPassInput';
 import CustomButton from '../../components/CustomButton';
-import {NAVIGATION, STRINGS} from '../../constants/strings';
+import {NAVIGATION} from '../../constants/strings';
 import Spacer from '../../components/Spacer';
 import {ICONS} from '../../constants/icons';
 import {LoginScreenProps} from '../../defs/navigation';
@@ -33,6 +33,7 @@ import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import Toast from 'react-native-toast-message';
 import {FirebaseAuthErrorHandler} from '../../utils/firebase';
 import CustomHeader from '../../components/CustomHeader';
+import { STRINGS } from '../../localization';
 
 function Login({navigation}: Readonly<LoginScreenProps>) {
   // constants

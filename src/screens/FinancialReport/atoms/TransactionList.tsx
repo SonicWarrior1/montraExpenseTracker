@@ -7,8 +7,8 @@ import {OnlineTransactionModel} from '../../../DbModels/OnlineTransactionModel';
 import {OfflineTransactionModel} from '../../../DbModels/OfflineTransactionModel';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RootStackParamList} from '../../../defs/navigation';
-import {STRINGS} from '../../../constants/strings';
 import TransactionItem from '../../../components/TransactionListItem/TransactionItem';
+import { STRINGS } from '../../../localization';
 
 function TransactionList({
   data,

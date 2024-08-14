@@ -2,9 +2,10 @@ import React, {useMemo} from 'react';
 import {Text, View} from 'react-native';
 import {PieChart} from 'react-native-gifted-charts';
 import style from '../styles';
-import {currencies, STRINGS} from '../../../constants/strings';
+import {currencies} from '../../../constants/strings';
 import {useAppTheme} from '../../../hooks/themeHook';
 import {formatWithCommas} from '../../../utils/commonFuncs';
+import { STRINGS } from '../../../localization';
 
 function Piegraph({
   transType,

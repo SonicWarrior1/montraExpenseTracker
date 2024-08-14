@@ -2,7 +2,7 @@ import React, {useCallback, useMemo, useState} from 'react';
 import {Platform, SafeAreaView, Text, View} from 'react-native';
 import style from './styles';
 import {useAppDispatch} from '../../redux/store';
-import {monthData, STRINGS, weekData} from '../../constants/strings';
+import {monthData, weekData} from '../../constants/strings';
 import CustomDropdown from '../../components/CustomDropDown';
 import CustomButton from '../../components/CustomButton';
 import {ICONS} from '../../constants/icons';
@@ -19,6 +19,7 @@ import {OnlineTransactionModel} from '../../DbModels/OnlineTransactionModel';
 import {OfflineTransactionModel} from '../../DbModels/OfflineTransactionModel';
 import CustomHeader from '../../components/CustomHeader';
 import {ExportScreenProps} from '../../defs/navigation';
+import { STRINGS } from '../../localization';
 
 function ExportData({navigation}: ExportScreenProps) {
   // redux
@@ -63,11 +64,11 @@ function ExportData({navigation}: ExportScreenProps) {
         }
         let frequency = '';
         if (item.freq?.freq === 'yearly') {
-          frequency = item.freq.day + monthData[item.freq.month].label;
+          frequency = item.freq.day + monthData(STRINGS)[item.freq.month].label;
         } else if (item.freq?.freq === 'monthly') {
           frequency = String(item.freq.day);
         } else if (item.freq?.freq === 'weekly') {
-          frequency = weekData[item.freq.weekDay].label;
+          frequency = weekData(STRINGS)[item.freq.weekDay].label;
         }
         return {
           ...item,

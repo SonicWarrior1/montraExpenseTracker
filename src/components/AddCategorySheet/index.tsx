@@ -13,7 +13,6 @@ import {
 import {transactionType} from '../../defs/transaction';
 import SheetBackdrop from '../SheetBackDrop';
 import {encrypt} from '../../utils/encryption';
-import {STRINGS} from '../../constants/strings';
 import {useAppTheme} from '../../hooks/themeHook';
 import {COLORS} from '../../constants/commonStyles';
 import {EmptyError} from '../../constants/errors';
@@ -30,6 +29,7 @@ import {
 import {BottomSheetModalMethods} from '@gorhom/bottom-sheet/lib/typescript/types';
 import {useRealm} from '@realm/react';
 import {getMyColor} from '../../utils/commonFuncs';
+import { STRINGS } from '../../localization';
 
 function AddCategorySheet({
   bottomSheetModalRef,

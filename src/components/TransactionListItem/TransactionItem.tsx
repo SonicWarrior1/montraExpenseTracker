@@ -16,6 +16,7 @@ import {formatWithCommas} from '../../utils/commonFuncs';
 import {formatAMPM} from '../../utils/firebase';
 import style from './styles';
 import {RFValue} from 'react-native-responsive-fontsize';
+import {convertCatLang, STRINGS} from '../../localization';
 
 const TransactionItem = ({
   item,
@@ -111,7 +112,7 @@ const TransactionItem = ({
         <Text style={styles.text1} numberOfLines={1}>
           {item.type === 'transfer'
             ? item.from + ' - ' + item.to
-            : item.category[0].toLocaleUpperCase() + item.category.slice(1)}
+            : convertCatLang(STRINGS, item.category)}
         </Text>
         <Text style={styles.text2} numberOfLines={1}>
           {item.desc}
@@ -155,7 +156,7 @@ const TransactionItem = ({
               ?.toDate()
               ?.getDate() +
               ' ' +
-              monthData[
+              monthData(STRINGS)[
                 Timestamp.fromMillis(item.timeStamp.seconds * 1000)
                   ?.toDate()
                   ?.getMonth()

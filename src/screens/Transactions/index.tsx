@@ -13,7 +13,7 @@ import {useAppSelector} from '../../redux/store';
 import {COLORS} from '../../constants/commonStyles';
 import TransactionHeader from '../../components/TransactionHeader';
 import {TransactionScreenProps} from '../../defs/navigation';
-import {NAVIGATION, STRINGS} from '../../constants/strings';
+import {NAVIGATION} from '../../constants/strings';
 import {useAppTheme} from '../../hooks/themeHook';
 import {Timestamp} from '@react-native-firebase/firestore';
 import TabBackdrop from '../../components/TabBackdrop';
@@ -21,6 +21,7 @@ import {useQuery} from '@realm/react';
 import {OnlineTransactionModel} from '../../DbModels/OnlineTransactionModel';
 import {OfflineTransactionModel} from '../../DbModels/OfflineTransactionModel';
 import TransactionItem from '../../components/TransactionListItem/TransactionItem';
+import { STRINGS } from '../../localization';
 function TransactionScreen({navigation}: Readonly<TransactionScreenProps>) {
   // constants
   const COLOR = useAppTheme();

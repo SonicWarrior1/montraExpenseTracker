@@ -4,7 +4,6 @@ import {
   FlatList,
   Pressable,
   SafeAreaView,
-  ScrollView,
   Text,
   TouchableOpacity,
   View,
@@ -15,7 +14,6 @@ import {ICONS} from '../../constants/icons';
 import firestore, {Timestamp} from '@react-native-firebase/firestore';
 import style from './styles';
 import {encrypt} from '../../utils/encryption';
-import {STRINGS} from '../../constants/strings';
 import {useAppTheme} from '../../hooks/themeHook';
 import Spacer from '../../components/Spacer';
 import {useNetInfo} from '@react-native-community/netinfo';
@@ -23,6 +21,7 @@ import {useRealm} from '@realm/react';
 import {UpdateMode} from 'realm';
 import {updateNotification} from '../../redux/reducers/userSlice';
 import NotificationListItem from './atoms/NotificationListItem';
+import { STRINGS } from '../../localization';
 
 function NotificationScreen({navigation}: Readonly<NotificationScreenProps>) {
   // redux
