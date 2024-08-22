@@ -53,8 +53,8 @@ export const NAVIGATION: {
 };
 
 export const STRINGS = {
-  Biometrics:'Biometrics',
-  ResetPassword:'Reset Password',
+  Biometrics: 'Biometrics',
+  ResetPassword: 'Reset Password',
   InvalidEmail: 'Invalid Email Address',
   ToManyRequestError: 'Too many requests. Please try again after sometime.',
   PopupClosedByUser: 'Authentication process canceled. Please try again.',
@@ -212,7 +212,8 @@ export const STRINGS = {
   CheckInternet: 'Please check your internet connection',
   PasswordDoNotMatch: 'Password do not match',
   ConfirmPasswordCannotBeEmpty: 'Confirm Password cannot be Empty',
-  PasswordNotValid: 'Password must contain atleast 1 Uppercase, 1 Lowercase, 1 Numeric and 1 Symbol Character',
+  PasswordNotValid:
+    'Password must contain atleast 1 Uppercase, 1 Lowercase, 1 Numeric and 1 Symbol Character',
   PasswordCannotBeEmpty: 'Password cannot be Empty',
   EmailIsNotValid: 'Email is not Valid',
   EmailCannotBeEmpty: 'Email cannot be Empty',
@@ -245,7 +246,7 @@ export const STRINGS = {
   NetworkError:
     'A network error (such as timeout, interrupted connection or unreachable host) has occurred.',
   UnknownError: 'An unknown error occurred. Please try again later.',
-  PasswordResetSucessful:'Password Reset Sucessful'
+  PasswordResetSucessful: 'Password Reset Sucessful',
 };
 export const OnboardData = [
   {
@@ -268,7 +269,7 @@ export const OnboardData = [
 export const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 export const nameRegex = /^[a-zA-Z ]*$/;
 export const passRegex =
-  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&\s])[A-Za-z\d@$!%*?&\s]{8,}$/;
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d\s])[A-Za-z\d\W\s]{8,}$/;
 
 export const monthData = [
   {label: 'January', value: 1},
