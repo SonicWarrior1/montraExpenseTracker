@@ -37,7 +37,7 @@ function ThemeScreen({navigation}: Readonly<ThemeScreenProps>) {
             }
           }}>
           <Text style={styles.text}>
-            {item[0].toUpperCase() + item.slice(1)}
+            {STRINGS[item[0].toUpperCase() + item.slice(1)]}
           </Text>
           <BouncyCheckbox
             disabled

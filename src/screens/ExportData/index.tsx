@@ -19,7 +19,7 @@ import {OnlineTransactionModel} from '../../DbModels/OnlineTransactionModel';
 import {OfflineTransactionModel} from '../../DbModels/OfflineTransactionModel';
 import CustomHeader from '../../components/CustomHeader';
 import {ExportScreenProps} from '../../defs/navigation';
-import { STRINGS } from '../../localization';
+import {convertLastNdaysText, STRINGS} from '../../localization';
 
 function ExportData({navigation}: ExportScreenProps) {
   // redux
@@ -132,7 +132,9 @@ function ExportData({navigation}: ExportScreenProps) {
           <CustomDropdown
             data={['all', 'expense', 'income', 'transfer'].map(item => {
               return {
-                label: item[0].toUpperCase() + item.slice(1),
+                label:
+                  STRINGS?.[item[0].toUpperCase() + item.slice(1)] ??
+                  item[0].toUpperCase() + item.slice(1),
                 value: item,
               };
             })}
@@ -146,7 +148,7 @@ function ExportData({navigation}: ExportScreenProps) {
           <CustomDropdown
             data={['7', '15', '30'].map(item => {
               return {
-                label: `Last ${item} days`,
+                label: convertLastNdaysText(STRINGS, item),
                 value: item,
               };
             })}

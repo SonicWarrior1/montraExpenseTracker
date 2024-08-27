@@ -1,9 +1,9 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {Pressable, Text, View} from 'react-native';
 import Spacer from '../../../components/Spacer';
 import {ICONS} from '../../../constants/icons';
 import styles from '../styles';
-import { STRINGS } from '../../../localization';
+import {STRINGS} from '../../../localization';
 
 function PinHeader({
   isSetup,
@@ -16,6 +16,12 @@ function PinHeader({
   backAction: () => boolean;
   setMenu: React.Dispatch<React.SetStateAction<boolean>>;
 }>) {
+  const [temp, setTemp] = useState(true);
+  useEffect(() => {
+    if (temp) {
+      setTemp(false);
+    }
+  }, [temp]);
   const getTitleText = () => {
     if (isSetup && oldPin === '') {
       return STRINGS.SetupPin;
@@ -26,13 +32,7 @@ function PinHeader({
     }
   };
   return (
-    <View
-      style={{
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        width: '100%',
-        alignItems: 'center',
-      }}>
+    <View style={styles.headerRow}>
       {isSetup ? (
         <Pressable onPress={backAction}>
           {ICONS.ArrowLeft({
@@ -61,4 +61,4 @@ function PinHeader({
   );
 }
 
-export default React.memo(PinHeader);
+export default PinHeader;

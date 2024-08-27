@@ -10,7 +10,7 @@ import {BottomTabNavigationProp} from '@react-navigation/bottom-tabs';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {Bar} from 'react-native-progress';
 import {useAppSelector} from '../../../redux/store';
-import { STRINGS } from '../../../localization';
+import {convertCatLang, STRINGS} from '../../../localization';
 
 function BudgetItem({
   item,
@@ -98,9 +98,7 @@ function BudgetItem({
       <View style={styles.catRow}>
         <View style={styles.catCtr}>
           <View style={[styles.colorBox, {backgroundColor: color}]} />
-          <Text style={styles.catText}>
-            {key[0].toUpperCase() + key.slice(1)}
-          </Text>
+          <Text style={styles.catText}>{convertCatLang(STRINGS, key)}</Text>
         </View>
         {(spend?.[key]?.USD ?? 0) >= val.limit &&
           ICONS.Alert({
@@ -110,7 +108,7 @@ function BudgetItem({
           })}
       </View>
       <Text style={styles.text1}>
-        Remaining {currencies[currency!].symbol}
+        {STRINGS.Remaining} {currencies[currency!].symbol}
         {formatWithCommas(getValue(val, key).toString())}
       </Text>
       <Bar
@@ -126,7 +124,7 @@ function BudgetItem({
             .toFixed(2)
             .toString(),
         )}{' '}
-        of {currencies[currency!].symbol}
+        {STRINGS.of} {currencies[currency!].symbol}
         {formatWithCommas(
           (val.conversion.usd[currency!.toLowerCase()] * val.limit)
             .toFixed(2)

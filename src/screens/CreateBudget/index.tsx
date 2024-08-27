@@ -37,7 +37,7 @@ import {
 } from '../../utils/firebase';
 import CategoryDropdownIcon from '../../components/CategoryColorIcon';
 import {RFValue} from 'react-native-responsive-fontsize';
-import { STRINGS } from '../../localization';
+import {convertCatLang, STRINGS} from '../../localization';
 function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
   // constants
   const COLOR = useAppTheme();
@@ -114,10 +114,13 @@ function CreateBudget({navigation, route}: Readonly<CreateBudgetScreenProps>) {
         )
         .map(item => {
           return {
-            label:
-              item === 'add'
+            label: convertCatLang(
+              STRINGS,
+              (item === 'add'
                 ? 'ADD NEW CATEGORY'
-                : item[0].toUpperCase() + item.slice(1),
+                : item[0].toUpperCase() + item.slice(1)
+              ).toLowerCase(),
+            ),
             value: item,
           };
         }),

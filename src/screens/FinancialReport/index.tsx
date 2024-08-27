@@ -25,7 +25,8 @@ import {OnlineTransactionModel} from '../../DbModels/OnlineTransactionModel';
 import {OfflineTransactionModel} from '../../DbModels/OfflineTransactionModel';
 import CustomHeader from '../../components/CustomHeader';
 import {FinancialReportScreenProps} from '../../defs/navigation';
-import { STRINGS } from '../../localization';
+import {STRINGS} from '../../localization';
+import {TransCatData} from '../../constants/strings';
 
 function FinancialReport({navigation}: Readonly<FinancialReportScreenProps>) {
   // state
@@ -214,7 +215,7 @@ function FinancialReport({navigation}: Readonly<FinancialReportScreenProps>) {
         </View>
         <View style={styles.flexRow}>
           <Dropdown
-          showsVerticalScrollIndicator={false}
+            showsVerticalScrollIndicator={false}
             style={[styles.dropdown, {width: 160}]}
             renderLeftIcon={() => (
               <View style={{marginRight: 10}}>
@@ -254,12 +255,7 @@ function FinancialReport({navigation}: Readonly<FinancialReportScreenProps>) {
             }}
             renderRightIcon={() => <></>}
             value={type}
-            data={['transaction', 'category'].map(item => {
-              return {
-                label: item[0].toUpperCase() + item.slice(1),
-                value: item,
-              };
-            })}
+            data={TransCatData(STRINGS)}
             labelField={'label'}
             valueField={'value'}
             onChange={({value}) => {

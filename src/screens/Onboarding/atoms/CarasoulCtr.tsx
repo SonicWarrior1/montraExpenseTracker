@@ -1,7 +1,7 @@
 import {Image, View, Text, Dimensions} from 'react-native';
 import {useAppTheme} from '../../../hooks/themeHook';
 import style from '../styles';
-import {useMemo} from 'react';
+import React, {useMemo} from 'react';
 import {isTablet} from 'react-native-device-info';
 
 const CarasoulCtr = ({
@@ -21,7 +21,7 @@ const CarasoulCtr = ({
   const getImage = useMemo(() => {
     if (index === 0) {
       return require('../../../assets/Images/onboarding1.png');
-    } else if (index == 1) {
+    } else if (index === 1) {
       return require('../../../assets/Images/onboarding2.png');
     } else {
       return require('../../../assets/Images/onboarding3.png');

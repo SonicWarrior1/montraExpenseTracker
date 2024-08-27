@@ -96,5 +96,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     borderRadius: 16,
   },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    alignItems: 'center',
+  },
 });
 export default styles;

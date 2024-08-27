@@ -34,6 +34,7 @@ function CustomHeader({
     | 'ExportData'
     | 'Theme'
     | 'ResetPassword'
+    | 'Language'
   >;
   color?: string;
   bottomBorder?: boolean;

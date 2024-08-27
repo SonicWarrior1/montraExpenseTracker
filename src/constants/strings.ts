@@ -55,22 +55,21 @@ export const NAVIGATION: {
   Language: 'Language',
 };
 
-export const OnboardData = [
+export const OnboardData = (STRINGS: typeof STRING) => [
   {
     icon: '../../assets/Images/onboarding1.png',
-    text1: 'Gain total control of your money',
-    text2: 'Become your own money manager and make every cent count',
+    text1: STRINGS.OnboardText1,
+    text2: STRINGS.OnboardSubText1,
   },
   {
     icon: '../../assets/Images/onboarding2.png',
-    text1: 'Know where your money goes',
-    text2:
-      'Track your transactions easily with categories and financial report ',
+    text1: STRINGS.OnboardText2,
+    text2: STRINGS.OnboardSubText2,
   },
   {
     icon: '../../assets/Images/onboarding3.png',
-    text1: 'Planning ahead',
-    text2: 'Setup your budget for each category so you are in control',
+    text1: STRINGS.OnboardText3,
+    text2: STRINGS.OnboardSubText3,
   },
 ];
 export const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -156,9 +155,14 @@ export const Wallets = [
 export const languages = {
   'en-US': {locale: 'en-US', language: 'English (United States)'},
   'es-ES': {locale: 'es-ES', language: 'Español (España)'},
-  'fr-FR': {locale: 'fr-FR', language: 'Français (France)'},
+  // 'fr-FR': {locale: 'fr-FR', language: 'Français (France)'},
   'ja-JP': {locale: 'ja-JP', language: '日本語 (日本)'},
-  'ru-RU': {locale: 'ru-RU', language: 'Русский (Россия)'},
+  // 'ru-RU': {locale: 'ru-RU', language: 'Русский (Россия)'},
   'hi-IN': {locale: 'hi-IN', language: 'हिन्दी (भारत)'},
-  'ar-SA': {locale: 'ar-SA', language: 'العربية (السعودية)'},
+  // 'ar-SA': {locale: 'ar-SA', language: 'العربية (السعودية)'},
 };
+
+export const TransCatData = (STRINGS: typeof STRING) => [
+  {label: STRINGS.Transaction, value: 'transaction'},
+  {label: STRINGS.Category, value: 'category'},
+];

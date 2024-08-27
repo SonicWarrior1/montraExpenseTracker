@@ -117,3 +117,7 @@ export const convertNotificationText = (
     }
   }
 };
+
+export const convertLastNdaysText = (STRING: typeof STRINGS, n: string) => {
+  return `${STRING.Last} ${n} ${STRING.Days}`;
+};

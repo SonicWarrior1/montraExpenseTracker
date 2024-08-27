@@ -19,7 +19,7 @@ import {FirebaseAuthErrorHandler} from '../../utils/firebase';
 import auth, {FirebaseAuthTypes} from '@react-native-firebase/auth';
 import Toast from 'react-native-toast-message';
 import {ResetPasswordScreenProps} from '../../defs/navigation';
-import { STRINGS } from '../../localization';
+import {STRINGS} from '../../localization';
 
 function ResetPassword({route, navigation}: ResetPasswordScreenProps) {
   const COLOR = useAppTheme();
@@ -81,7 +81,7 @@ function ResetPassword({route, navigation}: ResetPasswordScreenProps) {
         } catch (e) {
           // console.log(e);
           navigation.replace(user ? NAVIGATION.LOGIN : NAVIGATION.BottomTab);
-          Toast.show({text1: 'Link Expired/Already Used', type: 'error'});
+          Toast.show({text1: STRINGS.LinkExpired, type: 'error'});
         } finally {
           dispatch(setLoading(false));
         }

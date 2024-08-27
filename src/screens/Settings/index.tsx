@@ -11,7 +11,7 @@ import {Switch} from 'react-native-switch';
 import {setBiometrics} from '../../redux/reducers/userSlice';
 import ReactNativeBiometrics from 'react-native-biometrics';
 import Toast from 'react-native-toast-message';
-import { STRINGS } from '../../localization';
+import {STRINGS} from '../../localization';
 
 function SettingsScreen({navigation}: Readonly<SettingsScreenProps>) {
   const currency = useAppSelector(state => state.user.currentUser?.currency);
@@ -24,7 +24,7 @@ function SettingsScreen({navigation}: Readonly<SettingsScreenProps>) {
   const [checked, setChecked] = useState<boolean>(biometrics ?? false);
   const appState = useRef(AppState.currentState);
   const lang = useAppSelector(state => state.user.currentUser?.lang);
-  
+
   useEffect(() => {
     rnBiometrics.isSensorAvailable().then(sensor => {
       if (sensor.error) {
@@ -75,7 +75,11 @@ function SettingsScreen({navigation}: Readonly<SettingsScreenProps>) {
           navigation.navigate(NAVIGATION.Theme);
         }}
         text={STRINGS.Theme}
-        subText={theme?.[0]?.toLocaleUpperCase() + theme?.slice(1)!}
+        subText={
+          theme !== undefined
+            ? STRINGS[theme[0].toUpperCase() + theme.slice(1)]
+            : ''
+        }
       />
       <View style={styles.btn}>
         <Text style={styles.text}>{STRINGS.Biometrics}</Text>

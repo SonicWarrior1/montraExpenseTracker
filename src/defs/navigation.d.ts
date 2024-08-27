@@ -124,3 +124,7 @@ export type ResetPasswordScreenProps = StackScreenProps<
   RootStackParamList,
   'ResetPassword'
 >;
+export type LanguageScreenProps = StackScreenProps<
+  RootStackParamList,
+  'Language'
+>;

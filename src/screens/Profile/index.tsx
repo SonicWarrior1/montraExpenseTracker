@@ -17,16 +17,17 @@ import {useAppTheme} from '../../hooks/themeHook';
 // Third Party Libraries
 import {openLogoutSheet} from '../../redux/reducers/transactionSlice';
 import TabBackdrop from '../../components/TabBackdrop';
-import { STRINGS } from '../../localization';
+import {STRINGS} from '../../localization';
 
 function ProfileScreen({navigation}: Readonly<ProfileScreenProps>) {
   const dispatch = useAppDispatch();
   const username = useAppSelector(state => state.user.currentUser?.name);
+  const lang = useAppSelector(state => state.user.currentUser?.lang);
   const COLOR = useAppTheme();
   const styles = style(COLOR);
   return (
     <>
-      <SafeAreaView style={styles.safeView}>
+      <SafeAreaView style={styles.safeView} key={lang}>
         <ScrollView>
           <View style={styles.mainView}>
             <View style={styles.nameRow}>
@@ -41,7 +42,7 @@ function ProfileScreen({navigation}: Readonly<ProfileScreenProps>) {
                   <Text style={styles.text1} numberOfLines={1}>
                     {STRINGS.Username}
                   </Text>
-                  <Text style={styles.text2}>{username}</Text>
+                  <Text style={styles.text2}>{username ?? ''}</Text>
                 </View>
               </View>
             </View>

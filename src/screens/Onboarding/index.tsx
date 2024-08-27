@@ -34,7 +34,7 @@ function Onboarding({navigation}: Readonly<OnboardingScreenProps>) {
             <Carousel
               loop={false}
               width={screenWidth - 40}
-              data={OnboardData}
+              data={OnboardData(STRINGS)}
               scrollAnimationDuration={300}
               onSnapToItem={index => {
                 setIndex(index);

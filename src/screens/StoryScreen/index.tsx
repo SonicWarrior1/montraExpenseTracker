@@ -16,7 +16,7 @@ import {useAppSelector} from '../../redux/store';
 import {currencies, NAVIGATION} from '../../constants/strings';
 import {useAppTheme} from '../../hooks/themeHook';
 import {formatWithCommas} from '../../utils/commonFuncs';
-import { STRINGS } from '../../localization';
+import {convertCatLang, STRINGS} from '../../localization';
 
 export default function StoryScreen({navigation}: Readonly<StoryScreenProps>) {
   // redux
@@ -184,7 +184,7 @@ export default function StoryScreen({navigation}: Readonly<StoryScreenProps>) {
                       ICONS.Money({height: 20, width: 20})}
                   </View>
                   <Text style={styles.catText}>
-                    {item[0][0].toUpperCase() + item[0].slice(1)}
+                    {convertCatLang(STRINGS, item[0])}
                   </Text>
                 </View>
               ))}
@@ -242,7 +242,7 @@ export default function StoryScreen({navigation}: Readonly<StoryScreenProps>) {
                   </View>
                   {item[0] !== '' && (
                     <Text style={styles.catText} numberOfLines={1}>
-                      {item[0][0].toUpperCase() + item[0].slice(1)}
+                      {convertCatLang(STRINGS, item[0])}
                     </Text>
                   )}
                 </View>

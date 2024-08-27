@@ -23,7 +23,7 @@ import {openLogoutSheet} from '../../redux/reducers/transactionSlice';
 import {useRealm} from '@realm/react';
 import {useNetInfo} from '@react-native-community/netinfo';
 import Toast from 'react-native-toast-message';
-import { STRINGS } from '../../localization';
+import {STRINGS} from '../../localization';
 function LogoutSheet() {
   // constants
   const COLOR = useAppTheme();
@@ -49,11 +49,14 @@ function LogoutSheet() {
       } else {
         await NativeModules.GoogleSignInHandler.signOut();
       }
-      await auth().signOut();
+      try {
+        await auth().signOut();
+      } catch (e) {}
       dispatch(setTheme(authTheme));
       dispatch(userLoggedIn(undefined));
       dispatch(openLogoutSheet(false));
       dispatch(setBiometrics(undefined));
+      STRINGS.setLanguage(STRINGS.getInterfaceLanguage());
       realm.write(() => {
         realm.deleteAll();
       });

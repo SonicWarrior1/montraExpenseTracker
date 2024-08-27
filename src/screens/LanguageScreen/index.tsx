@@ -9,9 +9,13 @@ import {useAppSelector} from '../../redux/store';
 import firestore from '@react-native-firebase/firestore';
 // import {encrypt} from '../../utils/encryption';
 import style from './styles';
-import { STRINGS } from '../../localization';
+import {STRINGS} from '../../localization';
+// import RNRestart from 'react-native-restart';
+import {useNetInfo} from '@react-native-community/netinfo';
+import {LanguageScreenProps} from '../../defs/navigation';
+import Toast from 'react-native-toast-message';
 
-const LanguageScreen = ({route, navigation}) => {
+const LanguageScreen = ({navigation}: LanguageScreenProps) => {
   // redux
   const lang = useAppSelector(state => state.user.currentUser?.lang);
   const uid = useAppSelector(state => state.user.currentUser?.uid);
@@ -19,6 +23,7 @@ const LanguageScreen = ({route, navigation}) => {
   const COLORS = useAppTheme();
   const styles = style(COLORS);
   const userDoc = firestore().collection('users').doc(uid);
+  const {isConnected} = useNetInfo();
   return (
     <SafeAreaView style={styles.safeView}>
       <CustomHeader
@@ -35,7 +40,17 @@ const LanguageScreen = ({route, navigation}) => {
             style={styles.row}
             onPress={async () => {
               if (lang !== item.locale) {
-                await userDoc.update({lang: item.locale});
+                if (isConnected) {
+                  await userDoc.update({lang: item.locale});
+                } else {
+                  Toast.show({
+                    text1:
+                      'Language change when device has no internet access is not currently supported.',
+                    type: 'error',
+                  });
+                  // STRINGS.setLanguage(item.locale);
+                  // RNRestart.restart();
+                }
               }
             }}>
             <Text style={styles.text}>{item.language}</Text>
@@ -47,7 +62,17 @@ const LanguageScreen = ({route, navigation}) => {
               isChecked={lang === item.locale}
               onPress={async () => {
                 if (lang !== item.locale) {
-                  await userDoc.update({lang: item.locale});
+                  if (isConnected) {
+                    await userDoc.update({lang: item.locale});
+                  } else {
+                    Toast.show({
+                      text1:
+                        'Language change when device has no internet access is not currently supported.',
+                      type: 'error',
+                    });
+                    // STRINGS.setLanguage(item.locale);
+                    // RNRestart.restart();
+                  }
                 }
               }}
               iconStyle={{height: 24, width: 24}}

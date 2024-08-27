@@ -217,5 +217,17 @@
     "transportation": "Transportation",
     "salary": "Salary",
     "passive income": "Passive Income",
-    "add new category": "ADD NEW CATEGORY"
+    "add new category": "ADD NEW CATEGORY",
+    "of": "of",
+    "Device": "Device",
+    "OnboardText1": "Gain total control of your money",
+    "OnboardSubText1": "Become your own money manager and make every cent count",
+    "OnboardText2": "Know where your money goes",
+    "OnboardSubText2": "Track your transactions easily with categories and financial report ",
+    "OnboardText3": "Planning ahead",
+    "OnboardSubText3": "Setup your budget for each category so you are in control",
+    "LinkExpired": "Link Expired/Already Used",
+    "All": "All",
+    "Last": "Last",
+    "Days": "Days"
 }

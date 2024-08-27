@@ -217,5 +217,17 @@
   "transportation": "交通",
   "salary": "給料",
   "passive income": "受動的収入",
-  "add new category": "新しいカテゴリーを追加"
+  "add new category": "新しいカテゴリーを追加",
+  "of": "の",
+  "Device": "デバイス",
+  "OnboardText1": "お金を完全に管理する",
+  "OnboardSubText1": "自分のお金を自分で管理し、毎セントを大切にしましょう",
+  "OnboardText2": "お金の行き先を把握する",
+  "OnboardSubText2": "カテゴリーと財務報告で取引を簡単に追跡する",
+  "OnboardText3": "先を見据えた計画",
+  "OnboardSubText3": "各カテゴリーの予算を設定して、コントロールを維持する",
+  "LinkExpired": "リンクの有効期限が切れているか、すでに使用されています",
+  "All": "全て",
+  "Last": "過去",
+  "Days": "日間"
 }

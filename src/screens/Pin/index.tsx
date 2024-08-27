@@ -33,7 +33,7 @@ import ProgressDot from './atoms/ProgressDot';
 import KeyPad from './atoms/Keypad';
 import ReactNativeBiometrics from 'react-native-biometrics';
 import {isTablet} from 'react-native-device-info';
-import { STRINGS } from '../../localization';
+import {STRINGS} from '../../localization';
 
 function Pin({route, navigation}: Readonly<PinSentScreenProps>) {
   // constants
