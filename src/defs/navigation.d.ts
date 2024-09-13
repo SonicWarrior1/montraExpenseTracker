@@ -40,7 +40,9 @@ export type RootStackParamList = {
     mode: string;
     oobCode: string;
   };
-  Language:undefined
+  Language: undefined;
+  ChatDashboard: undefined;
+  ChatScreen: {roomId: string};
 };
 
 export type BottomParamList = {
@@ -127,4 +129,12 @@ export type ResetPasswordScreenProps = StackScreenProps<
 export type LanguageScreenProps = StackScreenProps<
   RootStackParamList,
   'Language'
+>;
+export type ChatDashboardScreenProps = StackScreenProps<
+  RootStackParamList,
+  'ChatDashboard'
+>;
+export type ChatScreenProps = StackScreenProps<
+  RootStackParamList,
+  'ChatScreen'
 >;

@@ -27,6 +27,8 @@ export const NAVIGATION: {
   Theme: 'Theme';
   ResetPassword: 'ResetPassword';
   Language: 'Language';
+  ChatDashboard: 'ChatDashboard';
+  ChatScreen: 'ChatScreen';
 } = {
   ONBOARDING: 'Onboarding',
   SIGNUP: 'Signup',
@@ -53,6 +55,8 @@ export const NAVIGATION: {
   Theme: 'Theme',
   ResetPassword: 'ResetPassword',
   Language: 'Language',
+  ChatDashboard: 'ChatDashboard',
+  ChatScreen: 'ChatScreen',
 };
 
 export const OnboardData = (STRINGS: typeof STRING) => [

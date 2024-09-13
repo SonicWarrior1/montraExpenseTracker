@@ -46,6 +46,8 @@ import Transfer2 from '../assets/Svgs/transfer.svg';
 import Success from '../assets/Svgs/success.svg';
 import AttachmentBtn from '../assets/Svgs/attachementButton.svg';
 import Calender from '../assets/Svgs/calender.svg';
+import Chat from '../assets/Svgs/chat.svg';
+import Send from '../assets/Svgs/send.svg';
 import {COLORS} from './commonStyles';
 const iconStyle = ({
   width = 0,
@@ -116,6 +118,8 @@ export const ICONS = {
   AttachmentBtn: (params: iconProps) =>
     AttachmentBtn({...iconStyle({...params})}),
   Calender: (params: iconProps) => Calender({...iconStyle({...params})}),
+  Chat: (params: iconProps) => Chat({...iconStyle({...params})}),
+  Send: (params: iconProps) => Send({...iconStyle({...params})}),
 };
 
 export const catIcons: {

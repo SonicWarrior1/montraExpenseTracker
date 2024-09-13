@@ -35,6 +35,7 @@ function CustomHeader({
     | 'Theme'
     | 'ResetPassword'
     | 'Language'
+    | 'ChatDashboard'
   >;
   color?: string;
   bottomBorder?: boolean;

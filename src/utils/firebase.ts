@@ -20,7 +20,9 @@ import firestore, {
   Timestamp,
 } from '@react-native-firebase/firestore';
 import {Dispatch} from '@reduxjs/toolkit';
-import { STRINGS } from '../localization';
+import {STRINGS} from '../localization';
+import {ChatToJson} from './chatFuncs';
+import {ChatMessage} from '../defs/ChatMessage';
 
 type transType = 'income' | 'transfer' | 'expense';
 type AllTransType =
@@ -1233,4 +1235,118 @@ export async function handleOfflineNotification({
       }
     }
   }
+}
+
+const roomExist = async ({
+  myUid,
+  otherUserUid,
+}: {
+  myUid: string;
+  otherUserUid: string;
+}) => {
+  try {
+    const a = await firestore()
+      .collection('chat')
+      .doc(myUid + '_' + otherUserUid)
+      .get();
+    const b = await firestore()
+      .collection('chat')
+      .doc(otherUserUid + '_' + myUid)
+      .get();
+    if (a.exists || b.exists) {
+      console.log('AlreadyExist');
+      return true;
+    }
+    return false;
+  } catch (e) {
+    console.log(e);
+    return true;
+  }
+};
+
+export const createRoom = async ({
+  myUid,
+  otherUserUid,
+}: {
+  myUid: string;
+  otherUserUid: string;
+}) => {
+  const exist = await roomExist({myUid, otherUserUid});
+  if (myUid !== otherUserUid && !exist) {
+    await firestore()
+      .collection('chat')
+      .doc(myUid + '_' + otherUserUid)
+      .set({
+        id: myUid + '_' + otherUserUid,
+        users: [myUid, otherUserUid],
+      });
+    console.log('RoomCreated');
+  } else {
+    console.log('dsjn');
+  }
+};
+
+export const sendMessage = async ({
+  id,
+  message,
+  by,
+  attachement,
+  attachementType,
+}: {
+  id: string;
+  message: string;
+  by: string;
+  attachement: string | undefined;
+  attachementType: ChatMessage['type'];
+}) => {
+  try {
+    const msgId = uuid.v4() as string;
+    let url = '';
+    if (attachement) {
+      url = await uploadAttachment({
+        attachement: attachement,
+        id: id,
+        msgId: msgId,
+      });
+    }
+    await firestore()
+      .collection('chat')
+      .doc(id)
+      .collection('messages')
+      .doc(msgId as string)
+      .set(
+        ChatToJson({
+          id: msgId as string,
+          text: message,
+          time: Timestamp.now(),
+          sender: by,
+          type: attachement ? attachementType : 'text',
+          attachment: url,
+        }),
+      );
+    console.log('msg sent');
+  } catch (e) {
+    console.log(e);
+  }
+};
+
+export async function uploadAttachment({
+  attachement,
+  id,
+  msgId,
+}: {
+  attachement: string;
+  id: string;
+  msgId: string;
+}) {
+  let url = '';
+  try {
+    if (attachement !== '') {
+      await storage().ref(`${id}/${msgId}`).putFile(attachement);
+      url = await storage().ref(`${id}/${msgId}`).getDownloadURL();
+    }
+  } catch (e) {
+    console.log(e);
+  }
+  return url;
 }

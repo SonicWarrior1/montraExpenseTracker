@@ -68,6 +68,25 @@ function ProfileScreen({navigation}: Readonly<ProfileScreenProps>) {
                 <Text style={styles.btnText}>{STRINGS.ExportData}</Text>
               </Pressable>
               <Pressable
+                style={styles.btn}
+                onPress={() => {
+                  navigation.navigate(NAVIGATION.ChatDashboard);
+                }}>
+                <View
+                  style={[
+                    styles.colorBox,
+                    {backgroundColor: COLORS.GREEN[20]},
+                  ]}>
+                  {ICONS.Chat({
+                    height: 22,
+                    width: 22,
+                    color: 'transparent',
+                    borderColor: COLOR.GREEN[100],
+                  })}
+                </View>
+                <Text style={styles.btnText}>{'Chat'}</Text>
+              </Pressable>
+              <Pressable
                 style={[styles.btn, {borderBottomWidth: 0}]}
                 onPress={() => {
                   dispatch(openLogoutSheet(true));

@@ -30,6 +30,8 @@ import {setConversionData} from '../redux/reducers/userSlice';
 import ResetPassword from '../screens/ResetPassword';
 import LanguageScreen from '../screens/LanguageScreen';
 import {STRINGS} from '../localization';
+import ChatDashboard from '../screens/ChatDashboard';
+import ChatScreen from '../screens/ChatScreen';
 
 export const Stack = createStackNavigator<RootStackParamList>();
 
@@ -179,6 +181,11 @@ function RootNavigator(): React.JSX.Element {
             name={NAVIGATION.ResetPassword}
             component={ResetPassword}
           />
+          <Stack.Screen
+            name={NAVIGATION.ChatDashboard}
+            component={ChatDashboard}
+          />
+          <Stack.Screen name={NAVIGATION.ChatScreen} component={ChatScreen} />
         </Stack.Group>
       ) : (
         <Stack.Group>

@@ -16,16 +16,18 @@ import RNBlobUtil from 'react-native-blob-util';
 import {BottomSheetModalMethods} from '@gorhom/bottom-sheet/lib/typescript/types';
 import {pickSingle, types} from 'react-native-document-picker';
 import {useNetInfo} from '@react-native-community/netinfo';
-import {Platform} from 'react-native';
+import {Platform, View} from 'react-native';
 import {throttle} from '../../utils/transFuncs';
 import Toast from 'react-native-toast-message';
 import {MimeToExtension} from '../../utils/commonFuncs';
-import { STRINGS } from '../../localization';
+import {STRINGS} from '../../localization';
+import FilePickButton from '../FilePickButton';
 
-function FilePickerSheet({
+function ChatFilePickerSheet({
   bottomSheetModalRef,
   setImage,
   setDoc,
+  setAudio,
   onDismiss,
 }: Readonly<{
   bottomSheetModalRef: React.RefObject<BottomSheetModalMethods>;
@@ -40,10 +42,20 @@ function FilePickerSheet({
       | undefined
     >
   >;
+  setAudio: React.Dispatch<
+    React.SetStateAction<
+      | {
+          uri: string;
+          name: string;
+          type: string;
+        }
+      | undefined
+    >
+  >;
   onDismiss?: () => void;
 }>) {
   // constants
-  const snapPoints = useMemo(() => ['25%'], []);
+  const snapPoints = useMemo(() => ['40%'], []);
   const COLOR = useAppTheme();
   const styles = style(COLOR);
   const {isConnected} = useNetInfo();
@@ -118,6 +130,33 @@ function FilePickerSheet({
       console.log(e);
     }
   };
+  const audioPicker = async () => {
+    try {
+      let res = await pickSingle({
+        copyTo: 'cachesDirectory',
+        allowMultiSelection: false,
+        type: [types.audio],
+      });
+      if (res.size! < 10485760) {
+        let uri = res.fileCopyUri ?? res.uri;
+        if (!isConnected) {
+          const filePath = Platform.OS === 'ios' ? res.uri.slice(7) : res.uri;
+          uri = await RNBlobUtil.fs.readFile(filePath, 'base64');
+        }
+        if (res) {
+          setAudio({uri: uri, name: res.name!, type: MimeToExtension[res.type!]});
+          bottomSheetModalRef.current?.close();
+        } else {
+          console.log('User cancelled audio picker');
+        }
+      } else {
+        Toast.show({text1: STRINGS.FileError, type: 'error'});
+        bottomSheetModalRef.current?.close();
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  };
 
   return (
     <BottomSheetModal
@@ -130,24 +169,57 @@ function FilePickerSheet({
       onDismiss={onDismiss}
       handleIndicatorStyle={{backgroundColor: COLOR.VIOLET[40]}}>
       <BottomSheetView style={styles.sheetView}>
-        <SheetButtons
-          title={STRINGS.Camera}
-          icon={ICONS.Camera}
-          onPress={throttle(openCamera, 1000)}
-        />
-        <SheetButtons
-          title={STRINGS.Image}
-          icon={ICONS.Gallery}
-          onPress={throttle(openImagePicker, 1000)}
-        />
-        <SheetButtons
-          title={STRINGS.Document}
-          icon={ICONS.Document}
-          onPress={throttle(docPicker, 1000)}
-        />
+        <View
+          style={{
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexDirection: 'row',
+            width: '100%',
+            paddingHorizontal: 20,
+          }}>
+          <FilePickButton
+            title={STRINGS.Camera}
+            icon={ICONS.Camera}
+            onPress={throttle(openCamera, 1000)}
+          />
+          <FilePickButton
+            title={'Gallery'}
+            icon={ICONS.Gallery}
+            onPress={throttle(openImagePicker, 1000)}
+          />
+          <FilePickButton
+            title={STRINGS.Document}
+            icon={ICONS.Document}
+            onPress={throttle(docPicker, 1000)}
+          />
+        </View>
+        <View
+          style={{
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexDirection: 'row',
+            width: '100%',
+            paddingHorizontal: 20,
+          }}>
+          <FilePickButton
+            title={'Audio'}
+            icon={ICONS.Camera}
+            onPress={throttle(audioPicker, 1000)}
+          />
+          {/* <FilePickButton
+            title={STRINGS.Image}
+            icon={ICONS.Gallery}
+            onPress={throttle(openImagePicker, 1000)}
+          />
+          <FilePickButton
+            title={STRINGS.Document}
+            icon={ICONS.Document}
+            onPress={throttle(docPicker, 1000)}
+          /> */}
+        </View>
       </BottomSheetView>
     </BottomSheetModal>
   );
 }
 
-export default React.memo(FilePickerSheet);
+export default React.memo(ChatFilePickerSheet);

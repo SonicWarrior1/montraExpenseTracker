@@ -2106,6 +2106,49 @@ PODS:
     - React-Core
   - react-native-safe-area-context (4.10.1):
     - React-Core
+  - react-native-video (6.5.0):
+    - DoubleConversion
+    - glog
+    - hermes-engine
+    - RCT-Folly (= 2024.01.01.00)
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Codegen
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - react-native-video/Video (= 6.5.0)
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-rendererdebug
+    - React-utils
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - Yoga
+  - react-native-video/Video (6.5.0):
+    - DoubleConversion
+    - glog
+    - hermes-engine
+    - RCT-Folly (= 2024.01.01.00)
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Codegen
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-rendererdebug
+    - React-utils
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - Yoga
   - React-nativeconfig (0.74.1)
   - React-NativeModulesApple (0.74.1):
     - glog
@@ -2438,9 +2481,20 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - RNSVG (15.3.0):
+  - RNSound (0.11.2):
+    - React-Core
+    - RNSound/Core (= 0.11.2)
+  - RNSound/Core (0.11.2):
+    - React-Core
+  - RNSVG (15.6.0):
     - React-Core
   - SocketRocket (0.7.0)
+  - VisionCamera (4.5.2):
+    - VisionCamera/Core (= 4.5.2)
+    - VisionCamera/React (= 4.5.2)
+  - VisionCamera/Core (4.5.2)
+  - VisionCamera/React (4.5.2):
+    - React-Core
   - Yoga (0.0.0)
 
 DEPENDENCIES:
@@ -2488,6 +2542,7 @@ DEPENDENCIES:
   - react-native-pdf (from `../node_modules/react-native-pdf`)
   - react-native-restart (from `../node_modules/react-native-restart`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
+  - react-native-video (from `../node_modules/react-native-video`)
   - React-nativeconfig (from `../node_modules/react-native/ReactCommon`)
   - React-NativeModulesApple (from `../node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios`)
   - React-perflogger (from `../node_modules/react-native/ReactCommon/reactperflogger`)
@@ -2527,7 +2582,9 @@ DEPENDENCIES:
   - "RNNotifee (from `../node_modules/@notifee/react-native`)"
   - RNReanimated (from `../node_modules/react-native-reanimated`)
   - RNScreens (from `../node_modules/react-native-screens`)
+  - RNSound (from `../node_modules/react-native-sound`)
   - RNSVG (from `../node_modules/react-native-svg`)
+  - VisionCamera (from `../node_modules/react-native-vision-camera`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
@@ -2641,6 +2698,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-restart"
   react-native-safe-area-context:
     :path: "../node_modules/react-native-safe-area-context"
+  react-native-video:
+    :path: "../node_modules/react-native-video"
   React-nativeconfig:
     :path: "../node_modules/react-native/ReactCommon"
   React-NativeModulesApple:
@@ -2719,8 +2778,12 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-reanimated"
   RNScreens:
     :path: "../node_modules/react-native-screens"
+  RNSound:
+    :path: "../node_modules/react-native-sound"
   RNSVG:
     :path: "../node_modules/react-native-svg"
+  VisionCamera:
+    :path: "../node_modules/react-native-vision-camera"
   Yoga:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
@@ -2789,6 +2852,7 @@ SPEC CHECKSUMS:
   react-native-pdf: 103940c90d62adfd259f63cca99c7c0c306b514c
   react-native-restart: 7595693413fe3ca15893702f2c8306c62a708162
   react-native-safe-area-context: dcab599c527c2d7de2d76507a523d20a0b83823d
+  react-native-video: 9f0b3c888537f9ded698f762f541b13573dd3686
   React-nativeconfig: 21d89c65ca39875fad2c5c465e0e013e514eba21
   React-NativeModulesApple: e2e180dae4486b2978fcf3564cc4c8de4b453a68
   React-perflogger: 3d31e0d1e8ad891e43a09ac70b7b17a79773003a
@@ -2829,8 +2893,10 @@ SPEC CHECKSUMS:
   RNNotifee: 8e2d3df3f0e9ce8f5d1fe4c967431138190b6175
   RNReanimated: 82d44098f1640ac390d073bca26264d52a67dc7d
   RNScreens: 30249f9331c3b00ae7cb7922e11f58b3ed369c07
-  RNSVG: a48668fd382115bc89761ce291a81c4ca5f2fd2e
+  RNSound: 6c156f925295bdc83e8e422e7d8b38d33bc71852
+  RNSVG: 5da7a24f31968ec74f0b091e3440080f347e279b
   SocketRocket: abac6f5de4d4d62d24e11868d7a2f427e0ef940d
+  VisionCamera: b69c637dc7388008c717b9566a006e5f9266fafe
   Yoga: dafebc41bc66910af33077aaa41078e89fd635bf
 
 PODFILE CHECKSUM: a96169537c6b99e7378acae1ff6efc4a134b8f5d

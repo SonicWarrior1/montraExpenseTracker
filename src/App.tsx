@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import RootNavigator from './navigators/RootNavigator';
 import {Provider} from 'react-redux';
@@ -21,6 +21,7 @@ import {AmountModel} from './DbModels/AmountModel';
 import {NotificationModel} from './DbModels/NotificationModel';
 import {ConversionModel} from './DbModels/ConversionModel';
 import {TextInput, TextStyle, Text} from 'react-native';
+import {useCameraPermission} from 'react-native-vision-camera';
 
 firestore().settings({persistence: false});
 interface ExtendedText extends Text {
@@ -40,6 +41,12 @@ function App(): React.JSX.Element {
   (TextInput as unknown as ExtendedTextInput).defaultProps = {
     allowFontScaling: false,
   };
+  const {hasPermission, requestPermission} = useCameraPermission();
+  useEffect(() => {
+    if (!hasPermission) {
+      requestPermission();
+    }
+  }, [hasPermission]);
   return (
     <GestureHandlerRootView style={{flex: 1}}>
       <RealmProvider
