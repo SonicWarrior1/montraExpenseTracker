@@ -1,79 +1,76 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# Expense Tracker App
 
-# Getting Started
+A cross-platform mobile and web application built with **React** and **React Native** for tracking daily expenses and managing budgets. The app offers real-time data synchronization, detailed financial reports, and secure access to help users effectively manage their finances.
 
->**Note**: Make sure you have completed the [React Native - Environment Setup](https://reactnative.dev/docs/environment-setup) instructions till "Creating a new application" step, before proceeding.
+## Features
 
-## Step 1: Start the Metro Server
+- **Expense & Income Tracking:** Log daily expenses and income for easy financial management.
+- **Budget Management:** Set budgets and receive notifications when the limit is exceeded.
+- **Detailed Financial Reports:** Generate comprehensive reports to analyze spending patterns and financial health.
+- **Authentication:** Secure user login and registration using Firebase Authentication.
+- **Realtime Sync:** Data is synchronized across devices in real-time via Firebase.
+- **Offline Access:** Track expenses without an internet connection using Realm.
+- **Data Encryption:** Sensitive data is encrypted to ensure security.
+- **App Lock:** Supports PIN and biometric authentication for added security.
+- **Data Export:** Export financial data to CSV files for easy record-keeping.
 
-First, you will need to start **Metro**, the JavaScript _bundler_ that ships _with_ React Native.
+## Installation
 
-To start Metro, run the following command from the _root_ of your React Native project:
+[<img src="https://github.com/machiav3lli/oandbackupx/blob/034b226cea5c1b30eb4f6a6f313e4dadcbb0ece4/badge_github.png"
+    alt="Get it on GitHub"
+    height="80">](https://github.com/SonicWarrior1/montraExpenseTracker/releases/tag/v1.0.0)
 
+## Run Code
+
+### Prerequisites
+- [Node.js](https://nodejs.org/en/) installed
+- Firebase account setup (for Authentication and Firestore)
+- Realm (for offline access)
+
+### Clone the Repository
 ```bash
-# using npm
-npm start
-
-# OR using Yarn
-yarn start
+git clone https://github.com/yourusername/expense-tracker-app.git
+cd expense-tracker-app
 ```
 
-## Step 2: Start your Application
-
-Let Metro Bundler run in its _own_ terminal. Open a _new_ terminal from the _root_ of your React Native project. Run the following command to start your _Android_ or _iOS_ app:
-
-### For Android
-
+### Install Dependencies
 ```bash
-# using npm
-npm run android
-
-# OR using Yarn
-yarn android
+yarn
 ```
 
-### For iOS
+### Firebase Setup
+- Go to the Firebase Console, create a new project, and enable Firebase Authentication and Firestore.
+- For Android, download the google-services.json file from Firebase and place it in the android/app folder of your project
+- For iOS, download the GoogleService-Info.plist file from Firebase and place it in the ios directory of your project
+- Update your Firebase configuration settings in the app as needed
+
+### Switch to Development Branch
+To switch to development branch, use the following command:
 
 ```bash
-# using npm
-npm run ios
-
-# OR using Yarn
-yarn ios
+git checkout development
 ```
 
-If everything is set up _correctly_, you should see your new app running in your _Android Emulator_ or _iOS Simulator_ shortly provided you have set up your emulator/simulator correctly.
+### Run the App
+- For Android
+  
+     ```bash
+     npx react-native run-android
+     ```
 
-This is one way to run your app — you can also run it directly from within Android Studio and Xcode respectively.
+- For IOS
+  
+     ```bash
+     cd ios && pod install && cd ..
+     npx react-native run-ios
+     ```
 
-## Step 3: Modifying your App
+### Usage
+- Register or log in using Firebase Authentication.
+- Track your daily expenses and incomes.
+- Set budgets for categories and receive alerts when limits are exceeded.
+- View detailed reports on your financial activity.
+- Export data to CSV for easy record-keeping.
 
-Now that you have successfully run the app, let's modify it.
-
-1. Open `App.tsx` in your text editor of choice and edit some lines.
-2. For **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Developer Menu** (<kbd>Ctrl</kbd> + <kbd>M</kbd> (on Window and Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (on macOS)) to see your changes!
-
-   For **iOS**: Hit <kbd>Cmd ⌘</kbd> + <kbd>R</kbd> in your iOS Simulator to reload the app and see your changes!
-
-## Congratulations! :tada:
-
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [Introduction to React Native](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you can't get this to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+### Contributing
+Pull requests are welcome. For major changes, please open an issue first to discuss the changes.
