@@ -2,6 +2,8 @@
 
 A cross-platform mobile and web application built with **React** and **React Native** for tracking daily expenses and managing budgets. The app offers real-time data synchronization, detailed financial reports, and secure access to help users effectively manage their finances.
 
+![Cover (1)](https://github.com/user-attachments/assets/2ebe86e3-f655-4bac-84a3-5448edf45f40)
+
 ## Features
 
 - **Expense & Income Tracking:** Log daily expenses and income for easy financial management.
